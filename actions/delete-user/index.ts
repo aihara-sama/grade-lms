@@ -7,9 +7,16 @@ import type { ReturnType } from "./types";
 
 const handler = async (userId: string): Promise<ReturnType> => {
   const currentUserPromise = createClient().auth.getUser();
-  const targetUserPromise = supabaseAdmin.from("users").select("creator_id").eq("id", userId).single();
+  const targetUserPromise = supabaseAdmin
+    .from("users")
+    .select("creator_id")
+    .eq("id", userId)
+    .single();
 
-  const [currentUser, targetUser] = await Promise.all([currentUserPromise, targetUserPromise]);
+  const [currentUser, targetUser] = await Promise.all([
+    currentUserPromise,
+    targetUserPromise,
+  ]);
 
   if (!currentUser.data.user) {
     return {
