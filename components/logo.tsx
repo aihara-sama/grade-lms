@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { FunctionComponent } from "react";
-
+let a = "";
+a = 2;
 interface IProps {}
 
 const Logo: FunctionComponent<IProps> = () => {
