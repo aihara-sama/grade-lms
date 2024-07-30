@@ -1,9 +1,10 @@
 import type { FunctionComponent } from "react";
 
-interface Props {
+interface IProps {
   className?: string;
 }
-const OverviewIcon: FunctionComponent<Props> = ({ className }) => {
+
+const OverviewIcon: FunctionComponent<IProps> = ({ className }) => {
   return (
     <svg
       width="14"
