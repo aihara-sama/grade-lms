@@ -35,7 +35,28 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        reddy: "blue",
+        primary: "#555555",
+        link: "#1C92FF",
+        light: "#8a8a8a",
+        white: "#fff",
+        black: "#000",
+        divider: "#d9d9d936",
+        transparent: "#ffffff00",
+
+        blue: {
+          100: "#3D9BF1",
+          200: "#3194ee",
+          300: "#0e7fe7",
+        },
+        dark: {
+          "100": "#00000029",
+          "200": "#00000069",
+        },
+        gray: {
+          100: "#f6f6f6",
+          200: "#e9e9e9",
+          500: "#d9d9d9",
+        },
       },
     },
   },
