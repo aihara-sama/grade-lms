@@ -38,6 +38,12 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.tsx", "**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.tsx",
+    "**/*.ts",
+    "**/*.css"
+  ],
   "exclude": ["node_modules", "supabase"]
 }

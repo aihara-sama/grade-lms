@@ -40,7 +40,6 @@
     "@types/react-datepicker": "^6.0.1",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "^7.0.2",
     "eslint": "^8",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.1.0",
