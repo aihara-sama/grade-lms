@@ -1,18 +1,18 @@
 import type { FunctionComponent } from "react";
 
-interface Props {
+interface IProps {
   className?: string;
 }
 
-const UsersIcon: FunctionComponent<Props> = ({ className }) => {
+const UsersIcon: FunctionComponent<IProps> = ({ className }) => {
   return (
     <svg
       width="14"
       height="12"
+      className={className}
       viewBox="0 0 14 12"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
     >
       <path
         fillRule="evenodd"

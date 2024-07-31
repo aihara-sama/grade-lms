@@ -16,7 +16,7 @@ const MobileDrawer: FunctionComponent<Props> = ({ navItems }) => {
       {/* Hamburger */}
       <div
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex md:hidden h-5 w-6 z-[2] flex-col justify-between cursor-pointer ml-auto left-5 top-4"
+        className="flex md:hidden h-5 w-6 z-[2] flex-col justify-between cursor-pointer ml-4 left-5 top-4"
       >
         {[...Array(3)].map((_, idx) => (
           <span className="block h-1 w-full rounded-lg bg-black" key={idx} />

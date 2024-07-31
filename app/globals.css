@@ -8,6 +8,9 @@
   }
 }
 @layer components {
+  .icon-button {
+    @apply cursor-pointer rounded-[50%] p-[7px] w-[32px] h-[32px] flex justify-center items-center bg-white;
+  }
 }
 @layer utilities {
 }
