@@ -1,14 +1,22 @@
 import type { FunctionComponent } from "react";
 
+enum Size {
+  sm = 16,
+  original = 30,
+}
 interface Props {
   className?: string;
+  size?: keyof typeof Size;
 }
 
-const AvatarIcon: FunctionComponent<Props> = ({ className }) => {
+const AvatarIcon: FunctionComponent<Props> = ({
+  className,
+  size = "original",
+}) => {
   return (
     <svg
-      width="30"
-      height="30"
+      width={Size[size]}
+      height={Size[size]}
       className={className}
       viewBox="0 0 30 30"
       fill="none"

@@ -1,5 +1,6 @@
 import type { NavItem } from "@/interfaces/navigation.interface";
-import { ROLES } from "@/interfaces/user.interface";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import type { User as IUser } from "@supabase/supabase-js";
 import type { FunctionComponent } from "react";
 import MobileDrawer from "../drawers/mobile-drawer";
 import CalendarIcon from "../icons/calendar-icon";
@@ -33,14 +34,19 @@ const navItems: NavItem[] = [
     Icon: <CalendarIcon />,
   },
 ];
-
-const Header: FunctionComponent = () => {
+interface IProps {
+  user: IUser;
+}
+const Header: FunctionComponent<IProps> = ({ user }) => {
   return (
     <div className="flex p-4 items-center shadow-lg">
       <Logo />
       <Nav navItems={navItems} />
       <QuickActions />
-      <User role={ROLES.TEACHER} userName="Aihara" />
+      <User
+        userName={(user.user_metadata as IUserMetadata).name}
+        role={(user.user_metadata as IUserMetadata).role}
+      />
       <MobileDrawer navItems={navItems} />
     </div>
   );

@@ -11,6 +11,13 @@
   .icon-button {
     @apply cursor-pointer rounded-[50%] p-[7px] w-[32px] h-[32px] flex justify-center items-center bg-white;
   }
+
+  .primary-button {
+    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[8px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300;
+  }
+  .page-title {
+    @apply text-[32px] font-bold max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden;
+  }
 }
 @layer utilities {
 }

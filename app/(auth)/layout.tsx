@@ -1,5 +1,5 @@
-import Header from "@/components/header";
 import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
@@ -7,12 +7,10 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
     data: { user },
   } = await createClient().auth.getUser();
 
-  return (
-    <>
-      <Header user={user} />
-      {children}
-    </>
-  );
+  if (user) {
+    return redirect("/dashboard");
+  }
+  return <>{children}</>;
 };
 
 export default Layout;
