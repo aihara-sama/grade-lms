@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const latoFont = Lato({
-  weight: ["700"],
+  weight: ["100", "300", "400", "700", "900"],
   subsets: ["latin"],
 });
 export const metadata: Metadata = {

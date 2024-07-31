@@ -42,6 +42,7 @@ const config: Config = {
         black: "#000",
         divider: "#d9d9d936",
         transparent: "#ffffff00",
+        mask: "#00000061",
 
         blue: {
           100: "#3D9BF1",

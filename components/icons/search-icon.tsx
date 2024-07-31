@@ -1,14 +1,16 @@
 import type { FunctionComponent } from "react";
+import { IconSize } from ".";
 
 interface IProps {
   className?: string;
+  size?: keyof typeof IconSize;
 }
 
-const SearchIcon: FunctionComponent<IProps> = ({ className }) => {
+const SearchIcon: FunctionComponent<IProps> = ({ className, size }) => {
   return (
     <svg
-      width="18"
-      height="18"
+      width={IconSize[size] || 18}
+      height={IconSize[size] || 18}
       className={className}
       viewBox="0 0 18 18"
       fill="none"

@@ -16,7 +16,7 @@
     "supabase:start": "npx supabase start",
     "supabase:db:reset": "npx supabase db reset",
     "supabase:gen-types": "npx supabase gen types typescript --local --schema public > types/supabase.type.ts",
-    "supabase:restart": "yarn supabase:db:reset && yarn supabase:gen-types"
+    "supabase:status": "npx supabase:status"
   },
   "dependencies": {
     "@supabase/ssr": "^0.1.0",
@@ -30,7 +30,9 @@
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
     "zod": "^3.22.4",
-    "zustand": "^4.5.2"
+    "zustand": "^4.5.2",
+    "chart.js": "^4.4.1",
+    "react-chartjs-2": "^5.2.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.6.1",

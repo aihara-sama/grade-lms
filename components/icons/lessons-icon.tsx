@@ -1,14 +1,16 @@
 import type { FunctionComponent } from "react";
 
+import { IconSize } from ".";
+
 interface Props {
   className?: string;
+  size?: keyof typeof IconSize;
 }
-
-const LessonsIcon: FunctionComponent<Props> = ({ className }) => {
+const LessonsIcon: FunctionComponent<Props> = ({ className, size }) => {
   return (
     <svg
-      width="14"
-      height="16"
+      width={IconSize[size] || 14}
+      height={IconSize[size] || 16}
       className={className}
       viewBox="0 0 14 14"
       fill="none"

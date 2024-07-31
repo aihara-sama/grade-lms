@@ -50,7 +50,7 @@ const SignUp: FunctionComponent<IProps> = () => {
         <Input
           name="name"
           type="text"
-          Icon={<AvatarIcon size="sm" />}
+          Icon={<AvatarIcon size="xs" />}
           placeholder="Name"
           fullWidth
           bottomSpacing

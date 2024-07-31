@@ -8,10 +8,10 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
   } = await createClient().auth.getUser();
 
   return (
-    <>
+    <div className="overflow-auto h-full flex-col">
       <Header user={user} />
       {children}
-    </>
+    </div>
   );
 };
 
