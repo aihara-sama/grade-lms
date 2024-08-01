@@ -4,7 +4,7 @@ interface Props {
   className?: string;
 }
 
-const ShrinkHorizontalcon: FunctionComponent<Props> = ({ className }) => {
+const ShrinkHorizontalIcon: FunctionComponent<Props> = ({ className }) => {
   return (
     <svg
       width="14"
@@ -38,4 +38,4 @@ const ShrinkHorizontalcon: FunctionComponent<Props> = ({ className }) => {
   );
 };
 
-export default ShrinkHorizontalcon;
+export default ShrinkHorizontalIcon;

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
-import Tab from "./Tab";
+import Tab from "./tab";
 
 interface IItem {
   title: string;

@@ -26,7 +26,7 @@ const BetterTable: FunctionComponent<IProps> = ({ data }) => {
           {data.map((row, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-[12px] px-[10px] py-[6px]  hover:bg-gray-200"
+              className="flex items-center gap-[12px] px-[10px] py-[6px]  hover:bg-gray-100"
             >
               {keys.map((key, i) => (
                 <div

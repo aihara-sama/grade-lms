@@ -6,7 +6,7 @@ interface IProps {
   close: () => void;
   title: string;
   content: JSX.Element;
-  width?: number;
+  width?: "md" | "lg";
   buttons?: ReactNode;
 }
 
@@ -15,7 +15,7 @@ const Modal: FunctionComponent<IProps> = ({
   content,
   close,
   buttons,
-  width = 400,
+  width = "md",
 }) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -31,7 +31,7 @@ const Modal: FunctionComponent<IProps> = ({
         onClick={close}
       ></div>
       <div
-        className={`items-center flex-col z-[999] rounded-[5px] w-[${width}px] shadow-md bg-white`}
+        className={`items-center flex-col z-[999] rounded-[5px] shadow-md bg-white ${width === "md" ? "w-[400px]" : "w-[680px]"}`}
       >
         <div className="px-[24px] py-[14px] flex items-center justify-between shadow-sm">
           <p className="font-bold">{title}</p>

@@ -18,6 +18,7 @@ interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   onClick?: React.MouseEventHandler<HTMLInputElement>;
   ref?: ForwardedRef<HTMLInputElement>;
   type?: InputHTMLAttributes<HTMLInputElement>["type"];
+  className?: string;
 }
 
 const Input: FunctionComponent<IProps> = ({
@@ -30,13 +31,17 @@ const Input: FunctionComponent<IProps> = ({
   onClick,
   ref,
   type,
+  className,
   ...inputProps
 }) => {
   const [inputType, setInputType] = useState(type);
 
   return (
-    <div onClick={onClick} className={`${bottomSpacing ? "mb-3" : "ml-0"}`}>
-      {label && <p className="mb-[6px]">{label}</p>}
+    <div
+      onClick={onClick}
+      className={`${bottomSpacing ? "mb-3" : "ml-0"} ${className}`}
+    >
+      {label && <p className="mb-1 text-sm font-bold">{label}</p>}
       <div className="relative">
         <div className="absolute top-2/4 left-[14px] flex > *:translate-y-[-50%]">
           {Icon}
