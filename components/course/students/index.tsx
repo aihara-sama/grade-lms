@@ -22,7 +22,7 @@ const Students: FunctionComponent<IProps> = ({ users }) => {
                 title={user.name}
                 subtitle={user.role}
               />
-              <button className="icon-button">
+              <button className="icon-button hover:bg-gray-100 active:bg-gray-200">
                 <MessagesIcon />
               </button>
             </div>

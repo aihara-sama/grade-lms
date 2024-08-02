@@ -17,7 +17,7 @@ const IconTitle: FunctionComponent<IProps> = ({
   onClick,
 }) => {
   const contents = (
-    <div className="flex items-center gap-[12px] text-primary [&>.icon]:rounded-[50%] [&>.icon]p-[4px] [&>.icon]w-[40px] [&>.icon]h-[40px] [&>.icon]flex justify-center [&>.icon]items-center [&>.icon]text-sm shadow-sm ">
+    <div className="flex items-center gap-[12px] text-primary [&>.icon]:rounded-[50%] [&>.icon]p-[4px] [&>.icon]w-[40px] [&>.icon]h-[40px] [&>.icon]flex justify-center [&>.icon]items-center [&>.icon]text-sm">
       {Icon}
       <div className="flex flex-col justify-between gap-[2px] overflow-hidden flex-[1]">
         {href ? (

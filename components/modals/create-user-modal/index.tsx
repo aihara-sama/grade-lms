@@ -50,9 +50,9 @@ const CreateUserModal: FunctionComponent<IProps> = ({ closeModal, onDone }) => {
               },
             ]}
           />
-          <hr />
+          <hr className="mb-4" />
           <div className="group-buttons">
-            <button className="putline-button w-full">
+            <button className="outline-button w-full">
               Create & add another
             </button>
             <button className="primary-button w-full" type="submit">

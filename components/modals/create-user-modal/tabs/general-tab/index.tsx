@@ -11,13 +11,13 @@ const GeneralTab: FunctionComponent<IProps> = () => {
     <>
       <Input
         name="name"
-        Icon={<AvatarIcon size="sm" />}
+        Icon={<AvatarIcon size="xs" />}
         placeholder="Name"
         bottomSpacing
         fullWidth
       />
       <Input
-        Icon={<EmailIcon size="sm" />}
+        Icon={<EmailIcon size="xs" />}
         placeholder="Email"
         bottomSpacing
         fullWidth
@@ -26,7 +26,7 @@ const GeneralTab: FunctionComponent<IProps> = () => {
       />
       <Input
         name="password"
-        Icon={<SecurityIcon size="sm" />}
+        Icon={<SecurityIcon size="xs" />}
         placeholder="Password"
         fullWidth
         type="password"
