@@ -26,8 +26,6 @@ const Select: FunctionComponent<IProps> = ({
   useBottomSpacing,
   useTopSpacing,
 }) => {
-  console.log({ items });
-
   const [isItemsPopperOpen, setIsItemsPopperOpen] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState<IItem>(
@@ -37,7 +35,7 @@ const Select: FunctionComponent<IProps> = ({
   return (
     <div className="relative">
       <div
-        className={`relative border-[1px] border-solid flex items-center justify-between px-[12px] py-[8px] rounded-[5px] cursor-pointer bg-[white] [transition:0.2s] w-[${fullWidth ? "100%" : "150px"}] ${useBottomSpacing ? "mb-2" : "mb-0"} ${
+        className={`relative border-[1px] border-solid flex items-center justify-between px-[12px] py-[8px] rounded-[5px] cursor-pointer bg-[white] [transition:0.2s] ${fullWidth ? "w-[100%]" : "w-[150px]"} ${useBottomSpacing ? "mb-2" : "mb-0"} ${
           useTopSpacing ? "mt-2" : "mt-0"
         } hover:bg-slate-100 active:bg-slate-200`}
         onClick={() => {

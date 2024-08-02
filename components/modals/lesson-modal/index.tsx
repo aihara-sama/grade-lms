@@ -6,6 +6,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
+import Select from "@/components/select";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import {
@@ -27,14 +28,21 @@ interface IProps {
   >[];
   close: () => void;
   onDone: () => void;
+  includeCoursesSelect?: boolean;
 }
 
-const LessonModal: FunctionComponent<IProps> = ({ lesson, close, onDone }) => {
+const LessonModal: FunctionComponent<IProps> = ({
+  lesson,
+  close,
+  onDone,
+  courses,
+  includeCoursesSelect = false,
+}) => {
   const router = useRouter();
   const [starts, setStarts] = useState<Date>(new Date(lesson.starts));
   const [ends, setEnds] = useState<Date>(new Date(lesson.ends));
   const [lessonTitle, setLessonTitle] = useState<string>(lesson.title);
-  const [courseId] = useState(lesson.course_id);
+  const [courseId, setCourseId] = useState(lesson.course_id);
   const duration = +new Date(ends) - +new Date(starts);
 
   const handleSaveLesson = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -113,14 +121,16 @@ const LessonModal: FunctionComponent<IProps> = ({ lesson, close, onDone }) => {
       content={
         <div className="">
           <form onSubmit={handleSaveLesson} id="create-lesson-form">
-            {/* <Select
-              fullWidth
-              label="Course"
-              defaultItemId={courseId}
-              onChange={(item) => setCourseId(item.id)}
-              items={courses}
-              useBottomSpacing
-            /> */}
+            {includeCoursesSelect && (
+              <Select
+                fullWidth
+                label="Course"
+                defaultItemId={courseId}
+                onChange={(item) => setCourseId(item.id)}
+                items={courses}
+                useBottomSpacing
+              />
+            )}
             <Input
               name="title"
               bottomSpacing

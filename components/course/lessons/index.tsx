@@ -27,7 +27,6 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
   const [isAssignmentsModalOpen, setIsAssignmentsModalOpen] = useState(false);
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [selectedLessonId, setSelectedLessonId] = useState<string>();
-  console.log({ lessons, selectedLessonId });
 
   const getLessons = async () => {
     const data = await supabaseClient
