@@ -1,12 +1,35 @@
 import type { NavItem } from "@/interfaces/navigation.interface";
+import { supabaseClient } from "@/utils/supabase/client";
+import { addMinutes, format } from "date-fns";
+import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
+import toast from "react-hot-toast";
 
 interface Props {
   navItems: NavItem[];
 }
 
 const Nav: FunctionComponent<Props> = ({ navItems }) => {
+  const router = useRouter();
+
+  const handleCreateLesson = async () => {
+    const { error, data } = await supabaseClient
+      .from("lessons")
+      .insert({
+        starts: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        ends: format(addMinutes(new Date(), 30), "yyyy-MM-dd'T'HH:mm:ss"),
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      router.push(`/dashboard/lessons/${data.id}`);
+    }
+  };
+
   return (
     <div className="hidden md:flex items-center gap-8 ml-9">
       {navItems.map(({ title, href, Icon }, idx) => (
@@ -15,6 +38,10 @@ const Nav: FunctionComponent<Props> = ({ navItems }) => {
           <span className="text-sm"> {title}</span>
         </Link>
       ))}
+
+      <button className="primary-button" onClick={handleCreateLesson}>
+        Quick lesson
+      </button>
     </div>
   );
 };

@@ -19,7 +19,7 @@ const UserNamePrompt: FunctionComponent<IProps> = () => {
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
         fullWidth
-        Icon={<AvatarIcon size="sm" />}
+        Icon={<AvatarIcon size="xs" />}
         label="Enter your name"
         bottomSpacing
         autoFocus

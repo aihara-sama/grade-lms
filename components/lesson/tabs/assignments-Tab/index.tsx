@@ -36,7 +36,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
       <div className="mb-[12px] flex flex-col gap-[6px]">
         {assignments.map((assignment) => (
           <div
-            className="flex items-center justify-between cursor-pointer p-[8px] hover:bg-slate-200"
+            className="flex items-center justify-between cursor-pointer p-[8px] hover:bg-slate-100"
             key={assignment.id}
           >
             <CardTitle
@@ -46,7 +46,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
               onClick={() => setCurrentAssignmentId(assignment.id)}
             />
             <div className="flex items-center gap-[12px]">
-              <button className="icon-button shadow-md">
+              <button className="icon-button shadow-md hover:bg-gray-100 active:bg-gray-200">
                 <DeleteIcon />
               </button>
             </div>

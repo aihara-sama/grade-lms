@@ -27,5 +27,7 @@
     "*.css": "tailwindcss"
   },
   "tailwindCSS.emmetCompletions": true,
-  "deno.enable": false
+  "deno.enable": false,
+  "spellright.language": ["en"],
+  "spellright.documentTypes": ["markdown", "latex", "plaintext"]
 }

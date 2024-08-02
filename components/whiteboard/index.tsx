@@ -45,7 +45,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
   const containerRef = useRef<HTMLDivElement>();
   const pointerEventRef =
     useRef<Parameters<ExcalidrawProps["onPointerUpdate"]>[0]>();
-  const { isExpanded } = useIsLessonHrExpanded();
+  const { isExpanded, setIsExpanded } = useIsLessonHrExpanded();
 
   // useEffect(() => {
   //   if (
@@ -131,7 +131,10 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
             </button>
             29min
           </div>
-          <button className="icon-button shadow-md">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="icon-button shadow-md"
+          >
             {isExpanded ? <ShrinkHorizontalcon /> : <ExpandHorizontalIcon />}
           </button>
           <button className="primary-button" onClick={handleInvite}>
@@ -140,7 +143,10 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
         </div>
       </div>
       <div
-        className={`relative border border-gray-200 h-[${whiteboardHeight + 100}px] [&>.excalidraw]h-[${whiteboardHeight}px] ${role === ROLES.STUDENT || role === ROLES.GUEST ? "[&>.excalidraw .App-menu_top]hidden [&>.excalidraw .layer-ui__wrapper__footer-right]hidden [&>.excalidraw .undo-redo-buttons]hidden" : ""}`}
+        className={`relative border border-gray-200 [&>.excalidraw]h-[${whiteboardHeight}px] ${role === ROLES.STUDENT || role === ROLES.GUEST ? "[&>.excalidraw .App-menu_top]:hidden [&>.excalidraw .layer-ui__wrapper__footer-right]:hidden [&>.excalidraw .undo-redo-buttons]:hidden" : ""} [&>.excalidraw]:h-[calc(100%-100px)]`}
+        style={{
+          height: `${whiteboardHeight}px`,
+        }}
       >
         <Excalidraw
           isCollaborating
