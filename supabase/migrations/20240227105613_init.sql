@@ -101,7 +101,8 @@ create table assignments (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   lesson_id uuid references public.lessons on delete cascade not null,
   title text not null,
-  body text default '{}' not null
+  body text default '{}' not null,
+  due_date timestamp not null
 );
 
 create table submissions (
@@ -121,8 +122,8 @@ begin
     values (new_course_id, new_title, new_starts, new_ends)
     returning id into lesson_id;
 
-    insert into public.assignments (lesson_id, title, body)
-    select lesson_id, assignment->>'title', assignment->>'body'
+    insert into public.assignments (lesson_id, title, body, due_date)
+    select lesson_id, assignment->>'title', assignment->>'body', assignment->>'due_date'
     from json_array_elements(new_assignments) as assignment;
 
     return lesson_id;

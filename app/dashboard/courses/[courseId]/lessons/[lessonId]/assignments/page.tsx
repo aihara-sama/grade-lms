@@ -1,6 +1,7 @@
 import Assignments from "@/components/assignments";
-import LessonHeader from "@/components/lesson/lesson-header";
+import LessonHeader from "@/components/live-lesson/lesson-header";
 import { supabaseClient } from "@/utils/supabase/client";
+
 import { type FunctionComponent } from "react";
 
 interface IProps {
@@ -27,7 +28,7 @@ const Page: FunctionComponent<IProps> = async ({
   return (
     <div>
       <LessonHeader course={course.data} lesson={lesson.data} />
-      <Assignments courseId={courseId} lessonId={lessonId} />
+      <Assignments lessonId={lessonId} />
     </div>
   );
 };

@@ -1,26 +1,25 @@
 "use client";
 
 import CreateAssignment from "@/components/assignments/create-assignment";
-import BetterTable from "@/components/better-table";
 import CardsContainer from "@/components/cards-container";
 import IconTitle from "@/components/icon-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
-import AddAssignmentModal from "@/components/modals/add-assignment-modal";
+import Table from "@/components/table";
 import Total from "@/components/total";
-import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 
+import AssignmentModal from "@/components/modals/assignment-modal";
+import type { Assignment } from "@/types/assignments.type";
+
 interface IProps {
   lessonId: string;
-  courseId: string;
 }
 const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
-  const [assignments, setAssignments] = useState<
-    Database["public"]["Tables"]["assignments"]["Row"][]
-  >([]);
+  // States
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [currentAssignmentId, setCurrentAssignmentId] = useState<
     string | undefined
   >();
@@ -33,6 +32,8 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
 
     setAssignments(data.data);
   };
+
+  // Effects
   useEffect(() => {
     getAssignments();
   }, []);
@@ -49,7 +50,7 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
         <CreateAssignment lessonId={lessonId} onDone={getAssignments} />
       </CardsContainer>
       <Input Icon={<SearchIcon />} placeholder="Search" />
-      <BetterTable
+      <Table
         data={assignments.map(({ id, title }) => ({
           Name: (
             <IconTitle
@@ -63,14 +64,13 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
         }))}
       />
       {currentAssignmentId && (
-        <AddAssignmentModal
-          lessonId={lessonId}
+        <AssignmentModal
           assignmentId={currentAssignmentId}
           onDone={() => {
             getAssignments();
             setCurrentAssignmentId(undefined);
           }}
-          closeModal={() => setCurrentAssignmentId(undefined)}
+          close={() => setCurrentAssignmentId(undefined)}
         />
       )}
     </>

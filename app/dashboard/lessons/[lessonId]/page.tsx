@@ -1,4 +1,4 @@
-import Lesson from "@/components/lesson";
+import LiveLesson from "@/components/live-lesson";
 import { supabaseClient } from "@/utils/supabase/client";
 import { createClient } from "@/utils/supabase/server";
 import { type FunctionComponent } from "react";
@@ -19,7 +19,7 @@ const Page: FunctionComponent<IProps> = async ({ params: { lessonId } }) => {
     .eq("id", lessonId)
     .single();
 
-  return <Lesson lesson={lesson.data} user={user} lessonId={lessonId} />;
+  return <LiveLesson lesson={lesson.data} user={user} />;
 };
 
 export default Page;

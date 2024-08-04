@@ -41,15 +41,16 @@ const LessonSettings: FunctionComponent<IProps> = ({
       <p className="section-title">Settings</p>
       <div className="rename-wrapper">
         <p>Lesson name</p>
-        <div className="flex items-stretch gap-[4px]">
+        <div className="flex gap-1">
           <Input
             Icon={<CourseIcon size="xs" />}
             value={lessonTitle}
             onChange={(e) => setLessonTitle(e.target.value)}
+            className="mb-auto"
           />
           <button
             disabled={!lessonTitle}
-            className="primary-button w-[100px]"
+            className="primary-button w-24"
             onClick={handleRenameLesson}
           >
             Save

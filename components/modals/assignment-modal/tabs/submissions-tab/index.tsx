@@ -12,18 +12,18 @@ const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
   return (
     <div>
       <Table
-        useFullWidth
-        rows={submissions.map(({ author, id, created }) => [
-          <IconTitle
-            Icon={<AvatarIcon size="lg" />}
-            key={id}
-            title={author.name}
-            subtitle={author.role}
-            href={`/users/${id}`}
-          />,
-          created,
-        ])}
-        titles={["Author", "Submitted"]}
+        data={submissions.map(({ id, author, created }) => ({
+          Author: (
+            <IconTitle
+              Icon={<AvatarIcon size="md" />}
+              key={id}
+              title={author.name}
+              subtitle={author.role}
+              href={`/users/${id}`}
+            />
+          ),
+          Submitted: created,
+        }))}
       />
     </div>
   );

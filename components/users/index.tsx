@@ -5,13 +5,13 @@ import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
-import BetterTable from "../better-table";
 import DeleteButton from "../buttons/delete-button";
 import CardsContainer from "../cards-container";
 import IconTitle from "../icon-title";
 import AvatarIcon from "../icons/avatar-icon";
 import SearchIcon from "../icons/search-icon";
 import Input from "../input";
+import Table from "../table";
 import Total from "../total";
 import CreateUser from "./CreateUser";
 
@@ -47,7 +47,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
         <CreateUser onDone={getUsers} />
       </CardsContainer>
       <Input Icon={<SearchIcon />} placeholder="Search" />
-      <BetterTable
+      <Table
         data={users.map(({ name, role, id }) => ({
           Name: (
             <IconTitle

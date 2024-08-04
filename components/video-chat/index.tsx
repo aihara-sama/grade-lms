@@ -1,12 +1,13 @@
 "use client";
 
 import Camera from "@/components/camera";
+import { useEffect, useRef, useState } from "react";
+
 import type { ICamera } from "@/interfaces/camera.interface";
 import type { ROLES } from "@/interfaces/user.interface";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import type Peer from "peerjs";
 import type { FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
 
 interface IProps {
   lessonId: string;
@@ -22,10 +23,72 @@ const VideoChat: FunctionComponent<IProps> = ({
   userName,
   role,
 }) => {
+  // State
   const [peer, setPeer] = useState<Peer>();
   const [cameras, setCameras] = useState<ICamera[]>([]);
+
+  // Refs
   const localStreamRef = useRef<MediaStream>();
 
+  // Handlers
+
+  const addCamera = (
+    stream: MediaStream,
+    id: string,
+    _userName: string,
+    _role: ROLES
+  ) => {
+    setCameras((prev) => {
+      if (!prev.find((camera) => camera.stream.id === stream.id)) {
+        return [
+          ...prev,
+          {
+            stream,
+            isCameraEnabled: true,
+            isMicEnabled: true,
+            anonId: id,
+            role: _role,
+            userName: _userName,
+          },
+        ];
+      }
+      return prev;
+    });
+  };
+  const join = async () => {
+    channel
+      .on("presence", { event: "join" }, (payload) => {
+        if (payload.key !== anonId) {
+          Object.keys(channel.presenceState())
+            .filter((id) => id !== anonId)
+            .forEach((id) => {
+              const outgoingCall = peer.call(id, localStreamRef.current, {
+                metadata: {
+                  anonId,
+                  role,
+                  userName,
+                },
+              });
+
+              outgoingCall.on("stream", (remoteStream) => {
+                addCamera(remoteStream, id, userName, role);
+              });
+            });
+        }
+      })
+      .on("presence", { event: "leave" }, (payload) => {
+        setCameras((prev) =>
+          prev.filter((camera) => camera.anonId !== payload.key)
+        );
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({
+            user_id: anonId,
+          });
+        }
+      });
+  };
   const toggleCamera = (id: string) => {
     setCameras((prev) => {
       return prev.map((cam) => {
@@ -71,6 +134,14 @@ const VideoChat: FunctionComponent<IProps> = ({
     });
   };
 
+  // Effects
+  useEffect(() => {
+    return () => {
+      localStreamRef.current?.getTracks().forEach((track) => {
+        track.stop();
+      });
+    };
+  }, []);
   useEffect(() => {
     channel.on("broadcast", { event: "camera:toggle" }, (payload) => {
       toggleCamera(payload.payload.anonId);
@@ -79,81 +150,12 @@ const VideoChat: FunctionComponent<IProps> = ({
       toggleAudio(payload.payload.anonId);
     });
   }, []);
-
-  const addCamera = (
-    stream: MediaStream,
-    id: string,
-    _userName: string,
-    _role: ROLES
-  ) => {
-    setCameras((prev) => {
-      if (!prev.find((camera) => camera.stream.id === stream.id)) {
-        return [
-          ...prev,
-          {
-            stream,
-            isCameraEnabled: true,
-            isMicEnabled: true,
-            anonId: id,
-            role: _role,
-            userName: _userName,
-          },
-        ];
-      }
-      return prev;
-    });
-  };
-
-  useEffect(() => {
-    return () => {
-      localStreamRef.current?.getTracks().forEach((track) => {
-        track.stop();
-      });
-    };
-  }, []);
-
-  const join = async () => {
-    channel
-      .on("presence", { event: "join" }, (payload) => {
-        if (payload.key !== anonId) {
-          Object.keys(channel.presenceState())
-            .filter((id) => id !== anonId)
-            .forEach((id) => {
-              const outgoingCall = peer.call(id, localStreamRef.current, {
-                metadata: {
-                  anonId,
-                  role,
-                  userName,
-                },
-              });
-
-              outgoingCall.on("stream", (remoteStream) => {
-                addCamera(remoteStream, id, userName, role);
-              });
-            });
-        }
-      })
-      .on("presence", { event: "leave" }, (payload) => {
-        setCameras((prev) =>
-          prev.filter((camera) => camera.anonId !== payload.key)
-        );
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({
-            user_id: anonId,
-          });
-        }
-      });
-  };
-
   useEffect(() => {
     // Handle SSR for navigator
     import("peerjs").then(({ default: Peer }) => {
       setPeer(new Peer(anonId));
     });
   }, []);
-
   useEffect(() => {
     if (peer) {
       peer.on("open", () => {
@@ -206,9 +208,10 @@ const VideoChat: FunctionComponent<IProps> = ({
     };
   }, [peer]);
 
+  // View
   return (
-    <div className="flex flex-col flex-[1]">
-      <div className="flex flex-col gap-[12px]">
+    <div className="flex flex-col flex-1">
+      <div className="flex flex-col gap-3">
         {cameras.map((camera, idx) => (
           <Camera
             toggleCamera={(id) => {

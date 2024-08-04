@@ -5,29 +5,39 @@ import type { FunctionComponent, MouseEvent, MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
 interface IProps {
-  onChange: (height: number) => void;
+  onResize: (height: number) => void;
   containerRef: MutableRefObject<HTMLElement>;
   minHeight: number;
   initialHeight: number;
 }
 
 const ResizeHandler: FunctionComponent<IProps> = ({
-  onChange,
+  onResize,
   containerRef,
   minHeight,
   initialHeight,
 }) => {
-  const isResizeHandlerPressedRef = useRef(false);
-  const initialHeightRef = useRef(initialHeight);
+  // Refs
   const heightRef = useRef(initialHeight);
   const startResizeYRef = useRef<number>();
+  const initialHeightRef = useRef(initialHeight);
+  const isResizeHandlerPressedRef = useRef(false);
 
+  // State
   const [height, setHeight] = useState(initialHeightRef.current);
 
-  useEffect(() => {
-    onChange(height);
-  }, [height]);
+  // Handlers
+  const handleMouseDown = (e: MouseEvent) => {
+    isResizeHandlerPressedRef.current = true;
 
+    startResizeYRef.current =
+      e.clientY - containerRef.current.getBoundingClientRect().top;
+  };
+
+  // Effects
+  useEffect(() => {
+    onResize(height);
+  }, [height]);
   useEffect(() => {
     window.addEventListener("mousemove", (e) => {
       if (isResizeHandlerPressedRef.current) {
@@ -47,17 +57,9 @@ const ResizeHandler: FunctionComponent<IProps> = ({
     });
   }, []);
 
-  const handleMouseDown = (e: MouseEvent) => {
-    isResizeHandlerPressedRef.current = true;
-
-    startResizeYRef.current =
-      e.clientY - containerRef.current.getBoundingClientRect().top;
-  };
+  // View
   return (
-    <div
-      className="absolute bottom-[24px] right-[24px]"
-      onMouseDown={handleMouseDown}
-    >
+    <div className="absolute bottom-6 right-6" onMouseDown={handleMouseDown}>
       <ResizeIcon className="cursor-nw-resize" />
     </div>
   );

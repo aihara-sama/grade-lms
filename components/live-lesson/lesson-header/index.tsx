@@ -5,8 +5,9 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
 import NavigationTabs from "@/components/navigation-tabs";
-import type { Database } from "@/types/supabase.type";
 import Link from "next/link";
+
+import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent, PropsWithChildren, ReactNode } from "react";
 
 interface IItem {
@@ -42,6 +43,10 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
     },
   ];
 
+  const isLessonOngoing =
+    Date.now() > +new Date(lesson.starts) &&
+    Date.now() < +new Date(lesson.ends);
+
   return (
     <div>
       <Breadcrumbs
@@ -65,18 +70,14 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
       />
       <div className="flex items-center justify-between">
         <p className="page-title">{lesson?.title}</p>
-        <div className="flex items-center gap-[12px]">
-          <div className="text-[15px] flex items-center gap-[6px] relative">
+        <div className="flex items-center gap-3">
+          <div className="text-4 flex items-center gap-1 relative">
             <div
-              className={`absolute block w-[10px] h-[10px] rounded-[50%] -left-4 top-[7px] ${
-                Date.now() > +new Date(lesson.starts) &&
-                Date.now() < +new Date(lesson.ends)
-                  ? "bg-green-500"
-                  : "bg-yellow-200"
+              className={`absolute block w-3 h-3 rounded-[50%] -left-4 top-[7px] ${
+                isLessonOngoing ? "bg-green-500" : "bg-yellow-200"
               }`}
             ></div>
-            {Date.now() > +new Date(lesson.starts) &&
-            Date.now() < +new Date(lesson.ends) ? (
+            {isLessonOngoing ? (
               "Ongoing"
             ) : (
               <>

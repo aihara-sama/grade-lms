@@ -39,12 +39,14 @@ const SignIn: FunctionComponent<IProps> = () => {
           type="email"
           placeholder="Email"
           Icon={<EmailIcon />}
+          fullWIdth
         />
         <Input
           name="password"
           type="password"
           placeholder="Password"
           Icon={<SecurityIcon />}
+          fullWIdth
         />
         <button className="primary-button">Sign In</button>
       </form>

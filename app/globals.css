@@ -235,6 +235,15 @@
   .page-wrapper {
     @apply p-[24px] flex-[1] flex flex-col max-w-[1432px] mx-[auto] my-[0];
   }
+  .hide-whiteboard-elements {
+    & > .excalidraw {
+      & > .App-menu_top,
+      & > .layer-ui__wrapper__footer-right,
+      & > .undo-redo-buttons {
+        @apply hidden;
+      }
+    }
+  }
 }
 @layer utilities {
 }

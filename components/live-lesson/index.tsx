@@ -1,38 +1,36 @@
 "use client";
 
+import ArrowRightIcon from "@/components/icons/arrow-right-icon";
+import AssignmentsIcon from "@/components/icons/assignments-icon";
+import CameraIcon from "@/components/icons/camera-icon";
+import ChatIcon from "@/components/icons/chat-icon";
+import Chat from "@/components/live-lesson/chat";
+import AssignmentsTab from "@/components/live-lesson/tabs/assignments-Tab";
+import UserNamePrompt from "@/components/live-lesson/user-name-prompt";
 import Tabs from "@/components/tabs";
 import VideoChat from "@/components/video-chat";
 import Whiteboard from "@/components/whiteboard";
 import { useUserName } from "@/hooks/useUserName";
 import { ROLES, type IUserMetadata } from "@/interfaces/user.interface";
-import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
-import type { RealtimeChannel, User } from "@supabase/supabase-js";
+import clsx from "clsx";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import { v4 as uuid } from "uuid";
-import ArrowRightIcon from "../icons/arrow-right-icon";
-import AssignmentsIcon from "../icons/assignments-icon";
-import CameraIcon from "../icons/camera-icon";
-import ChatIcon from "../icons/chat-icon";
-import Chat from "./chat";
-import AssignmentsTab from "./tabs/assignments-Tab";
-import UserNamePrompt from "./user-name-prompt";
+
+import type { Lesson } from "@/types/lessons.type";
+import type { RealtimeChannel, User } from "@supabase/supabase-js";
 
 interface IProps {
-  lessonId: string;
   user?: User;
-  lesson: Database["public"]["Tables"]["lessons"]["Row"];
+  lesson: Lesson;
 }
 
-const Lesson: FunctionComponent<IProps> = ({ lessonId, lesson, user }) => {
-  const [isRightSideOpen, setIsRightSideOpen] = useState(true);
-  const [islessonHrExpanded, setIslessonHrExpanded] = useState(false);
-  const anonIdRef = useRef<string>(uuid());
-  const userNameStore = useUserName();
-  const userName =
-    (user?.user_metadata as IUserMetadata)?.name || userNameStore.userName;
-  const role = (user?.user_metadata as IUserMetadata)?.role || ROLES.GUEST;
+const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
+  // State
+  const [isAsideOpen, setIsAsideOpen] = useState(true);
 
+  // Refs
+  const anonIdRef = useRef<string>(uuid());
   const channelRef = useRef<RealtimeChannel>(
     supabaseClient.channel(lesson.id, {
       config: {
@@ -43,19 +41,27 @@ const Lesson: FunctionComponent<IProps> = ({ lessonId, lesson, user }) => {
     })
   );
 
+  // Hooks
+  const userNameStore = useUserName();
+
+  // Vars
+  const role = (user?.user_metadata as IUserMetadata)?.role || ROLES.GUEST;
+  const userName =
+    (user?.user_metadata as IUserMetadata)?.name || userNameStore.userName;
+
+  // Effects
   useEffect(() => {
     userNameStore.setUserName(localStorage.getItem("userName") || "");
   }, []);
 
+  // View
   if (userName === null) return null;
   if (userName === "") return <UserNamePrompt />;
 
   return (
     <div>
-      <main className="flex gap-[24px]">
+      <main className="flex gap-6">
         <Whiteboard
-          islessonHrExpanded={islessonHrExpanded}
-          setIslessonHrExpanded={setIslessonHrExpanded}
           lesson={lesson}
           role={role}
           userName={userName}
@@ -63,16 +69,16 @@ const Lesson: FunctionComponent<IProps> = ({ lessonId, lesson, user }) => {
         />
 
         <div
-          className={`pl-[24px] relative border-l-2 border-gray-200 ${isRightSideOpen ? "flex-1" : "flex-[0]"}`}
+          className={`pl-6 relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >
           <button
-            className={`icon-button shadow-md absolute top-2/4 -left-[16px] transform -translate-y-1/2 ${isRightSideOpen ? "[&>.icon]:rotate-0" : "[&>.icon]:rotate-180"}`}
-            onClick={() => setIsRightSideOpen((prev) => !prev)}
+            className={`icon-button shadow-md absolute top-2/4 -left-[16px] transform -translate-y-1/2 ${clsx(isAsideOpen && "[&>.icon]:rotate-180")}`}
+            onClick={() => setIsAsideOpen((prev) => !prev)}
           >
             <ArrowRightIcon />
           </button>
           <aside
-            className={`${isRightSideOpen ? "flex" : "hidden"} flex-col gap-[14px]`}
+            className={`${isAsideOpen ? "flex" : "hidden"} flex-col gap-3`}
           >
             <Tabs
               tabs={[
@@ -82,7 +88,7 @@ const Lesson: FunctionComponent<IProps> = ({ lessonId, lesson, user }) => {
                     <VideoChat
                       channel={channelRef.current}
                       anonId={anonIdRef.current}
-                      lessonId={lessonId}
+                      lessonId={lesson.id}
                       role={role}
                       userName={userName}
                     />
@@ -95,14 +101,14 @@ const Lesson: FunctionComponent<IProps> = ({ lessonId, lesson, user }) => {
                     <Chat
                       channel={channelRef.current}
                       userName={userName}
-                      lessonId={lessonId}
+                      lessonId={lesson.id}
                     />
                   ),
                   Icon: <ChatIcon />,
                 },
                 {
                   title: "Assignments",
-                  content: <AssignmentsTab lessonId={lessonId} />,
+                  content: <AssignmentsTab lessonId={lesson.id} />,
                   Icon: <AssignmentsIcon />,
                 },
               ]}
@@ -114,4 +120,4 @@ const Lesson: FunctionComponent<IProps> = ({ lessonId, lesson, user }) => {
   );
 };
 
-export default Lesson;
+export default LiveLesson;

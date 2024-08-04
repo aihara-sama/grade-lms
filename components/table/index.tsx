@@ -1,41 +1,45 @@
-import type { FunctionComponent } from "react";
+import { type FunctionComponent, type ReactNode } from "react";
 
 interface IProps {
-  rows: React.ReactNode[][];
-  titles: string[];
-  useFullWidth?: boolean;
+  data: { [key: string]: ReactNode }[];
 }
 
-const Table: FunctionComponent<IProps> = ({ rows, titles, useFullWidth }) => {
+const Table: FunctionComponent<IProps> = ({ data }) => {
+  if (!data.length) return null;
+
+  const keys = Object.keys(data[0]);
+
   return (
-    <div className="min-h-[430px] overflow-auto border border-gray-200">
-      <table
-        className={`w-full rounded-[5px] [border-spacing:0] pb-[12px] overflow-auto min-w-[${useFullWidth ? "100%" : "700px"}]`}
-      >
-        <thead>
-          <tr className="bg-gray-200">
-            {titles.map((title, idx) => (
-              <th className="px-[22px] py-[14px]" key={idx}>
-                {title}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, idx) => (
-            <tr className="text-left text-sm" key={idx}>
-              {row.map((cell, i) => (
-                <td
-                  className="px-[22px] py-[10px] max-w-0 whitespace-nowrap overflow-ellipsis overflow-hidden"
+    <div className="relative border border-gray-200">
+      <div className="min-h-[430px] overflow-auto flex flex-col">
+        <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200">
+          {keys.map((key) => (
+            <div
+              className="text-sm flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3]"
+              key={key}
+            >
+              {key}
+            </div>
+          ))}
+        </div>
+        <div className="p-4 flex flex-col gap-2">
+          {data.map((row, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-3 px-3 py-3  hover:bg-gray-100"
+            >
+              {keys.map((key, i) => (
+                <div
+                  className=" flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3]"
                   key={i}
                 >
-                  {cell}
-                </td>
+                  {row[key]}
+                </div>
               ))}
-            </tr>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </div>
   );
 };

@@ -20,7 +20,7 @@ const CardTitle: FunctionComponent<IProps> = ({
   const [isCardHovered, setIsCardHovered] = useState(false);
   return (
     <div
-      className="text-primary flex items-center gap-[12px] [&>.icon]rounded-[50%] [&>.icon]p-[4px] [&>.icon]w-[40px] [&>.icon]h-[40px] [&>.icon]flex [&>.icon]justify-center [&>.icon]items-center [&>.icon]text-sm [&>.icon]shadow-md [&>.icon]bg-white"
+      className="text-primary flex items-center gap-3"
       onClick={onClick}
       onMouseEnter={() => setIsCardHovered(true)}
       onMouseLeave={() => setIsCardHovered(false)}
@@ -34,7 +34,7 @@ const CardTitle: FunctionComponent<IProps> = ({
       ) : (
         Icon
       )}
-      <div className="flex flex-col justify-between gap-[2px] overflow-hidden flex-[1]">
+      <div className="flex flex-col justify-between gap-[2px] overflow-hidden flex-1">
         <div className="font-bold text-sm overflow-hidden overflow-ellipsis">
           {title}
         </div>

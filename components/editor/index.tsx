@@ -20,10 +20,10 @@ const EDITTOR_HOLDER_ID = "editorjs";
 
 interface IProps {
   data: OutputData;
-  setAssignmentBody: (data: OutputData) => void;
+  onChange: (data: OutputData) => void;
 }
 
-const Editor: FunctionComponent<IProps> = ({ data, setAssignmentBody }) => {
+const Editor: FunctionComponent<IProps> = ({ data, onChange }) => {
   const ejInstance = useRef<EditorJS>();
   // const [editorData, setEditorData] = useState<OutputData>(data);
 
@@ -32,7 +32,7 @@ const Editor: FunctionComponent<IProps> = ({ data, setAssignmentBody }) => {
       inlineToolbar: true,
       sanitizer: {},
       placeholder: "Start here...",
-      minHeight: 300,
+      minHeight: 320,
       holder: EDITTOR_HOLDER_ID,
       data,
       onReady: () => {
@@ -42,7 +42,7 @@ const Editor: FunctionComponent<IProps> = ({ data, setAssignmentBody }) => {
         const content = await ejInstance.current.saver.save();
         // Put your logic here to save this data to your DB
 
-        setAssignmentBody(content);
+        onChange(content);
       },
       autofocus: false,
       tools: {
@@ -82,7 +82,7 @@ const Editor: FunctionComponent<IProps> = ({ data, setAssignmentBody }) => {
 
   return (
     <div
-      className="overflow-auto max-h-[300px] p-[8px] border border-gray-200"
+      className="overflow-auto max-h-80 p-2 border border-gray-200"
       id={EDITTOR_HOLDER_ID}
     ></div>
   );

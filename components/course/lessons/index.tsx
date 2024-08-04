@@ -1,15 +1,14 @@
 "use client";
 
-import BetterTable from "@/components/better-table";
 import DeleteButton from "@/components/buttons/delete-button";
 import CardsContainer from "@/components/cards-container";
 import IconTitle from "@/components/icon-title";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
-import CreateLesson from "@/components/lesson/create-lesson";
-import AssignmentsModal from "@/components/modals/assignments-modal";
+import CreateLesson from "@/components/live-lesson/create-lesson";
 import LessonModal from "@/components/modals/lesson-modal";
+import Table from "@/components/table";
 import Total from "@/components/total";
 import { supabaseClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
@@ -26,9 +25,10 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
   const [lessons, seteLessons] = useState<
     Database["public"]["Tables"]["lessons"]["Row"][]
   >([]);
-  const [isAssignmentsModalOpen, setIsAssignmentsModalOpen] = useState(false);
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
-  const [selectedLessonId, setSelectedLessonId] = useState<string>();
+  const [selectedLessonId, setSelectedLessonId] = useState<string>(
+    "5b8cc57a-e760-4327-ad98-4d1fdd2d0572"
+  );
 
   const getLessons = async () => {
     const data = await supabaseClient
@@ -71,7 +71,7 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
         <CreateLesson onDone={getLessons} courseId={courseId} />
       </CardsContainer>
       <Input Icon={<SearchIcon />} placeholder="Search" />
-      <BetterTable
+      <Table
         data={lessons.map(({ id, title, starts }) => ({
           Name: (
             <IconTitle
@@ -110,12 +110,6 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
           close={() => setIsLessonModalOpen(false)}
           onDone={() => getLessons()}
           courses={[]}
-        />
-      )}
-      {isAssignmentsModalOpen && (
-        <AssignmentsModal
-          lessonId={selectedLessonId}
-          close={() => setIsAssignmentsModalOpen(false)}
         />
       )}
     </>

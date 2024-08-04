@@ -17,7 +17,7 @@ const IconTitle: FunctionComponent<IProps> = ({
   onClick,
 }) => {
   const titleWrapper = (
-    <div className="font-bold text-sm overflow-hidden overflow-ellipsis">
+    <div className="font-bold text-sm overflow-hidden overflow-ellipsis cursor-pointer">
       {title}
     </div>
   );

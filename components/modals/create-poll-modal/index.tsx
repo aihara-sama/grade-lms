@@ -3,8 +3,9 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
 import { supabaseClient } from "@/utils/supabase/client";
-import { type FunctionComponent } from "react";
 import toast from "react-hot-toast";
+
+import { type FunctionComponent } from "react";
 
 interface IProps {
   closeModal: () => void;
@@ -51,28 +52,30 @@ const CreatePollModal: FunctionComponent<IProps> = ({
       content={
         <form onSubmit={handleCreatePoll}>
           <Input
+            fullWIdth
             placeholder="Title"
             name="title"
             Icon={<CoursesIcon size="sm" />}
           />
           <Input
+            fullWIdth
             placeholder="Option 1"
             name="polls"
             Icon={<CourseIcon size="sm" />}
           />
           <Input
+            fullWIdth
             placeholder="Option 2"
             name="polls"
             Icon={<CourseIcon size="sm" />}
           />
           <Input
+            fullWIdth
             placeholder="Option 3"
             name="polls"
             Icon={<CourseIcon size="sm" />}
           />
-          <button className="primary-button" type="submit">
-            Create
-          </button>
+          <button className="primary-button">Create</button>
         </form>
       }
     />

@@ -39,15 +39,19 @@ const LessonModal: FunctionComponent<IProps> = ({
   courses,
   includeCoursesSelect = false,
 }) => {
+  // Hooks
   const router = useRouter();
 
+  // State
   const [starts, setStarts] = useState<Date>(new Date(lesson.starts));
   const [ends, setEnds] = useState<Date>(new Date(lesson.ends));
   const [lessonTitle, setLessonTitle] = useState<string>(lesson.title);
   const [courseId, setCourseId] = useState(lesson.course_id);
 
+  // Vars
   const duration = +new Date(ends) - +new Date(starts);
 
+  // Handlers
   const handleSaveLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -67,7 +71,6 @@ const LessonModal: FunctionComponent<IProps> = ({
       close();
     }
   };
-
   const handleChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -77,7 +80,6 @@ const LessonModal: FunctionComponent<IProps> = ({
       setEnds(subMinutes(ends, 15));
     }
   };
-
   const deleteLesson = async () => {
     const { error } = await supabaseClient
       .from("lessons")
@@ -93,11 +95,12 @@ const LessonModal: FunctionComponent<IProps> = ({
     }
   };
 
+  // View
   return (
     <Modal
       close={close}
       title={`${lesson.id ? "Edit" : "Create"} lesson`}
-      buttons={
+      headerButtons={
         <>
           {lesson.course_id && (
             <button
@@ -119,7 +122,7 @@ const LessonModal: FunctionComponent<IProps> = ({
         </>
       }
       content={
-        <div className="">
+        <div>
           <form onSubmit={handleSaveLesson} id="create-lesson-form">
             {includeCoursesSelect && (
               <Select
@@ -146,7 +149,6 @@ const LessonModal: FunctionComponent<IProps> = ({
               setStarts(date);
               setEnds(new Date(+date + duration));
             }}
-            useBottomSpacing
             label="Starts at"
           />
           <Input

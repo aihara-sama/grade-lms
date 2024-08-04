@@ -48,6 +48,7 @@ const CourseSettings: FunctionComponent<IProps> = ({
             Icon={<CourseIcon size="xs" />}
             value={courseTitle}
             onChange={(e) => setCourseTitle(e.target.value)}
+            className="mb-auto"
           />
           <button
             disabled={!courseTitle}

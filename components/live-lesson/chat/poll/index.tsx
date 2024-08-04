@@ -1,5 +1,5 @@
 import AvatarIcon from "@/components/icons/avatar-icon";
-import PollOption from "@/components/lesson/chat/poll/poll-option";
+import PollOption from "@/components/live-lesson/chat/poll/poll-option";
 
 import type { FunctionComponent } from "react";
 

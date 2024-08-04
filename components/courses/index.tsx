@@ -1,6 +1,5 @@
 "use client";
 
-import BetterTable from "@/components/better-table";
 import DeleteButton from "@/components/buttons/delete-button";
 import CardsContainer from "@/components/cards-container";
 import CreateCourse from "@/components/courses/create-course";
@@ -9,6 +8,7 @@ import CourseIcon from "@/components/icons/course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import Table from "@/components/table";
 import Total from "@/components/total";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
@@ -71,7 +71,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
         placeholder="Search"
         className="w-auto"
       />
-      <BetterTable
+      <Table
         data={courses.map(({ id, title, lessons, users }) => ({
           Name: (
             <IconTitle

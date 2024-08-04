@@ -5,14 +5,14 @@ import IconTitle from "@/components/icon-title";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import Table from "@/components/table";
+import Total from "@/components/total";
 import EnrollUsers from "@/components/users/enroll-users";
 import { ROLES } from "@/interfaces/user.interface";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
-import BetterTable from "../../better-table";
-import Total from "../../total";
 
 interface IProps {
   courseId: string;
@@ -61,7 +61,7 @@ const Members: FunctionComponent<IProps> = ({ courseId }) => {
         <EnrollUsers onDone={getMembers} courseId={courseId} />
       </CardsContainer>
       <Input Icon={<SearchIcon />} placeholder="Search" />
-      <BetterTable
+      <Table
         data={members.map(({ name, role, id }) => ({
           Name: (
             <IconTitle

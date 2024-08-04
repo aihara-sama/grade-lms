@@ -1,11 +1,13 @@
 "use client";
 
-import type { Placement } from "@floating-ui/utils/dist/floating-ui.utils";
+import CalendarIcon from "@/components/icons/calendar-icon";
 import { format } from "date-fns";
 import { forwardRef, useState, type FunctionComponent } from "react";
 import ReactDatePicker from "react-datepicker";
+
+import type { Placement } from "@floating-ui/utils/dist/floating-ui.utils";
+
 import "react-datepicker/dist/react-datepicker.css";
-import CalendarIcon from "../icons/calendar-icon";
 
 const CustomInput = forwardRef<
   HTMLButtonElement,
@@ -23,7 +25,7 @@ const CustomInput = forwardRef<
     ref={ref}
     type="button"
   >
-    <p className="absolute -top-[11px] left-[9px] text-sm">{label}</p>
+    <p className="absolute -top-3 left-2 text-sm">{label}</p>
     <CalendarIcon />
     {date}
   </button>
@@ -33,7 +35,6 @@ CustomInput.displayName = "CustomInput";
 interface IProps {
   date: Date;
   label: string;
-  useBottomSpacing?: boolean;
   onChange: (date: Date) => void;
   popperPlacement?: Placement;
 }

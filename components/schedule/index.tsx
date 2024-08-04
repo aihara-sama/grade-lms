@@ -1,14 +1,14 @@
 "use client";
 
+import ArrowLeftIcon from "@/components/icons/arrow-left-icon";
+import ArrowRightIcon from "@/components/icons/arrow-right-icon";
+import LessonModal from "@/components/modals/lesson-modal";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
+import Select from "@/components/select";
 import { useSchedule } from "@/hooks/useSchedule";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
-import type { Database } from "@/types/supabase.type";
 import { getEventWidth } from "@/utils/get-event-wIdth";
 import { supabaseClient } from "@/utils/supabase/client";
-import type { User } from "@supabase/supabase-js";
 import {
   addDays,
   addHours,
@@ -19,13 +19,14 @@ import {
   millisecondsToMinutes,
   subDays,
 } from "date-fns";
-import type { FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import ArrowLeftIcon from "../icons/arrow-left-icon";
-import ArrowRightIcon from "../icons/arrow-right-icon";
-import LessonModal from "../modals/lesson-modal";
-import Select from "../select";
+
+import type { Course } from "@/types/courses.type";
+import type { Lesson } from "@/types/lessons.type";
+import type { Database } from "@/types/supabase.type";
+import type { User } from "@supabase/supabase-js";
+import type { FunctionComponent } from "react";
 
 interface IProps {
   user: User;
@@ -46,11 +47,11 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   // State
   const [days, setDays] = useState(getWeekDays());
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [hoveredDate, setHoveredDate] = useState<string>();
   const [defaultCourseId, setDefaulltCourseId] = useState<string>(null);
   const [courses, setCourses] = useState<Pick<Course, "id" | "title">[]>([
     { title: "-", id: null },
   ]);
-  const [hoveredDate, setHoveredDate] = useState<string>();
 
   // Zustand
   const canDropEvent = useSchedule((state) => state.canDropEvent);
@@ -60,6 +61,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const pointerOffsetPositionOnEvent = useSchedule(
     (state) => state.pointerOffsetPositionOnEvent
   );
+
   const setCanDropEvent = useSchedule((state) => state.setCanDropEvent);
   const setDraggingEvent = useSchedule((state) => state.setDraggingEvent);
   const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
@@ -80,6 +82,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const draggingEventRef = useRef<HTMLDivElement>();
   const hoursLabelsDaysWrapperRef = useRef<HTMLDivElement>();
 
+  // Handlers
   const getLessons = async () => {
     const { data, error } = await supabaseClient
       .from("lessons")
@@ -115,7 +118,6 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     if (error) toast.error(error.message);
     else setCourses([{ title: "-", id: null }, ...data.courses]);
   };
-
   const handleSaveLesson = async (
     newStart: string,
     event: Database["public"]["Tables"]["lessons"]["Row"]
@@ -139,7 +141,6 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       await getLessons();
     }
   };
-
   const scroll = (direction: "top" | "bottom") => {
     intervalIDRef.current = setInterval(() => {
       hoursLabelsDaysWrapperRef.current.scrollBy(
@@ -148,7 +149,6 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       );
     }, 2);
   };
-
   const handlePointerMove = (e: MouseEvent) => {
     // if (isScrolling()) return;
     if (initPointerPosition && !draggingEvent) {
@@ -236,7 +236,6 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       }
     }
   };
-
   const handleMouseUp = async () => {
     if (draggingEvent) {
       if (canDropEvent) {
@@ -250,14 +249,13 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     setInitPointerPosition(undefined);
   };
 
+  // Effects
   useEffect(() => {
     isDraggingEventRef.current = !!draggingEvent;
   }, [draggingEvent]);
-
   useEffect(() => {
     getCourses();
   }, []);
-
   useEffect(() => {
     if (defaultCourseId) {
       getLessonsByCourseId(defaultCourseId);
@@ -265,13 +263,11 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       getLessons();
     }
   }, [defaultCourseId, days]);
-
   useEffect(() => {
     document.querySelector(`[data-hour-label="8:00 AM"]`).scrollIntoView({
       behavior: "smooth",
     });
   }, []);
-
   useEffect(() => {
     window.addEventListener("mousemove", handlePointerMove);
     return () => window.removeEventListener("mousemove", handlePointerMove);
@@ -286,9 +282,9 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   return (
     <div>
       <h1 className="page-title">Schedule</h1>
-      <div className="flex justify-between items-center mb-[8px]">
-        <div className="mt-[4px] flex items-center gap-[12px]">
-          <div className="flex gap-[6px] font-bold">
+      <div className="flex justify-between items-center mb-2">
+        <div className="mt-1 flex items-center gap-3">
+          <div className="flex gap-1 font-bold">
             <div className="start">{format(days[0], "MMM d")}</div>
             <span>-</span>
             <div className="end">{format(days[days.length - 1], "MMM d")}</div>
@@ -350,11 +346,11 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
           ))}
         </div>
 
-        <div className="flex-[1]" ref={daysRef} onMouseUp={handleMouseUp}>
+        <div className="flex-1" ref={daysRef} onMouseUp={handleMouseUp}>
           <div className="relative flex overflow-hidden">
             {days.map((day, idx) => {
               return (
-                <div className="flex-[1]" key={idx}>
+                <div className="flex-1" key={idx}>
                   {[...Array(differenceInHours(addDays(day, 1), day))].map(
                     (__, i) => (
                       <Hour

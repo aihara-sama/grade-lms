@@ -4,18 +4,15 @@ import Input from "@/components/input";
 import Modal from "@/components/modal";
 import { supabaseClient } from "@/utils/supabase/client";
 import {
-  addDays,
   addMinutes,
   format,
   millisecondsToMinutes,
-  setHours,
-  setMinutes,
-  setSeconds,
   subMinutes,
 } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import { getNextMorning } from "@/utils/get-next-morning";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {
@@ -30,9 +27,7 @@ const AddLessonModal: FunctionComponent<IProps> = ({
   onDone,
 }) => {
   const [lessonName, setLessonName] = useState("");
-  const [starts, setStarts] = useState<Date>(
-    addDays(setSeconds(setMinutes(setHours(new Date(), 8), 0), 0), 1)
-  );
+  const [starts, setStarts] = useState<Date>(getNextMorning());
   const [ends, setEnds] = useState<Date>(addMinutes(starts, 30));
   const duration = +new Date(ends) - +new Date(starts);
 
@@ -44,16 +39,12 @@ const AddLessonModal: FunctionComponent<IProps> = ({
   const handleCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { error } = await supabaseClient.rpc(
-      "create_lesson_with_assignments",
-      {
-        new_course_id: courseId,
-        new_title: new FormData(e.currentTarget).get("title") as string,
-        new_starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
-        new_ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-        new_assignments: [],
-      }
-    );
+    const { error } = await supabaseClient.from("lessons").insert({
+      course_id: courseId,
+      title: new FormData(e.currentTarget).get("title") as string,
+      starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
+      ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
+    });
 
     if (error) {
       toast(error.message);
@@ -92,7 +83,6 @@ const AddLessonModal: FunctionComponent<IProps> = ({
           <DateInput
             date={starts}
             onChange={handleChangeDate}
-            useBottomSpacing
             label="Starts at"
           />
           <Input

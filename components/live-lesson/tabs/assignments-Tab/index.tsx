@@ -3,7 +3,7 @@
 import CardTitle from "@/components/card-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
-import AddAssignmentModal from "@/components/modals/add-assignment-modal";
+import CreateAssignmentModal from "@/components/modals/create-assignment-modal";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
@@ -54,7 +54,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
         ))}
       </div>
       {currentAssignmentId && (
-        <AddAssignmentModal
+        <CreateAssignmentModal
           lessonId={lessonId}
           assignmentId={currentAssignmentId}
           onDone={() => {

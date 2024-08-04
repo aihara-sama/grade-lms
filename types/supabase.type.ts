@@ -12,18 +12,21 @@ export type Database = {
       assignments: {
         Row: {
           body: string;
+          due_date: string;
           id: string;
           lesson_id: string;
           title: string;
         };
         Insert: {
           body?: string;
+          due_date: string;
           id?: string;
           lesson_id: string;
           title: string;
         };
         Update: {
           body?: string;
+          due_date?: string;
           id?: string;
           lesson_id?: string;
           title?: string;

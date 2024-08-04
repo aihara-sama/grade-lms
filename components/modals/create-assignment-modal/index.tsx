@@ -2,19 +2,14 @@ import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
-import type { Database } from "@/types/supabase.type";
+import { getNextMorning } from "@/utils/get-next-morning";
 import { supabaseClient } from "@/utils/supabase/client";
-import {
-  addDays,
-  addMinutes,
-  millisecondsToMinutes,
-  setHours,
-  setMinutes,
-  setSeconds,
-} from "date-fns";
+import { format } from "date-fns";
 import dynamic from "next/dynamic";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
+
+import type { Assignment } from "@/types/assignments.type";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
@@ -25,31 +20,27 @@ interface IProps {
   assignmentId?: string;
   lessonId: string;
 }
-const AddAssignmentModal: FunctionComponent<IProps> = ({
+const CreateAssignmentModal: FunctionComponent<IProps> = ({
   onDone,
   closeModal,
   assignmentId,
   lessonId,
 }) => {
-  const [assignment, setAssignment] = useState<
-    Database["public"]["Tables"]["assignments"]["Row"]
-  >({
-    id: undefined,
+  // States
+  const [assignment, setAssignment] = useState<Omit<Assignment, "id">>({
     lesson_id: lessonId,
     title: "",
     body: "{}",
+    due_date: format(getNextMorning(), "yyyy-MM-dd'T'HH:mm:ss"),
   });
 
-  const [starts, setStarts] = useState<Date>(
-    addDays(setSeconds(setMinutes(setHours(new Date(), 8), 0), 0), 1)
-  );
-  const [ends, setEnds] = useState<Date>(addMinutes(starts, 30));
-  const duration = +new Date(ends) - +new Date(starts);
+  // Vars
 
+  // Handlers
   const handleCreateAssignment = async () => {
     const { error } = await supabaseClient
       .from("assignments")
-      .upsert(assignment);
+      .insert(assignment);
 
     toast(error?.message || "Assignment created");
 
@@ -57,7 +48,14 @@ const AddAssignmentModal: FunctionComponent<IProps> = ({
       onDone();
     }
   };
+  const handleChangeDate = (date: Date) => {
+    setAssignment((_assignment) => ({
+      ..._assignment,
+      due_date: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
+    }));
+  };
 
+  // Effects
   useEffect(() => {
     if (assignmentId) {
       (async () => {
@@ -75,19 +73,15 @@ const AddAssignmentModal: FunctionComponent<IProps> = ({
     }
   }, []);
 
-  const handleChangeDate = (date: Date) => {
-    setStarts(date);
-    setEnds(addMinutes(date, millisecondsToMinutes(duration)));
-  };
-
   return (
     <Modal
       width="lg"
       close={closeModal}
       title="Assignment"
       content={
-        <div className="">
+        <div>
           <Input
+            fullWIdth
             Icon={<LessonsIcon size="xs" />}
             placeholder="Assignment name"
             name="title"
@@ -98,23 +92,21 @@ const AddAssignmentModal: FunctionComponent<IProps> = ({
           />
           <p>Description</p>
           <Editor
-            setAssignmentBody={(data) =>
+            onChange={(data) =>
               setAssignment((prev) => ({ ...prev, body: JSON.stringify(data) }))
             }
             data={JSON.parse(assignment.body)}
           />
-          <div className="flex gap-[14px] items-center mt-[14px]">
-            <div className="pr-[12px] border-r-2 border-gray-200">
+          <div className="flex gap-3 items-center mt-3">
+            <div className="pr-3 border-r-2 border-gray-200">
               <DateInput
-                date={starts}
+                date={new Date(assignment.due_date)}
                 onChange={handleChangeDate}
                 label="Due date"
                 popperPlacement="top-start"
               />
             </div>
-            <button className="outline-button w-full">
-              Create & add another
-            </button>
+            <button className="outline-button">Create & add another</button>
             <button
               disabled={!assignment.title}
               className="primary-button"
@@ -129,4 +121,4 @@ const AddAssignmentModal: FunctionComponent<IProps> = ({
   );
 };
 
-export default AddAssignmentModal;
+export default CreateAssignmentModal;

@@ -1,11 +1,12 @@
 "use client";
 
 import LessonSettings from "@/components/lesson-settings";
-import LessonHeader from "@/components/lesson/lesson-header";
-import type { Database } from "@/types/supabase.type";
+import LessonHeader from "@/components/live-lesson/lesson-header";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
+
+import type { Database } from "@/types/supabase.type";
 
 interface IProps {
   params: {

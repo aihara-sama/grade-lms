@@ -4,7 +4,7 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Modal from "@/components/modal";
 import Tabs from "@/components/tabs";
-import type { Database } from "@/types/supabase.type";
+import type { Assignment } from "@/types/assignments.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -22,16 +22,13 @@ const AssignmentModal: FunctionComponent<IProps> = ({
   close,
   onDone,
 }) => {
-  const [assignment, setAssignment] =
-    useState<Database["public"]["Tables"]["assignments"]["Row"]>();
+  const [assignment, setAssignment] = useState<Assignment>();
 
-  const saveAssignment = async (
-    body: Database["public"]["Tables"]["assignments"]["Row"]
-  ) => {
+  const saveAssignment = async (_assignment: Assignment) => {
     const { error } = await supabaseClient
       .from("assignments")
-      .update(body)
-      .eq("id", body.id);
+      .update(_assignment)
+      .eq("id", _assignment.id);
 
     if (error) {
       toast(error.message);

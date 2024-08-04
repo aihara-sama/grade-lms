@@ -49,18 +49,21 @@ const SignUp: FunctionComponent<IProps> = () => {
           type="text"
           placeholder="Name"
           Icon={<AvatarIcon size="xs" />}
+          fullWIdth
         />
         <Input
           name="email"
           type="email"
           placeholder="Email"
           Icon={<EmailIcon />}
+          fullWIdth
         />
         <Input
           name="password"
           type="password"
           placeholder="Password"
           Icon={<SecurityIcon />}
+          fullWIdth
         />
         <button className="primary-button">Sign Up</button>
       </form>

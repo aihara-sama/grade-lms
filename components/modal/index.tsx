@@ -5,7 +5,7 @@ import { useEffect } from "react";
 interface IProps {
   width?: "md" | "lg";
   title: string;
-  buttons?: ReactNode;
+  headerButtons?: ReactNode;
   content: JSX.Element;
   close: () => void;
 }
@@ -13,7 +13,7 @@ interface IProps {
 const Modal: FunctionComponent<IProps> = ({
   title,
   content,
-  buttons,
+  headerButtons,
   close,
   width = "md",
 }) => {
@@ -37,7 +37,7 @@ const Modal: FunctionComponent<IProps> = ({
         <div className="px-6 py-3 flex items-center justify-between shadow-sm">
           <p className="font-bold">{title}</p>
           <div className="flex items-center">
-            {buttons}
+            {headerButtons}
             <button className="icon-button" onClick={close}>
               <CloseIcon />
             </button>
