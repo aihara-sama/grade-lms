@@ -70,7 +70,7 @@ const CreatePollModal: FunctionComponent<IProps> = ({
             name="polls"
             Icon={<CourseIcon size="sm" />}
           />
-          <button className="primary-button w-full" type="submit">
+          <button className="primary-button" type="submit">
             Create
           </button>
         </form>

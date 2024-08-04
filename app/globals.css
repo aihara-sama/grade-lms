@@ -211,7 +211,7 @@
   }
 
   .primary-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[8px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300;
+    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[8px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300 w-full;
   }
 
   .link-button {

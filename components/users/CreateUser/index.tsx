@@ -22,7 +22,7 @@ const CreateUser: FunctionComponent<IProps> = ({ onDone }) => {
     <div className="px-[24px] py-[32px] flex flex-col items-center justify-between w-[250px] rounded-[5px] border border-light bg-white">
       <AddUserIcon size="lg" />
       <hr />
-      <button className="primary-button w-full" onClick={openModal}>
+      <button className="primary-button" onClick={openModal}>
         Create
       </button>
       {isCreateUserModalOpen && (

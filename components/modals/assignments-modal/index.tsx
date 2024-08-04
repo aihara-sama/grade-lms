@@ -86,7 +86,7 @@ const AssignmentsModal: FunctionComponent<IProps> = ({ close, lessonId }) => {
               </div>
             ))}
           </div>
-          <button className="primary-button w-full">Add</button>
+          <button className="primary-button">Add</button>
           {isAssignmentModalOpen && (
             <AssignmentModal
               onDone={() => {

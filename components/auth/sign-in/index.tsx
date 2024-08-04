@@ -37,18 +37,16 @@ const SignIn: FunctionComponent<IProps> = () => {
         <Input
           name="email"
           type="email"
-          Icon={<EmailIcon />}
           placeholder="Email"
+          Icon={<EmailIcon />}
         />
         <Input
           name="password"
-          Icon={<SecurityIcon />}
-          placeholder="Password"
           type="password"
+          placeholder="Password"
+          Icon={<SecurityIcon />}
         />
-        <button className="primary-button w-full" type="submit">
-          Sign In
-        </button>
+        <button className="primary-button">Sign In</button>
       </form>
       <p>
         Don&apos;t have an account? <Link href="/sign-up">Sign Up</Link>

@@ -117,7 +117,7 @@ const AddAssignmentModal: FunctionComponent<IProps> = ({
             </button>
             <button
               disabled={!assignment.title}
-              className="primary-button w-full"
+              className="primary-button"
               onClick={handleCreateAssignment}
             >
               Create

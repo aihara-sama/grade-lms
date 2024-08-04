@@ -47,24 +47,22 @@ const SignUp: FunctionComponent<IProps> = () => {
         <Input
           name="name"
           type="text"
-          Icon={<AvatarIcon size="xs" />}
           placeholder="Name"
+          Icon={<AvatarIcon size="xs" />}
         />
         <Input
           name="email"
           type="email"
-          Icon={<EmailIcon />}
           placeholder="Email"
+          Icon={<EmailIcon />}
         />
         <Input
           name="password"
-          Icon={<SecurityIcon />}
-          placeholder="Password"
           type="password"
+          placeholder="Password"
+          Icon={<SecurityIcon />}
         />
-        <button className="primary-button w-full" type="submit">
-          Sign Up
-        </button>
+        <button className="primary-button">Sign Up</button>
       </form>
       <p>
         Already have an account? <Link href="/sign-in">Sign In</Link>

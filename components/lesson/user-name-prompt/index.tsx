@@ -22,7 +22,7 @@ const UserNamePrompt: FunctionComponent<IProps> = () => {
         label="Enter your name"
         autoFocus
       />
-      <button className="primary-button w-full" onClick={handleJoin}>
+      <button className="primary-button" onClick={handleJoin}>
         Join
       </button>
     </div>

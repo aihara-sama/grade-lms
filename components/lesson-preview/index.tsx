@@ -184,7 +184,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
           onChange={handleChangeDuration}
         />
         <hr className="mx-[0] my-[8px] border-divider" />
-        <button className="primary-button w-full" onClick={handleSave}>
+        <button className="primary-button" onClick={handleSave}>
           Save
         </button>
       </aside>

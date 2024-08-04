@@ -68,7 +68,7 @@ const EnrollUsersModal: FunctionComponent<IProps> = ({ close, courseId }) => {
               </div>
             ))}
           </div>
-          <button className="primary-button w-full" onClick={enroll}>
+          <button className="primary-button" onClick={enroll}>
             Enroll
           </button>
         </div>

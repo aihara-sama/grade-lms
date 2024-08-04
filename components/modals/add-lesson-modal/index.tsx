@@ -104,7 +104,7 @@ const AddLessonModal: FunctionComponent<IProps> = ({
           <hr className="my-3" />
           <button
             disabled={!lessonName}
-            className="primary-button w-full"
+            className="primary-button"
             type="submit"
           >
             Create

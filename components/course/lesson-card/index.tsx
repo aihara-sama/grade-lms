@@ -24,7 +24,7 @@ const LessonCard: FunctionComponent<IProps> = ({ lesson }) => {
           Enter class
         </Link>
       </button>
-      <button className="primary-button w-full">Check assignments</button>
+      <button className="primary-button">Check assignments</button>
     </div>
   );
 };

@@ -48,7 +48,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
     <div className="border border-dashed border-light bg-white px-[24px] py-[32px] flex flex-col items-center justify-between sm:w-[250px] w-full rounded-[5px]">
       <AddCourseIcon />
       <hr className="w-full my-3" />
-      <button className="primary-button w-full" onClick={openModal}>
+      <button className="primary-button" onClick={openModal}>
         Create
       </button>
       {isCreateCourseModalOpen && (
@@ -64,7 +64,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
                 name="title"
                 autoFocus
               />
-              <button className="primary-button w-full" type="submit">
+              <button className="primary-button" type="submit">
                 Create
               </button>
             </form>

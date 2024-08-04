@@ -55,7 +55,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({ closeModal, onDone }) => {
             <button className="outline-button w-full">
               Create & add another
             </button>
-            <button className="primary-button w-full" type="submit">
+            <button className="primary-button" type="submit">
               Create
             </button>
           </div>

@@ -23,9 +23,7 @@ const CreateAssignment: FunctionComponent<IProps> = ({ onDone, lessonId }) => {
     <div className="px-[24px] py-[32px] flex flex-col items-center justify-between w-[250px] rounded-[5px] border border-light bg-white">
       <AddAssignmentIcon size="md" />
       <hr />
-      <button className="primary-button w-full" onClick={openModal}>
-        Create
-      </button>
+      <button onClick={openModal}>Create</button>
       {isCreateUserModalOpen && (
         <AddAssignmentModal
           closeModal={closeModal}

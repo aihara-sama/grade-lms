@@ -24,7 +24,7 @@ const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId }) => {
     <div className="border border-dashed px-[24px] py-[32px] flex flex-col items-center justify-between w-[250px] rounded-[5px] border-light bg-white">
       <AddUserIcon size="lg" />
       <hr className="w-full my-3" />
-      <button className="primary-button w-full" onClick={openModal}>
+      <button className="primary-button" onClick={openModal}>
         Enroll
       </button>
       {isEnrollUsersModalOpen && (

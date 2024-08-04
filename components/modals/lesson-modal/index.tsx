@@ -157,7 +157,7 @@ const LessonModal: FunctionComponent<IProps> = ({
             disabled={!lessonTitle}
             type="submit"
             form="create-lesson-form"
-            className="primary-button w-full"
+            className="primary-button"
           >
             Save
           </button>

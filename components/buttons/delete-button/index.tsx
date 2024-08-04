@@ -55,10 +55,7 @@ const DeleteButton: FunctionComponent<IProps> = ({
                 <button className="outline-button w-full" onClick={closeModal}>
                   Cancel
                 </button>
-                <button
-                  className="primary-button w-full"
-                  onClick={handleDeleteRecord}
-                >
+                <button className="primary-button" onClick={handleDeleteRecord}>
                   Delete
                 </button>
               </div>

@@ -36,10 +36,7 @@ const OverviewTab: FunctionComponent<IProps> = ({ onDone, assignment }) => {
           <DateInput date={new Date()} onChange={() => {}} label="Due date" />
         </div>
 
-        <button
-          className="primary-button w-full"
-          onClick={handleSaveAssignment}
-        >
+        <button className="primary-button" onClick={handleSaveAssignment}>
           Save
         </button>
       </div>
