@@ -3,6 +3,7 @@ import Lessons from "@/components/course/lessons";
 import { supabaseClient } from "@/utils/supabase/client";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+
 import { type FunctionComponent } from "react";
 
 interface IProps {

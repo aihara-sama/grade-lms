@@ -7,7 +7,6 @@ import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
 import Select from "@/components/select";
-import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import {
   addMinutes,
@@ -16,9 +15,11 @@ import {
   subMinutes,
 } from "date-fns";
 import { useRouter } from "next/navigation";
-import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+
+import type { Database } from "@/types/supabase.type";
+import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {
   lesson: Partial<Database["public"]["Tables"]["lessons"]["Row"]>;
@@ -39,10 +40,12 @@ const LessonModal: FunctionComponent<IProps> = ({
   includeCoursesSelect = false,
 }) => {
   const router = useRouter();
+
   const [starts, setStarts] = useState<Date>(new Date(lesson.starts));
   const [ends, setEnds] = useState<Date>(new Date(lesson.ends));
   const [lessonTitle, setLessonTitle] = useState<string>(lesson.title);
   const [courseId, setCourseId] = useState(lesson.course_id);
+
   const duration = +new Date(ends) - +new Date(starts);
 
   const handleSaveLesson = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -130,6 +133,7 @@ const LessonModal: FunctionComponent<IProps> = ({
             )}
             <Input
               name="title"
+              fullWIdth
               Icon={<LessonsIcon size="xs" />}
               placeholder="Lesson name"
               onChange={(e) => setLessonTitle(e.target.value)}
@@ -146,6 +150,7 @@ const LessonModal: FunctionComponent<IProps> = ({
             label="Starts at"
           />
           <Input
+            fullWIdth
             label="Duration:"
             type="number"
             Icon={<TimeIcon />}

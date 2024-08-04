@@ -13,9 +13,10 @@ import {
   setSeconds,
   subMinutes,
 } from "date-fns";
-import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+
+import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {
   courseId: string;
@@ -80,6 +81,7 @@ const AddLessonModal: FunctionComponent<IProps> = ({
       content={
         <form onSubmit={handleCreateLesson}>
           <Input
+            fullWIdth
             value={lessonName}
             onChange={(e) => setLessonName(e.target.value)}
             name="title"
@@ -94,6 +96,7 @@ const AddLessonModal: FunctionComponent<IProps> = ({
             label="Starts at"
           />
           <Input
+            fullWIdth
             label="Duration"
             type="number"
             Icon={<LessonsIcon />}

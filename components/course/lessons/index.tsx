@@ -11,10 +11,12 @@ import CreateLesson from "@/components/lesson/create-lesson";
 import AssignmentsModal from "@/components/modals/assignments-modal";
 import LessonModal from "@/components/modals/lesson-modal";
 import Total from "@/components/total";
-import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
-import { useEffect, useState, type FunctionComponent } from "react";
+import { useEffect, useState } from "react";
+
+import type { Database } from "@/types/supabase.type";
+import type { FunctionComponent } from "react";
 
 interface IProps {
   courseId: string;
