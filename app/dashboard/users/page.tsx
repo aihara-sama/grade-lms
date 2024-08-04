@@ -7,9 +7,10 @@ const Page = async () => {
   } = await createClient().auth.getUser();
 
   return (
-    <div className="page-wrapper">
+    <div>
       <p className="page-title">Users</p>
-      <hr />
+      <p>View and manage users</p>
+      <hr className="my-2 mb-4" />
       <Users user={user} />
     </div>
   );

@@ -24,7 +24,7 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
   if (error) return redirect("/dashboard/courses");
 
   return (
-    <div className="page-wrapper">
+    <div>
       <CourseHeader course={course} />
       <Lessons courseId={params.courseId} userId={user.id} />
     </div>

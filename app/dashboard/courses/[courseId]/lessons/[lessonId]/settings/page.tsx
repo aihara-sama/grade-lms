@@ -44,7 +44,7 @@ const Page: FunctionComponent<IProps> = ({ params }) => {
   }, []);
 
   return (
-    <div className="page-wrapper">
+    <div>
       {course && lesson && (
         <>
           <LessonHeader course={course} lesson={lesson} />

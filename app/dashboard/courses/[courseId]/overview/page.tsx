@@ -35,7 +35,7 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
   const teacher = users.find((user) => user.role === ROLES.TEACHER);
 
   return (
-    <div className="page-wrapper">
+    <div>
       <CourseHeader course={data[0]} />
       <div className="flex gap-[30px] flex-[1] items-start">
         <div className="flex-[1]">

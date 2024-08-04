@@ -36,7 +36,7 @@ const Page: FunctionComponent<IProps> = ({ params }) => {
   // if (error) return redirect("/dashboard/courses");
 
   return (
-    <div className="page-wrapper">
+    <div>
       {course && (
         <>
           <CourseHeader course={course} />

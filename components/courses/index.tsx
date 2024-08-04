@@ -1,19 +1,20 @@
 "use client";
 
-import type { Database } from "@/types/supabase.type";
+import BetterTable from "@/components/better-table";
+import DeleteButton from "@/components/buttons/delete-button";
+import CardsContainer from "@/components/cards-container";
+import CreateCourse from "@/components/courses/create-course";
+import IconTitle from "@/components/icon-title";
+import CourseIcon from "@/components/icons/course-icon";
+import CoursesIcon from "@/components/icons/courses-icon";
+import SearchIcon from "@/components/icons/search-icon";
+import Input from "@/components/input";
+import Total from "@/components/total";
 import { supabaseClient } from "@/utils/supabase/client";
-import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
-import BetterTable from "../better-table";
-import DeleteButton from "../buttons/delete-button";
-import CardsContainer from "../cards-container";
-import IconTitle from "../icon-title";
-import CourseIcon from "../icons/course-icon";
-import CoursesIcon from "../icons/courses-icon";
-import SearchIcon from "../icons/search-icon";
-import Input from "../input";
-import Total from "../total";
-import CreateCourse from "./create-course";
+
+import type { Database } from "@/types/supabase.type";
+import type { User } from "@supabase/supabase-js";
 
 interface IProps {
   user: User;
@@ -65,7 +66,11 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
         />
         <CreateCourse userId={user.id} onDone={getCourses} />
       </CardsContainer>
-      <Input Icon={<SearchIcon size="xs" />} placeholder="Search" />
+      <Input
+        Icon={<SearchIcon size="xs" />}
+        placeholder="Search"
+        className="w-auto"
+      />
       <BetterTable
         data={courses.map(({ id, title, lessons, users }) => ({
           Name: (

@@ -25,7 +25,7 @@ const Page: FunctionComponent<IProps> = async ({
     .single();
 
   return (
-    <div className="page-wrapper">
+    <div>
       <LessonHeader course={course.data} lesson={lesson.data} />
       <Assignments courseId={courseId} lessonId={lessonId} />
     </div>

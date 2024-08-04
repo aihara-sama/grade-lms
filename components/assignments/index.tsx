@@ -1,17 +1,17 @@
 "use client";
 
 import CreateAssignment from "@/components/assignments/create-assignment";
+import BetterTable from "@/components/better-table";
 import CardsContainer from "@/components/cards-container";
 import IconTitle from "@/components/icon-title";
+import AssignmentsIcon from "@/components/icons/assignments-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import AddAssignmentModal from "@/components/modals/add-assignment-modal";
+import Total from "@/components/total";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
-import BetterTable from "../better-table";
-import AssignmentsIcon from "../icons/assignments-icon";
-import AddAssignmentModal from "../modals/add-assignment-modal";
-import Total from "../total";
 
 interface IProps {
   lessonId: string;

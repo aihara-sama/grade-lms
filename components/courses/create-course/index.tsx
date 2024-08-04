@@ -17,6 +17,7 @@ interface IProps {
 const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
   const router = useRouter();
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
+  const [courseTitle, setCourseTitle] = useState("");
 
   const closeModal = () => {
     setIsCreateCourseModalOpen(false);
@@ -45,7 +46,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
   };
 
   return (
-    <div className="border border-dashed border-light bg-white px-[24px] py-[32px] flex flex-col items-center justify-between sm:w-[250px] w-full rounded-[5px]">
+    <div className="border border-dashed border-light bg-white px-6 py-8 flex flex-col items-center justify-between sm:w-64 w-full rounded-md">
       <AddCourseIcon />
       <hr className="w-full my-3" />
       <button className="primary-button" onClick={openModal}>
@@ -58,13 +59,16 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
           content={
             <form action={submitCreateCourse}>
               <Input
+                autoFocus
+                fullWIdth
+                name="title"
                 label="Course name"
+                value={courseTitle}
                 Icon={<CoursesIcon />}
                 placeholder="My course..."
-                name="title"
-                autoFocus
+                onChange={(e) => setCourseTitle(e.target.value)}
               />
-              <button className="primary-button" type="submit">
+              <button disabled={!courseTitle} className="primary-button">
                 Create
               </button>
             </form>

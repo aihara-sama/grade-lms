@@ -12,6 +12,7 @@ interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   onClick?: React.MouseEventHandler<HTMLInputElement>;
   type?: InputHTMLAttributes<HTMLInputElement>["type"];
   className?: string;
+  fullWIdth?: boolean;
 }
 
 const Input: FunctionComponent<IProps> = ({
@@ -19,6 +20,7 @@ const Input: FunctionComponent<IProps> = ({
   type,
   label,
   value,
+  fullWIdth,
   placeholder,
   className,
   onClick,
@@ -41,6 +43,7 @@ const Input: FunctionComponent<IProps> = ({
           value={value}
           type={inputType}
           placeholder={placeholder}
+          className={fullWIdth ? "w-full" : ""}
           {...inputProps}
         />
         {type === "password" && (

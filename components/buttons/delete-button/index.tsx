@@ -1,8 +1,9 @@
 "use client";
 
 import Modal from "@/components/modal";
-import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
+
+import { useState, type FunctionComponent } from "react";
 
 interface IProps {
   record: string;
@@ -39,9 +40,10 @@ const DeleteButton: FunctionComponent<IProps> = ({
   };
   return (
     <>
-      <button className="primary-button" onClick={openModal}>
+      <button className="primary-button w-auto" onClick={openModal}>
         Delete
       </button>
+
       {isDeleteRecordModalOpen && (
         <Modal
           close={closeModal}

@@ -1,6 +1,5 @@
-import type { FunctionComponent, ReactNode } from "react";
-
 import Link from "next/link";
+import type { FunctionComponent, ReactNode } from "react";
 
 interface IProps {
   total: number;
@@ -11,13 +10,13 @@ interface IProps {
 
 const Total: FunctionComponent<IProps> = ({ total, href, title, Icon }) => {
   return (
-    <div className="shadow-md flex flex-col items-center p-[24px] w-full rounded-[5px] sm:w-[250px]">
+    <div className="shadow-md flex flex-col items-center p-6 w-full rounded-md sm:w-64">
       {Icon}
       <hr className="w-full my-3" />
-      <p className="total-title">{title}</p>
-      <p className="mt-[8px] text-4xl">{total}</p>
+      <p>{title}</p>
+      <p className="mt-2 text-4xl">{total}</p>
       {href && (
-        <Link className="link-button w-full mt-[12px]" href={href}>
+        <Link className="link-button w-full mt-3" href={href}>
           View all
         </Link>
       )}

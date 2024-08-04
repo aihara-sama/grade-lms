@@ -22,7 +22,7 @@ const TotalCourses: FunctionComponent<IProps> = ({
     <div className="shadow-sm flex flex-col items-center p-[24px] w-[250px] rounded-[5px]">
       <CoursesIcon />
       <hr />
-      <p className="total-title">{title}</p>
+      <p>{title}</p>
 
       <p className="mt-[8px] text-4xl">{total}</p>
       {href && (

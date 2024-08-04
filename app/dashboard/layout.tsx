@@ -1,5 +1,7 @@
+import ContentWrapper from "@/components/content-wrapper";
 import Header from "@/components/header";
 import { createClient } from "@/utils/supabase/server";
+
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
@@ -10,7 +12,7 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
   return (
     <div className="overflow-auto h-full flex-col">
       <Header user={user} />
-      {children}
+      <ContentWrapper>{children}</ContentWrapper>
     </div>
   );
 };
