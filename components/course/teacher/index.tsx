@@ -10,9 +10,9 @@ interface IProps {
 
 const Teacher: FunctionComponent<IProps> = ({ id, name }) => {
   return (
-    <div className="mt-[40px]">
-      <p className="mb-[8px] font-bold">Teacher</p>
-      <div className="flex justify-between items-center p-[14px] rounded-[8px] shadow-md">
+    <div className="mt-10">
+      <p className="mb-2 font-bold">Teacher</p>
+      <div className="flex justify-between items-center p-3 rounded-lg shadow-md">
         <IconTitle
           Icon={<AvatarIcon />}
           href={`/users/${id}`}

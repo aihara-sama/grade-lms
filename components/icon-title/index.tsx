@@ -16,20 +16,21 @@ const IconTitle: FunctionComponent<IProps> = ({
   href,
   onClick,
 }) => {
+  const titleWrapper = (
+    <div className="font-bold text-sm overflow-hidden overflow-ellipsis">
+      {title}
+    </div>
+  );
   const contents = (
-    <div className="flex items-center gap-[12px] text-primary [&>.icon]:rounded-[50%] [&>.icon]p-[4px] [&>.icon]w-[40px] [&>.icon]h-[40px] [&>.icon]flex justify-center [&>.icon]items-center [&>.icon]text-sm">
+    <div className="flex items-center justify-center gap-3 text-primary [&>.icon]:rounded-[50%]">
       {Icon}
-      <div className="flex flex-col justify-between gap-[2px] overflow-hidden flex-[1]">
+      <div className="flex flex-col flex-1 justify-between gap-[2px] overflow-hidden">
         {href ? (
           <Link href={href} className="self-start">
-            <div className="font-bold text-sm overflow-hidden overflow-ellipsis">
-              {title}
-            </div>
+            {titleWrapper}
           </Link>
         ) : (
-          <div className="font-bold text-sm overflow-hidden overflow-ellipsis">
-            {title}
-          </div>
+          titleWrapper
         )}
         <div className="text-xs text-light">{subtitle}</div>
       </div>

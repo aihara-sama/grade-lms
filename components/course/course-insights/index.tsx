@@ -1,7 +1,8 @@
 "use client";
 
+import Insight from "@/components/course/insight";
+
 import { type FunctionComponent, type PropsWithChildren } from "react";
-import Insight from "../insight";
 
 interface IProps {}
 

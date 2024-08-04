@@ -10,12 +10,12 @@ interface IProps {
 
 const Students: FunctionComponent<IProps> = ({ users }) => {
   return (
-    <div className="mt-[16px] flex flex-col flex-[1]">
-      <p className="mb-[8px] font-bold">Students</p>
-      <div className="flex-[1] p-[16px] rounded-[8px] max-h-[453px] overflow-auto shadow-md">
+    <div className="mt-4 flex flex-col flex-1">
+      <p className="mb-2 font-bold">Students</p>
+      <div className="flex-1 p-4 rounded-lg max-h-[453px] overflow-auto shadow-md">
         {users.map((user, idx, arr) => (
-          <div key={idx} className="mb-[16px] [&:last-child]:mb-0">
-            <div className="flex justify-between items-center mb-[16px]">
+          <div key={idx} className="mb-4 [&:last-child]:mb-0">
+            <div className="flex justify-between items-center mb-4">
               <IconTitle
                 Icon={<AvatarIcon />}
                 href={`/users/${user.id}`}
