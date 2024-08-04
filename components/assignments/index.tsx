@@ -48,7 +48,7 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
         />
         <CreateAssignment lessonId={lessonId} onDone={getAssignments} />
       </CardsContainer>
-      <Input bottomSpacing Icon={<SearchIcon />} placeholder="Search" />
+      <Input Icon={<SearchIcon />} placeholder="Search" />
       <BetterTable
         data={assignments.map(({ id, title }) => ({
           Name: (

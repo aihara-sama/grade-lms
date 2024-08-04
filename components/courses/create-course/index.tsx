@@ -59,10 +59,8 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
             <form action={submitCreateCourse}>
               <Input
                 label="Course name"
-                fullWidth
                 Icon={<CoursesIcon />}
                 placeholder="My course..."
-                bottomSpacing
                 name="title"
                 autoFocus
               />

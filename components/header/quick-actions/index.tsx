@@ -9,10 +9,10 @@ interface IProps {}
 const QuickActions: FunctionComponent<IProps> = () => {
   return (
     <div className="flex gap-[4px] items-center ml-auto">
-      <button className="icon-button hover:bg-gray-100 active:bg-gray-200">
+      <button className="icon-button">
         <MessagesIcon />
       </button>
-      <button className="icon-button hover:bg-gray-100 active:bg-gray-200">
+      <button className="icon-button">
         <NotificationsIcon />
       </button>
     </div>

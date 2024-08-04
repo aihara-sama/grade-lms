@@ -98,7 +98,7 @@ const LessonModal: FunctionComponent<IProps> = ({
         <>
           {lesson.course_id && (
             <button
-              className="icon-button hover:bg-gray-100 active:bg-gray-200"
+              className="icon-button"
               onClick={() =>
                 router.push(
                   `/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}`
@@ -109,10 +109,7 @@ const LessonModal: FunctionComponent<IProps> = ({
             </button>
           )}
           {lesson.id && (
-            <button
-              className="icon-button hover:bg-gray-100 active:bg-gray-200"
-              onClick={deleteLesson}
-            >
+            <button className="icon-button" onClick={deleteLesson}>
               <DeleteIcon />
             </button>
           )}
@@ -133,13 +130,10 @@ const LessonModal: FunctionComponent<IProps> = ({
             )}
             <Input
               name="title"
-              bottomSpacing
               Icon={<LessonsIcon size="xs" />}
               placeholder="Lesson name"
-              fullWidth
               onChange={(e) => setLessonTitle(e.target.value)}
               value={lessonTitle}
-              className="mb-4"
             />
           </form>
           <DateInput
@@ -153,7 +147,6 @@ const LessonModal: FunctionComponent<IProps> = ({
           />
           <Input
             label="Duration:"
-            fullWidth
             type="number"
             Icon={<TimeIcon />}
             value={`${millisecondsToMinutes(duration)}`}

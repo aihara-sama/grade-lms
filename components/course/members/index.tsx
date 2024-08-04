@@ -60,7 +60,7 @@ const Members: FunctionComponent<IProps> = ({ courseId }) => {
         />
         <EnrollUsers onDone={getMembers} courseId={courseId} />
       </CardsContainer>
-      <Input bottomSpacing Icon={<SearchIcon />} placeholder="Search" />
+      <Input Icon={<SearchIcon />} placeholder="Search" />
       <BetterTable
         data={members.map(({ name, role, id }) => ({
           Name: (

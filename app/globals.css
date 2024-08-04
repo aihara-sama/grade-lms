@@ -198,13 +198,16 @@
   button {
     @apply disabled:opacity-75 disabled:cursor-default disabled:bg-link !important;
   }
+  input {
+    @apply border border-gray-500 pl-8 pr-4 py-2 rounded-md text-sm w-full;
+  }
 }
 @layer components {
   .event {
     @apply absolute w-full text-[#f7f7f7] text-[13px] pl-[8px] z-[1] font-bold rounded-[3px] [transition:0.2s_background-color] select-none bg-link hover:bg-blue-200 active:bg-blue-300 before:content-[''] before:block before:h-[100%] before:w-[5px] before:bg-green-500 before:absolute before:left-0;
   }
   .icon-button {
-    @apply cursor-pointer rounded-[50%] p-[7px] w-[32px] h-[32px] flex justify-center items-center bg-white;
+    @apply cursor-pointer rounded-[50%] p-[7px] w-[32px] h-[32px] flex justify-center items-center bg-white hover:bg-gray-100 active:bg-gray-200;
   }
 
   .primary-button {

@@ -37,10 +37,7 @@ const Modal: FunctionComponent<IProps> = ({
           <p className="font-bold">{title}</p>
           <div className="flex items-center">
             {buttons}
-            <button
-              className="icon-button hover:bg-gray-100 active:bg-gray-200"
-              onClick={close}
-            >
+            <button className="icon-button" onClick={close}>
               <CloseIcon />
             </button>
           </div>

@@ -125,10 +125,8 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
           <span className="text">{lesson.title}</span>
         </div>
         <div className="flex items-center gap-[12px]">
-          <div className="flex items-center text-sm">
-            <button className="icon-button">
-              <TimeIcon />
-            </button>
+          <div className="flex items-center text-sm gap-1">
+            <TimeIcon />
             29min
           </div>
           <button

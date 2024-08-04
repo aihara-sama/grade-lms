@@ -46,7 +46,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
               onClick={() => setCurrentAssignmentId(assignment.id)}
             />
             <div className="flex items-center gap-[12px]">
-              <button className="icon-button shadow-md hover:bg-gray-100 active:bg-gray-200">
+              <button className="icon-button shadow-md">
                 <DeleteIcon />
               </button>
             </div>

@@ -132,7 +132,6 @@ const Chat: FunctionComponent<IProps> = ({ lessonId, userName, channel }) => {
         onChange={(e) => setMessage(e.target.value)}
         value={message}
         Icon={<AttachIcon />}
-        fullWidth
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             handleCreateMesssage();

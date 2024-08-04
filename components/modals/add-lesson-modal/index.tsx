@@ -83,10 +83,8 @@ const AddLessonModal: FunctionComponent<IProps> = ({
             value={lessonName}
             onChange={(e) => setLessonName(e.target.value)}
             name="title"
-            bottomSpacing
             Icon={<LessonsIcon size="xs" />}
             placeholder="Lesson name"
-            fullWidth
             className="mb-4"
           />
           <DateInput
@@ -97,7 +95,6 @@ const AddLessonModal: FunctionComponent<IProps> = ({
           />
           <Input
             label="Duration"
-            fullWidth
             type="number"
             Icon={<LessonsIcon />}
             value={`${millisecondsToMinutes(duration)}`}

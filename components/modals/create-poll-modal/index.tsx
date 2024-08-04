@@ -51,29 +51,21 @@ const CreatePollModal: FunctionComponent<IProps> = ({
       content={
         <form onSubmit={handleCreatePoll}>
           <Input
-            bottomSpacing
-            fullWidth
             placeholder="Title"
             name="title"
             Icon={<CoursesIcon size="sm" />}
           />
           <Input
-            bottomSpacing
-            fullWidth
             placeholder="Option 1"
             name="polls"
             Icon={<CourseIcon size="sm" />}
           />
           <Input
-            bottomSpacing
-            fullWidth
             placeholder="Option 2"
             name="polls"
             Icon={<CourseIcon size="sm" />}
           />
           <Input
-            bottomSpacing
-            fullWidth
             placeholder="Option 3"
             name="polls"
             Icon={<CourseIcon size="sm" />}

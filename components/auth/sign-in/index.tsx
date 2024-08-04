@@ -13,6 +13,7 @@ interface IProps {}
 
 const SignIn: FunctionComponent<IProps> = () => {
   const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -38,16 +39,12 @@ const SignIn: FunctionComponent<IProps> = () => {
           type="email"
           Icon={<EmailIcon />}
           placeholder="Email"
-          fullWidth
-          bottomSpacing
         />
         <Input
           name="password"
           Icon={<SecurityIcon />}
           placeholder="Password"
-          fullWidth
           type="password"
-          bottomSpacing
         />
         <button className="primary-button w-full" type="submit">
           Sign In

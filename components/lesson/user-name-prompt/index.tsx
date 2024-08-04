@@ -18,10 +18,8 @@ const UserNamePrompt: FunctionComponent<IProps> = () => {
       <Input
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
-        fullWidth
         Icon={<AvatarIcon size="xs" />}
         label="Enter your name"
-        bottomSpacing
         autoFocus
       />
       <button className="primary-button w-full" onClick={handleJoin}>

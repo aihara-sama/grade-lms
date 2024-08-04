@@ -9,18 +9,10 @@ interface IProps {}
 const GeneralTab: FunctionComponent<IProps> = () => {
   return (
     <>
-      <Input
-        name="name"
-        Icon={<AvatarIcon size="xs" />}
-        placeholder="Name"
-        bottomSpacing
-        fullWidth
-      />
+      <Input name="name" Icon={<AvatarIcon size="xs" />} placeholder="Name" />
       <Input
         Icon={<EmailIcon size="xs" />}
         placeholder="Email"
-        bottomSpacing
-        fullWidth
         type="email"
         name="email"
       />
@@ -28,8 +20,8 @@ const GeneralTab: FunctionComponent<IProps> = () => {
         name="password"
         Icon={<SecurityIcon size="xs" />}
         placeholder="Password"
-        fullWidth
         type="password"
+        className="mb-auto"
       />
     </>
   );

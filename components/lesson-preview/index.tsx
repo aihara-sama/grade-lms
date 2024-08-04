@@ -127,7 +127,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
         <div className="flex items-center mb-[12px]">
           <p className="text-center text-xl font-bold">Whiteboard preview</p>
           <button
-            className="icon-button shadow-md ml-auto mr-[8px] hover:bg-gray-100 active:bg-gray-200"
+            className="icon-button shadow-md ml-auto mr-[8px]"
             onClick={handleSaveWhiteboardData}
           >
             <SaveIcon />

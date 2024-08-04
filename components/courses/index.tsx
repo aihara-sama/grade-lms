@@ -65,11 +65,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
         />
         <CreateCourse userId={user.id} onDone={getCourses} />
       </CardsContainer>
-      <Input
-        bottomSpacing
-        Icon={<SearchIcon size="xs" />}
-        placeholder="Search"
-      />
+      <Input Icon={<SearchIcon size="xs" />} placeholder="Search" />
       <BetterTable
         data={courses.map(({ id, title, lessons, users }) => ({
           Name: (

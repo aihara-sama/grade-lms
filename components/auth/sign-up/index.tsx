@@ -11,15 +11,11 @@ import { useRouter } from "next/navigation";
 import { type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-// const isValidEmail = (email: string) => {
-//   const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-//   return regex.test(email);
-// };
-
 interface IProps {}
 
 const SignUp: FunctionComponent<IProps> = () => {
   const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -43,6 +39,7 @@ const SignUp: FunctionComponent<IProps> = () => {
     if (error) toast(error.message);
     else router.push("/dashboard");
   };
+
   return (
     <div className="flex flex-col justify-center items-center h-screen mx-4">
       <p className="page-title mb-6">Sign Up</p>
@@ -52,24 +49,18 @@ const SignUp: FunctionComponent<IProps> = () => {
           type="text"
           Icon={<AvatarIcon size="xs" />}
           placeholder="Name"
-          fullWidth
-          bottomSpacing
         />
         <Input
           name="email"
           type="email"
           Icon={<EmailIcon />}
           placeholder="Email"
-          fullWidth
-          bottomSpacing
         />
         <Input
           name="password"
           Icon={<SecurityIcon />}
           placeholder="Password"
-          fullWidth
           type="password"
-          bottomSpacing
         />
         <button className="primary-button w-full" type="submit">
           Sign Up

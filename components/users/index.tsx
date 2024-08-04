@@ -46,7 +46,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
         />
         <CreateUser onDone={getUsers} />
       </CardsContainer>
-      <Input bottomSpacing Icon={<SearchIcon />} placeholder="Search" />
+      <Input Icon={<SearchIcon />} placeholder="Search" />
       <BetterTable
         data={users.map(({ name, role, id }) => ({
           Name: (

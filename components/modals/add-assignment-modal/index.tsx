@@ -88,10 +88,8 @@ const AddAssignmentModal: FunctionComponent<IProps> = ({
       content={
         <div className="">
           <Input
-            bottomSpacing
             Icon={<LessonsIcon size="xs" />}
             placeholder="Assignment name"
-            fullWidth
             name="title"
             onChange={(e) =>
               setAssignment((prev) => ({ ...prev, title: e.target.value }))

@@ -66,7 +66,7 @@ const Lesson: FunctionComponent<IProps> = ({ lessonId, lesson, user }) => {
           className={`pl-[24px] relative border-l-2 border-gray-200 ${isRightSideOpen ? "flex-1" : "flex-[0]"}`}
         >
           <button
-            className={`icon-button shadow-md absolute top-2/4 -left-[16px] transform -translate-y-1/2 ${isRightSideOpen ? "[&>.icon]:rotate-0" : "[&>.icon]:rotate-180"} hover:bg-gray-100 active:bg-gray-200`}
+            className={`icon-button shadow-md absolute top-2/4 -left-[16px] transform -translate-y-1/2 ${isRightSideOpen ? "[&>.icon]:rotate-0" : "[&>.icon]:rotate-180"}`}
             onClick={() => setIsRightSideOpen((prev) => !prev)}
           >
             <ArrowRightIcon />

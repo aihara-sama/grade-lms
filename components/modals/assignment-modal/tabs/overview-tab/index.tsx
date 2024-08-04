@@ -23,10 +23,8 @@ const OverviewTab: FunctionComponent<IProps> = ({ onDone, assignment }) => {
   return (
     <div>
       <Input
-        bottomSpacing
         Icon={<LessonsIcon size="sm" />}
         placeholder="Assignment name"
-        fullWidth
         name="title"
         value={assignmentTitle}
         onChange={(e) => setAssignmentTitle(e.target.value)}

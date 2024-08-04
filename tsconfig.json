@@ -28,7 +28,9 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": false,
+    "noEmitOnError": false,
     "target": "es5",
+
     "plugins": [
       {
         "name": "next"
