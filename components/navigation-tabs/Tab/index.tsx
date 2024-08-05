@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+
 import type { FunctionComponent, ReactNode } from "react";
 
 interface IProps {

@@ -2,6 +2,7 @@
 
 import Tab from "@/components/navigation-tabs/tab";
 import { usePathname } from "next/navigation";
+
 import type { FunctionComponent, ReactNode } from "react";
 
 interface IItem {
