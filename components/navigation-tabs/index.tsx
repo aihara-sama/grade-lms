@@ -1,6 +1,6 @@
 "use client";
 
-import Tab from "@/components/navigation-tabs/tab";
+import Tab from "@/components/navigation-tabs/Tab";
 import { usePathname } from "next/navigation";
 
 import type { FunctionComponent, ReactNode } from "react";
