@@ -4,7 +4,7 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import MembersIcon from "@/components/icons/members-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
-import NavigationTabs from "@/components/navigation-tabs";
+import NavigationTabs from "@/components/nav-tabs";
 import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent, PropsWithChildren, ReactNode } from "react";
 

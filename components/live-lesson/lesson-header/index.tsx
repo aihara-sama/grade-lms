@@ -4,7 +4,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
-import NavigationTabs from "@/components/navigation-tabs";
+import NavigationTabs from "@/components/nav-tabs";
 import Link from "next/link";
 
 import type { Database } from "@/types/supabase.type";
