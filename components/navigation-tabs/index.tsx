@@ -1,5 +1,3 @@
-"use client";
-
 import Tab from "@/components/navigation-tabs/tab";
 import { usePathname } from "next/navigation";
 
