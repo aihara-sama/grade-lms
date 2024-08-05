@@ -1,19 +1,19 @@
 "use client";
 
 import { deleteUser } from "@/actions/delete-user";
+import DeleteButton from "@/components/buttons/delete-button";
+import CardsContainer from "@/components/cards-container";
+import IconTitle from "@/components/icon-title";
+import AvatarIcon from "@/components/icons/avatar-icon";
+import SearchIcon from "@/components/icons/search-icon";
+import Input from "@/components/input";
+import Table from "@/components/table";
+import Total from "@/components/total";
+import CreateUser from "@/components/users/create-user";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
-import DeleteButton from "../buttons/delete-button";
-import CardsContainer from "../cards-container";
-import IconTitle from "../icon-title";
-import AvatarIcon from "../icons/avatar-icon";
-import SearchIcon from "../icons/search-icon";
-import Input from "../input";
-import Table from "../table";
-import Total from "../total";
-import CreateUser from "./CreateUser";
 
 interface IProps {
   user: User;

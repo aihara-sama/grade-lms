@@ -4,11 +4,11 @@ import { createUser } from "@/actions/create-user";
 import CameraIcon from "@/components/icons/camera-icon";
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import Modal from "@/components/modal";
+import AvatarTab from "@/components/modals/create-user-modal/tabs/avatar-tab";
+import GeneralTab from "@/components/modals/create-user-modal/tabs/general-tab";
 import Tabs from "@/components/tabs";
 import { type FunctionComponent } from "react";
 import toast from "react-hot-toast";
-import AvatarTab from "./tabs/avatar-tab";
-import GeneralTab from "./tabs/general-tab";
 
 interface IProps {
   onDone: () => void;

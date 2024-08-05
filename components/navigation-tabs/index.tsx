@@ -1,8 +1,8 @@
 "use client";
 
+import Tab from "@/components/navigation-tabs/tab";
 import { usePathname } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
-import Tab from "./tab";
 
 interface IItem {
   title: string;

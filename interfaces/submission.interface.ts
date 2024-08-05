@@ -1,4 +1,4 @@
-import type { IUserMetadata } from "./user.interface";
+import type { IUserMetadata } from "@/interfaces/user.interface";
 
 export interface ISubmission {
   author: IUserMetadata;

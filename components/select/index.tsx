@@ -1,6 +1,6 @@
+import ArrowIcon from "@/components/icons/arrow-icon";
+import SelectPopper from "@/components/poppers/select-popper";
 import { useRef, useState, type FunctionComponent } from "react";
-import ArrowIcon from "../icons/arrow-icon";
-import SelectPopper from "../poppers/select-popper";
 
 interface IItem {
   title: string;

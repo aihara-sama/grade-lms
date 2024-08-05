@@ -1,13 +1,13 @@
 "use client";
 
+import CourseIcon from "@/components/icons/course-icon";
+import Input from "@/components/input";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 // import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
-import CourseIcon from "../../icons/course-icon";
-import Input from "../../input";
 
 interface IProps {
   course: Database["public"]["Tables"]["courses"]["Row"];

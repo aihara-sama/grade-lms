@@ -1,12 +1,12 @@
 "use client";
 
+import MicroDisabledIcon from "@/components/icons/micro-disabled-icon";
+import MicroIcon from "@/components/icons/micro-icon";
+import RemoveUserIcon from "@/components/icons/remove-user-icon";
+import VideoDisabledIcon from "@/components/icons/video-disabled-icon";
+import VideoIcon from "@/components/icons/video-icon";
 import type { ICamera } from "@/interfaces/camera.interface";
 import { useEffect, useRef, type FunctionComponent } from "react";
-import MicroDisabledIcon from "../icons/micro-disabled-icon";
-import MicroIcon from "../icons/micro-icon";
-import RemoveUserIcon from "../icons/remove-user-icon";
-import VideoDisabledIcon from "../icons/video-disabled-icon";
-import VideoIcon from "../icons/video-icon";
 
 interface IProps {
   anonId: string;

@@ -3,13 +3,13 @@
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Modal from "@/components/modal";
+import OverviewTab from "@/components/modals/assignment-modal/tabs/overview-tab";
+import SubmissionsTab from "@/components/modals/assignment-modal/tabs/submissions-tab";
 import Tabs from "@/components/tabs";
 import type { Assignment } from "@/types/assignments.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
-import OverviewTab from "./tabs/overview-tab";
-import SubmissionsTab from "./tabs/submissions-tab";
 
 interface IProps {
   assignmentId: string;

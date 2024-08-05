@@ -1,6 +1,5 @@
+import { IconSize } from "@/components/icons";
 import type { FunctionComponent } from "react";
-
-import { IconSize } from ".";
 
 interface Props {
   className?: string;

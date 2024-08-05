@@ -1,10 +1,10 @@
 "use client";
 
+import Logo from "@/components/logo";
 import type { NavItem } from "@/interfaces/navigation.interface";
 import clsx from "clsx";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
-import Logo from "../logo";
 
 interface Props {
   navItems: NavItem[];

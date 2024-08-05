@@ -1,9 +1,9 @@
 "use server";
 
+import type { ReturnType } from "@/actions/delete-user/types";
 import { ROLES } from "@/interfaces/user.interface";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
-import type { ReturnType } from "./types";
 
 const handler = async (userId: string): Promise<ReturnType> => {
   const currentUserPromise = createClient().auth.getUser();
