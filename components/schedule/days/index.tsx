@@ -7,7 +7,7 @@ import { forwardRef, memo, useEffect, useState } from "react";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
 import { useSchedule } from "@/hooks/useSchedule";
-import { getEventWidth } from "@/utils/get-event-wIdth";
+import { getEventWidth } from "@/utils/get-event-width";
 import {
   addDays,
   addHours,

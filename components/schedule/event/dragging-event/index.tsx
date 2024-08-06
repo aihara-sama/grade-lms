@@ -1,6 +1,6 @@
 import { useSchedule } from "@/hooks/useSchedule";
 import type { Database } from "@/types/supabase.type";
-import { getEventWidth } from "@/utils/get-event-wIdth";
+import { getEventWidth } from "@/utils/get-event-width";
 import { minToPx } from "@/utils/min-to-px";
 import { forwardRef, memo } from "react";
 
