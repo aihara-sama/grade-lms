@@ -122,16 +122,6 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     newStart: string,
     event: Database["public"]["Tables"]["lessons"]["Row"]
   ) => {
-    console.log({
-      ends: format(
-        addMinutes(
-          new Date(newStart),
-          millisecondsToMinutes(+new Date(event.ends) - +new Date(event.starts))
-        ),
-        "yyyy-MM-dd'T'HH:mm:ss"
-      ),
-    });
-
     const { error } = await supabaseClient.from("lessons").upsert({
       ...event,
       starts: format(newStart, "yyyy-MM-dd'T'HH:mm:ss"),
