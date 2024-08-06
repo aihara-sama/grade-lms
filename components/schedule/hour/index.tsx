@@ -63,12 +63,6 @@ function isFirstDateFromYesterdayOrMore(
   return startOfFirst <= startOfYesterday;
 }
 
-// Example usage:
-const firstDate = "2020-12-12T23:30:45";
-const secondDate = "2021-12-12T01:30:15";
-
-console.log(isFirstDateFromYesterdayOrMore(firstDate, secondDate)); // true
-
 const Hour: FunctionComponent<IProps> = ({
   day,
   index,
@@ -83,7 +77,6 @@ const Hour: FunctionComponent<IProps> = ({
       +new Date(lesson.starts) >= +new Date(hour) &&
       +new Date(lesson.starts) < +addHours(day, index + 1)
   );
-  console.log({ events });
 
   const yesterdayEvent = events.filter(
     (lesson) =>
@@ -92,12 +85,6 @@ const Hour: FunctionComponent<IProps> = ({
         format(hour, "yyyy-MM-dd'T'HH:mm:ss")
       ) && +new Date(lesson.ends) >= +new Date(hour)
   );
-  if (yesterdayEvent.length) {
-    console.log({
-      yesterdayEvent,
-      hour: format(hour, "yyyy-MM-dd'T'HH:mm:ss"),
-    });
-  }
 
   return (
     <>

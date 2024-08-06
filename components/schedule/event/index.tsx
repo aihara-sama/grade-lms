@@ -16,8 +16,6 @@ const Event: FunctionComponent<IProps> = ({
   index,
   isSummerDaylight,
 }) => {
-  console.log({ event });
-
   const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
   const draggingEvent = useSchedule((state) => state.draggingEvent);
   const setPointerOffsetPositionOnEvent = useSchedule(
