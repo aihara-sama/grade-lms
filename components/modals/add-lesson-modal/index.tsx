@@ -41,7 +41,7 @@ const AddLessonModal: FunctionComponent<IProps> = ({
 
     const { error } = await supabaseClient.from("lessons").insert({
       course_id: courseId,
-      title: new FormData(e.currentTarget).get("title") as string,
+      title: (new FormData(e.currentTarget).get("title") as string).trim(),
       starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
       ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
     });

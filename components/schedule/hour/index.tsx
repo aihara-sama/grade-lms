@@ -196,6 +196,7 @@ const Hour: FunctionComponent<IProps> = ({
             return (
               <>
                 <Event
+                  isInterdayEvent
                   isSummerDaylight={
                     index > 0 &&
                     isSummerDaylight(
@@ -208,7 +209,6 @@ const Hour: FunctionComponent<IProps> = ({
                   }
                   event={{
                     ...event,
-                    starts: format(startOfDay(hour), "yyyy-MM-dd'T'HH:mm:ss"),
                     ends: format(
                       addMilliseconds(
                         startOfDay(hour),
