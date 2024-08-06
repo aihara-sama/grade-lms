@@ -2,7 +2,7 @@ import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 import {
   addMinutes,
   format,
@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { getNextMorning } from "@/helpers/get-next-morning";
+import { getNextMorning } from "@/utils/get-next-morning";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {

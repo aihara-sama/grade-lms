@@ -10,8 +10,8 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import CreateUser from "@/components/users/create-user";
-import { supabaseClient } from "@/helpers/supabase/client";
 import type { Database } from "@/types/supabase.type";
+import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
 

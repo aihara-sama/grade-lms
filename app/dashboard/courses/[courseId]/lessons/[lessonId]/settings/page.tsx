@@ -2,7 +2,7 @@
 
 import LessonSettings from "@/components/lesson-settings";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 

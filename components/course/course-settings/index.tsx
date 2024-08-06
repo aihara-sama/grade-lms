@@ -2,8 +2,8 @@
 
 import CourseIcon from "@/components/icons/course-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/helpers/supabase/client";
 import type { Database } from "@/types/supabase.type";
+import { supabaseClient } from "@/utils/supabase/client";
 // import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";

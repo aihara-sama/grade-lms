@@ -6,8 +6,8 @@ import Modal from "@/components/modal";
 import OverviewTab from "@/components/modals/assignment-modal/tabs/overview-tab";
 import SubmissionsTab from "@/components/modals/assignment-modal/tabs/submissions-tab";
 import Tabs from "@/components/tabs";
-import { supabaseClient } from "@/helpers/supabase/client";
 import type { Assignment } from "@/types/assignments.type";
+import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 

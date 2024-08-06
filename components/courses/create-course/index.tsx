@@ -4,7 +4,7 @@ import AddCourseIcon from "@/components/icons/add-course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 

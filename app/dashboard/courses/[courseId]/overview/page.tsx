@@ -6,8 +6,8 @@ import Teacher from "@/components/course/teacher";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Total from "@/components/total";
-import { supabaseClient } from "@/helpers/supabase/client";
 import { ROLES } from "@/interfaces/user.interface";
+import { supabaseClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
 
 import type { FunctionComponent } from "react";

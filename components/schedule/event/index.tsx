@@ -8,8 +8,8 @@ import {
 } from "date-fns";
 import { memo, type FunctionComponent, type MouseEvent } from "react";
 
-import { minToPx } from "@/helpers/min-to-px";
 import { useSchedule } from "@/hooks/useSchedule";
+import { minToPx } from "@/utils/min-to-px";
 
 interface IProps {
   event: Database["public"]["Tables"]["lessons"]["Row"];

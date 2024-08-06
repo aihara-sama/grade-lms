@@ -1,6 +1,6 @@
 "use client";
 
-import { formatTimeUntilEvent } from "@/helpers/format-time-until-event";
+import { formatTimeUntilEvent } from "@/utils/format-time-until-event";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 interface IProps {

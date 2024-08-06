@@ -8,7 +8,7 @@ import Input from "@/components/input";
 import Message from "@/components/live-lesson/chat/message";
 import Poll from "@/components/live-lesson/chat/poll";
 import CreatePollModal from "@/components/modals/create-poll-modal";
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 

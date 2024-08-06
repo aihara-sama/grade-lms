@@ -1,7 +1,7 @@
 import LessonPreview from "@/components/lesson-preview";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { supabaseClient } from "@/helpers/supabase/client";
-import { createClient } from "@/helpers/supabase/server";
+import { supabaseClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 
 import { type FunctionComponent } from "react";
 

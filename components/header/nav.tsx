@@ -1,5 +1,5 @@
-import { supabaseClient } from "@/helpers/supabase/client";
 import type { NavItem } from "@/interfaces/navigation.interface";
+import { supabaseClient } from "@/utils/supabase/client";
 import { addMinutes, format } from "date-fns";
 import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";

@@ -1,7 +1,7 @@
 import Event from "@/components/schedule/event";
-import { minToPx } from "@/helpers/min-to-px";
 import { useSchedule } from "@/hooks/useSchedule";
 import type { Database } from "@/types/supabase.type";
+import { minToPx } from "@/utils/min-to-px";
 import {
   addHours,
   addMilliseconds,

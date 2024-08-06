@@ -1,4 +1,4 @@
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 

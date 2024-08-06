@@ -1,5 +1,5 @@
 import Users from "@/components/users";
-import { createClient } from "@/helpers/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 
 const Page = async () => {
   const {

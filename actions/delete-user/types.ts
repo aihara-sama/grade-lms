@@ -1,3 +1,3 @@
-import type { ActionState } from "@/helpers/create-safe-action";
+import type { ActionState } from "@/utils/create-safe-action";
 
 export type ReturnType = ActionState<null>;

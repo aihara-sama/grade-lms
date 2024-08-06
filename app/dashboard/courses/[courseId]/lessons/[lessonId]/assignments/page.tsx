@@ -1,6 +1,6 @@
 import Assignments from "@/components/assignments";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 
 import { type FunctionComponent } from "react";
 

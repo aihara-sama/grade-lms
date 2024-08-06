@@ -2,8 +2,8 @@
 
 import CourseHeader from "@/components/course/course-header";
 import CourseSettings from "@/components/course/course-settings";
-import { supabaseClient } from "@/helpers/supabase/client";
 import type { Database } from "@/types/supabase.type";
+import { supabaseClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 

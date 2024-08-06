@@ -4,8 +4,8 @@ import CardTitle from "@/components/card-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import CreateAssignmentModal from "@/components/modals/create-assignment-modal";
-import { supabaseClient } from "@/helpers/supabase/client";
 import type { Database } from "@/types/supabase.type";
+import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 interface IProps {

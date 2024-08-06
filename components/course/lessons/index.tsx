@@ -10,7 +10,7 @@ import CreateLesson from "@/components/live-lesson/create-lesson";
 import LessonModal from "@/components/modals/lesson-modal";
 import Table from "@/components/table";
 import Total from "@/components/total";
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 

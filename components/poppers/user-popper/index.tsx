@@ -12,7 +12,7 @@ import { useEffect, useRef } from "react";
 
 import AvatarIcon from "@/components/icons/avatar-icon";
 import LogoutIcon from "@/components/icons/logout-icon";
-import { supabaseClient } from "@/helpers/supabase/client";
+import { supabaseClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
