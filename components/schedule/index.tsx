@@ -50,7 +50,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const [hoveredDate, setHoveredDate] = useState<string>();
   const [defaultCourseId, setDefaulltCourseId] = useState<string>(null);
   const [courses, setCourses] = useState<Pick<Course, "id" | "title">[]>([
-    { title: "-", id: null },
+    { title: "No course", id: null },
   ]);
 
   // Zustand
@@ -116,7 +116,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       .eq("id", user.id)
       .single();
     if (error) toast.error(error.message);
-    else setCourses([{ title: "-", id: null }, ...data.courses]);
+    else setCourses([{ title: "No course", id: null }, ...data.courses]);
   };
   const handleSaveLesson = async (
     newStart: string,
@@ -249,8 +249,6 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const handleMouseUp = async () => {
     if (draggingEvent) {
       if (canDropEvent) {
-        console.log({ hoveredDate, draggingEvent });
-
         await handleSaveLesson(hoveredDate, draggingEvent);
       }
       draggingEventRef.current = undefined;
@@ -294,8 +292,8 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   return (
     <div onMouseUp={handleMouseUp}>
       <h1 className="page-title">Schedule</h1>
-      <p>View and manage your schedule</p>
-      <hr className="my-2 mb-4" />
+      <p className="text-neutral-500">View and manage your schedule</p>
+      <hr className="my-2 mb-8" />
       <div className="flex justify-between items-center mb-2">
         <div className="mt-1 flex items-center gap-3">
           <div className="flex gap-1 font-bold">
