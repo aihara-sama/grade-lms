@@ -7,7 +7,7 @@ import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
 import Select from "@/components/select";
-import { supabaseClient } from "@/utils/supabase/client";
+import { supabaseClient } from "@/helpers/supabase/client";
 import {
   addMinutes,
   format,

@@ -1,5 +1,5 @@
 import Courses from "@/components/courses";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/helpers/supabase/server";
 
 const Page = async () => {
   const {

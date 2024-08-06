@@ -8,9 +8,9 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import EnrollUsers from "@/components/users/enroll-users";
+import { supabaseClient } from "@/helpers/supabase/client";
 import { ROLES } from "@/interfaces/user.interface";
 import type { Database } from "@/types/supabase.type";
-import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 

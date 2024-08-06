@@ -24,10 +24,10 @@ const Table: FunctionComponent<IProps> = ({ data }) => {
         </div>
         <div className="p-2 flex flex-col gap-2">
           {data.map((row, idx) => (
-            <div key={idx} className="flex items-center gap-3 px-3 py-3">
+            <div key={idx} className="flex items-center gap-3 px-3 py-1">
               {keys.map((key, i) => (
                 <div
-                  className=" flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3]"
+                  className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3]"
                   key={i}
                 >
                   {row[key]}

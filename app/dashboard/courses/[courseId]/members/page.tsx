@@ -1,6 +1,6 @@
 import CourseHeader from "@/components/course/course-header";
 import Members from "@/components/course/members";
-import { supabaseClient } from "@/utils/supabase/client";
+import { supabaseClient } from "@/helpers/supabase/client";
 import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";

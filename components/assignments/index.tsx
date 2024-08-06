@@ -8,7 +8,7 @@ import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
-import { supabaseClient } from "@/utils/supabase/client";
+import { supabaseClient } from "@/helpers/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 import AssignmentModal from "@/components/modals/assignment-modal";

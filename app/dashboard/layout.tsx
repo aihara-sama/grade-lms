@@ -1,6 +1,6 @@
 import ContentWrapper from "@/components/content-wrapper";
 import Header from "@/components/header";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/helpers/supabase/server";
 
 import type { FunctionComponent, PropsWithChildren } from "react";
 

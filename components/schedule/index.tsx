@@ -6,9 +6,9 @@ import LessonModal from "@/components/modals/lesson-modal";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
 import Select from "@/components/select";
+import { getEventWidth } from "@/helpers/get-event-width";
+import { supabaseClient } from "@/helpers/supabase/client";
 import { useSchedule } from "@/hooks/useSchedule";
-import { getEventWidth } from "@/utils/get-event-width";
-import { supabaseClient } from "@/utils/supabase/client";
 import {
   addDays,
   addHours,

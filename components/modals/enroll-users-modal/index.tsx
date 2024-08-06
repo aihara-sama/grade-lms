@@ -1,8 +1,8 @@
 import CardTitle from "@/components/card-title";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import Modal from "@/components/modal";
+import { supabaseClient } from "@/helpers/supabase/client";
 import type { Database } from "@/types/supabase.type";
-import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 

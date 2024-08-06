@@ -1,7 +1,7 @@
+import { getEventWidth } from "@/helpers/get-event-width";
+import { minToPx } from "@/helpers/min-to-px";
 import { useSchedule } from "@/hooks/useSchedule";
 import type { Database } from "@/types/supabase.type";
-import { getEventWidth } from "@/utils/get-event-width";
-import { minToPx } from "@/utils/min-to-px";
 import { forwardRef, memo } from "react";
 
 interface IProps {

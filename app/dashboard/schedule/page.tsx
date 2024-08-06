@@ -1,5 +1,5 @@
 import Schedule from "@/components/schedule";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/helpers/supabase/server";
 
 const Page = async () => {
   const {

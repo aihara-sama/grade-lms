@@ -2,11 +2,11 @@
 
 import { CreateUser } from "@/actions/create-user/schema";
 import type { InputType, ReturnType } from "@/actions/create-user/types";
+import { createSafeAction } from "@/helpers/create-safe-action";
+import { supabaseAdmin } from "@/helpers/supabase/admin";
+import { createClient } from "@/helpers/supabase/server";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { ROLES } from "@/interfaces/user.interface";
-import { createSafeAction } from "@/utils/create-safe-action";
-import { supabaseAdmin } from "@/utils/supabase/admin";
-import { createClient } from "@/utils/supabase/server";
 
 const handler = async (payload: InputType): Promise<ReturnType> => {
   const {

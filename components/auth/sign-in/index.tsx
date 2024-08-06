@@ -3,7 +3,7 @@
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/utils/supabase/client";
+import { supabaseClient } from "@/helpers/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";

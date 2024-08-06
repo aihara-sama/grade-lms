@@ -5,7 +5,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import SaveIcon from "@/components/icons/save-icon";
 import Input from "@/components/input";
 import ResizeHandler from "@/components/resize-handler";
-import { supabaseClient } from "@/utils/supabase/client";
+import { supabaseClient } from "@/helpers/supabase/client";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import {
   addMinutes,

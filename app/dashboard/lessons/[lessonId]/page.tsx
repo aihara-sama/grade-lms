@@ -1,6 +1,6 @@
 import LiveLesson from "@/components/live-lesson";
-import { supabaseClient } from "@/utils/supabase/client";
-import { createClient } from "@/utils/supabase/server";
+import { supabaseClient } from "@/helpers/supabase/client";
+import { createClient } from "@/helpers/supabase/server";
 import { type FunctionComponent } from "react";
 
 interface IProps {
