@@ -122,6 +122,16 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     newStart: string,
     event: Database["public"]["Tables"]["lessons"]["Row"]
   ) => {
+    console.log({
+      ends: format(
+        addMinutes(
+          new Date(newStart),
+          millisecondsToMinutes(+new Date(event.ends) - +new Date(event.starts))
+        ),
+        "yyyy-MM-dd'T'HH:mm:ss"
+      ),
+    });
+
     const { error } = await supabaseClient.from("lessons").upsert({
       ...event,
       starts: format(newStart, "yyyy-MM-dd'T'HH:mm:ss"),
@@ -239,6 +249,8 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const handleMouseUp = async () => {
     if (draggingEvent) {
       if (canDropEvent) {
+        console.log({ hoveredDate, draggingEvent });
+
         await handleSaveLesson(hoveredDate, draggingEvent);
       }
       draggingEventRef.current = undefined;
@@ -280,8 +292,10 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   ]);
 
   return (
-    <div>
+    <div onMouseUp={handleMouseUp}>
       <h1 className="page-title">Schedule</h1>
+      <p>View and manage your schedule</p>
+      <hr className="my-2 mb-4" />
       <div className="flex justify-between items-center mb-2">
         <div className="mt-1 flex items-center gap-3">
           <div className="flex gap-1 font-bold">
@@ -346,7 +360,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
           ))}
         </div>
 
-        <div className="flex-1" ref={daysRef} onMouseUp={handleMouseUp}>
+        <div className="flex-1" ref={daysRef}>
           <div className="relative flex overflow-hidden">
             {days.map((day, idx) => {
               return (

@@ -4,9 +4,12 @@ import type { Database } from "@/types/supabase.type";
 import { minToPx } from "@/utils/min-to-px";
 import {
   addHours,
+  addMilliseconds,
   addMinutes,
+  format,
   hoursToMilliseconds,
   millisecondsToMinutes,
+  startOfDay,
 } from "date-fns";
 import type { FunctionComponent } from "react";
 import { memo } from "react";
@@ -23,6 +26,49 @@ interface IProps {
 const isSummerDaylight = (date1: Date, date2: Date) =>
   new Date(+date1).getTimezoneOffset() !== new Date(+date2).getTimezoneOffset();
 
+function parseDate(dateString: string) {
+  // Split the date and time parts
+  const [datePart, timePart] = dateString.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+  // Create a new Date object with the parsed values
+  return new Date(year, month - 1, day, hours, minutes, seconds);
+}
+
+function isFirstDateFromYesterdayOrMore(
+  firstDateStr: string,
+  secondDateStr: string
+) {
+  const first = parseDate(firstDateStr);
+  const second = parseDate(secondDateStr);
+
+  // Ensure both dates are valid
+  if (Number.isNaN(first.getTime()) || Number.isNaN(second.getTime())) {
+    throw new Error("Invalid date format");
+  }
+
+  // Get the start of the day for both dates
+  const startOfFirst = new Date(first);
+  startOfFirst.setHours(0, 0, 0, 0);
+
+  const startOfSecond = new Date(second);
+  startOfSecond.setHours(0, 0, 0, 0);
+
+  // Get the start of the day for the day before the second date
+  const startOfYesterday = new Date(startOfSecond);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+  // Check if the first date is from the day before or earlier than the second date
+  return startOfFirst <= startOfYesterday;
+}
+
+// Example usage:
+const firstDate = "2020-12-12T23:30:45";
+const secondDate = "2021-12-12T01:30:15";
+
+console.log(isFirstDateFromYesterdayOrMore(firstDate, secondDate)); // true
+
 const Hour: FunctionComponent<IProps> = ({
   day,
   index,
@@ -37,6 +83,21 @@ const Hour: FunctionComponent<IProps> = ({
       +new Date(lesson.starts) >= +new Date(hour) &&
       +new Date(lesson.starts) < +addHours(day, index + 1)
   );
+  console.log({ events });
+
+  const yesterdayEvent = events.filter(
+    (lesson) =>
+      isFirstDateFromYesterdayOrMore(
+        lesson.starts,
+        format(hour, "yyyy-MM-dd'T'HH:mm:ss")
+      ) && +new Date(lesson.ends) >= +new Date(hour)
+  );
+  if (yesterdayEvent.length) {
+    console.log({
+      yesterdayEvent,
+      hour: format(hour, "yyyy-MM-dd'T'HH:mm:ss"),
+    });
+  }
 
   return (
     <>
@@ -122,23 +183,59 @@ const Hour: FunctionComponent<IProps> = ({
             ></div>
           );
         })}
-        {hourEvents.map((event, idx) => (
-          <Event
-            isSummerDaylight={
-              index > 0 &&
-              isSummerDaylight(
-                addHours(day, index),
-                new Date(
-                  +new Date(event.starts) +
-                    (+new Date(event.ends) - +new Date(event.starts))
-                )
-              )
-            }
-            event={event}
-            key={idx}
-            index={idx}
-          />
-        ))}
+        {hourEvents.map((event, idx) => {
+          return (
+            <>
+              <Event
+                isSummerDaylight={
+                  index > 0 &&
+                  isSummerDaylight(
+                    addHours(day, index),
+                    new Date(
+                      +new Date(event.starts) +
+                        (+new Date(event.ends) - +new Date(event.starts))
+                    )
+                  )
+                }
+                event={event}
+                key={idx}
+                index={idx}
+              />
+            </>
+          );
+        })}
+        {new Date(hour).getHours() === 0 &&
+          yesterdayEvent.map((event, idx) => {
+            return (
+              <>
+                <Event
+                  isSummerDaylight={
+                    index > 0 &&
+                    isSummerDaylight(
+                      addHours(day, index),
+                      new Date(
+                        +new Date(event.starts) +
+                          (+new Date(event.ends) - +new Date(event.starts))
+                      )
+                    )
+                  }
+                  event={{
+                    ...event,
+                    starts: format(startOfDay(hour), "yyyy-MM-dd'T'HH:mm:ss"),
+                    ends: format(
+                      addMilliseconds(
+                        startOfDay(hour),
+                        +new Date(event.ends) - +startOfDay(new Date(hour))
+                      ),
+                      "yyyy-MM-dd'T'HH:mm:ss"
+                    ),
+                  }}
+                  key={idx}
+                  index={idx}
+                />
+              </>
+            );
+          })}
       </div>
     </>
   );
