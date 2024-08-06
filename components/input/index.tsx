@@ -34,7 +34,9 @@ const Input: FunctionComponent<IProps> = ({
 
   return (
     <div onClick={onClick} className={`mb-3 ${className}`}>
-      {label && <p className="mb-1 text-sm font-bold">{label}</p>}
+      {label && (
+        <p className="mb-1 text-sm font-bold text-neutral-500">{label}</p>
+      )}
       <div className="relative">
         <div className="absolute top-2/4 flex *:translate-y-[-50%] left-3">
           {Icon}

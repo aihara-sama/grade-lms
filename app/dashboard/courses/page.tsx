@@ -9,7 +9,7 @@ const Page = async () => {
   return (
     <div>
       <p className="page-title">Courses</p>
-      <p>View and manage courses</p>
+      <p className="text-neutral-500">View and manage courses</p>
       <hr className="my-2 mb-4" />
       <Courses user={user} />
     </div>

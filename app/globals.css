@@ -199,7 +199,7 @@
     @apply disabled:opacity-75 disabled:cursor-default disabled:bg-link !important;
   }
   input {
-    @apply border border-gray-500 pl-8 pr-4 py-2 rounded-md text-sm;
+    @apply border border-gray-500 pl-8 pr-4 py-[7.5px] rounded-md text-sm;
   }
 }
 @layer components {
@@ -211,18 +211,18 @@
   }
 
   .primary-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[8px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300 w-full;
+    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300 w-full;
   }
 
   .link-button {
     @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[8px] shadow-sm bg-link text-white hover:bg-blue-200 hover:text-white active:bg-blue-300;
   }
   .outline-button {
-    @apply rounded-[5px] flex items-center justify-center gap-[6px] p-[8px] pl-[12px] pr-[12px] whitespace-nowrap relative text-[15px] shadow-sm text-primary bg-white border border-gray-200 cursor-pointer hover:bg-gray-100 active:bg-gray-200;
+    @apply rounded-[5px] flex items-center justify-center gap-[6px] p-[6px] pl-[12px] pr-[12px] whitespace-nowrap relative text-[15px] shadow-sm text-primary bg-white border border-gray-200 cursor-pointer hover:bg-gray-100 active:bg-gray-200;
   }
 
   .page-title {
-    @apply text-[32px] font-bold max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden;
+    @apply text-3xl font-bold max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden text-neutral-600;
   }
   .section-title {
     @apply text-2xl font-bold mx-[0] my-[12px];

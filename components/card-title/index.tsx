@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
 
 interface IProps {
@@ -7,10 +8,12 @@ interface IProps {
   subtitle: string;
   onClick: () => void;
   onToggle?: (checked: boolean) => void;
+  href?: string;
 }
 
 const CardTitle: FunctionComponent<IProps> = ({
   Icon,
+  href,
   title,
   checked,
   subtitle,
@@ -27,7 +30,7 @@ const CardTitle: FunctionComponent<IProps> = ({
     >
       {onToggle && (isCardHovered || checked) ? (
         <input
-          className="m-[8.5px] cursor-pointer"
+          className="m-2 cursor-pointer w-4 h-4"
           onChange={(e) => onToggle(e.target.checked)}
           type="checkbox"
         />
@@ -36,7 +39,7 @@ const CardTitle: FunctionComponent<IProps> = ({
       )}
       <div className="flex flex-col justify-between gap-[2px] overflow-hidden flex-1">
         <div className="font-bold text-sm overflow-hidden overflow-ellipsis">
-          {title}
+          {href ? <Link href={href}>{title}</Link> : title}
         </div>
         <div className="text-xs text-light">{subtitle}</div>
       </div>

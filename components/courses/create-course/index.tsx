@@ -5,7 +5,6 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
 import { supabaseClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
@@ -15,7 +14,6 @@ interface IProps {
 }
 
 const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
-  const router = useRouter();
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
   const [courseTitle, setCourseTitle] = useState("");
 
@@ -27,7 +25,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
   };
 
   const submitCreateCourse = async (formData: FormData) => {
-    const { error, data } = await supabaseClient
+    const { error } = await supabaseClient
       .from("courses")
       .insert({
         title: formData.get("title") as string,
@@ -40,8 +38,8 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
     } else {
       toast("Course created");
       closeModal();
+      setCourseTitle("");
       onDone();
-      router.push(`/dashboard/courses/${data.id}/overview`);
     }
   };
 

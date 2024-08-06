@@ -35,7 +35,7 @@ const Modal: FunctionComponent<IProps> = ({
         className={`items-center flex-col z-[999] rounded-md shadow-md bg-white ${width === "md" ? "w-[400px]" : "w-[680px]"}`}
       >
         <div className="px-6 py-3 flex items-center justify-between shadow-sm">
-          <p className="font-bold">{title}</p>
+          <p className="font-bold text-neutral-600">{title}</p>
           <div className="flex items-center">
             {headerButtons}
             <button className="icon-button" onClick={close}>
