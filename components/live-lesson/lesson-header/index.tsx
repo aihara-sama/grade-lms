@@ -2,10 +2,10 @@ import Breadcrumbs from "@/components/breadcrumbs";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import OverviewIcon from "@/components/icons/dashboard-icon";
+import NotificationsIcon from "@/components/icons/notifications-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
 import NavigationTabs from "@/components/nav-tabs";
-import Link from "next/link";
 
 import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent, PropsWithChildren, ReactNode } from "react";
@@ -69,11 +69,13 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
         ]}
       />
       <div className="flex items-center justify-between">
-        <p className="page-title">{lesson?.title}</p>
+        <p className="text-3xl font-bold text-neutral-600 my-3">
+          {lesson?.title}
+        </p>
         <div className="flex items-center gap-3">
-          <div className="text-4 flex items-center gap-1 relative">
+          <div className="text-4 flex items-center gap-1 relative text-sm">
             <div
-              className={`absolute block w-3 h-3 rounded-[50%] -left-4 top-[7px] ${
+              className={`absolute block w-2 h-2 rounded-[50%] -left-4 top-[12px] ${
                 isLessonOngoing ? "bg-green-500" : "bg-yellow-200"
               }`}
             ></div>
@@ -85,15 +87,12 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
                 <span className="font-bold">
                   <LiveTime date={new Date(lesson.starts)} />
                 </span>
+                <button className="ml-2 icon-button text-amber-600 border border-amber-600">
+                  <NotificationsIcon size="xs" />
+                </button>
               </>
             )}
           </div>
-          <Link
-            className="link-button w-36"
-            href={`/dashboard/lessons/${lesson?.id}`}
-          >
-            Enter class
-          </Link>
         </div>
       </div>
       <NavigationTabs tabs={tabs} />

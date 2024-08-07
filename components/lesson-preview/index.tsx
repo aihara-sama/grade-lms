@@ -21,6 +21,9 @@ import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types
 import type { User } from "@supabase/supabase-js";
 import type { ChangeEvent, FunctionComponent } from "react";
 
+import CalendarIcon from "@/components/icons/calendar-icon";
+import WhiteboardIcon from "@/components/icons/whiteboard-icon";
+import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface IProps {
@@ -85,10 +88,15 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
   };
 
   return (
-    <div className="flex gap-6 mt-3" ref={containerRef}>
+    <div className="flex flex-col sm:flex-row gap-6 mt-3" ref={containerRef}>
       <main className="flex-1">
         <div className="flex items-center mb-3">
-          <p className="text-center text-xl font-bold">Whiteboard preview</p>
+          <div className="flex items-center gap-2">
+            <WhiteboardIcon size="sm" />
+            <p className="text-center text-neutral-600 font-bold">
+              Whiteboard preview
+            </p>
+          </div>
           <button
             className="icon-button shadow-md ml-auto mr-2"
             onClick={handleSaveWhiteboardData}
@@ -127,25 +135,41 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
           />
         </div>
       </main>
-      <aside className="pt-8">
+      <aside className="pt-12 flex flex-col">
+        <p className="text-neutral-600 ">Timeline</p>
+        <hr className="mb-6" />
         <DateInput
           date={starts}
           onChange={handleChangeDate}
           label="Starts at"
           popperPlacement="bottom-start"
         />
-        <div className="mb-2 mt-3 text-4">Duration:</div>
         <Input
+          className="mt-3 mb-0"
+          label="Duration"
           fullWIdth
           type="number"
           Icon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={handleChangeDuration}
         />
-        <hr className="mx-0 my-2 border-divider" />
         <button className="primary-button" onClick={handleSave}>
           Save
         </button>
+        <div className="mt-3 sm:mt-auto flex flex-col gap-1">
+          <Link
+            className="warning-button "
+            href={`/dashboard/lessons/${lesson?.id}`}
+          >
+            Enter class
+          </Link>
+          <Link
+            className="link-button flex gap-2 items-center"
+            href="/dashboard/schedule"
+          >
+            Find in schedule <CalendarIcon />
+          </Link>
+        </div>
       </aside>
     </div>
   );

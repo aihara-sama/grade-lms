@@ -12,7 +12,7 @@ const QuickActions: FunctionComponent<IProps> = () => {
       <button className="icon-button">
         <MessagesIcon />
       </button>
-      <button className="icon-button">
+      <button className="icon-button text-neutral-600">
         <NotificationsIcon />
       </button>
     </div>
