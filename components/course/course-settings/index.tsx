@@ -1,6 +1,6 @@
 "use client";
 
-import CourseIcon from "@/components/icons/course-icon";
+import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
@@ -42,10 +42,10 @@ const CourseSettings: FunctionComponent<IProps> = ({
     <div>
       <p className="section-title">Settings</p>
       <div>
-        <p className="mb-1">Course name</p>
-        <div className="flex items-stretch gap-[4px]">
+        <div className="flex items-end gap-[4px]">
           <Input
-            Icon={<CourseIcon size="xs" />}
+            label="Course name"
+            Icon={<CoursesIcon size="xs" />}
             value={courseTitle}
             onChange={(e) => setCourseTitle(e.target.value)}
             className="mb-auto"
