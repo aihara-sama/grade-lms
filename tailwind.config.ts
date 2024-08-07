@@ -43,6 +43,12 @@ const config: Config = {
         transparent: "#ffffff00",
         mask: "#00000061",
 
+        amber: {
+          500: "#fbbf24",
+          520: "#f2b311",
+          550: "#d89c00",
+        },
+
         blue: {
           100: "#3D9BF1",
           200: "#3194ee",

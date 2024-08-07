@@ -57,7 +57,9 @@ const CourseHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
           },
         ]}
       />
-      <p className="page-title">{course?.title}</p>
+      <p className="text-3xl font-bold text-neutral-600 my-3">
+        {course?.title}
+      </p>
       <NavigationTabs tabs={tabs} />
     </>
   );

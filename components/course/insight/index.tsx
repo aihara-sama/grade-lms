@@ -63,7 +63,7 @@ const Insight: FunctionComponent<IProps> = ({ data, labels, label }) => {
     return () => window.removeEventListener("resize", handleSetChartWidth);
   }, []);
   return (
-    <div className="flex-[1">
+    <div className="flex-[1] h-[300px]">
       <div
         className="h-[300px] overflow-hidden relative"
         style={{

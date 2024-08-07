@@ -15,7 +15,6 @@ import { useEffect, useState, type FunctionComponent } from "react";
 import CardTitle from "@/components/card-title";
 import DeleteIcon from "@/components/icons/delete-icon";
 import Modal from "@/components/modal";
-import Skeleton from "@/components/skeleton";
 import type { Database } from "@/types/supabase.type";
 import type { User } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
@@ -139,8 +138,6 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
           }))}
         />
       )}
-
-      {isCoursesLoading && <Skeleton />}
 
       {!courses.length && !isCoursesLoading && (
         <div className="flex justify-center mt-12">

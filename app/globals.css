@@ -211,11 +211,14 @@
   }
 
   .primary-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300 w-full;
+    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300 w-full font-bold;
+  }
+  .warning-button {
+    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-amber-400 hover:text-white hover:bg-amber-520 active:bg-amber-550 w-full font-bold;
   }
 
   .link-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[8px] shadow-sm bg-link text-white hover:bg-blue-200 hover:text-white active:bg-blue-300;
+    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] shadow-sm bg-link text-white hover:bg-blue-200 hover:text-white active:bg-blue-300 font-bold;
   }
   .outline-button {
     @apply rounded-[5px] flex items-center justify-center gap-[6px] p-[6px] pl-[12px] pr-[12px] whitespace-nowrap relative text-[15px] shadow-sm text-primary bg-white border border-gray-200 cursor-pointer hover:bg-gray-100 active:bg-gray-200;
@@ -225,7 +228,7 @@
     @apply text-3xl font-bold max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden text-neutral-600;
   }
   .section-title {
-    @apply text-2xl font-bold mx-[0] my-[12px];
+    @apply text-xl font-bold mx-[0] my-[12px] text-neutral-600;
   }
 
   .group-buttons {

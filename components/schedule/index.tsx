@@ -27,21 +27,11 @@ import type { Lesson } from "@/types/lessons.type";
 import type { Database } from "@/types/supabase.type";
 import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent } from "react";
+import { getWeekDays } from "@/utils/get-week-days";
 
 interface IProps {
   user: User;
 }
-const getWeekDays = (start = new Date()) => {
-  return [
-    format(addDays(start, 0), "MM/dd/yyyy"),
-    format(addDays(start, 1), "MM/dd/yyyy"),
-    format(addDays(start, 2), "MM/dd/yyyy"),
-    format(addDays(start, 3), "MM/dd/yyyy"),
-    format(addDays(start, 4), "MM/dd/yyyy"),
-    format(addDays(start, 5), "MM/dd/yyyy"),
-    format(addDays(start, 6), "MM/dd/yyyy"),
-  ];
-};
 
 const Schedule: FunctionComponent<IProps> = ({ user }) => {
   // State

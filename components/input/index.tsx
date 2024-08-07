@@ -38,7 +38,7 @@ const Input: FunctionComponent<IProps> = ({
         <p className="mb-1 text-sm font-bold text-neutral-500">{label}</p>
       )}
       <div className="relative">
-        <div className="absolute top-2/4 flex *:translate-y-[-50%] left-3">
+        <div className="absolute top-2/4 flex *:translate-y-[-50%] left-3 text-neutral-600">
           {Icon}
         </div>
         <input

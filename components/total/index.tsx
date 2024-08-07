@@ -10,7 +10,7 @@ interface IProps {
 
 const Total: FunctionComponent<IProps> = ({ total, href, title, Icon }) => {
   return (
-    <div className="shadow-md flex flex-col items-center p-6 w-full rounded-md sm:w-64">
+    <div className="shadow-md flex flex-col items-center p-6 w-full rounded-md sm:w-64 text-neutral-600">
       {Icon}
       <hr className="w-full my-3" />
       <p className="text-neutral-500">{title}</p>
