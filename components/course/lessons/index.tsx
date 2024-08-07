@@ -2,7 +2,6 @@
 
 import DeleteButton from "@/components/buttons/delete-button";
 import CardsContainer from "@/components/cards-container";
-import IconTitle from "@/components/icon-title";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
@@ -14,14 +13,21 @@ import { supabaseClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 
+import CardTitle from "@/components/card-title";
+import DeleteIcon from "@/components/icons/delete-icon";
+import Modal from "@/components/modal";
 import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent } from "react";
+import toast from "react-hot-toast";
 
 interface IProps {
   courseId: string;
   userId: string;
 }
 const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
+  const [isDeleteBulkLessonsModalOpen, setIsDeleteBulkLessonsModalOpen] =
+    useState(false);
+  const [lessonsIds, setLessonsIds] = useState<string[]>([]);
   const [lessons, seteLessons] = useState<
     Database["public"]["Tables"]["lessons"]["Row"][]
   >([]);
@@ -54,6 +60,19 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
       error: error ? error.message : null,
     };
   };
+  const handleBulkDeleteLessons = async () => {
+    const { error } = await supabaseClient
+      .from("lessons")
+      .delete()
+      .in("id", lessonsIds);
+
+    if (error) toast.error("Something went wrong");
+
+    setLessonsIds([]);
+    setIsDeleteBulkLessonsModalOpen(false);
+
+    getLessons();
+  };
 
   useEffect(() => {
     getLessons();
@@ -70,16 +89,37 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
         />
         <CreateLesson onDone={getLessons} courseId={courseId} />
       </CardsContainer>
-      <Input Icon={<SearchIcon />} placeholder="Search" />
+      {!lessonsIds.length ? (
+        <Input
+          Icon={<SearchIcon size="xs" />}
+          placeholder="Search"
+          className="w-auto"
+        />
+      ) : (
+        <div className="mb-3">
+          <button
+            onClick={() => setIsDeleteBulkLessonsModalOpen(true)}
+            className="outline-button flex font-semibold gap-2 items-center"
+          >
+            Delete <DeleteIcon />
+          </button>
+        </div>
+      )}
       <Table
         data={lessons.map(({ id, title, starts }) => ({
           Name: (
-            <IconTitle
-              Icon={<LessonsIcon size="sm" />}
-              key={id}
+            <CardTitle
+              href={`/dashboard/courses/${courseId}/lessons/${id}/overview`}
+              checked={lessonsIds.includes(id)}
+              Icon={<LessonsIcon size="md" />}
               title={title}
               subtitle=""
-              href={`/dashboard/courses/${courseId}/lessons/${id}/overview`}
+              onClick={() => {}}
+              onToggle={(checked) =>
+                checked
+                  ? setLessonsIds((prev) => [...prev, id])
+                  : setLessonsIds((prev) => prev.filter((_id) => _id !== id))
+              }
             />
           ),
           Starts: format(new Date(starts), "EEEE, MMM d"),
@@ -110,6 +150,33 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
           close={() => setIsLessonModalOpen(false)}
           onDone={() => getLessons()}
           courses={[]}
+        />
+      )}
+      {isDeleteBulkLessonsModalOpen && (
+        <Modal
+          close={() => setIsDeleteBulkLessonsModalOpen(false)}
+          title="Delete Lessons"
+          content={
+            <>
+              <p className="mb-4">
+                Are you sure you want to delete selected lessons?
+              </p>
+              <div className="group-buttons">
+                <button
+                  className="outline-button w-full"
+                  onClick={() => setIsDeleteBulkLessonsModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="primary-button"
+                  onClick={handleBulkDeleteLessons}
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          }
         />
       )}
     </>
