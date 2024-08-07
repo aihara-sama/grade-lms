@@ -1,6 +1,5 @@
 import IconTitle from "@/components/icon-title";
 import AvatarIcon from "@/components/icons/avatar-icon";
-import MessagesIcon from "@/components/icons/messages-icon";
 import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent } from "react";
 
@@ -22,9 +21,6 @@ const Students: FunctionComponent<IProps> = ({ users }) => {
                 title={user.name}
                 subtitle={user.role}
               />
-              <button className="icon-button">
-                <MessagesIcon />
-              </button>
             </div>
             {idx !== arr.length - 1 && <hr />}
           </div>

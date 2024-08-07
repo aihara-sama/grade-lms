@@ -54,7 +54,9 @@ create policy "Can insert course's data." on courses for insert with check (true
 create table user_courses (
   user_id uuid references public.users on delete cascade not null,
   course_id uuid references public.courses on delete cascade not null,
+  created_at timestamp not null default now(),
   primary key (user_id, course_id)
+  
 );
 
 
