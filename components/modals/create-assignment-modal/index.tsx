@@ -91,12 +91,19 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
             value={assignment.title}
           />
           <p>Description</p>
-          <Editor
-            onChange={(data) =>
-              setAssignment((prev) => ({ ...prev, body: JSON.stringify(data) }))
-            }
-            data={JSON.parse(assignment.body)}
-          />
+          <div className="min-h-[320px]">
+            {" "}
+            <Editor
+              onChange={(data) =>
+                setAssignment((prev) => ({
+                  ...prev,
+                  body: JSON.stringify(data),
+                }))
+              }
+              data={JSON.parse(assignment.body)}
+            />
+          </div>
+
           <div className="flex gap-3 items-center mt-3">
             <div className="pr-3 border-r-2 border-gray-200">
               <DateInput

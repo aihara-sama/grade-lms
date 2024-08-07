@@ -7,6 +7,7 @@ import OverviewTab from "@/components/modals/assignment-modal/tabs/overview-tab"
 import SubmissionsTab from "@/components/modals/assignment-modal/tabs/submissions-tab";
 import Tabs from "@/components/tabs";
 import type { Assignment } from "@/types/assignments.type";
+import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -23,6 +24,8 @@ const AssignmentModal: FunctionComponent<IProps> = ({
   onDone,
 }) => {
   const [assignment, setAssignment] = useState<Assignment>();
+  const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
+  console.log({ submissions });
 
   const saveAssignment = async (_assignment: Assignment) => {
     const { error } = await supabaseClient
@@ -38,6 +41,25 @@ const AssignmentModal: FunctionComponent<IProps> = ({
       close();
     }
   };
+
+  const getSubmissions = () => {
+    return supabaseClient
+      .from("submissions")
+      .select("*, author:users(*)")
+      .eq("assignment_id", assignmentId);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await getSubmissions();
+
+      if (error) {
+        toast(error.message);
+      } else {
+        setSubmissions(data);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -57,22 +79,27 @@ const AssignmentModal: FunctionComponent<IProps> = ({
       close={close}
       title="Assignment"
       content={
-        <Tabs
-          tabs={[
-            {
-              title: "Overview",
-              Icon: <OverviewIcon />,
-              content: assignment && (
-                <OverviewTab assignment={assignment} onDone={saveAssignment} />
-              ),
-            },
-            {
-              title: "Submissions",
-              Icon: <SubmissionsIcon />,
-              content: <SubmissionsTab submissions={[]} />,
-            },
-          ]}
-        />
+        <div className="min-h-[523px]">
+          <Tabs
+            tabs={[
+              {
+                title: "Overview",
+                Icon: <OverviewIcon />,
+                content: assignment && (
+                  <OverviewTab
+                    assignment={assignment}
+                    onDone={saveAssignment}
+                  />
+                ),
+              },
+              {
+                title: "Submissions",
+                Icon: <SubmissionsIcon />,
+                content: <SubmissionsTab submissions={submissions} />,
+              },
+            ]}
+          />
+        </div>
       }
     />
   );

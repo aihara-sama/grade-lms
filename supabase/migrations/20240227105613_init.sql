@@ -111,7 +111,10 @@ create table submissions (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   assignment_id uuid references public.assignments on delete cascade not null,
   user_id uuid references public.users on delete cascade not null,
-  body text not null
+  body text not null,
+  title text not null,
+  grade int,
+  created_at timestamp not null default now()
 );
 
 -- Create a function to create a lesson and its assignments

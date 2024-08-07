@@ -21,14 +21,16 @@ const EDITTOR_HOLDER_ID = "editorjs";
 interface IProps {
   data: OutputData;
   onChange: (data: OutputData) => void;
+  readOnly?: boolean;
 }
 
-const Editor: FunctionComponent<IProps> = ({ data, onChange }) => {
+const Editor: FunctionComponent<IProps> = ({ data, onChange, readOnly }) => {
   const ejInstance = useRef<EditorJS>();
   // const [editorData, setEditorData] = useState<OutputData>(data);
 
   const initEditor = () => {
     const editor = new EditorJS({
+      readOnly,
       inlineToolbar: true,
       sanitizer: {},
       placeholder: "Start here...",

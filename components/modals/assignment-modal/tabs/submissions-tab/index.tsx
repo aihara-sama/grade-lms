@@ -1,30 +1,52 @@
 import IconTitle from "@/components/icon-title";
-import AvatarIcon from "@/components/icons/avatar-icon";
+import SubmissionsIcon from "@/components/icons/submissions-icon";
+import ViewSubmissionModal from "@/components/modals/view-submission-modal";
 import Table from "@/components/table";
-import type { ISubmission } from "@/interfaces/submission.interface";
-import type { FunctionComponent } from "react";
+import type { SubmissionWithAuthor } from "@/types/submissions.type";
+import { format } from "date-fns";
+import Link from "next/link";
+
+import { useState, type FunctionComponent } from "react";
 
 interface IProps {
-  submissions: ISubmission[];
+  submissions: SubmissionWithAuthor[];
 }
 
 const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<string>();
   return (
     <div>
       <Table
-        data={submissions.map(({ id, author, created }) => ({
-          Author: (
+        data={submissions.map(({ id, author, title, grade, created_at }) => ({
+          Name: (
             <IconTitle
-              Icon={<AvatarIcon size="md" />}
+              Icon={<SubmissionsIcon size="sm" />}
               key={id}
-              title={author.name}
-              subtitle={author.role}
-              href={`/users/${id}`}
+              title={title}
+              subtitle=""
+              onClick={() => setSelectedSubmissionId(id)}
             />
           ),
-          Submitted: created,
+          Author: (
+            <Link className="text-sm" href={`/users/${author.id}`}>
+              {author.name}
+            </Link>
+          ),
+          Grade: <p className="text-sm">{grade}</p>,
+          Submitted: (
+            <p className="text-sm">
+              {format(new Date(created_at), "EEEE, MMM d")}
+            </p>
+          ),
         }))}
       />
+      {selectedSubmissionId && (
+        <ViewSubmissionModal
+          closeModal={() => setSelectedSubmissionId(undefined)}
+          onDone={() => {}}
+          submissionId={selectedSubmissionId}
+        />
+      )}
     </div>
   );
 };

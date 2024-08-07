@@ -228,19 +228,28 @@ export type Database = {
         Row: {
           assignment_id: string;
           body: string;
+          created_at: string;
+          grade: number | null;
           id: string;
+          title: string;
           user_id: string;
         };
         Insert: {
           assignment_id: string;
           body: string;
+          created_at?: string;
+          grade?: number | null;
           id?: string;
+          title: string;
           user_id: string;
         };
         Update: {
           assignment_id?: string;
           body?: string;
+          created_at?: string;
+          grade?: number | null;
           id?: string;
+          title?: string;
           user_id?: string;
         };
         Relationships: [

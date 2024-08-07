@@ -24,7 +24,6 @@ const CardTitle: FunctionComponent<IProps> = ({
   return (
     <div
       className="text-primary flex items-center gap-3"
-      onClick={onClick}
       onMouseEnter={() => setIsCardHovered(true)}
       onMouseLeave={() => setIsCardHovered(false)}
     >
@@ -38,7 +37,10 @@ const CardTitle: FunctionComponent<IProps> = ({
         Icon
       )}
       <div className="flex flex-col justify-between gap-[2px] overflow-hidden flex-1">
-        <div className="font-bold text-sm overflow-hidden overflow-ellipsis">
+        <div
+          onClick={onClick}
+          className="cursor-pointer font-bold text-sm overflow-hidden overflow-ellipsis"
+        >
           {href ? <Link href={href}>{title}</Link> : title}
         </div>
         <div className="text-xs text-light">{subtitle}</div>

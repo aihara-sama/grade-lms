@@ -2,7 +2,6 @@
 
 import CreateAssignment from "@/components/assignments/create-assignment";
 import CardsContainer from "@/components/cards-container";
-import IconTitle from "@/components/icon-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
@@ -11,14 +10,23 @@ import Total from "@/components/total";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 
+import CardTitle from "@/components/card-title";
+import DeleteIcon from "@/components/icons/delete-icon";
+import Modal from "@/components/modal";
 import AssignmentModal from "@/components/modals/assignment-modal";
 import type { Assignment } from "@/types/assignments.type";
+import toast from "react-hot-toast";
 
 interface IProps {
   lessonId: string;
 }
 const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
   // States
+  const [
+    isDeleteBulkAssignmentsModalOpen,
+    setIsDeleteBulkAssignmentsModalOpen,
+  ] = useState(false);
+  const [assignmentsIds, setAssignmentsIds] = useState<string[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [currentAssignmentId, setCurrentAssignmentId] = useState<
     string | undefined
@@ -31,6 +39,19 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
       .eq("lesson_id", lessonId);
 
     setAssignments(data.data);
+  };
+  const handleBulkDeleteAssignments = async () => {
+    const { error } = await supabaseClient
+      .from("assignments")
+      .delete()
+      .in("id", assignmentsIds);
+
+    if (error) toast.error("Something went wrong");
+
+    setAssignmentsIds([]);
+    setIsDeleteBulkAssignmentsModalOpen(false);
+
+    getAssignments();
   };
 
   // Effects
@@ -48,17 +69,39 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
           title="Total assignments"
         />
         <CreateAssignment lessonId={lessonId} onDone={getAssignments} />
-      </CardsContainer>
-      <Input Icon={<SearchIcon />} placeholder="Search" />
+      </CardsContainer>{" "}
+      {!assignmentsIds.length ? (
+        <Input
+          Icon={<SearchIcon size="xs" />}
+          placeholder="Search"
+          className="w-auto"
+        />
+      ) : (
+        <div className="mb-3">
+          <button
+            onClick={() => setIsDeleteBulkAssignmentsModalOpen(true)}
+            className="outline-button flex font-semibold gap-2 items-center"
+          >
+            Delete <DeleteIcon />
+          </button>
+        </div>
+      )}
       <Table
         data={assignments.map(({ id, title }) => ({
           Name: (
-            <IconTitle
-              Icon={<AssignmentsIcon size="sm" />}
-              key={id}
+            <CardTitle
+              onClick={() => setCurrentAssignmentId(id)}
+              checked={assignmentsIds.includes(id)}
+              Icon={<AssignmentsIcon size="md" />}
               title={title}
               subtitle=""
-              onClick={() => setCurrentAssignmentId(id)}
+              onToggle={(checked) =>
+                checked
+                  ? setAssignmentsIds((prev) => [...prev, id])
+                  : setAssignmentsIds((prev) =>
+                      prev.filter((_id) => _id !== id)
+                    )
+              }
             />
           ),
         }))}
@@ -71,6 +114,33 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
             setCurrentAssignmentId(undefined);
           }}
           close={() => setCurrentAssignmentId(undefined)}
+        />
+      )}
+      {isDeleteBulkAssignmentsModalOpen && (
+        <Modal
+          close={() => setIsDeleteBulkAssignmentsModalOpen(false)}
+          title="Delete Assignments"
+          content={
+            <>
+              <p className="mb-4">
+                Are you sure you want to delete selected assignments?
+              </p>
+              <div className="group-buttons">
+                <button
+                  className="outline-button w-full"
+                  onClick={() => setIsDeleteBulkAssignmentsModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="primary-button"
+                  onClick={handleBulkDeleteAssignments}
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          }
         />
       )}
     </>
