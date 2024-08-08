@@ -10,8 +10,8 @@ import type {
 } from "react";
 import { useEffect, useRef } from "react";
 
-import AvatarIcon from "@/components/icons/avatar-icon";
 import LogoutIcon from "@/components/icons/logout-icon";
+import type { ROLES } from "@/interfaces/user.interface";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -22,7 +22,8 @@ interface IProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   anhrolElRef: MutableRefObject<HTMLDivElement>;
   userName: string;
-  role: string;
+  role: ROLES;
+  avatar: string;
 }
 
 const UserPopper: FunctionComponent<IProps> = ({
@@ -32,6 +33,7 @@ const UserPopper: FunctionComponent<IProps> = ({
   anhrolElRef,
   role,
   userName,
+  avatar,
 }) => {
   const router = useRouter();
   const popperRef = useRef<HTMLDivElement>();
@@ -66,8 +68,12 @@ const UserPopper: FunctionComponent<IProps> = ({
       className={`${isOpen ? "block" : "hidden"} bg-white shadow-sm absolute right-[22px] top-[71px] w-[230px] px-[0] py-[14px] rounded-[3px]`}
     >
       <div className="ml-[16px] flex items-center gap-[8px]">
-        <AvatarIcon />
-        <div className="flex flex-col justify-between gap-[2px] flex-[1]">
+        <img
+          className="[border-radius:50%] w-9 h-9"
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
+          alt=""
+        />
+        <div className="flex flex-col justify-between flex-[1]">
           <div className="font-bold text-base">{userName}</div>
           <div className="text-sm text-light">{role}</div>
         </div>

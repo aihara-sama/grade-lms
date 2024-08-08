@@ -62,6 +62,7 @@ const Header: FunctionComponent<IProps> = ({ user }) => {
           <User
             userName={(user.user_metadata as IUserMetadata).name}
             role={(user.user_metadata as IUserMetadata).role}
+            avatar={(user.user_metadata as IUserMetadata).avatar}
           />
           <MobileDrawer navItems={navItems} />
         </>

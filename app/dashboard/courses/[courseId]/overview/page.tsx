@@ -55,7 +55,11 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
           <CourseInsights courseId={params.courseId} />
         </div>
         <div className="[flex-basis:300px] self-stretch xl:flex flex-col hidden">
-          <Teacher id={teacher.id} name={teacher.name} />
+          <Teacher
+            id={teacher.id}
+            name={teacher.name}
+            avatar={teacher.avatar}
+          />
           <Students
             users={users.filter((user) => user.role === ROLES.STUDENT)}
           />

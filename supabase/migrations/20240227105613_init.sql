@@ -9,6 +9,7 @@ create table users (
   name text not null,
   role text not null,
   email text not null,
+  avatar text not null,
   fcm_token text
 );
 alter table users enable row level security;
@@ -21,8 +22,8 @@ create policy "Can update own's data." on users for update using (auth.uid() = i
 create function public.handle_new_user() 
 returns trigger as $$
 begin
-  insert into public.users (id, email, name, role, creator_id)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'role', new.raw_user_meta_data->>'creator_id');
+  insert into public.users (id, email, name, role, avatar, creator_id)
+  values (new.id, new.email, new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'role', new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'creator_id');
   return new;
 end;
 $$ language plpgsql security definer;
@@ -189,3 +190,13 @@ $$ language plpgsql;
 -- Example usage:
 -- SELECT create_poll_with_options_and_message('Poll Title', '[{"title": "Option 1"}, {"title": "Option 2"}, {"title": "Option 3"}]');
 
+create or replace function public.get_users_not_in_course(p_course_id uuid)
+returns setof public.users as $$
+begin
+    return query
+    select u.*
+    from public.users u
+    left join public.user_courses uc on u.id = uc.user_id and uc.course_id = p_course_id
+    where uc.user_id is null;
+end;
+$$ language plpgsql;

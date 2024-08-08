@@ -34,6 +34,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       name: payload.name,
       creator_id: user.id,
       role: ROLES.STUDENT,
+      avatar: payload.avatar,
     } as IUserMetadata,
     email_confirm: true,
   });

@@ -1,6 +1,5 @@
 "use client";
 
-import AvatarIcon from "@/components/icons/avatar-icon";
 import ProfileIcon from "@/components/icons/profile-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import UserPopper from "@/components/poppers/user-popper";
@@ -29,11 +28,12 @@ export const items: IItem[] = [
 
 interface IProps {
   userName: string;
+  avatar: string;
   role: ROLES;
 }
 
 const User: FunctionComponent<IProps> = (props) => {
-  const { userName, role } = props;
+  const { userName, role, avatar } = props;
   const anhrolElRef = useRef<HTMLDivElement>();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -47,9 +47,14 @@ const User: FunctionComponent<IProps> = (props) => {
         ref={anhrolElRef}
         className="ml-3 border-l-2 border-solid border-gray-500 flex items-center gap-[16px] pl-[16px] cursor-pointer"
       >
-        <AvatarIcon />
+        <img
+          className="[border-radius:50%] w-7 h-7"
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
+          alt=""
+        />
       </div>
       <UserPopper
+        avatar={avatar}
         userName={userName}
         role={role}
         anhrolElRef={anhrolElRef}

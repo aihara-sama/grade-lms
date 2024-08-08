@@ -34,7 +34,7 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
   const getMembers = async () => {
     const data = await supabaseClient
       .from("courses")
-      .select("id, users(*)")
+      .select("id, users!inner(*)")
       .eq("id", courseId)
       .single();
 
@@ -81,7 +81,7 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
           total={members.length}
           title="Total members"
         />
-        <EnrollUsers onDone={getMembers} courseId={courseId} />
+        <EnrollUsers onDone={getMembers} courseId={courseId} user={user} />
       </CardsContainer>
       {!membersIds.length ? (
         <Input
@@ -100,11 +100,17 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
         </div>
       )}
       <Table
-        data={members.map(({ name, role, id }) => ({
+        data={members.map(({ name, role, id, avatar }) => ({
           Name:
             user.id === id ? (
               <IconTitle
-                Icon={<AvatarIcon size="md" />}
+                Icon={
+                  <img
+                    className="[border-radius:50%] w-8 h-8"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
+                    alt=""
+                  />
+                }
                 key={id}
                 title={name}
                 subtitle={role}
@@ -114,7 +120,13 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
               <CardTitle
                 href={`/users/${id}`}
                 checked={membersIds.includes(id)}
-                Icon={<AvatarIcon size="md" />}
+                Icon={
+                  <img
+                    className="[border-radius:50%] w-8 h-8"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
+                    alt=""
+                  />
+                }
                 title={name}
                 subtitle={role}
                 onClick={() => {}}

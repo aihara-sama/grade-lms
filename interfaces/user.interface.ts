@@ -7,6 +7,7 @@ export enum ROLES {
 export interface IUserMetadata {
   name: string;
   role: ROLES;
+  avatar: string;
   /**
    * Push Notifications Token
    */

@@ -304,6 +304,7 @@ export type Database = {
       };
       users: {
         Row: {
+          avatar: string;
           creator_id: string | null;
           email: string;
           fcm_token: string | null;
@@ -312,6 +313,7 @@ export type Database = {
           role: string;
         };
         Insert: {
+          avatar: string;
           creator_id?: string | null;
           email: string;
           fcm_token?: string | null;
@@ -320,6 +322,7 @@ export type Database = {
           role: string;
         };
         Update: {
+          avatar?: string;
           creator_id?: string | null;
           email?: string;
           fcm_token?: string | null;
@@ -360,6 +363,20 @@ export type Database = {
           poll_options: Json;
         };
         Returns: string;
+      };
+      get_users_not_in_course: {
+        Args: {
+          p_course_id: string;
+        };
+        Returns: {
+          avatar: string;
+          creator_id: string | null;
+          email: string;
+          fcm_token: string | null;
+          id: string;
+          name: string;
+          role: string;
+        }[];
       };
     };
     Enums: {

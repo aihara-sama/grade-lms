@@ -2,14 +2,17 @@
 
 import AddUserIcon from "@/components/icons/add-user-icon";
 import EnrollUsersModal from "@/components/modals/enroll-users-modal";
+import type { User as IUser } from "@supabase/supabase-js";
 import { useState, type FunctionComponent } from "react";
 
 interface IProps {
   onDone: () => void;
   courseId: string;
+
+  user: IUser;
 }
 
-const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId }) => {
+const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId, user }) => {
   const [isEnrollUsersModalOpen, setIsEnrollUsersModalOpen] = useState(false);
 
   const closeModal = () => {
@@ -28,7 +31,7 @@ const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId }) => {
         Enroll
       </button>
       {isEnrollUsersModalOpen && (
-        <EnrollUsersModal close={closeModal} courseId={courseId} />
+        <EnrollUsersModal user={user} close={closeModal} courseId={courseId} />
       )}
     </div>
   );

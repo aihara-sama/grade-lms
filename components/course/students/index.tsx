@@ -1,5 +1,4 @@
 import IconTitle from "@/components/icon-title";
-import AvatarIcon from "@/components/icons/avatar-icon";
 import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent } from "react";
 
@@ -16,7 +15,13 @@ const Students: FunctionComponent<IProps> = ({ users }) => {
           <div key={idx} className="mb-4 [&:last-child]:mb-0">
             <div className="flex justify-between items-center mb-4">
               <IconTitle
-                Icon={<AvatarIcon />}
+                Icon={
+                  <img
+                    className="[border-radius:50%] w-7 h-7"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${user.avatar}`}
+                    alt=""
+                  />
+                }
                 href={`/users/${user.id}`}
                 title={user.name}
                 subtitle={user.role}

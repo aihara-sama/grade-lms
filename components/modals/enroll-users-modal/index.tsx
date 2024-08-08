@@ -1,26 +1,38 @@
 import CardTitle from "@/components/card-title";
-import AvatarIcon from "@/components/icons/avatar-icon";
 import Modal from "@/components/modal";
-import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
+import type { User } from "@/types/users";
+import type { User as IUser } from "@supabase/supabase-js";
+
 interface IProps {
   close: () => void;
   courseId: string;
+  user: IUser;
 }
 
-const EnrollUsersModal: FunctionComponent<IProps> = ({ close, courseId }) => {
-  const [users, setUsers] = useState<
-    Database["public"]["Tables"]["users"]["Row"][]
-  >([]);
+const EnrollUsersModal: FunctionComponent<IProps> = ({
+  close,
+  courseId,
+  user,
+}) => {
+  // State
+  const [users, setUsers] = useState<User[]>([]);
   const [usersIds, setUsersIds] = useState<string[]>([]);
-  const getUsers = async () => {
-    const data = await supabaseClient.from("users").select("*");
-    setUsers(data.data);
-  };
 
+  // Handlers
+  const getUsers = async () => {
+    const { data } = await supabaseClient
+      .rpc("get_users_not_in_course", {
+        p_course_id: courseId,
+      })
+      .eq("creator_id", user.id)
+      .neq("id", user.id);
+
+    setUsers(data);
+  };
   const enroll = async () => {
     const { error } = await supabaseClient.from("user_courses").insert(
       usersIds.map((userId) => ({
@@ -38,6 +50,7 @@ const EnrollUsersModal: FunctionComponent<IProps> = ({ close, courseId }) => {
     }
   };
 
+  // Effects
   useEffect(() => {
     getUsers();
   }, []);
@@ -49,20 +62,25 @@ const EnrollUsersModal: FunctionComponent<IProps> = ({ close, courseId }) => {
       content={
         <div>
           <div className="mb-[12px] flex flex-col gap-[12px]">
-            {users.map((user) => (
-              <div className="flex items-center justify-between" key={user.id}>
+            {users.map((u) => (
+              <div className="flex items-center justify-between" key={u.id}>
                 <CardTitle
-                  checked={usersIds.includes(user.id)}
-                  Icon={<AvatarIcon size="md" />}
-                  title={user.name}
-                  subtitle={user.role}
+                  href={`/users/${u.id}`}
+                  checked={usersIds.includes(u.id)}
+                  Icon={
+                    <img
+                      className="[border-radius:50%] w-8 h-8"
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${u.avatar}`}
+                      alt=""
+                    />
+                  }
+                  title={u.name}
+                  subtitle={u.role}
                   onClick={() => {}}
                   onToggle={(checked) =>
                     checked
-                      ? setUsersIds((prev) => [...prev, user.id])
-                      : setUsersIds((prev) =>
-                          prev.filter((id) => id !== user.id)
-                        )
+                      ? setUsersIds((prev) => [...prev, u.id])
+                      : setUsersIds((prev) => prev.filter((id) => id !== u.id))
                   }
                 />
               </div>

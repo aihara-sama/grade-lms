@@ -32,6 +32,7 @@ const SignUp: FunctionComponent<IProps> = () => {
         data: {
           name,
           role: ROLES.TEACHER,
+          avatar: "default-avatar",
         } as IUserMetadata,
       },
     });

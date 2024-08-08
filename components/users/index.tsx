@@ -2,11 +2,13 @@
 
 import { deleteUser } from "@/actions/delete-user";
 import DeleteButton from "@/components/buttons/delete-button";
+import CardTitle from "@/components/card-title";
 import CardsContainer from "@/components/cards-container";
-import IconTitle from "@/components/icon-title";
 import AvatarIcon from "@/components/icons/avatar-icon";
+import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import Modal from "@/components/modal";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import CreateUser from "@/components/users/create-user";
@@ -14,12 +16,16 @@ import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
+import toast from "react-hot-toast";
 
 interface IProps {
   user: User;
 }
 
 const Users: FunctionComponent<IProps> = ({ user }) => {
+  const [isDeleteBulkUsersModalOpen, setIsDeleteBulkUsersModalOpen] =
+    useState(false);
+  const [usersIds, setUsersIds] = useState<string[]>([]);
   const [users, setUsers] = useState<
     Database["public"]["Tables"]["users"]["Row"][]
   >([]);
@@ -30,6 +36,19 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
       .select("*")
       .eq("creator_id", user.id);
     setUsers(data.data);
+  };
+  const handleBulkDeleteUsers = async () => {
+    const { error } = await supabaseClient
+      .from("users")
+      .delete()
+      .in("id", usersIds);
+
+    if (error) toast.error("Something went wrong");
+
+    setUsersIds([]);
+    setIsDeleteBulkUsersModalOpen(false);
+
+    getUsers();
   };
 
   useEffect(() => {
@@ -46,16 +65,43 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
         />
         <CreateUser onDone={getUsers} />
       </CardsContainer>
-      <Input Icon={<SearchIcon />} placeholder="Search" />
+      {!usersIds.length ? (
+        <Input
+          Icon={<SearchIcon size="xs" />}
+          placeholder="Search"
+          className="w-auto"
+        />
+      ) : (
+        <div className="mb-3">
+          <button
+            onClick={() => setIsDeleteBulkUsersModalOpen(true)}
+            className="outline-button flex font-semibold gap-2 items-center"
+          >
+            Delete <DeleteIcon />
+          </button>
+        </div>
+      )}
       <Table
-        data={users.map(({ name, role, id }) => ({
+        data={users.map(({ name, role, id, avatar }) => ({
           Name: (
-            <IconTitle
-              Icon={<AvatarIcon size="lg" />}
-              key={id}
+            <CardTitle
+              href={`/users/${id}`}
+              checked={usersIds.includes(id)}
+              Icon={
+                <img
+                  className="[border-radius:50%] w-8 h-8"
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
+                  alt=""
+                />
+              }
               title={name}
               subtitle={role}
-              href={`/users/${id}`}
+              onClick={() => {}}
+              onToggle={(checked) =>
+                checked
+                  ? setUsersIds((prev) => [...prev, id])
+                  : setUsersIds((prev) => prev.filter((_id) => _id !== id))
+              }
             />
           ),
           Action: (
@@ -69,6 +115,33 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
           ),
         }))}
       />
+      {isDeleteBulkUsersModalOpen && (
+        <Modal
+          close={() => setIsDeleteBulkUsersModalOpen(false)}
+          title="Delete Users"
+          content={
+            <>
+              <p className="mb-4">
+                Are you sure you want to delete selected users?
+              </p>
+              <div className="group-buttons">
+                <button
+                  className="outline-button w-full"
+                  onClick={() => setIsDeleteBulkUsersModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="primary-button"
+                  onClick={handleBulkDeleteUsers}
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          }
+        />
+      )}
     </>
   );
 };
