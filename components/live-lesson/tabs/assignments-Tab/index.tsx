@@ -1,8 +1,10 @@
 "use client";
 
+import DeleteButton from "@/components/buttons/delete-button";
 import CardTitle from "@/components/card-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
+import AssignmentModal from "@/components/modals/assignment-modal";
 import CreateAssignmentModal from "@/components/modals/create-assignment-modal";
 import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
@@ -13,6 +15,9 @@ interface IProps {
 }
 
 const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
+  // States
+  const [isCreateAssignmentModalOpen, setIsCreateAssignmentModalOpen] =
+    useState(false);
   const [currentAssignmentId, setCurrentAssignmentId] = useState<
     string | undefined
   >();
@@ -28,11 +33,26 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
 
     setAssignments(data.data);
   };
+
+  const deleteAssignment = async (
+    assignmentId: string
+  ): Promise<{ error: string | null; data: null }> => {
+    const { error } = await supabaseClient
+      .from("assignments")
+      .delete()
+      .eq("id", assignmentId);
+
+    return {
+      data: null,
+      error: error ? error.message : null,
+    };
+  };
+
   useEffect(() => {
     getAssignments();
   }, []);
   return (
-    <div>
+    <div className="flex flex-1 flex-col">
       <div className="mb-[12px] flex flex-col gap-[6px]">
         {assignments.map((assignment) => (
           <div
@@ -48,20 +68,44 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
             <div className="flex items-center gap-[12px]">
               <button className="icon-button shadow-md">
                 <DeleteIcon />
+                <DeleteButton
+                  onDone={getAssignments}
+                  action={deleteAssignment}
+                  record="assignment"
+                  id={assignment.id}
+                  key={assignment.id}
+                />
               </button>
             </div>
           </div>
         ))}
       </div>
+      <div className="mt-auto">
+        <button
+          className="outline-button w-full"
+          onClick={() => setIsCreateAssignmentModalOpen(true)}
+        >
+          Create assignments
+        </button>
+      </div>
       {currentAssignmentId && (
-        <CreateAssignmentModal
-          lessonId={lessonId}
+        <AssignmentModal
           assignmentId={currentAssignmentId}
           onDone={() => {
             getAssignments();
             setCurrentAssignmentId(undefined);
           }}
-          closeModal={() => setCurrentAssignmentId(undefined)}
+          close={() => setCurrentAssignmentId(undefined)}
+        />
+      )}
+      {isCreateAssignmentModalOpen && (
+        <CreateAssignmentModal
+          closeModal={() => setIsCreateAssignmentModalOpen(false)}
+          lessonId={lessonId}
+          onDone={() => {
+            setIsCreateAssignmentModalOpen(false);
+            getAssignments();
+          }}
         />
       )}
     </div>
