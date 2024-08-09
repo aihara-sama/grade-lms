@@ -2,5 +2,6 @@
   "server-component": {
     "courses": "Courses"
   },
-  "search": "Search"
+  "search": "Search",
+  "profile": "Profile"
 }

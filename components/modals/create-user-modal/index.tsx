@@ -95,12 +95,14 @@ const CreateUserModal: FunctionComponent<IProps> = ({ closeModal, onDone }) => {
                 title: "Avatar",
                 Icon: <CameraIcon />,
                 content: (
-                  <AvatarUpload
-                    setAvatar={(avatar) => {
-                      setUserDetails((_) => ({ ..._, avatar }));
-                    }}
-                    avatar={userDetails.avatar}
-                  />
+                  <div className="flex justify-center mx-[0] my-[23.5px]">
+                    <AvatarUpload
+                      setAvatar={(avatar) => {
+                        setUserDetails((_) => ({ ..._, avatar }));
+                      }}
+                      avatar={userDetails.avatar}
+                    />
+                  </div>
                 ),
               },
             ]}

@@ -17,7 +17,7 @@ const Students: FunctionComponent<IProps> = ({ users }) => {
               <IconTitle
                 Icon={
                   <img
-                    className="[border-radius:50%] w-7 h-7"
+                    className="[border-radius:50%] w-7 h-7 object-cover "
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${user.avatar}`}
                     alt=""
                   />

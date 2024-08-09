@@ -1,7 +1,6 @@
 "use client";
 
 import ProfileIcon from "@/components/icons/profile-icon";
-import SettingsIcon from "@/components/icons/settings-icon";
 import UserPopper from "@/components/poppers/user-popper";
 import type { IItem } from "@/interfaces/menu.interface";
 import type { ROLES } from "@/interfaces/user.interface";
@@ -11,13 +10,8 @@ import { useRef, useState } from "react";
 export const items: IItem[] = [
   {
     title: "Profile",
-    href: "/profile",
+    href: "/dashboard/profile",
     Icon: ProfileIcon,
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/profile/settings",
-    Icon: SettingsIcon,
   },
   // {
   //   title: "Log out",
@@ -48,7 +42,7 @@ const User: FunctionComponent<IProps> = (props) => {
         className="ml-3 border-l-2 border-solid border-gray-500 flex items-center gap-[16px] pl-[16px] cursor-pointer"
       >
         <img
-          className="[border-radius:50%] w-7 h-7"
+          className="[border-radius:50%] w-7 h-7 object-cover "
           src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
           alt=""
         />

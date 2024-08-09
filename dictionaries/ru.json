@@ -2,5 +2,6 @@
   "server-component": {
     "courses": "Курсы"
   },
-  "search": "Пойск"
+  "search": "Пойск",
+  "profile": "Профиль"
 }

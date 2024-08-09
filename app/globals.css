@@ -218,7 +218,7 @@
   }
 
   .link-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] shadow-sm bg-link text-white hover:bg-blue-200 hover:text-white active:bg-blue-300 font-bold;
+    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] shadow-sm bg-link text-white hover:bg-blue-200 hover:text-white active:bg-blue-300 font-bold gap-[6px];
   }
   .outline-button {
     @apply rounded-[5px] flex items-center justify-center gap-[6px] p-[6px] pl-[12px] pr-[12px] whitespace-nowrap relative text-[15px] shadow-sm text-primary bg-white border border-gray-200 cursor-pointer hover:bg-gray-100 active:bg-gray-200;
