@@ -1,6 +1,6 @@
 "use client";
 
-import { formatTimeUntilEvent } from "@/utils/format-time-until-event";
+import { formatDistanceToNowStrict } from "date-fns";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 interface IProps {
@@ -8,11 +8,11 @@ interface IProps {
 }
 
 const LiveTime: FunctionComponent<IProps> = ({ date }) => {
-  const [liveDate, setLiveDate] = useState(formatTimeUntilEvent(date));
+  const [liveDate, setLiveDate] = useState(formatDistanceToNowStrict(date));
 
   useEffect(() => {
     setInterval(() => {
-      setLiveDate(formatTimeUntilEvent(date));
+      setLiveDate(formatDistanceToNowStrict(date));
     }, 1000);
   }, []);
 

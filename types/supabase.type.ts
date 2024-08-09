@@ -97,24 +97,27 @@ export type Database = {
       messages: {
         Row: {
           author: string;
+          author_avatar: string;
+          author_role: string;
           id: string;
-          is_poll: boolean;
           lesson_id: string;
           reply_id: string | null;
           text: string | null;
         };
         Insert: {
           author: string;
+          author_avatar: string;
+          author_role: string;
           id?: string;
-          is_poll?: boolean;
           lesson_id: string;
           reply_id?: string | null;
           text?: string | null;
         };
         Update: {
           author?: string;
+          author_avatar?: string;
+          author_role?: string;
           id?: string;
-          is_poll?: boolean;
           lesson_id?: string;
           reply_id?: string | null;
           text?: string | null;
@@ -130,61 +133,6 @@ export type Database = {
           {
             foreignKeyName: "messages_reply_id_fkey";
             columns: ["reply_id"];
-            isOneToOne: false;
-            referencedRelation: "messages";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      poll_options: {
-        Row: {
-          id: string;
-          poll_id: string;
-          title: string;
-          votes: number | null;
-        };
-        Insert: {
-          id?: string;
-          poll_id: string;
-          title: string;
-          votes?: number | null;
-        };
-        Update: {
-          id?: string;
-          poll_id?: string;
-          title?: string;
-          votes?: number | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "poll_options_poll_id_fkey";
-            columns: ["poll_id"];
-            isOneToOne: false;
-            referencedRelation: "polls";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      polls: {
-        Row: {
-          id: string;
-          message_id: string;
-          title: string;
-        };
-        Insert: {
-          id?: string;
-          message_id: string;
-          title: string;
-        };
-        Update: {
-          id?: string;
-          message_id?: string;
-          title?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "polls_message_id_fkey";
-            columns: ["message_id"];
             isOneToOne: false;
             referencedRelation: "messages";
             referencedColumns: ["id"];
@@ -352,15 +300,6 @@ export type Database = {
           new_starts: string;
           new_ends: string;
           new_assignments: Json;
-        };
-        Returns: string;
-      };
-      create_poll_with_options_and_message: {
-        Args: {
-          lesson_id: string;
-          author: string;
-          poll_title: string;
-          poll_options: Json;
         };
         Returns: string;
       };

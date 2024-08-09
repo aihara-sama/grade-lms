@@ -10,8 +10,13 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import InviteIcon from "@/components/icons/invite-icon";
 import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
+import Input from "@/components/input";
+import LiveTime from "@/components/live-time";
+import Modal from "@/components/modal";
 import type { Lesson } from "@/types/lessons.type";
+import { supabaseClient } from "@/utils/supabase/client";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
   AppState,
@@ -20,7 +25,8 @@ import type {
 } from "@excalidraw/excalidraw/types/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import clsx from "clsx";
-import type { FunctionComponent } from "react";
+import { format, minutesToMilliseconds } from "date-fns";
+import type { ChangeEvent, FunctionComponent } from "react";
 
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
@@ -38,10 +44,12 @@ interface IProps {
 
 const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
   // State
+  const [isExtendLessonModalOpen, setIsExtendLessonModalOpen] = useState(false);
   const [whiteboardHeight, setWhiteboardHeight] = useState(500);
   const [whiteboardInitialHeight] = useState(
-    typeof window !== "undefined" ? window.innerHeight - 300 : 500
+    typeof window !== "undefined" ? window.innerHeight - 200 : 500
   );
+  const [extendLessonByMin, setExtendLessonByMin] = useState(15);
 
   // Refs
   const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI>(null);
@@ -108,6 +116,34 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
       },
     });
   };
+  const handleChangeExtendLesson = (e: ChangeEvent<HTMLInputElement>) => {
+    const extendBy = +e.target.value;
+
+    if (extendBy > extendLessonByMin) {
+      setExtendLessonByMin(extendBy + 14);
+    } else if (extendBy < extendLessonByMin && extendBy > 15) {
+      setExtendLessonByMin(extendBy - 14);
+    }
+  };
+
+  const handleExtendLesson = async () => {
+    const { error } = await supabaseClient
+      .from("lessons")
+      .update({
+        ends: format(
+          +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin),
+          "yyyy-MM-dd'T'HH:mm:ss"
+        ),
+      })
+      .eq("id", lesson.id);
+
+    if (error) {
+      toast(error.message);
+    } else {
+      toast("Lesson extended");
+      setIsExtendLessonModalOpen(false);
+    }
+  };
 
   return (
     <div className="flex-[4]" ref={containerRef}>
@@ -117,9 +153,17 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
           <span className="text">{lesson.title}</span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center text-sm gap-1">
+          <div className="flex items-center text-sm gap-2">
             <TimeIcon />
-            29min
+            <p className="text-neutral-600 font-bold">
+              <LiveTime date={new Date(lesson.ends)} /> left
+            </p>
+            <button
+              className="text-link"
+              onClick={() => setIsExtendLessonModalOpen(true)}
+            >
+              Extend?
+            </button>
           </div>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -127,8 +171,8 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
           >
             {isExpanded ? <ShrinkHorizontalIcon /> : <ExpandHorizontalIcon />}
           </button>
-          <button className="primary-button" onClick={handleInvite}>
-            Invite
+          <button className="icon-button" onClick={handleInvite}>
+            <InviteIcon size="sm" />
           </button>
         </div>
       </div>
@@ -179,6 +223,41 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
           onResize={(height) => setWhiteboardHeight(height)}
         />
       </div>
+      {isExtendLessonModalOpen && (
+        <Modal
+          title="Extend lesson"
+          close={() => setIsExtendLessonModalOpen(false)}
+          content={
+            <div>
+              <div>
+                <Input
+                  value={`${extendLessonByMin}`}
+                  onChange={handleChangeExtendLesson}
+                  autoFocus
+                  fullWIdth
+                  Icon={<TimeIcon />}
+                  type="number"
+                  label="Add minutes"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  className="outline-button ml-auto w-auto"
+                  onClick={() => setIsExtendLessonModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="primary-button w-auto"
+                  onClick={handleExtendLesson}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          }
+        />
+      )}
     </div>
   );
 };

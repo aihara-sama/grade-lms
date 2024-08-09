@@ -17,12 +17,15 @@ import clsx from "clsx";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import { v4 as uuid } from "uuid";
 
+import Breadcrumbs from "@/components/breadcrumbs";
+import CoursesIcon from "@/components/icons/courses-icon";
+import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import type { RealtimeChannel, User } from "@supabase/supabase-js";
 
 interface IProps {
   user?: User;
-  lesson: Lesson;
+  lesson: Lesson & { course: Course };
 }
 
 const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
@@ -60,7 +63,28 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
 
   return (
     <div>
-      <main className="flex gap-6">
+      {lesson.course && (
+        <Breadcrumbs
+          Icon={<CoursesIcon />}
+          items={[
+            { title: "Courses", href: "/dashboard/courses" },
+            {
+              title: lesson.course?.title,
+              href: `/dashboard/courses/${lesson.course.id}/overview`,
+            },
+            {
+              title: "Lessons",
+              href: `/dashboard/courses/${lesson.course.id}/lessons`,
+            },
+            {
+              isCurrentPage: true,
+              title: lesson?.title,
+              href: `/dashboard/courses/${lesson.course.id}/lessons/${lesson?.id}/overview`,
+            },
+          ]}
+        />
+      )}
+      <main className="flex gap-6 mt-4">
         <Whiteboard
           lesson={lesson}
           role={role}
@@ -69,7 +93,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
         />
 
         <div
-          className={`pl-6 relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
+          className={`pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >
           <button
             className={`icon-button shadow-md absolute top-2/4 -left-[16px] transform -translate-y-1/2 ${clsx(isAsideOpen && "[&>.icon]:rotate-180")}`}
@@ -99,9 +123,15 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
                   title: "Messages",
                   content: (
                     <Chat
+                      userRole={role}
                       channel={channelRef.current}
                       userName={userName}
                       lessonId={lesson.id}
+                      avatar={
+                        role === ROLES.GUEST
+                          ? "default-abatar"
+                          : (user.user_metadata as IUserMetadata).avatar
+                      }
                     />
                   ),
                   Icon: <ChatIcon />,

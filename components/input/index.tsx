@@ -22,7 +22,7 @@ const Input: FunctionComponent<IProps> = ({
   value,
   fullWIdth,
   placeholder,
-  className,
+  className = "",
   onClick,
   ...inputProps
 }) => {

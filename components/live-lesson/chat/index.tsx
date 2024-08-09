@@ -1,48 +1,42 @@
 "use client";
 
 import AttachIcon from "@/components/icons/attach-icon";
-import BlockChatIcon from "@/components/icons/block-chat-icon";
-import ClearIcon from "@/components/icons/clear-icon";
-import PollIcon from "@/components/icons/poll-icon";
 import Input from "@/components/input";
 import Message from "@/components/live-lesson/chat/message";
-import Poll from "@/components/live-lesson/chat/poll";
-import CreatePollModal from "@/components/modals/create-poll-modal";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
+import MessagesIcon from "@/components/icons/messages-icon";
+import type { ROLES } from "@/interfaces/user.interface";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 interface IProps {
   lessonId: string;
   userName: string;
+  avatar: string;
+  userRole: ROLES;
   channel: RealtimeChannel;
 }
 
-const Chat: FunctionComponent<IProps> = ({ lessonId, userName, channel }) => {
+const Chat: FunctionComponent<IProps> = ({
+  lessonId,
+  userName,
+  channel,
+  avatar,
+  userRole,
+}) => {
   // State
-  const [isCreatePollModalOpen, setIsCreatePollModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<
     {
       author: string;
+      author_avatar: string;
+      author_role: string;
       id: string;
-      is_poll: boolean;
       lesson_id: string;
       reply_id: string;
       text: string;
-      polls: {
-        id: string;
-        message_id: string;
-        title: string;
-        poll_options: {
-          id: string;
-          poll_id: string;
-          title: string;
-          votes: number;
-        }[];
-      }[];
     }[]
   >([]);
 
@@ -58,8 +52,10 @@ const Chat: FunctionComponent<IProps> = ({ lessonId, userName, channel }) => {
         author: userName,
         lesson_id: lessonId,
         reply_id: replyId,
+        author_avatar: avatar,
+        author_role: userRole,
       })
-      .select("*, polls(*, poll_options(*))")
+      .select("*")
       .single();
 
     if (error) {
@@ -79,7 +75,7 @@ const Chat: FunctionComponent<IProps> = ({ lessonId, userName, channel }) => {
   const getMessages = async () => {
     const data = await supabaseClient
       .from("messages")
-      .select("*, polls(*, poll_options(*))")
+      .select("*")
       .eq("lesson_id", lessonId);
     setMessages(data.data);
   };
@@ -99,42 +95,30 @@ const Chat: FunctionComponent<IProps> = ({ lessonId, userName, channel }) => {
 
   return (
     <div className="rounded-md relative px-4 py-0 pb-4 flex-1 flex flex-col border border-gray-200">
-      <div className="flex justify-center gap-3 px-0 py-3">
-        <button
-          className="icon-button"
-          onClick={() => setIsCreatePollModalOpen(true)}
-        >
-          <PollIcon />
-        </button>
-        <button className="icon-button">
-          <ClearIcon />
-        </button>
-        <button className="icon-button">
-          <BlockChatIcon />
-        </button>
+      <div className="flex justify-center py-3">
+        <div className="flex items-center gap-2">
+          <MessagesIcon size="xs" />
+          <p className="text-lg font-bold text-center">Chat</p>
+        </div>
       </div>
       <hr />
       <div
         style={{
-          maxHeight: `${typeof window !== "undefined" ? window.innerHeight - 200 : 0}px`,
+          maxHeight: `${typeof window !== "undefined" ? window.innerHeight - 380 : 0}px`,
         }}
         ref={messagesRef}
-        className="flex-1 flex flex-col gap-2 overflow-y-auto mb-3"
+        className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1"
       >
-        {messages.map((msg) =>
-          msg.is_poll ? (
-            <Poll
-              onDone={getMessages}
-              author={msg.author}
-              key={msg.id}
-              poll={msg.polls[0]}
-            />
-          ) : (
-            <Message key={msg.id} message={msg} />
-          )
-        )}
+        <div className="flex flex-1 flex-col gap-2">
+          {messages.map((msg, idx) => (
+            <div key={msg.id} className={`${idx === 0 ? "mt-auto" : ""}`}>
+              <Message message={msg} />
+            </div>
+          ))}
+        </div>
       </div>
       <Input
+        className="mt-auto"
         fullWIdth
         onChange={(e) => setMessage(e.target.value)}
         value={message}
@@ -145,14 +129,6 @@ const Chat: FunctionComponent<IProps> = ({ lessonId, userName, channel }) => {
           }
         }}
       />
-      {isCreatePollModalOpen && (
-        <CreatePollModal
-          lessonId={lessonId}
-          closeModal={() => setIsCreatePollModalOpen(false)}
-          author={userName}
-          onDone={getMessages}
-        />
-      )}
     </div>
   );
 };

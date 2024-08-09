@@ -144,51 +144,10 @@ create table messages (
   lesson_id uuid references public.lessons on delete cascade not null,
   reply_id uuid references public.messages on delete cascade,
   author text not null,
-  is_poll BOOLEAN default false not null,
+  author_avatar text not null,
+  author_role text not null,
   text text
 );
-
-create table polls (
-  id uuid not null primary key DEFAULT gen_random_uuid(),
-  message_id uuid references public.messages on delete cascade not null,
-  title text not null
-);
-
-create table poll_options (
-  id uuid not null primary key DEFAULT gen_random_uuid(),
-  poll_id uuid references public.polls on delete cascade not null,
-  title text not null,
-  votes int default 0
-);
-
--- Create a function to create a poll with options and a new message
-create function create_poll_with_options_and_message(lesson_id uuid, author text, poll_title text, poll_options json)
-returns uuid as $$
-declare
-    message_id uuid;
-    poll_id uuid;
-begin
-    -- Insert a new message
-    insert into public.messages (lesson_id, author, is_poll)
-    values (lesson_id, author, true)
-    returning id into message_id;
-
-    -- Create the poll associated with the message
-    insert into public.polls (message_id, title)
-    values (message_id, poll_title)
-    returning id into poll_id;
-
-    -- Insert poll options
-    insert into public.poll_options (poll_id, title)
-    select poll_id, option->>'title'
-    from json_array_elements(poll_options) as option;
-
-    return message_id;
-end;
-$$ language plpgsql;
-
--- Example usage:
--- SELECT create_poll_with_options_and_message('Poll Title', '[{"title": "Option 1"}, {"title": "Option 2"}, {"title": "Option 3"}]');
 
 create or replace function public.get_users_not_in_course(p_course_id uuid)
 returns setof public.users as $$
