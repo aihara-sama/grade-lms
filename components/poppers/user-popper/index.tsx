@@ -65,7 +65,7 @@ const UserPopper: FunctionComponent<IProps> = ({
   return (
     <div
       ref={popperRef}
-      className={`${isOpen ? "block" : "hidden"} bg-white shadow-sm absolute right-[22px] top-[71px] w-[230px] px-[0] py-[14px] rounded-[3px]`}
+      className={`${isOpen ? "block" : "hidden"} bg-white shadow-sm absolute right-[22px] top-[71px] w-[230px] px-[0] py-[14px] rounded-[3px] z-[999]`}
     >
       <div className="ml-[16px] flex items-center gap-[8px]">
         <img
