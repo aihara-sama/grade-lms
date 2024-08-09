@@ -44,7 +44,8 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
     const { error } = await supabaseClient
       .from("user_courses")
       .delete()
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .eq("course_id", courseId);
 
     if (error) {
       toast(error.message);
@@ -58,7 +59,8 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
     const { error } = await supabaseClient
       .from("user_courses")
       .delete()
-      .in("user_id", membersIds);
+      .in("user_id", membersIds)
+      .eq("course_id", courseId);
 
     if (error) toast.error("Something went wrong");
 

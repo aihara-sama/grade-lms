@@ -200,3 +200,14 @@ begin
     where uc.user_id is null;
 end;
 $$ language plpgsql;
+
+create or replace function public.get_courses_not_assigned_to_user(p_user_id uuid)
+returns setof public.courses as $$
+begin
+    return query
+    select c.*
+    from public.courses c
+    left join public.user_courses uc on c.id = uc.course_id and uc.user_id = p_user_id
+    where uc.user_id is null;
+end;
+$$ language plpgsql;

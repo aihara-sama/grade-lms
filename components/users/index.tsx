@@ -5,6 +5,8 @@ import DeleteButton from "@/components/buttons/delete-button";
 import CardTitle from "@/components/card-title";
 import CardsContainer from "@/components/cards-container";
 import AvatarIcon from "@/components/icons/avatar-icon";
+import CourseIcon from "@/components/icons/course-icon";
+import CoursesIcon from "@/components/icons/courses-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
@@ -12,24 +14,56 @@ import Modal from "@/components/modal";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import CreateUser from "@/components/users/create-user";
-import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
-import type { User } from "@supabase/supabase-js";
-import { useEffect, useState, type FunctionComponent } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import type { Course } from "@/types/courses.type";
+import type { Lesson } from "@/types/lessons.type";
+import type { UserCourses } from "@/types/user-courses.type";
+import type { User } from "@/types/users";
+import type { User as IUser } from "@supabase/supabase-js";
+import type { FunctionComponent } from "react";
+
+const parseUsersCoursesIds = (usersIds: string[], coursesIds: string[]) => {
+  const userCourses: Omit<UserCourses, "created_at">[] = [];
+
+  for (let idx = 0; idx < usersIds.length; idx++) {
+    const userId = usersIds[idx];
+
+    for (let i = 0; i < coursesIds.length; i++) {
+      const courseId = coursesIds[i];
+
+      userCourses.push({
+        course_id: courseId,
+        user_id: userId,
+      });
+    }
+  }
+
+  return userCourses;
+};
+
 interface IProps {
-  user: User;
+  user: IUser;
 }
 
 const Users: FunctionComponent<IProps> = ({ user }) => {
-  const [isDeleteBulkUsersModalOpen, setIsDeleteBulkUsersModalOpen] =
-    useState(false);
-  const [usersIds, setUsersIds] = useState<string[]>([]);
-  const [users, setUsers] = useState<
-    Database["public"]["Tables"]["users"]["Row"][]
+  // State
+  const [users, setUsers] = useState<User[]>([]);
+  const [courses, setCourses] = useState<
+    (Course & {
+      lessons: Lesson[];
+      users: User[];
+    })[]
   >([]);
+  const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
+  const [isEnrollUsersModalOpen, setIsEnrollUsersModalOpen] = useState(false);
+  const [usersIds, setUsersIds] = useState<string[]>([]);
+  const [coursesIds, setCoursesIds] = useState<string[]>([]);
+  const [enrollUserId, setEnrollUserId] = useState("");
 
+  // Handlers
   const getUsers = async () => {
     const data = await supabaseClient
       .from("users")
@@ -37,7 +71,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
       .eq("creator_id", user.id);
     setUsers(data.data);
   };
-  const handleBulkDeleteUsers = async () => {
+  const handleDeleteUsers = async () => {
     const { error } = await supabaseClient
       .from("users")
       .delete()
@@ -46,9 +80,44 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
     if (error) toast.error("Something went wrong");
 
     setUsersIds([]);
-    setIsDeleteBulkUsersModalOpen(false);
+    setIsDeleteUsersModalOpen(false);
 
     getUsers();
+  };
+  const handleEnrollUsers = async (
+    _usersIds: string[],
+    _coursesIds: string[]
+  ) => {
+    const { error } = await supabaseClient
+      .from("user_courses")
+      .upsert(parseUsersCoursesIds(_usersIds, _coursesIds));
+
+    if (error) {
+      toast(error.message);
+    } else {
+      toast("Users enrolled");
+      setIsEnrollUsersModalOpen(false);
+    }
+  };
+  const getCourses = async () => {
+    const data = await supabaseClient
+      .from("users")
+      .select("id, courses(*, lessons(*), users(*))")
+      .eq("id", user.id)
+      .single();
+
+    setCourses(data.data.courses);
+  };
+  const getUnenrolledCourses = async (userId: string) => {
+    const data = await supabaseClient
+      .rpc("get_courses_not_assigned_to_user", {
+        p_user_id: userId,
+      })
+      .returns<typeof courses>();
+
+    console.log({ data });
+
+    setCourses(data.data);
   };
 
   useEffect(() => {
@@ -72,9 +141,18 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
           className="w-auto"
         />
       ) : (
-        <div className="mb-3">
+        <div className="mb-3 gap-2 flex">
           <button
-            onClick={() => setIsDeleteBulkUsersModalOpen(true)}
+            onClick={() => {
+              setIsEnrollUsersModalOpen(true);
+              getCourses();
+            }}
+            className="outline-button flex font-semibold gap-2 items-center"
+          >
+            Enroll <CoursesIcon />
+          </button>
+          <button
+            onClick={() => setIsDeleteUsersModalOpen(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Delete <DeleteIcon />
@@ -105,19 +183,31 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
             />
           ),
           Action: (
-            <DeleteButton
-              onDone={getUsers}
-              action={deleteUser}
-              record="user"
-              id={id}
-              key={id}
-            />
+            <div className="flex gap-2">
+              <DeleteButton
+                onDone={getUsers}
+                action={deleteUser}
+                record="user"
+                id={id}
+                key={id}
+              />
+              <button
+                className="primary-button w-auto"
+                onClick={() => {
+                  setEnrollUserId(id);
+                  setIsEnrollUsersModalOpen(true);
+                  getUnenrolledCourses(id);
+                }}
+              >
+                Enroll
+              </button>
+            </div>
           ),
         }))}
       />
-      {isDeleteBulkUsersModalOpen && (
+      {isDeleteUsersModalOpen && (
         <Modal
-          close={() => setIsDeleteBulkUsersModalOpen(false)}
+          close={() => setIsDeleteUsersModalOpen(false)}
           title="Delete Users"
           content={
             <>
@@ -127,15 +217,64 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
               <div className="group-buttons">
                 <button
                   className="outline-button w-full"
-                  onClick={() => setIsDeleteBulkUsersModalOpen(false)}
+                  onClick={() => setIsDeleteUsersModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button className="primary-button" onClick={handleDeleteUsers}>
+                  Delete
+                </button>
+              </div>
+            </>
+          }
+        />
+      )}
+      {isEnrollUsersModalOpen && (
+        <Modal
+          close={() => setIsEnrollUsersModalOpen(false)}
+          title="Enrollment"
+          content={
+            <>
+              <p className="mb-3 text-neutral-500">Select courses to enroll</p>
+              <Table
+                data={courses.map(({ id, title }) => ({
+                  Name: (
+                    <CardTitle
+                      href={`/dashboard/courses/${id}/overview`}
+                      checked={coursesIds.includes(id)}
+                      Icon={<CourseIcon />}
+                      title={title}
+                      subtitle="Active"
+                      onClick={() => {}}
+                      onToggle={(checked) =>
+                        checked
+                          ? setCoursesIds((prev) => [...prev, id])
+                          : setCoursesIds((prev) =>
+                              prev.filter((_id) => _id !== id)
+                            )
+                      }
+                    />
+                  ),
+                }))}
+              />
+              <div className="group-buttons">
+                <button
+                  className="outline-button w-full"
+                  onClick={() => setIsEnrollUsersModalOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
+                  disabled={!coursesIds.length}
                   className="primary-button"
-                  onClick={handleBulkDeleteUsers}
+                  onClick={() =>
+                    handleEnrollUsers(
+                      enrollUserId ? [enrollUserId] : usersIds,
+                      coursesIds
+                    )
+                  }
                 >
-                  Delete
+                  Enroll
                 </button>
               </div>
             </>

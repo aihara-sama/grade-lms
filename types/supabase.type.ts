@@ -364,6 +364,15 @@ export type Database = {
         };
         Returns: string;
       };
+      get_courses_not_assigned_to_user: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: {
+          id: string;
+          title: string;
+        }[];
+      };
       get_users_not_in_course: {
         Args: {
           p_course_id: string;
