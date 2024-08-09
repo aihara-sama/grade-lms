@@ -16,14 +16,16 @@ import CardTitle from "@/components/card-title";
 import DeleteIcon from "@/components/icons/delete-icon";
 import Modal from "@/components/modal";
 import type { Database } from "@/types/supabase.type";
+import type { getDictionary } from "@/utils/get-dictionary";
 import type { User } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 
 interface IProps {
   user: User;
+  dictionary: Awaited<ReturnType<typeof getDictionary>>;
 }
 
-const Courses: FunctionComponent<IProps> = ({ user }) => {
+const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const [isDeleteBulkCoursesModalOpen, setIsDeleteBulkCoursesModalOpen] =
     useState(false);
   const [coursesIds, setCoursesIds] = useState<string[]>([]);
@@ -93,7 +95,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
       {!coursesIds.length ? (
         <Input
           Icon={<SearchIcon size="xs" />}
-          placeholder="Search"
+          placeholder={dictionary.search}
           className="w-auto"
         />
       ) : (
