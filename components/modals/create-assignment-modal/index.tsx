@@ -10,6 +10,10 @@ import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 import type { Assignment } from "@/types/assignments.type";
+import type { Course } from "@/types/courses.type";
+import type { Lesson } from "@/types/lessons.type";
+import type { Notification } from "@/types/notifications";
+import type { User } from "@supabase/supabase-js";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
@@ -18,17 +22,21 @@ interface IProps {
   onDone: () => void;
   closeModal: () => void;
   assignmentId?: string;
-  lessonId: string;
+  user: User;
+  course: Course;
+  lesson: Lesson;
 }
 const CreateAssignmentModal: FunctionComponent<IProps> = ({
   onDone,
   closeModal,
   assignmentId,
-  lessonId,
+  user,
+  course,
+  lesson,
 }) => {
   // States
   const [assignment, setAssignment] = useState<Omit<Assignment, "id">>({
-    lesson_id: lessonId,
+    lesson_id: lesson.id,
     title: "",
     body: "{}",
     due_date: format(getNextMorning(), "yyyy-MM-dd'T'HH:mm:ss"),
@@ -38,14 +46,43 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
 
   // Handlers
   const handleCreateAssignment = async () => {
-    const { error } = await supabaseClient
+    const { error: assignmentErr, data: assignmentData } = await supabaseClient
       .from("assignments")
-      .insert(assignment);
+      .insert(assignment)
+      .select("id")
+      .single();
 
-    toast(error?.message || "Assignment created");
+    if (assignmentErr) {
+      toast.error("Something went wrong");
+    } else {
+      const { error: coursesErr, data: courses } = await supabaseClient
+        .from("courses")
+        .select("users(id)")
+        .neq("users.id", user.id);
 
-    if (!error) {
-      onDone();
+      if (coursesErr) {
+        toast.error("Something went wrong");
+      } else {
+        const { error: notificationsErr } = await supabaseClient
+          .from("notifications")
+          .insert(
+            courses[0].users.map(({ id }) => ({
+              user_id: id,
+              assignment_id: assignmentData.id,
+              course_id: course.id,
+              lesson_id: lesson.id,
+              is_read: false,
+              type: "assignment",
+            })) as Notification[]
+          );
+
+        if (notificationsErr) {
+          toast.error("Something went wrong");
+        } else {
+          toast.success("Assignment created");
+          onDone();
+        }
+      }
     }
   };
   const handleChangeDate = (date: Date) => {

@@ -35,6 +35,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       creator_id: user.id,
       role: ROLES.STUDENT,
       avatar: payload.avatar,
+      preferred_locale: payload.preferred_locale,
     } as IUserMetadata,
     email_confirm: true,
   });

@@ -10,6 +10,7 @@ create table users (
   role text not null,
   email text not null,
   avatar text not null,
+  preferred_locale text not null,
   fcm_token text
 );
 alter table users enable row level security;
@@ -22,8 +23,8 @@ create policy "Can update own's data." on users for update using (auth.uid() = i
 create function public.handle_new_user() 
 returns trigger as $$
 begin
-  insert into public.users (id, email, name, role, avatar, creator_id)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'role', new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'creator_id');
+  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id)
+  values (new.id, new.email, new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'role', new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id');
   return new;
 end;
 $$ language plpgsql security definer;
@@ -100,6 +101,8 @@ create table sent_notifications (
   lesson_id uuid references public.lessons on delete cascade
 );
 
+
+
 create table assignments (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   lesson_id uuid references public.lessons on delete cascade not null,
@@ -116,6 +119,18 @@ create table submissions (
   title text not null,
   grade int,
   created_at timestamp not null default now()
+);
+
+create table notifications (
+  -- UUID from auth.users
+  id uuid not null primary key DEFAULT gen_random_uuid(),
+  user_id uuid references public.users,
+  course_id uuid references public.courses,
+  lesson_id uuid references public.lessons,
+  assignment_id uuid references public.assignments,
+  created_at timestamp not null default now(),
+  type text not null,
+  is_read boolean not null
 );
 
 -- Create a function to create a lesson and its assignments

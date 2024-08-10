@@ -139,6 +139,68 @@ export type Database = {
           },
         ];
       };
+      notifications: {
+        Row: {
+          assignment_id: string | null;
+          course_id: string | null;
+          created_at: string;
+          id: string;
+          is_read: boolean;
+          lesson_id: string | null;
+          type: string;
+          user_id: string | null;
+        };
+        Insert: {
+          assignment_id?: string | null;
+          course_id?: string | null;
+          created_at?: string;
+          id?: string;
+          is_read: boolean;
+          lesson_id?: string | null;
+          type: string;
+          user_id?: string | null;
+        };
+        Update: {
+          assignment_id?: string | null;
+          course_id?: string | null;
+          created_at?: string;
+          id?: string;
+          is_read?: boolean;
+          lesson_id?: string | null;
+          type?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_assignment_id_fkey";
+            columns: ["assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "assignments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "courses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_lesson_id_fkey";
+            columns: ["lesson_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       sent_notifications: {
         Row: {
           id: string;
@@ -258,6 +320,7 @@ export type Database = {
           fcm_token: string | null;
           id: string;
           name: string;
+          preferred_locale: string;
           role: string;
         };
         Insert: {
@@ -267,6 +330,7 @@ export type Database = {
           fcm_token?: string | null;
           id: string;
           name: string;
+          preferred_locale: string;
           role: string;
         };
         Update: {
@@ -276,6 +340,7 @@ export type Database = {
           fcm_token?: string | null;
           id?: string;
           name?: string;
+          preferred_locale?: string;
           role?: string;
         };
         Relationships: [
@@ -323,6 +388,7 @@ export type Database = {
           fcm_token: string | null;
           id: string;
           name: string;
+          preferred_locale: string;
           role: string;
         }[];
       };

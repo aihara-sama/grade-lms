@@ -15,12 +15,23 @@ import DeleteIcon from "@/components/icons/delete-icon";
 import Modal from "@/components/modal";
 import AssignmentModal from "@/components/modals/assignment-modal";
 import type { Assignment } from "@/types/assignments.type";
+import type { Course } from "@/types/courses.type";
+import type { Lesson } from "@/types/lessons.type";
+import type { User } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 
 interface IProps {
   lessonId: string;
+  course: Course;
+  lesson: Lesson;
+  user: User;
 }
-const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
+const Assignments: FunctionComponent<IProps> = ({
+  lessonId,
+  user,
+  course,
+  lesson,
+}) => {
   // States
   const [
     isDeleteBulkAssignmentsModalOpen,
@@ -68,7 +79,12 @@ const Assignments: FunctionComponent<IProps> = ({ lessonId }) => {
           total={assignments.length}
           title="Total assignments"
         />
-        <CreateAssignment lessonId={lessonId} onDone={getAssignments} />
+        <CreateAssignment
+          course={course}
+          lesson={lesson}
+          user={user}
+          onDone={getAssignments}
+        />
       </CardsContainer>{" "}
       {!assignmentsIds.length ? (
         <Input

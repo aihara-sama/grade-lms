@@ -5,7 +5,7 @@ import AssignmentsIcon from "@/components/icons/assignments-icon";
 import CameraIcon from "@/components/icons/camera-icon";
 import ChatIcon from "@/components/icons/chat-icon";
 import Chat from "@/components/live-lesson/chat";
-import AssignmentsTab from "@/components/live-lesson/tabs/assignments-Tab";
+import AssignmentsTab from "@/components/live-lesson/tabs/assignments-tab";
 import UserNamePrompt from "@/components/live-lesson/user-name-prompt";
 import Tabs from "@/components/tabs";
 import VideoChat from "@/components/video-chat";

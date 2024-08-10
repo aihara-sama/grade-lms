@@ -115,8 +115,6 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
       })
       .returns<typeof courses>();
 
-    console.log({ data });
-
     setCourses(data.data);
   };
 
@@ -132,7 +130,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
           total={users.length}
           title="Total users"
         />
-        <CreateUser onDone={getUsers} />
+        <CreateUser user={user} onDone={getUsers} />
       </CardsContainer>
       {!usersIds.length ? (
         <Input

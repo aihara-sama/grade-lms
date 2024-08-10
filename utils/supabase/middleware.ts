@@ -1,3 +1,4 @@
+import { getLocale } from "@/utils/get-locale";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -55,8 +56,10 @@ export async function updateSession(request: NextRequest) {
   );
 
   const { error } = await supabase.auth.getUser();
+  const locale = getLocale(request);
 
-  if (error) return NextResponse.redirect(new URL("/sign-up", request.url));
+  if (error)
+    return NextResponse.redirect(new URL(`/${locale}/sign-up`, request.url));
 
   return response;
 }

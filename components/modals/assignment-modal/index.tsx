@@ -6,11 +6,14 @@ import Modal from "@/components/modal";
 import OverviewTab from "@/components/modals/assignment-modal/tabs/overview-tab";
 import SubmissionsTab from "@/components/modals/assignment-modal/tabs/submissions-tab";
 import Tabs from "@/components/tabs";
+import { supabaseClient } from "@/utils/supabase/client";
+import toast from "react-hot-toast";
+
+import { useEffect, useState } from "react";
+
 import type { Assignment } from "@/types/assignments.type";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
-import { supabaseClient } from "@/utils/supabase/client";
-import { useEffect, useState, type FunctionComponent } from "react";
-import toast from "react-hot-toast";
+import type { FunctionComponent } from "react";
 
 interface IProps {
   assignmentId: string;

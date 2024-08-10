@@ -58,7 +58,7 @@ const Header: FunctionComponent<IProps> = ({ user }) => {
       {!!user && (
         <>
           <Nav navItems={navItems} />
-          <QuickActions />
+          <QuickActions user={user} />
           <User
             userName={(user.user_metadata as IUserMetadata).name}
             role={(user.user_metadata as IUserMetadata).role}

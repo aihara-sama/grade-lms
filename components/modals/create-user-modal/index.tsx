@@ -13,11 +13,14 @@ import Tabs from "@/components/tabs";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import type { User } from "@supabase/supabase-js";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {
   onDone: () => void;
   closeModal: () => void;
+  user: User;
 }
 
 const initUserDetails = {
@@ -27,11 +30,18 @@ const initUserDetails = {
   avatar: "default-avatar",
 };
 
-const CreateUserModal: FunctionComponent<IProps> = ({ closeModal, onDone }) => {
+const CreateUserModal: FunctionComponent<IProps> = ({
+  closeModal,
+  onDone,
+  user,
+}) => {
   const [userDetails, setUserDetails] = useState(initUserDetails);
 
   const handleCreateUser = async (createAnother?: boolean) => {
-    const { error } = await createUser(userDetails);
+    const { error } = await createUser({
+      ...userDetails,
+      preferred_locale: (user.user_metadata as IUserMetadata).preferred_locale,
+    });
 
     toast(error || "User created");
 

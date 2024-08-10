@@ -5,10 +5,11 @@ import CardTitle from "@/components/card-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import AssignmentModal from "@/components/modals/assignment-modal";
-import CreateAssignmentModal from "@/components/modals/create-assignment-modal";
-import type { Database } from "@/types/supabase.type";
 import { supabaseClient } from "@/utils/supabase/client";
-import { useEffect, useState, type FunctionComponent } from "react";
+import { useEffect, useState } from "react";
+
+import type { Database } from "@/types/supabase.type";
+import type { FunctionComponent } from "react";
 
 interface IProps {
   lessonId: string;
@@ -16,8 +17,7 @@ interface IProps {
 
 const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
   // States
-  const [isCreateAssignmentModalOpen, setIsCreateAssignmentModalOpen] =
-    useState(false);
+  const [, setIsCreateAssignmentModalOpen] = useState(false);
   const [currentAssignmentId, setCurrentAssignmentId] = useState<
     string | undefined
   >();
@@ -98,16 +98,15 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
           close={() => setCurrentAssignmentId(undefined)}
         />
       )}
-      {isCreateAssignmentModalOpen && (
+      {/* {isCreateAssignmentModalOpen && (
         <CreateAssignmentModal
           closeModal={() => setIsCreateAssignmentModalOpen(false)}
-          lessonId={lessonId}
           onDone={() => {
             setIsCreateAssignmentModalOpen(false);
             getAssignments();
           }}
         />
-      )}
+      )} */}
     </div>
   );
 };

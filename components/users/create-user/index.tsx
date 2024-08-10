@@ -2,13 +2,15 @@
 
 import AddUserIcon from "@/components/icons/add-user-icon";
 import CreateUserModal from "@/components/modals/create-user-modal";
+import type { User } from "@supabase/supabase-js";
 import { useState, type FunctionComponent } from "react";
 
 interface IProps {
   onDone: () => void;
+  user: User;
 }
 
-const CreateUser: FunctionComponent<IProps> = ({ onDone }) => {
+const CreateUser: FunctionComponent<IProps> = ({ onDone, user }) => {
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
 
   const closeModal = () => {
@@ -26,7 +28,7 @@ const CreateUser: FunctionComponent<IProps> = ({ onDone }) => {
         Create
       </button>
       {isCreateUserModalOpen && (
-        <CreateUserModal closeModal={closeModal} onDone={onDone} />
+        <CreateUserModal user={user} closeModal={closeModal} onDone={onDone} />
       )}
     </div>
   );

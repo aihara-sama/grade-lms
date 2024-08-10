@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n-config";
+
 export enum ROLES {
   STUDENT = "Student",
   TEACHER = "Teacher",
@@ -8,6 +10,8 @@ export interface IUserMetadata {
   name: string;
   role: ROLES;
   avatar: string;
+  email: string;
+  preferred_locale: Locale;
   /**
    * Push Notifications Token
    */

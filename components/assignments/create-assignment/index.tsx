@@ -2,14 +2,24 @@
 
 import AddAssignmentIcon from "@/components/icons/add-assignment-icon";
 import CreateAssignmentModal from "@/components/modals/create-assignment-modal";
+import type { Course } from "@/types/courses.type";
+import type { Lesson } from "@/types/lessons.type";
+import type { User } from "@supabase/supabase-js";
 import { useState, type FunctionComponent } from "react";
 
 interface IProps {
-  lessonId: string;
   onDone: () => void;
+  user: User;
+  course: Course;
+  lesson: Lesson;
 }
 
-const CreateAssignment: FunctionComponent<IProps> = ({ onDone, lessonId }) => {
+const CreateAssignment: FunctionComponent<IProps> = ({
+  onDone,
+  user,
+  course,
+  lesson,
+}) => {
   // States
   const [isCreateAssignmentModalOpen, setIsCreateAssignmentModalOpen] =
     useState(false);
@@ -32,8 +42,10 @@ const CreateAssignment: FunctionComponent<IProps> = ({ onDone, lessonId }) => {
       </button>
       {isCreateAssignmentModalOpen && (
         <CreateAssignmentModal
+          course={course}
+          lesson={lesson}
+          user={user}
           closeModal={closeCreateAssignmentModal}
-          lessonId={lessonId}
           onDone={() => {
             closeCreateAssignmentModal();
             onDone();

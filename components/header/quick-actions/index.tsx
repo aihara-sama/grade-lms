@@ -1,16 +1,17 @@
 "use client";
 
-import NotificationsIcon from "@/components/icons/notifications-icon";
+import NotificationsDrawer from "@/components/drawers/notifications-drawer";
+import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent } from "react";
 
-interface IProps {}
+interface IProps {
+  user: User;
+}
 
-const QuickActions: FunctionComponent<IProps> = () => {
+const QuickActions: FunctionComponent<IProps> = ({ user }) => {
   return (
     <div className="flex gap-[4px] items-center ml-auto">
-      <button className="icon-button text-neutral-600">
-        <NotificationsIcon />
-      </button>
+      <NotificationsDrawer user={user} />
     </div>
   );
 };

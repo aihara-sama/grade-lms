@@ -33,6 +33,7 @@ const SignUp: FunctionComponent<IProps> = () => {
           name,
           role: ROLES.TEACHER,
           avatar: "default-avatar",
+          preferred_locale: "en",
         } as IUserMetadata,
       },
     });
