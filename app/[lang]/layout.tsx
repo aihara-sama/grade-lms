@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${latoFont.className}`}>
         <div className="dum"></div>
-        <PaypalProvider clientId={process.env.PAYPAL_CLIENT_ID}>
+        <PaypalProvider>
           {children}
           <Toaster />
           <ProgressBar />

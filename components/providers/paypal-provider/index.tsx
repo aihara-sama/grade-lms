@@ -1,18 +1,13 @@
 "use client";
 
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, PropsWithChildren } from "react";
 
-interface IProps {
-  children: React.ReactNode;
-  clientId: string;
-}
-
-const PaypalProvider: FunctionComponent<IProps> = ({ children, clientId }) => {
+const PaypalProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
   return (
     <PayPalScriptProvider
       options={{
-        "client-id": clientId,
+        "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
         currency: "USD",
         intent: "subscription",
         vault: true,
