@@ -141,7 +141,7 @@ const Assignments: FunctionComponent<IProps> = ({
               <p className="mb-4">
                 Are you sure you want to delete selected assignments?
               </p>
-              <div className="group-buttons">
+              <div className="flex justify-end gap-3">
                 <button
                   className="outline-button w-full"
                   onClick={() => setIsDeleteBulkAssignmentsModalOpen(false)}

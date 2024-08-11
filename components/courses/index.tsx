@@ -160,7 +160,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
               <p className="mb-4">
                 Are you sure you want to delete selected courses?
               </p>
-              <div className="group-buttons">
+              <div className="flex justify-end gap-3">
                 <button
                   className="outline-button w-full"
                   onClick={() => setIsDeleteBulkCoursesModalOpen(false)}

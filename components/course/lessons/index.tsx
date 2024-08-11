@@ -124,7 +124,7 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
           ),
           Starts: format(new Date(starts), "EEEE, MMM d"),
           Action: (
-            <div className="group-buttons" key={id}>
+            <div className="flex justify-end gap-3" key={id}>
               <DeleteButton
                 onDone={getLessons}
                 action={deleteLesson}
@@ -161,7 +161,7 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
               <p className="mb-4">
                 Are you sure you want to delete selected lessons?
               </p>
-              <div className="group-buttons">
+              <div className="flex justify-end gap-3">
                 <button
                   className="outline-button w-full"
                   onClick={() => setIsDeleteBulkLessonsModalOpen(false)}

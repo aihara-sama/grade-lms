@@ -56,23 +56,17 @@
   }
 
   .event {
-    @apply absolute w-full text-[#f7f7f7] text-[13px] pl-[8px] z-[1] font-bold rounded-[3px] [transition:0.2s_background-color] select-none bg-link hover:bg-blue-200 active:bg-blue-300 before:content-[''] before:block before:h-[100%] before:w-[5px] before:bg-green-500 before:absolute before:left-0;
+    @apply whitespace-nowrap overflow-ellipsis overflow-hidden pr-1 absolute w-full cursor-pointer text-neutral-100 text-[13px] pl-2 z-[1] font-bold rounded-[3px] transition-colors select-none bg-link hover:bg-blue-200 active:bg-blue-300 before:content-[''] before:block before:h-[100%] before:w-[5px] before:bg-green-500 before:absolute before:left-0;
   }
 
   .page-title {
-    @apply text-3xl font-bold max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden text-neutral-600;
+    @apply text-3xl font-bold whitespace-nowrap overflow-ellipsis text-neutral-600 max-w-[400px] overflow-hidden;
   }
   .section-title {
-    @apply text-xl font-bold mx-[0] my-[12px] text-neutral-600;
+    @apply text-xl font-bold my-3 text-neutral-600;
   }
-
-  .group-buttons {
-    @apply flex gap-[14px] mb-[4px] self-stretch;
-  }
-
-  .page-wrapper {
-    @apply p-[24px] flex-[1] flex flex-col max-w-[1432px] mx-[auto] my-[0];
-  }
+}
+@layer utilities {
   .hide-whiteboard-elements {
     & > .excalidraw {
       & > .App-menu_top,
@@ -82,6 +76,4 @@
       }
     }
   }
-}
-@layer utilities {
 }

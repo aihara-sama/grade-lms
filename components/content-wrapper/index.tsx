@@ -1,6 +1,7 @@
 "use client";
 
 import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
+import clsx from "clsx";
 import type { FunctionComponent } from "react";
 
 interface IProps {
@@ -11,7 +12,7 @@ const ContentWrapper: FunctionComponent<IProps> = ({ children }) => {
   const { isExpanded } = useIsLessonHrExpanded();
   return (
     <div
-      className={`page-wrapper ${isExpanded ? "[max-width:unset] [margin:unset]" : ""}`}
+      className={`flex flex-1 flex-col p-6 max-w-[1432px] mx-[auto] ${clsx(isExpanded && "[max-width:unset] [margin:unset]")}`}
     >
       {children}
     </div>

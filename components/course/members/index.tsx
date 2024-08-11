@@ -159,7 +159,7 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
               <p className="mb-4">
                 Are you sure you want to dispel selected members?
               </p>
-              <div className="group-buttons">
+              <div className="flex justify-end gap-3">
                 <button
                   className="outline-button w-full"
                   onClick={() => setIsDeleteBulkMembersModalOpen(false)}

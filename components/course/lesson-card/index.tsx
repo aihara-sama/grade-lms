@@ -15,7 +15,7 @@ const LessonCard: FunctionComponent<IProps> = ({ lesson }) => {
       <hr className="mt-[10px] mb-[14px] w-3/4" />
       <p className="mb-[8px]">Starts in:</p>
       <p className="font-bold mb-[14px]">1h 30m</p>
-      <button className="group-buttons">
+      <button className="flex justify-end gap-3">
         <button className="outline-button w-full">View</button>
         <Link
           className="link-button w-full"

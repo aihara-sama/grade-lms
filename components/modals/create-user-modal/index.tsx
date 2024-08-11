@@ -118,7 +118,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
             ]}
           />
           <hr className="mb-4" />
-          <div className="group-buttons">
+          <div className="flex justify-end gap-3">
             <button
               onClick={() => handleCreateUser(true)}
               className="outline-button w-full"

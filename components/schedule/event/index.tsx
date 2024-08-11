@@ -1,4 +1,7 @@
-import type { Database } from "@/types/supabase.type";
+import { useSchedule } from "@/hooks/useSchedule";
+import type { Lesson } from "@/types/lessons.type";
+import { minToPx } from "@/utils/min-to-px";
+import clsx from "clsx";
 import {
   format,
   hoursToMilliseconds,
@@ -8,12 +11,9 @@ import {
 } from "date-fns";
 import { memo, type FunctionComponent, type MouseEvent } from "react";
 
-import { useSchedule } from "@/hooks/useSchedule";
-import { minToPx } from "@/utils/min-to-px";
-
 interface IProps {
-  event: Database["public"]["Tables"]["lessons"]["Row"];
   index: number;
+  event: Lesson;
   isSummerDaylight: boolean;
   isInterdayEvent?: boolean;
 }
@@ -24,20 +24,24 @@ const Event: FunctionComponent<IProps> = ({
   isSummerDaylight,
   isInterdayEvent,
 }) => {
+  // State
+  const duration = +new Date(event.ends) - +new Date(event.starts);
   const eventStarts = isInterdayEvent
     ? format(startOfDay(event.ends), "yyyy-MM-dd'T'HH:mm:ss")
     : event.starts;
-  const duration = +new Date(event.ends) - +new Date(event.starts);
-  console.log(millisecondsToMinutes(duration));
+
+  // Hooks
+  const draggingEvent = useSchedule((state) => state.draggingEvent);
 
   const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
-  const draggingEvent = useSchedule((state) => state.draggingEvent);
   const setPointerOffsetPositionOnEvent = useSchedule(
     (state) => state.setPointerOffsetPositionOnEvent
   );
   const setInitPointerPosition = useSchedule(
     (state) => state.setInitPointerPosition
   );
+
+  // Handlers
   const handlePointerDown = (e: MouseEvent) => {
     setInitPointerPosition({
       pointerX: e.clientX,
@@ -50,34 +54,32 @@ const Event: FunctionComponent<IProps> = ({
   };
 
   return (
-    <>
-      <div
-        onMouseDown={handlePointerDown}
-        onClick={() => setSelectedLesson(event)}
-        data-date={new Date(eventStarts)}
-        className={`event cursor-pointer opacity-${draggingEvent?.id === event.id ? 0.7 : 1} whitespace-nowrap overflow-ellipsis overflow-hidden pr-1 ${millisecondsToMinutes(duration) === 15 || format(new Date(eventStarts), "HH:mm") === "23:45" ? "flex gap-1 justify-between" : ""}`}
-        data-lesson-id={event.id}
-        style={{
-          top: `${
-            minToPx(minutesToMilliseconds(new Date(eventStarts).getMinutes())) +
-            (index > 0 ? 1 : 0)
-          }px`,
-          height: `${
-            minToPx(
-              +new Date(event.ends) -
-                +new Date(eventStarts) +
-                +(isSummerDaylight ? hoursToMilliseconds(1) : 0)
-            ) - (index > 0 ? 1 : 0)
-          }px`,
-        }}
-      >
-        {`${event.title}`}
-        <div className="flex gap-1">
-          <p>{format(new Date(event.starts), "HH:mm")}</p>-
-          <p>{format(new Date(event.ends), "HH:mm")}</p>
-        </div>
+    <div
+      onClick={() => setSelectedLesson(event)}
+      onMouseDown={handlePointerDown}
+      data-lesson-id={event.id}
+      data-date={new Date(eventStarts)}
+      className={`event ${draggingEvent?.id === event.id ? "opacity-80" : "opacity-1"} ${clsx(millisecondsToMinutes(duration) === 15 || (format(new Date(eventStarts), "HH:mm") === "23:45" && "flex gap-1 justify-between"))}`}
+      style={{
+        top: `${
+          minToPx(minutesToMilliseconds(new Date(eventStarts).getMinutes())) +
+          (index > 0 ? 1 : 0)
+        }px`,
+        height: `${
+          minToPx(
+            +new Date(event.ends) -
+              +new Date(eventStarts) +
+              +(isSummerDaylight ? hoursToMilliseconds(1) : 0)
+          ) - (index > 0 ? 1 : 0)
+        }px`,
+      }}
+    >
+      {event.title}
+      <div className="flex gap-1">
+        <p>{format(new Date(event.starts), "HH:mm")}</p>-
+        <p>{format(new Date(event.ends), "HH:mm")}</p>
       </div>
-    </>
+    </div>
   );
 };
 

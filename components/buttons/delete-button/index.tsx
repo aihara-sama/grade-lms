@@ -53,8 +53,8 @@ const DeleteButton: FunctionComponent<IProps> = ({
               <p className="mb-4">
                 Are you sure you want to delete this {record}?
               </p>
-              <div className="group-buttons">
-                <button className="outline-button w-full" onClick={closeModal}>
+              <div className="flex justify-end gap-3">
+                <button className="outline-button" onClick={closeModal}>
                   Cancel
                 </button>
                 <button className="primary-button" onClick={handleDeleteRecord}>

@@ -212,7 +212,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
               <p className="mb-4">
                 Are you sure you want to delete selected users?
               </p>
-              <div className="group-buttons">
+              <div className="flex justify-end gap-3">
                 <button
                   className="outline-button w-full"
                   onClick={() => setIsDeleteUsersModalOpen(false)}
@@ -255,7 +255,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
                   ),
                 }))}
               />
-              <div className="group-buttons">
+              <div className="flex justify-end gap-3">
                 <button
                   className="outline-button w-full"
                   onClick={() => setIsEnrollUsersModalOpen(false)}
