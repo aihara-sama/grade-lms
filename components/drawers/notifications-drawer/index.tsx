@@ -2,6 +2,9 @@
 
 import CloseIcon from "@/components/icons/close-icon";
 import NotificationsIcon from "@/components/icons/notifications-icon";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { ROLES } from "@/interfaces/user.interface";
+import { getNotificationChannel } from "@/utils/get-notification-channel";
 import { parseNotification } from "@/utils/parse-notification";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -9,6 +12,7 @@ import clsx from "clsx";
 import { formatDistanceToNowStrict } from "date-fns";
 import Link from "next/link";
 import { useEffect, useState, type FunctionComponent } from "react";
+import toast from "react-hot-toast";
 
 interface Props {
   user: User;
@@ -37,20 +41,65 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
       };
     }[]
   >([]);
-  useEffect(() => {
-    (async () => {
-      const data = await supabaseClient
-        .from("notifications")
-        .select(
-          "id, is_read, type, created_at, course:courses(title, id), lesson:lessons(title, id), assignment:assignments(title), user:users!inner(name)"
-        )
-        .eq("users.id", user.id);
 
-      console.log({ data });
-      setNotifications(data.data);
-    })();
-  }, []);
+  const [isNewNotification, setIsNewNotification] = useState(false);
+
+  const getNotifications = async () => {
+    const data = await supabaseClient
+      .from("notifications")
+      .select(
+        "id, is_read, type, created_at, course:courses(title, id), lesson:lessons(title, id), assignment:assignments(title), user:users!inner(name)"
+      )
+      .eq("users.id", user.id);
+
+    setNotifications(data.data);
+  };
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const room =
+      (user.user_metadata as IUserMetadata).role === ROLES.TEACHER
+        ? user.id
+        : (user.user_metadata as IUserMetadata).creator_id;
+
+    getNotificationChannel(room)
+      .on("broadcast", { event: "notification" }, () => {
+        setIsNewNotification(true);
+      })
+      .subscribe();
+  }, []);
+
+  const readNotification = async (notificationId: string) => {
+    const { error } = await supabaseClient
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("id", notificationId);
+
+    if (error) {
+      toast.error("Something went wrong");
+    } else {
+      setNotifications((prev) =>
+        prev.map((_) => {
+          if (_.id === notificationId) _.is_read = true;
+          return _;
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      getNotifications();
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    setIsNewNotification(notifications.some(({ is_read }) => !is_read));
+  }, [notifications]);
+
   return (
     <>
       {isOpen && (
@@ -61,9 +110,12 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
       )}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="icon-button text-neutral-600"
+        className="icon-button text-neutral-600 relative"
       >
         <NotificationsIcon />
+        {isNewNotification && (
+          <div className="absolute right-[7px] top-[7px] w-[10px] h-[10px] bg-red-500 [border-radius:50%] border border-white"></div>
+        )}
       </button>
 
       {/* Actual Drawer */}
@@ -83,15 +135,24 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
             </button>
           </div>
         </div>
-        <div className="px-7">
+        <div className="max-h-[calc(100vh-88px)] overflow-auto">
           {notifications.map((notification) => {
             const { href, body, textHref, title } =
               parseNotification(notification);
             return (
-              <div key={notification.id} className="flex flex-col gap-4 mt-4">
+              <div
+                onMouseEnter={() => {
+                  if (!notification.is_read) readNotification(notification.id);
+                }}
+                key={notification.id}
+                className="flex flex-col py-4 mt-4 px-7 "
+              >
                 <div className="flex items-start gap-2">
-                  <button className="icon-button border border-neutral-300">
+                  <button className="relative icon-button border border-neutral-300">
                     <NotificationsIcon className="" size="xs" />
+                    <div
+                      className={`absolute bottom-[-18px] w-[10px] h-[10px]  [border-radius:50%] border border-white ${!notification.is_read ? "bg-red-500" : "bg-transparent"} transition-all`}
+                    ></div>
                   </button>
                   <div>
                     <p className="text-neutral-700 text-[15px] font-bold">
@@ -112,7 +173,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
                     </Link>
                   </div>
                 </div>
-                <hr />
+                <hr className="mt-4" />
               </div>
             );
           })}

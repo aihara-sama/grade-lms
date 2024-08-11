@@ -9,10 +9,13 @@ import dynamic from "next/dynamic";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { ROLES } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import type { Notification } from "@/types/notifications";
+import { getNotificationChannel } from "@/utils/get-notification-channel";
 import type { User } from "@supabase/supabase-js";
 
 const Editor = dynamic(() => import("@/components/editor"), {
@@ -74,7 +77,19 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
               is_read: false,
               type: "assignment",
             })) as Notification[]
-          );
+          )
+          .select("*")
+          .single();
+
+        const room =
+          (user.user_metadata as IUserMetadata).role === ROLES.TEACHER
+            ? user.id
+            : (user.user_metadata as IUserMetadata).creator_id;
+
+        getNotificationChannel(room).send({
+          event: "notification",
+          type: "broadcast",
+        });
 
         if (notificationsErr) {
           toast.error("Something went wrong");
