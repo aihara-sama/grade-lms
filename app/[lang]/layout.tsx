@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import ProgressBar from "@/components/pregress-bar";
 import PaypalProvider from "@/components/providers/paypal-provider";
 import { Lato } from "next/font/google";
+import type { FunctionComponent, PropsWithChildren } from "react";
 import { Toaster } from "react-hot-toast";
 
 const latoFont = Lato({
@@ -10,15 +11,10 @@ const latoFont = Lato({
   subsets: ["latin"],
 });
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const Layout: FunctionComponent<PropsWithChildren> = ({ children }) => {
   return (
     <html lang="en">
       <body className={`${latoFont.className}`}>
-        <div className="dum"></div>
         <PaypalProvider>
           {children}
           <Toaster />
@@ -27,4 +23,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default Layout;

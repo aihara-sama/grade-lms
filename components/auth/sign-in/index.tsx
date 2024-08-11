@@ -12,8 +12,10 @@ import toast from "react-hot-toast";
 interface IProps {}
 
 const SignIn: FunctionComponent<IProps> = () => {
+  // Hooks
   const router = useRouter();
 
+  // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -31,9 +33,9 @@ const SignIn: FunctionComponent<IProps> = () => {
     else router.push("/dashboard");
   };
   return (
-    <div className="flex flex-col justify-center items-center h-screen">
-      <p className="page-title mb-6">Sign In</p>
-      <form onSubmit={handleSubmit} className="w-full sm:w-64">
+    <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
+      <p className="page-title mb-6 text-center">Login</p>
+      <form onSubmit={handleSubmit}>
         <Input
           name="email"
           type="email"
@@ -48,10 +50,13 @@ const SignIn: FunctionComponent<IProps> = () => {
           Icon={<SecurityIcon />}
           fullWIdth
         />
-        <button className="primary-button">Sign In</button>
+        <button className="primary-button w-full">Login</button>
       </form>
-      <p>
-        Don&apos;t have an account? <Link href="/sign-up">Sign Up</Link>
+      <p className="text-sm">
+        Don&apos;t have an account?{" "}
+        <Link href="/sign-up" className="underline">
+          Join
+        </Link>
       </p>
     </div>
   );

@@ -27,7 +27,7 @@ const initUserDetails = {
   name: "",
   email: "",
   password: "",
-  avatar: "default-avatar",
+  avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
 };
 
 const CreateUserModal: FunctionComponent<IProps> = ({

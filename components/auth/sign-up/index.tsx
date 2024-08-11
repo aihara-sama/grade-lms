@@ -11,11 +11,11 @@ import { useRouter } from "next/navigation";
 import { type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {}
-
-const SignUp: FunctionComponent<IProps> = () => {
+const SignUp: FunctionComponent = () => {
+  // Hooks
   const router = useRouter();
 
+  // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -32,7 +32,7 @@ const SignUp: FunctionComponent<IProps> = () => {
         data: {
           name,
           role: ROLES.TEACHER,
-          avatar: "default-avatar",
+          avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
           preferred_locale: "en",
         } as IUserMetadata,
       },
@@ -43,9 +43,9 @@ const SignUp: FunctionComponent<IProps> = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen mx-4">
-      <p className="page-title mb-6">Sign Up</p>
-      <form noValidate onSubmit={handleSubmit} className="w-full sm:w-64">
+    <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
+      <p className="page-title mb-6 text-center">Create account</p>
+      <form noValidate onSubmit={handleSubmit}>
         <Input
           name="name"
           type="text"
@@ -67,10 +67,13 @@ const SignUp: FunctionComponent<IProps> = () => {
           Icon={<SecurityIcon />}
           fullWIdth
         />
-        <button className="primary-button">Sign Up</button>
+        <button className="primary-button w-full">Create account</button>
       </form>
-      <p>
-        Already have an account? <Link href="/sign-in">Sign In</Link>
+      <p className="text-sm">
+        Already have an account?{" "}
+        <Link href="/sign-in" className="underline">
+          Login
+        </Link>
       </p>
     </div>
   );
