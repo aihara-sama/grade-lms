@@ -1,10 +1,9 @@
-// tailwind.config.js
 import { readFileSync } from "fs";
 import postcss from "postcss";
 import postcssJs from "postcss-js";
-import type { Config } from "tailwindcss";
-
 import plugin from "tailwindcss/plugin";
+
+import type { Config } from "tailwindcss";
 
 // Editor sugestions for custom css classes
 require.extensions[".css"] = function (module, filename) {
@@ -67,6 +66,6 @@ const config: Config = {
     },
   },
   // eslint-disable-next-line global-require
-  plugins: [require("./app/globals.css")],
+  plugins: [require("./styles/globals.css")],
 };
 export default config;

@@ -16,8 +16,8 @@ const Total: FunctionComponent<IProps> = ({ total, href, title, Icon }) => {
       <p className="text-neutral-500">{title}</p>
       <p className="mt-2 text-4xl text-neutral-600">{total}</p>
       {href && (
-        <Link className="link-button w-full mt-3" href={href}>
-          View all
+        <Link className="mt-3 w-full" href={href}>
+          <button className="primary-button w-full">View all</button>
         </Link>
       )}
     </div>

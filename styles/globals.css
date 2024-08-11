@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  a {
+    @apply hover:text-blue-500;
+  }
+  button {
+    @apply font-bold whitespace-nowrap py-[6px] px-3 gap-[6px] shadow-sm [transition:0.2s] cursor-pointer rounded-[5px] flex items-center justify-center;
+    @apply disabled:opacity-75 disabled:cursor-default disabled:bg-link !important;
+  }
+  input {
+    @apply text-sm pl-8 pr-4 py-[7.5px] rounded-md border border-gray-500;
+  }
+
+  /* Scrollbar ↴ */
+  *::-webkit-scrollbar {
+    @apply w-1 h-1 bg-white;
+  }
+  *::-webkit-scrollbar-track {
+    @apply bg-white;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply bg-black/20 outline outline-1 outline-transparent rounded-[4px] w-1;
+  }
+  /* ^ Scrollbar ^ */
+}
+@layer components {
+  .icon-button {
+    @apply text-neutral-600 bg-white p-2 rounded-[50%];
+    @apply hover:bg-gray-100;
+    @apply active:bg-gray-200;
+  }
+
+  .primary-button {
+    @apply text-white bg-link;
+    @apply hover:bg-blue-200;
+    @apply active:bg-blue-300;
+  }
+  .warning-button {
+    @apply text-white bg-amber-400;
+    @apply hover:text-white hover:bg-amber-520;
+    @apply active:bg-amber-550;
+  }
+
+  .link-button {
+    @apply text-white bg-link;
+    @apply hover:text-white hover:bg-blue-200;
+    @apply active:bg-blue-300;
+  }
+  .outline-button {
+    @apply text-[15px] text-primary bg-white border border-gray-200;
+    @apply hover:bg-gray-100;
+    @apply active:bg-gray-200;
+  }
+
+  .event {
+    @apply absolute w-full text-[#f7f7f7] text-[13px] pl-[8px] z-[1] font-bold rounded-[3px] [transition:0.2s_background-color] select-none bg-link hover:bg-blue-200 active:bg-blue-300 before:content-[''] before:block before:h-[100%] before:w-[5px] before:bg-green-500 before:absolute before:left-0;
+  }
+
+  .page-title {
+    @apply text-3xl font-bold max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden text-neutral-600;
+  }
+  .section-title {
+    @apply text-xl font-bold mx-[0] my-[12px] text-neutral-600;
+  }
+
+  .group-buttons {
+    @apply flex gap-[14px] mb-[4px] self-stretch;
+  }
+
+  .page-wrapper {
+    @apply p-[24px] flex-[1] flex flex-col max-w-[1432px] mx-[auto] my-[0];
+  }
+  .hide-whiteboard-elements {
+    & > .excalidraw {
+      & > .App-menu_top,
+      & > .layer-ui__wrapper__footer-right,
+      & > .undo-redo-buttons {
+        @apply hidden;
+      }
+    }
+  }
+}
+@layer utilities {
+}

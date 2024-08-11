@@ -37,10 +37,14 @@ const OngoingLessonCard: FunctionComponent<IProps> = ({ courseId }) => {
       <hr className="w-48 mb-2" />
       <p className="mb-1 text-lg font-bold">{lesson?.title || "No lesson"}</p>
       <Link
-        className={`w-64 mt-3 ${lesson ? "warning-button" : "link-button"}`}
+        className="mt-3"
         href={lesson ? `/dashboard/lessons/${lesson.id}` : `lessons`}
       >
-        {lesson ? "Enter class" : "Create"}
+        <button
+          className={`${lesson ? "warning-button" : "primary-button"} w-64`}
+        >
+          {lesson ? "Enter class" : "Create"}
+        </button>
       </Link>
     </div>
   );

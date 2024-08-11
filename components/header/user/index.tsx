@@ -13,11 +13,6 @@ export const items: IItem[] = [
     href: "/dashboard/profile",
     Icon: ProfileIcon,
   },
-  // {
-  //   title: "Log out",
-  //   href: "/log-out",
-  //   Icon: LogoutIcon,
-  // },
 ];
 
 interface IProps {
@@ -42,7 +37,7 @@ const User: FunctionComponent<IProps> = (props) => {
         className="ml-3 border-l-2 border-solid border-gray-500 flex items-center gap-[16px] pl-[16px] cursor-pointer"
       >
         <img
-          className="[border-radius:50%] w-7 h-7 object-cover "
+          className="rounded-[50%] w-7 h-7 object-cover"
           src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
           alt=""
         />

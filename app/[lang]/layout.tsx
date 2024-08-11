@@ -1,4 +1,4 @@
-import "@/app/globals.css";
+import "@/styles/globals.css";
 
 import ProgressBar from "@/components/pregress-bar";
 import PaypalProvider from "@/components/providers/paypal-provider";

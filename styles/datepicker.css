@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Datepicker ↴ */
 .react-datepicker-popper {
   @apply shadow-md z-[4] !important;
@@ -156,8 +152,7 @@
 }
 
 .react-datepicker__time-container,
-.eePCcq
-  .react-datepicker__time-container
+.react-datepicker__time-container
   .react-datepicker__time
   .react-datepicker__time-box
   ul.react-datepicker__time-list {
@@ -172,81 +167,3 @@
   width: 100%;
 }
 /* ^ Datepicker ^ */
-
-/* Scrollbar ↴ */
-*::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-  background-color: #fff;
-}
-*::-webkit-scrollbar-track {
-  --webkit-box-shadow: inset 0 0 6px transparent;
-  background-color: #fff;
-}
-*::-webkit-scrollbar-thumb {
-  background-color: #0000001f;
-  outline: 1px solid transparent;
-  border-radius: 4px;
-  width: 4px;
-}
-/* ^ Scrollbar ^ */
-
-@layer base {
-  a:hover {
-    @apply text-blue-500;
-  }
-  button {
-    @apply disabled:opacity-75 disabled:cursor-default disabled:bg-link !important;
-  }
-  input {
-    @apply border border-gray-500 pl-8 pr-4 py-[7.5px] rounded-md text-sm;
-  }
-}
-@layer components {
-  .event {
-    @apply absolute w-full text-[#f7f7f7] text-[13px] pl-[8px] z-[1] font-bold rounded-[3px] [transition:0.2s_background-color] select-none bg-link hover:bg-blue-200 active:bg-blue-300 before:content-[''] before:block before:h-[100%] before:w-[5px] before:bg-green-500 before:absolute before:left-0;
-  }
-  .icon-button {
-    @apply cursor-pointer rounded-[50%] p-[7px] w-[32px] h-[32px] flex justify-center items-center bg-white hover:bg-gray-100 active:bg-gray-200;
-  }
-
-  .primary-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-link hover:bg-blue-200 active:bg-blue-300 w-full font-bold;
-  }
-  .warning-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] gap-[6px] pl-[12px] pr-[12px] [transition:0.2s] shadow-sm text-white bg-amber-400 hover:text-white hover:bg-amber-520 active:bg-amber-550 w-full font-bold;
-  }
-
-  .link-button {
-    @apply cursor-pointer rounded-[5px] flex items-center justify-center p-[6px] shadow-sm bg-link text-white hover:bg-blue-200 hover:text-white active:bg-blue-300 font-bold gap-[6px];
-  }
-  .outline-button {
-    @apply rounded-[5px] flex items-center justify-center gap-[6px] p-[6px] pl-[12px] pr-[12px] whitespace-nowrap relative text-[15px] shadow-sm text-primary bg-white border border-gray-200 cursor-pointer hover:bg-gray-100 active:bg-gray-200;
-  }
-
-  .page-title {
-    @apply text-3xl font-bold max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden text-neutral-600;
-  }
-  .section-title {
-    @apply text-xl font-bold mx-[0] my-[12px] text-neutral-600;
-  }
-
-  .group-buttons {
-    @apply flex gap-[14px] mb-[4px] self-stretch;
-  }
-
-  .page-wrapper {
-    @apply p-[24px] flex-[1] flex flex-col max-w-[1432px] mx-[auto] my-[0];
-  }
-  .hide-whiteboard-elements {
-    & > .excalidraw {
-      & > .App-menu_top,
-      & > .layer-ui__wrapper__footer-right,
-      & > .undo-redo-buttons {
-        @apply hidden;
-      }
-    }
-  }
-}
-@layer utilities {
-}

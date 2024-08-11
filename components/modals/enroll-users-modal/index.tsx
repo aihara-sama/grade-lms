@@ -69,7 +69,7 @@ const EnrollUsersModal: FunctionComponent<IProps> = ({
                   checked={usersIds.includes(u.id)}
                   Icon={
                     <img
-                      className="[border-radius:50%] w-8 h-8"
+                      className="rounded-[50%] w-8 h-8"
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${u.avatar}`}
                       alt=""
                     />

@@ -65,11 +65,11 @@ const UserPopper: FunctionComponent<IProps> = ({
   return (
     <div
       ref={popperRef}
-      className={`${isOpen ? "block" : "hidden"} bg-white shadow-sm absolute right-[22px] top-[71px] w-[230px] px-[0] py-[14px] rounded-[3px] z-[999]`}
+      className={`${isOpen ? "block" : "hidden"} bg-white shadow-md absolute right-[22px] top-[71px] w-[230px] px-[0] py-[14px] rounded-[3px] z-[999]`}
     >
       <div className="ml-[16px] flex items-center gap-[8px]">
         <img
-          className="[border-radius:50%] w-9 h-9"
+          className="rounded-[50%] w-9 h-9"
           src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
           alt=""
         />

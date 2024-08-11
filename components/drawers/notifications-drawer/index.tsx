@@ -110,11 +110,11 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
       )}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="icon-button text-neutral-600 relative"
+        className="icon-button relative"
       >
-        <NotificationsIcon />
+        <NotificationsIcon size="sm" />
         {isNewNotification && (
-          <div className="absolute right-[7px] top-[7px] w-[10px] h-[10px] bg-red-500 [border-radius:50%] border border-white"></div>
+          <div className="absolute right-[7px] top-[7px] w-[10px] h-[10px] bg-red-500 rounded-[50%] border border-white"></div>
         )}
       </button>
 
@@ -135,7 +135,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
             </button>
           </div>
         </div>
-        <div className="max-h-[calc(100vh-88px)] overflow-auto">
+        <div className="max-h-[calc(100vh-88px)] overflow-auto py-4">
           {notifications.map((notification) => {
             const { href, body, textHref, title } =
               parseNotification(notification);
@@ -145,13 +145,13 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
                   if (!notification.is_read) readNotification(notification.id);
                 }}
                 key={notification.id}
-                className="flex flex-col py-4 mt-4 px-7 "
+                className="flex flex-col pb-4 px-7 "
               >
                 <div className="flex items-start gap-2">
                   <button className="relative icon-button border border-neutral-300">
                     <NotificationsIcon className="" size="xs" />
                     <div
-                      className={`absolute bottom-[-18px] w-[10px] h-[10px]  [border-radius:50%] border border-white ${!notification.is_read ? "bg-red-500" : "bg-transparent"} transition-all`}
+                      className={`absolute bottom-[-18px] w-[10px] h-[10px]  rounded-[50%] border border-white ${!notification.is_read ? "bg-red-500" : "bg-transparent"} transition-all`}
                     ></div>
                   </button>
                   <div>

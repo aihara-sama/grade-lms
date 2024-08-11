@@ -5,9 +5,10 @@ import { format } from "date-fns";
 import { forwardRef, useState, type FunctionComponent } from "react";
 import ReactDatePicker from "react-datepicker";
 
-import type { Placement } from "@floating-ui/utils/dist/floating-ui.utils";
-
+import "@/styles/datepicker.css";
 import "react-datepicker/dist/react-datepicker.css";
+
+import type { Placement } from "@floating-ui/utils/dist/floating-ui.utils";
 
 const CustomInput = forwardRef<
   HTMLButtonElement,

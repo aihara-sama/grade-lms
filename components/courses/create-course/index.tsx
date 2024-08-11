@@ -47,7 +47,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
     <div className="border border-dashed border-light bg-white px-6 py-8 flex flex-col items-center justify-between sm:w-64 w-full rounded-md">
       <AddCourseIcon />
       <hr className="w-full my-3" />
-      <button className="primary-button" onClick={openModal}>
+      <button className="primary-button w-full" onClick={openModal}>
         Create
       </button>
       {isCreateCourseModalOpen && (
@@ -66,7 +66,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
                 placeholder="My course..."
                 onChange={(e) => setCourseTitle(e.target.value)}
               />
-              <button disabled={!courseTitle} className="primary-button">
+              <button disabled={!courseTitle} className="primary-button w-full">
                 Create
               </button>
             </form>

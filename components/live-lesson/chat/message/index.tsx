@@ -9,7 +9,7 @@ const Message: FunctionComponent<IProps> = ({ message }) => {
   return (
     <div className="flex gap-2">
       <img
-        className="[border-radius:50%] w-8 h-8"
+        className="rounded-[50%] w-8 h-8"
         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${message.author_avatar}`}
         alt=""
       />

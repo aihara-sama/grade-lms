@@ -31,7 +31,7 @@ const AvatarUpload: FunctionComponent<IProps> = ({ setAvatar, avatar }) => {
       <img
         alt="avatar"
         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
-        className="[border-radius:50%] w-40 h-40 border border-neutral-200 object-cover"
+        className="rounded-[50%] w-40 h-40 border border-neutral-200 object-cover"
       />
       <label>
         <div className="flex cursor-pointer absolute bottom-[2px] right-[12px] p-[10px] rounded-[50%] border border-3 border-white bg-gray-100 shadow-md hover:bg-gray-200 active:bg-gray-500">
