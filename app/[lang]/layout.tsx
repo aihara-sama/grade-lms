@@ -18,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${latoFont.className}`}>
+        <div className="dum"></div>
         <PaypalProvider clientId={process.env.PAYPAL_CLIENT_ID}>
           {children}
           <Toaster />

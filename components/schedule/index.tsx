@@ -25,9 +25,9 @@ import toast from "react-hot-toast";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import type { Database } from "@/types/supabase.type";
+import { getWeekDays } from "@/utils/get-week-days";
 import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent } from "react";
-import { getWeekDays } from "@/utils/get-week-days";
 
 interface IProps {
   user: User;

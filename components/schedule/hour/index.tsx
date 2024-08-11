@@ -87,7 +87,7 @@ const Hour: FunctionComponent<IProps> = ({
   );
 
   return (
-    <>
+    <div>
       {index > 0 &&
         isSummerDaylight(addHours(day, index), addHours(day, index - 1)) && (
           <div
@@ -102,12 +102,14 @@ const Hour: FunctionComponent<IProps> = ({
           </div>
         )}
       <div
+        id="a"
         className="hour h-[81px] [border-top:1px_solid_#dfdfdf] [border-right:1px_solid_#dfdfdf] relative"
         data-date={new Date(hour)}
       >
         {[...Array(4)].map((_, idx) => {
           return (
             <div
+              key={idx}
               onClick={() =>
                 setSelectedLesson({
                   id: undefined,
@@ -144,7 +146,6 @@ const Hour: FunctionComponent<IProps> = ({
                   )
                 )
               }
-              key={idx}
               className={`placeholder absolute w-full text-center border-[2px] border-dashed border-[#c3c3c3] rounded-[3px] opacity-0 [transition:0.1s] bg-[white] h-[20px] flex justify-center items-center bg-transparent ${!draggingEvent ? "hover:cursor-pointer hover:opacity-100" : ""} active:bg-gray-100 ${quarter === idx * 15 ? "opacity-100" : "opacity-0"}`}
               style={{
                 top: `${idx * 20}px`,
@@ -172,59 +173,53 @@ const Hour: FunctionComponent<IProps> = ({
         })}
         {hourEvents.map((event, idx) => {
           return (
-            <>
-              <Event
-                isSummerDaylight={
-                  index > 0 &&
-                  isSummerDaylight(
-                    addHours(day, index),
-                    new Date(
-                      +new Date(event.starts) +
-                        (+new Date(event.ends) - +new Date(event.starts))
-                    )
+            <Event
+              isSummerDaylight={
+                index > 0 &&
+                isSummerDaylight(
+                  addHours(day, index),
+                  new Date(
+                    +new Date(event.starts) +
+                      (+new Date(event.ends) - +new Date(event.starts))
                   )
-                }
-                event={event}
-                key={idx}
-                index={idx}
-              />
-            </>
+                )
+              }
+              event={event}
+              key={idx}
+              index={idx}
+            />
           );
         })}
         {new Date(hour).getHours() === 0 &&
-          yesterdayEvent.map((event, idx) => {
-            return (
-              <>
-                <Event
-                  isInterdayEvent
-                  isSummerDaylight={
-                    index > 0 &&
-                    isSummerDaylight(
-                      addHours(day, index),
-                      new Date(
-                        +new Date(event.starts) +
-                          (+new Date(event.ends) - +new Date(event.starts))
-                      )
-                    )
-                  }
-                  event={{
-                    ...event,
-                    ends: format(
-                      addMilliseconds(
-                        startOfDay(hour),
-                        +new Date(event.ends) - +startOfDay(new Date(hour))
-                      ),
-                      "yyyy-MM-dd'T'HH:mm:ss"
-                    ),
-                  }}
-                  key={idx}
-                  index={idx}
-                />
-              </>
-            );
-          })}
+          yesterdayEvent.map((event, idx) => (
+            <Event
+              isInterdayEvent
+              isSummerDaylight={
+                index > 0 &&
+                isSummerDaylight(
+                  addHours(day, index),
+                  new Date(
+                    +new Date(event.starts) +
+                      (+new Date(event.ends) - +new Date(event.starts))
+                  )
+                )
+              }
+              event={{
+                ...event,
+                ends: format(
+                  addMilliseconds(
+                    startOfDay(hour),
+                    +new Date(event.ends) - +startOfDay(new Date(hour))
+                  ),
+                  "yyyy-MM-dd'T'HH:mm:ss"
+                ),
+              }}
+              key={idx}
+              index={idx}
+            />
+          ))}
       </div>
-    </>
+    </div>
   );
 };
 
