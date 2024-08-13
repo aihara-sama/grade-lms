@@ -124,10 +124,10 @@ create table submissions (
 create table notifications (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
-  user_id uuid references public.users,
-  course_id uuid references public.courses,
-  lesson_id uuid references public.lessons,
-  assignment_id uuid references public.assignments,
+  user_id uuid references public.users on delete SET NULL,
+  course_id uuid references public.courses on delete SET NULL,
+  lesson_id uuid references public.lessons on delete SET NULL,
+  assignment_id uuid references public.assignments on delete SET NULL,
   created_at timestamp not null default now(),
   type text not null,
   is_read boolean not null

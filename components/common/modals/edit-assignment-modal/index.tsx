@@ -1,9 +1,9 @@
 "use client";
 
+import OverviewTab from "@/components/common/modals/edit-assignment-modal/tabs/overview-tab";
+import SubmissionsTab from "@/components/common/modals/edit-assignment-modal/tabs/submissions-tab";
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
-import OverviewTab from "@/components/modals/edit-assignment-modal/tabs/overview-tab";
-import SubmissionsTab from "@/components/modals/edit-assignment-modal/tabs/submissions-tab";
 import Tabs from "@/components/tabs";
 import { supabaseClient } from "@/utils/supabase/client";
 import toast from "react-hot-toast";

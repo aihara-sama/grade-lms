@@ -1,6 +1,6 @@
+import ViewSubmissionModal from "@/components/common/modals/view-submission-modal";
 import IconTitle from "@/components/icon-title";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
-import ViewSubmissionModal from "@/components/modals/view-submission-modal";
 import Table from "@/components/table";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import { format } from "date-fns";

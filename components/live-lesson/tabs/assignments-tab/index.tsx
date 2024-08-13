@@ -2,9 +2,9 @@
 
 import DeleteButton from "@/components/buttons/delete-button";
 import CardTitle from "@/components/card-title";
+import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
-import EditAssignmentModal from "@/components/modals/edit-assignment-modal";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 

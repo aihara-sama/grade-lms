@@ -1,7 +1,7 @@
 "use client";
 
+import AddLessonModal from "@/components/common/modals/create-lesson-modal";
 import AddLessonIcon from "@/components/icons/add-lesson-icon";
-import AddLessonModal from "@/components/modals/add-lesson-modal";
 import { useState, type FunctionComponent } from "react";
 
 interface IProps {

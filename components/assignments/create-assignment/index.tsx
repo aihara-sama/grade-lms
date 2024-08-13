@@ -1,7 +1,7 @@
 "use client";
 
+import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
 import AddAssignmentIcon from "@/components/icons/add-assignment-icon";
-import CreateAssignmentModal from "@/components/modals/create-assignment-modal";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import type { User } from "@supabase/supabase-js";

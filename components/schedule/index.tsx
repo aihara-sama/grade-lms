@@ -1,8 +1,8 @@
 "use client";
 
+import EditLessonModal from "@/components/common/modals/edit-lesson-modal";
 import ArrowLeftIcon from "@/components/icons/arrow-left-icon";
 import ArrowRightIcon from "@/components/icons/arrow-right-icon";
-import EditLessonModal from "@/components/modals/edit-lesson-modal";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
 import { useSchedule } from "@/hooks/useSchedule";

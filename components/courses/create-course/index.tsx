@@ -50,29 +50,27 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
       <button className="primary-button w-full" onClick={openModal}>
         Create
       </button>
-      {isCreateCourseModalOpen && (
-        <BaseModal
-          setIsOpen={setIsCreateCourseModalOpen}
-          isOpen={isCreateCourseModalOpen}
-          header="Create course"
-        >
-          <form action={submitCreateCourse}>
-            <Input
-              autoFocus
-              fullWIdth
-              name="title"
-              label="Course name"
-              value={courseTitle}
-              Icon={<CoursesIcon />}
-              placeholder="My course..."
-              onChange={(e) => setCourseTitle(e.target.value)}
-            />
-            <button disabled={!courseTitle} className="primary-button w-full">
-              Create
-            </button>
-          </form>
-        </BaseModal>
-      )}
+      <BaseModal
+        setIsOpen={setIsCreateCourseModalOpen}
+        isOpen={isCreateCourseModalOpen}
+        header="Create course"
+      >
+        <form action={submitCreateCourse}>
+          <Input
+            autoFocus
+            fullWIdth
+            name="title"
+            label="Course name"
+            value={courseTitle}
+            Icon={<CoursesIcon />}
+            placeholder="My course..."
+            onChange={(e) => setCourseTitle(e.target.value)}
+          />
+          <button disabled={!courseTitle} className="primary-button w-full">
+            Create
+          </button>
+        </form>
+      </BaseModal>
     </div>
   );
 };

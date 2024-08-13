@@ -2,11 +2,11 @@
 
 import DeleteButton from "@/components/buttons/delete-button";
 import CardsContainer from "@/components/cards-container";
+import EditLessonModal from "@/components/common/modals/edit-lesson-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import CreateLesson from "@/components/live-lesson/create-lesson";
-import EditLessonModal from "@/components/modals/edit-lesson-modal";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import { supabaseClient } from "@/utils/supabase/client";

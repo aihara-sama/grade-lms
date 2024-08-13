@@ -1,7 +1,7 @@
 "use client";
 
+import CreateUserModal from "@/components/common/modals/create-user-modal";
 import AddUserIcon from "@/components/icons/add-user-icon";
-import CreateUserModal from "@/components/modals/create-user-modal";
 import type { User } from "@supabase/supabase-js";
 import { useState, type FunctionComponent } from "react";
 

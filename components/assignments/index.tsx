@@ -12,8 +12,8 @@ import { useEffect, useState, type FunctionComponent } from "react";
 
 import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
+import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import DeleteIcon from "@/components/icons/delete-icon";
-import EditAssignmentModal from "@/components/modals/edit-assignment-modal";
 import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";

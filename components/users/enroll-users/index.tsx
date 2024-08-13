@@ -1,7 +1,7 @@
 "use client";
 
+import EnrollUsersModal from "@/components/common/modals/enroll-users-modal";
 import AddUserIcon from "@/components/icons/add-user-icon";
-import EnrollUsersModal from "@/components/modals/enroll-users-modal";
 import type { User as IUser } from "@supabase/supabase-js";
 import { useState, type FunctionComponent } from "react";
 
