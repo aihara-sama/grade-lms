@@ -1,6 +1,7 @@
 "use client";
 
 import CloseIcon from "@/components/icons/close-icon";
+import { hasVerticalScrollbar } from "@/utils/has-vertical-scrollbar";
 import clsx from "clsx";
 import {
   useEffect,
@@ -29,7 +30,10 @@ const BaseDrawer: FunctionComponent<PropsWithChildren<IProps>> = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = "4px";
+
+      if (hasVerticalScrollbar()) {
+        document.body.style.paddingRight = "4px";
+      }
     } else {
       document.body.style.overflow = "unset";
       document.body.style.paddingRight = "0px";
@@ -49,15 +53,16 @@ const BaseDrawer: FunctionComponent<PropsWithChildren<IProps>> = ({
       {/* Actual Drawer */}
       <div
         className={clsx(
-          "bg-white w-full sm:w-[450px] transition-all ease-in duration-200 absolute z-[999] inset-y-0",
+          "bg-white transition-transform ease-in duration-200 absolute z-[999] inset-y-0",
           {
-            "translate-x-0 opacity-100": placement === "left" && isOpen,
-            "-translate-x-[450px] ": placement === "left" && !isOpen,
-            "translate-x-[0] opacity-100": placement === "right" && isOpen,
-            "translate-x-full sm:translate-x-[450px] ":
-              placement === "right" && !isOpen,
+            "w-full sm:w-[450px]":
+              placement === "left" || placement === "right",
             "left-0": placement === "left",
             "right-0": placement === "right",
+            "transform translate-x-0": placement === "left" && isOpen,
+            "-translate-x-full": placement === "left" && !isOpen,
+            "translate-x-0": placement === "right" && isOpen,
+            "translate-x-full": placement === "right" && !isOpen,
           }
         )}
       >
