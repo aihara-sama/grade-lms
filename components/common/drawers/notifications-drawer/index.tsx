@@ -45,6 +45,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
   >([]);
 
   const [isNewNotification, setIsNewNotification] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const getNotifications = async () => {
     const data = await supabaseClient
@@ -56,7 +57,6 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
 
     setNotifications(data.data);
   };
-  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const room =

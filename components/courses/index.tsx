@@ -13,8 +13,8 @@ import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 import CardTitle from "@/components/card-title";
+import BaseModal from "@/components/common/modals/base-modal";
 import DeleteIcon from "@/components/icons/delete-icon";
-import Modal from "@/components/modal";
 import type { Database } from "@/types/supabase.type";
 import type { getDictionary } from "@/utils/get-dictionary";
 import type { User } from "@supabase/supabase-js";
@@ -151,33 +151,26 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
           </div>
         </div>
       )}
-      {isDeleteBulkCoursesModalOpen && (
-        <Modal
-          close={() => setIsDeleteBulkCoursesModalOpen(false)}
-          title="Delete courses"
-          content={
-            <>
-              <p className="mb-4">
-                Are you sure you want to delete selected courses?
-              </p>
-              <div className="flex justify-end gap-3">
-                <button
-                  className="outline-button w-full"
-                  onClick={() => setIsDeleteBulkCoursesModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="primary-button"
-                  onClick={handleBulkDeleteCourses}
-                >
-                  Delete
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
+      <BaseModal
+        setIsOpen={setIsDeleteBulkCoursesModalOpen}
+        isOpen={isDeleteBulkCoursesModalOpen}
+        header="Delete courses"
+      >
+        <p className="mb-4">
+          Are you sure you want to delete selected courses?
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            className="outline-button w-full"
+            onClick={() => setIsDeleteBulkCoursesModalOpen(false)}
+          >
+            Cancel
+          </button>
+          <button className="primary-button" onClick={handleBulkDeleteCourses}>
+            Delete
+          </button>
+        </div>
+      </BaseModal>
     </>
   );
 };

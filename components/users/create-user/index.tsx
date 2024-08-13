@@ -13,23 +13,22 @@ interface IProps {
 const CreateUser: FunctionComponent<IProps> = ({ onDone, user }) => {
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
 
-  const closeModal = () => {
-    setIsCreateUserModalOpen(false);
-  };
-  const openModal = () => {
-    setIsCreateUserModalOpen(true);
-  };
-
   return (
     <div className="px-[24px] py-[32px] flex flex-col items-center justify-between w-[250px] rounded-[5px] border border-dashed border-light bg-white">
       <AddUserIcon size="lg" />
       <hr />
-      <button className="primary-button" onClick={openModal}>
+      <button
+        className="primary-button"
+        onClick={() => setIsCreateUserModalOpen(true)}
+      >
         Create
       </button>
-      {isCreateUserModalOpen && (
-        <CreateUserModal user={user} closeModal={closeModal} onDone={onDone} />
-      )}
+      <CreateUserModal
+        user={user}
+        isOpen={isCreateUserModalOpen}
+        setIsOpen={(isOpen) => setIsCreateUserModalOpen(isOpen)}
+        onDone={onDone}
+      />
     </div>
   );
 };

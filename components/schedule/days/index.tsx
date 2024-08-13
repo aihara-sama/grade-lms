@@ -156,9 +156,7 @@ const Days = forwardRef<HTMLDivElement, IProps>(function Days(
 
   useEffect(() => {
     window.addEventListener("mousemove", handlePointerMove);
-    hoursLabelsDaysWrapperRef.current.addEventListener("scroll", (e) => {
-      console.log({ e });
-    });
+
     return () => window.removeEventListener("mousemove", handlePointerMove);
   }, [
     lessons,

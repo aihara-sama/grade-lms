@@ -11,9 +11,9 @@ import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 import CardTitle from "@/components/card-title";
+import BaseModal from "@/components/common/modals/base-modal";
 import DeleteIcon from "@/components/icons/delete-icon";
-import Modal from "@/components/modal";
-import AssignmentModal from "@/components/modals/assignment-modal";
+import EditAssignmentModal from "@/components/modals/edit-assignment-modal";
 import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
@@ -42,6 +42,8 @@ const Assignments: FunctionComponent<IProps> = ({
   const [currentAssignmentId, setCurrentAssignmentId] = useState<
     string | undefined
   >();
+  const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
+    useState(false);
 
   const getAssignments = async () => {
     const data = await supabaseClient
@@ -122,43 +124,38 @@ const Assignments: FunctionComponent<IProps> = ({
           ),
         }))}
       />
-      {currentAssignmentId && (
-        <AssignmentModal
-          assignmentId={currentAssignmentId}
-          onDone={() => {
-            getAssignments();
-            setCurrentAssignmentId(undefined);
-          }}
-          close={() => setCurrentAssignmentId(undefined)}
-        />
-      )}
-      {isDeleteBulkAssignmentsModalOpen && (
-        <Modal
-          close={() => setIsDeleteBulkAssignmentsModalOpen(false)}
-          title="Delete Assignments"
-          content={
-            <>
-              <p className="mb-4">
-                Are you sure you want to delete selected assignments?
-              </p>
-              <div className="flex justify-end gap-3">
-                <button
-                  className="outline-button w-full"
-                  onClick={() => setIsDeleteBulkAssignmentsModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="primary-button"
-                  onClick={handleBulkDeleteAssignments}
-                >
-                  Delete
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
+      <EditAssignmentModal
+        assignmentId={currentAssignmentId}
+        onDone={() => {
+          getAssignments();
+          setCurrentAssignmentId(undefined);
+        }}
+        setIsOpen={setIsEditAssignmentModalOpen}
+        isOpen={isEditAssignmentModalOpen}
+      />
+      <BaseModal
+        setIsOpen={() => setIsDeleteBulkAssignmentsModalOpen(false)}
+        isOpen={isDeleteBulkAssignmentsModalOpen}
+        header="Delete Assignments"
+      >
+        <p className="mb-4">
+          Are you sure you want to delete selected assignments?
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            className="outline-button w-full"
+            onClick={() => setIsDeleteBulkAssignmentsModalOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="primary-button"
+            onClick={handleBulkDeleteAssignments}
+          >
+            Delete
+          </button>
+        </div>
+      </BaseModal>
     </>
   );
 };

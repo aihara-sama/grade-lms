@@ -1,22 +1,27 @@
 import CardTitle from "@/components/card-title";
-import Modal from "@/components/modal";
 import { supabaseClient } from "@/utils/supabase/client";
-import { useEffect, useState, type FunctionComponent } from "react";
+import type { Dispatch, FunctionComponent, SetStateAction } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import type { User } from "@/types/users";
 import type { User as IUser } from "@supabase/supabase-js";
 
 interface IProps {
-  close: () => void;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   courseId: string;
   user: IUser;
+  onDone: () => void;
 }
 
 const EnrollUsersModal: FunctionComponent<IProps> = ({
-  close,
   courseId,
   user,
+  isOpen,
+  setIsOpen,
+  onDone,
 }) => {
   // State
   const [users, setUsers] = useState<User[]>([]);
@@ -45,8 +50,8 @@ const EnrollUsersModal: FunctionComponent<IProps> = ({
       toast(error.message);
     } else {
       toast("Users enrolled");
-      getUsers();
-      close();
+      setIsOpen(false);
+      onDone();
     }
   };
 
@@ -56,42 +61,38 @@ const EnrollUsersModal: FunctionComponent<IProps> = ({
   }, []);
 
   return (
-    <Modal
-      close={close}
-      title="Enroll users"
-      content={
-        <div>
-          <div className="mb-[12px] flex flex-col gap-[12px]">
-            {users.map((u) => (
-              <div className="flex items-center justify-between" key={u.id}>
-                <CardTitle
-                  href={`/users/${u.id}`}
-                  checked={usersIds.includes(u.id)}
-                  Icon={
-                    <img
-                      className="rounded-[50%] w-8 h-8"
-                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${u.avatar}`}
-                      alt=""
-                    />
-                  }
-                  title={u.name}
-                  subtitle={u.role}
-                  onClick={() => {}}
-                  onToggle={(checked) =>
-                    checked
-                      ? setUsersIds((prev) => [...prev, u.id])
-                      : setUsersIds((prev) => prev.filter((id) => id !== u.id))
-                  }
-                />
-              </div>
-            ))}
-          </div>
-          <button className="primary-button" onClick={enroll}>
-            Enroll
-          </button>
+    <BaseModal setIsOpen={setIsOpen} isOpen={isOpen} header="Enroll users">
+      <div>
+        <div className="mb-[12px] flex flex-col gap-[12px]">
+          {users.map((u) => (
+            <div className="flex items-center justify-between" key={u.id}>
+              <CardTitle
+                href={`/users/${u.id}`}
+                checked={usersIds.includes(u.id)}
+                Icon={
+                  <img
+                    className="rounded-[50%] w-8 h-8"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${u.avatar}`}
+                    alt=""
+                  />
+                }
+                title={u.name}
+                subtitle={u.role}
+                onClick={() => {}}
+                onToggle={(checked) =>
+                  checked
+                    ? setUsersIds((prev) => [...prev, u.id])
+                    : setUsersIds((prev) => prev.filter((id) => id !== u.id))
+                }
+              />
+            </div>
+          ))}
         </div>
-      }
-    />
+        <button className="primary-button" onClick={enroll}>
+          Enroll
+        </button>
+      </div>
+    </BaseModal>
   );
 };
 

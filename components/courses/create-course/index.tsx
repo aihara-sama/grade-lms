@@ -1,9 +1,9 @@
 "use client";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import AddCourseIcon from "@/components/icons/add-course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
-import Modal from "@/components/modal";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -51,27 +51,27 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
         Create
       </button>
       {isCreateCourseModalOpen && (
-        <Modal
-          close={closeModal}
-          title="Create course"
-          content={
-            <form action={submitCreateCourse}>
-              <Input
-                autoFocus
-                fullWIdth
-                name="title"
-                label="Course name"
-                value={courseTitle}
-                Icon={<CoursesIcon />}
-                placeholder="My course..."
-                onChange={(e) => setCourseTitle(e.target.value)}
-              />
-              <button disabled={!courseTitle} className="primary-button w-full">
-                Create
-              </button>
-            </form>
-          }
-        />
+        <BaseModal
+          setIsOpen={setIsCreateCourseModalOpen}
+          isOpen={isCreateCourseModalOpen}
+          header="Create course"
+        >
+          <form action={submitCreateCourse}>
+            <Input
+              autoFocus
+              fullWIdth
+              name="title"
+              label="Course name"
+              value={courseTitle}
+              Icon={<CoursesIcon />}
+              placeholder="My course..."
+              onChange={(e) => setCourseTitle(e.target.value)}
+            />
+            <button disabled={!courseTitle} className="primary-button w-full">
+              Create
+            </button>
+          </form>
+        </BaseModal>
       )}
     </div>
   );

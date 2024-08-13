@@ -1,8 +1,8 @@
 "use client";
 
-import Modal from "@/components/modal";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import { useState, type FunctionComponent } from "react";
 
 interface IProps {
@@ -44,27 +44,21 @@ const DeleteButton: FunctionComponent<IProps> = ({
         Delete
       </button>
 
-      {isDeleteRecordModalOpen && (
-        <Modal
-          close={closeModal}
-          title={`Delete ${record}`}
-          content={
-            <>
-              <p className="mb-4">
-                Are you sure you want to delete this {record}?
-              </p>
-              <div className="flex justify-end gap-3">
-                <button className="outline-button" onClick={closeModal}>
-                  Cancel
-                </button>
-                <button className="primary-button" onClick={handleDeleteRecord}>
-                  Delete
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
+      <BaseModal
+        isOpen={isDeleteRecordModalOpen}
+        setIsOpen={setIsDeleteRecordModalOpen}
+        header={`Delete ${record}`}
+      >
+        <p className="mb-4">Are you sure you want to delete this {record}?</p>
+        <div className="flex justify-end gap-3">
+          <button className="outline-button" onClick={closeModal}>
+            Cancel
+          </button>
+          <button className="primary-button" onClick={handleDeleteRecord}>
+            Delete
+          </button>
+        </div>
+      </BaseModal>
     </>
   );
 };

@@ -10,11 +10,11 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import InviteIcon from "@/components/icons/invite-icon";
 import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
 import Input from "@/components/input";
 import LiveTime from "@/components/live-time";
-import Modal from "@/components/modal";
 import type { Lesson } from "@/types/lessons.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
@@ -224,39 +224,39 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
         />
       </div>
       {isExtendLessonModalOpen && (
-        <Modal
-          title="Extend lesson"
-          close={() => setIsExtendLessonModalOpen(false)}
-          content={
+        <BaseModal
+          header="Extend lesson"
+          setIsOpen={() => setIsExtendLessonModalOpen(false)}
+          isOpen={isExtendLessonModalOpen}
+        >
+          <div>
             <div>
-              <div>
-                <Input
-                  value={`${extendLessonByMin}`}
-                  onChange={handleChangeExtendLesson}
-                  autoFocus
-                  fullWIdth
-                  Icon={<TimeIcon />}
-                  type="number"
-                  label="Add minutes"
-                />
-              </div>
-              <div className="flex gap-3">
-                <button
-                  className="outline-button ml-auto w-auto"
-                  onClick={() => setIsExtendLessonModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="primary-button w-auto"
-                  onClick={handleExtendLesson}
-                >
-                  Save
-                </button>
-              </div>
+              <Input
+                value={`${extendLessonByMin}`}
+                onChange={handleChangeExtendLesson}
+                autoFocus
+                fullWIdth
+                Icon={<TimeIcon />}
+                type="number"
+                label="Add minutes"
+              />
             </div>
-          }
-        />
+            <div className="flex gap-3">
+              <button
+                className="outline-button ml-auto w-auto"
+                onClick={() => setIsExtendLessonModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="primary-button w-auto"
+                onClick={handleExtendLesson}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </BaseModal>
       )}
     </div>
   );

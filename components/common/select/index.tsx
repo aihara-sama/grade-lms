@@ -1,6 +1,7 @@
 import BasePopper from "@/components/common/poppers/base-popper";
 import ArrowIcon from "@/components/icons/arrow-icon";
 import type { ISelectItem } from "@/interfaces/menu.interface";
+import clsx from "clsx";
 import type { FunctionComponent } from "react";
 import { useRef, useState } from "react";
 
@@ -10,6 +11,7 @@ interface IProps {
   useUnselect?: boolean;
   defaultValue: ISelectItem;
   onChange: (option: ISelectItem) => void;
+  fullWidth?: boolean;
 }
 
 const Select: FunctionComponent<IProps> = ({
@@ -18,6 +20,7 @@ const Select: FunctionComponent<IProps> = ({
   defaultValue,
   useUnselect,
   onChange,
+  fullWidth,
 }) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +31,7 @@ const Select: FunctionComponent<IProps> = ({
   return (
     <div>
       <div
-        className="relative border-[1px] border-solid flex items-center justify-between px-3 py-2 rounded-[5px] cursor-pointer bg-white hover:bg-gray-100 active:bg-gray-200 gap-3 w-40"
+        className={`relative border-[1px] border-solid flex items-center justify-between px-3 py-2 rounded-[5px] cursor-pointer bg-white hover:bg-gray-100 active:bg-gray-200 gap-3 ${clsx(fullWidth ? "w-full" : "w-40")}`}
         onClick={() => setIsOpen((prev) => !prev)}
         ref={anchorEl}
       >
@@ -43,7 +46,7 @@ const Select: FunctionComponent<IProps> = ({
           <div
             className="px-[14px] py-[10px] rounded-[3px] cursor-pointer font-bold hover:bg-gray-100"
             onClick={() => {
-              onChange(undefined);
+              onChange(null);
               setIsOpen(false);
             }}
           >

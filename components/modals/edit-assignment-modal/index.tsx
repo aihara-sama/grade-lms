@@ -2,33 +2,34 @@
 
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
-import Modal from "@/components/modal";
-import OverviewTab from "@/components/modals/assignment-modal/tabs/overview-tab";
-import SubmissionsTab from "@/components/modals/assignment-modal/tabs/submissions-tab";
+import OverviewTab from "@/components/modals/edit-assignment-modal/tabs/overview-tab";
+import SubmissionsTab from "@/components/modals/edit-assignment-modal/tabs/submissions-tab";
 import Tabs from "@/components/tabs";
 import { supabaseClient } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import type { Assignment } from "@/types/assignments.type";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
-import type { FunctionComponent } from "react";
+import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 
 interface IProps {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   assignmentId: string;
-  close: () => void;
   onDone: () => void;
 }
 
-const AssignmentModal: FunctionComponent<IProps> = ({
+const EditAssignmentModal: FunctionComponent<IProps> = ({
   assignmentId,
-  close,
   onDone,
+  isOpen,
+  setIsOpen,
 }) => {
   const [assignment, setAssignment] = useState<Assignment>();
   const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
-  console.log({ submissions });
 
   const saveAssignment = async (_assignment: Assignment) => {
     const { error } = await supabaseClient
@@ -41,7 +42,7 @@ const AssignmentModal: FunctionComponent<IProps> = ({
     } else {
       toast("Assignment saved");
       onDone();
-      close();
+      setIsOpen(false);
     }
   };
 
@@ -77,35 +78,32 @@ const AssignmentModal: FunctionComponent<IProps> = ({
   }, []);
 
   return (
-    <Modal
+    <BaseModal
       width="lg"
-      close={close}
-      title="Assignment"
-      content={
-        <div className="min-h-[523px]">
-          <Tabs
-            tabs={[
-              {
-                title: "Overview",
-                Icon: <OverviewIcon />,
-                content: assignment && (
-                  <OverviewTab
-                    assignment={assignment}
-                    onDone={saveAssignment}
-                  />
-                ),
-              },
-              {
-                title: "Submissions",
-                Icon: <SubmissionsIcon />,
-                content: <SubmissionsTab submissions={submissions} />,
-              },
-            ]}
-          />
-        </div>
-      }
-    />
+      setIsOpen={setIsOpen}
+      isOpen={isOpen}
+      header="Assignment"
+    >
+      <div className="min-h-[523px]">
+        <Tabs
+          tabs={[
+            {
+              title: "Overview",
+              Icon: <OverviewIcon />,
+              content: assignment && (
+                <OverviewTab assignment={assignment} onDone={saveAssignment} />
+              ),
+            },
+            {
+              title: "Submissions",
+              Icon: <SubmissionsIcon />,
+              content: <SubmissionsTab submissions={submissions} />,
+            },
+          ]}
+        />
+      </div>
+    </BaseModal>
   );
 };
 
-export default AssignmentModal;
+export default EditAssignmentModal;

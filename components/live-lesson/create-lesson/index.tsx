@@ -20,19 +20,19 @@ const CreateLesson: FunctionComponent<IProps> = ({ courseId, onDone }) => {
   };
 
   return (
-    <div className="px-6 border-dashed py-8 flex flex-col items-center justify-between w-64 rounded-md bg-white border border-light border-dashed text-neutral-600">
+    <div className="px-6 py-8 flex flex-col items-center justify-between w-64 rounded-md bg-white border border-light border-dashed text-neutral-600">
       <AddLessonIcon size="lg" />
       <hr className="w-full my-3" />
       <button className="primary-button" onClick={openModal}>
         Create
       </button>
-      {isAddLessonModalOpen && (
-        <AddLessonModal
-          courseId={courseId}
-          closeModal={closeModal}
-          onDone={onDone}
-        />
-      )}
+      <AddLessonModal
+        isOpen={isAddLessonModalOpen}
+        setIsOpen={setIsAddLessonModalOpen}
+        courseId={courseId}
+        closeModal={closeModal}
+        onDone={onDone}
+      />
     </div>
   );
 };

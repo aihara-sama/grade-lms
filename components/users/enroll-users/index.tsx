@@ -15,24 +15,23 @@ interface IProps {
 const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId, user }) => {
   const [isEnrollUsersModalOpen, setIsEnrollUsersModalOpen] = useState(false);
 
-  const closeModal = () => {
-    setIsEnrollUsersModalOpen(false);
-    onDone();
-  };
-  const openModal = () => {
-    setIsEnrollUsersModalOpen(true);
-  };
-
   return (
     <div className="border border-dashed px-[24px] py-[32px] flex flex-col items-center justify-between w-[250px] rounded-[5px] border-light bg-white">
       <AddUserIcon size="lg" />
       <hr className="w-full my-3" />
-      <button className="primary-button" onClick={openModal}>
+      <button
+        className="primary-button"
+        onClick={() => setIsEnrollUsersModalOpen(true)}
+      >
         Enroll
       </button>
-      {isEnrollUsersModalOpen && (
-        <EnrollUsersModal user={user} close={closeModal} courseId={courseId} />
-      )}
+      <EnrollUsersModal
+        onDone={onDone}
+        user={user}
+        courseId={courseId}
+        isOpen={isEnrollUsersModalOpen}
+        setIsOpen={(isOpen) => setIsEnrollUsersModalOpen(isOpen)}
+      />
     </div>
   );
 };

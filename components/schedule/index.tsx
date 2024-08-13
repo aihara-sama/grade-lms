@@ -2,7 +2,7 @@
 
 import ArrowLeftIcon from "@/components/icons/arrow-left-icon";
 import ArrowRightIcon from "@/components/icons/arrow-right-icon";
-import LessonModal from "@/components/modals/lesson-modal";
+import EditLessonModal from "@/components/modals/edit-lesson-modal";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
 import { useSchedule } from "@/hooks/useSchedule";
@@ -34,14 +34,6 @@ interface IProps {
 }
 
 const Schedule: FunctionComponent<IProps> = ({ user }) => {
-  // State
-  const [days, setDays] = useState(getWeekDays());
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [hoveredDate, setHoveredDate] = useState<string>();
-  const [courses, setCourses] = useState<Pick<Course, "id" | "title">[]>([]);
-  const [selectedCourse, setSelectedCourse] =
-    useState<Pick<Course, "id" | "title">>(null);
-
   // Zustand
   const canDropEvent = useSchedule((state) => state.canDropEvent);
   const draggingEvent = useSchedule((state) => state.draggingEvent);
@@ -63,6 +55,16 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const setPointerOffsetPositionOnEvent = useSchedule(
     (state) => state.setPointerOffsetPositionOnEvent
   );
+
+  // State
+  const [days, setDays] = useState(getWeekDays());
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [hoveredDate, setHoveredDate] = useState<string>();
+  const [courses, setCourses] = useState<Pick<Course, "id" | "title">[]>([]);
+  const [selectedCourse, setSelectedCourse] =
+    useState<Pick<Course, "id" | "title">>(null);
+  const [isEditLessonModalOpen, setIsEditLessonModalOpen] =
+    useState(!!selectedLesson);
 
   // Refs
   const isDraggingEventRef = useRef(false);
@@ -268,6 +270,10 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     pointerOffsetPositionOnEvent,
   ]);
 
+  useEffect(() => {
+    setIsEditLessonModalOpen(!!selectedLesson);
+  }, [selectedLesson]);
+
   return (
     <div onMouseUp={handleMouseUp}>
       <h1 className="page-title">Schedule</h1>
@@ -380,20 +386,24 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
           </div>
         </div>
       </div>
-      {!!selectedLesson && (
-        <LessonModal
-          includeCoursesSelect
-          courses={courses}
-          lesson={selectedLesson}
-          close={() => {
-            setSelectedLesson(undefined);
-          }}
-          onDone={() => {
+      <EditLessonModal
+        isOpen={isEditLessonModalOpen}
+        setIsOpen={(isOpen) => {
+          setIsEditLessonModalOpen(isOpen);
+          setSelectedLesson(undefined);
+        }}
+        includeCoursesSelect
+        courses={courses}
+        lesson={selectedLesson}
+        onDone={() => {
+          if (selectedCourse) {
+            getLessonsByCourseId(selectedCourse.id);
+          } else {
             getLessons();
-            setSelectedLesson(undefined);
-          }}
-        />
-      )}
+          }
+          setSelectedLesson(undefined);
+        }}
+      />
     </div>
   );
 };

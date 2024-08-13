@@ -4,7 +4,7 @@ import DeleteButton from "@/components/buttons/delete-button";
 import CardTitle from "@/components/card-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
-import AssignmentModal from "@/components/modals/assignment-modal";
+import EditAssignmentModal from "@/components/modals/edit-assignment-modal";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 
@@ -18,6 +18,8 @@ interface IProps {
 const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
   // States
   const [, setIsCreateAssignmentModalOpen] = useState(false);
+  const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
+    useState(false);
   const [currentAssignmentId, setCurrentAssignmentId] = useState<
     string | undefined
   >();
@@ -89,13 +91,14 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
         </button>
       </div>
       {currentAssignmentId && (
-        <AssignmentModal
+        <EditAssignmentModal
           assignmentId={currentAssignmentId}
           onDone={() => {
             getAssignments();
             setCurrentAssignmentId(undefined);
           }}
-          close={() => setCurrentAssignmentId(undefined)}
+          setIsOpen={setIsEditAssignmentModalOpen}
+          isOpen={isEditAssignmentModalOpen}
         />
       )}
       {/* {isCreateAssignmentModalOpen && (

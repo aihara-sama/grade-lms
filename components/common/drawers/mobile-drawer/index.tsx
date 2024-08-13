@@ -7,10 +7,11 @@ import Logo from "@/components/logo";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
 
-interface Props {}
-const MobileDrawer: FunctionComponent<Props> = () => {
+const MobileDrawer: FunctionComponent = () => {
+  // State
   const [isOpen, setIsOpen] = useState(false);
 
+  // View
   return (
     <>
       <Hamburger onClick={() => setIsOpen(true)} />

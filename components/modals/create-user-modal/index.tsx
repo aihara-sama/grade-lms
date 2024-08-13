@@ -8,18 +8,24 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
-import Modal from "@/components/modal";
 import Tabs from "@/components/tabs";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import type { User } from "@supabase/supabase-js";
-import type { ChangeEvent, FunctionComponent } from "react";
+import type {
+  ChangeEvent,
+  Dispatch,
+  FunctionComponent,
+  SetStateAction,
+} from "react";
 
 interface IProps {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   onDone: () => void;
-  closeModal: () => void;
   user: User;
 }
 
@@ -31,9 +37,10 @@ const initUserDetails = {
 };
 
 const CreateUserModal: FunctionComponent<IProps> = ({
-  closeModal,
   onDone,
   user,
+  isOpen,
+  setIsOpen,
 }) => {
   const [userDetails, setUserDetails] = useState(initUserDetails);
 
@@ -47,7 +54,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
 
     if (!error) {
       if (!createAnother) {
-        closeModal();
+        setIsOpen(false);
       }
       setUserDetails(initUserDetails);
       onDone();
@@ -58,85 +65,85 @@ const CreateUserModal: FunctionComponent<IProps> = ({
     setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
   };
   return (
-    <Modal
-      close={closeModal}
-      title="Create user"
-      content={
-        <form noValidate>
-          <Tabs
-            tabs={[
-              {
-                title: "General",
-                Icon: <OverviewIcon />,
-                content: (
-                  <>
-                    <Input
-                      onChange={handleInputChange}
-                      value={userDetails.name}
-                      fullWIdth
-                      name="name"
-                      Icon={<AvatarIcon size="xs" />}
-                      label="Name"
-                      autoFocus
-                    />
-                    <Input
-                      onChange={handleInputChange}
-                      value={userDetails.email}
-                      Icon={<EmailIcon size="xs" />}
-                      label="Email"
-                      type="email"
-                      name="email"
-                      fullWIdth
-                    />
-                    <Input
-                      onChange={handleInputChange}
-                      value={userDetails.password}
-                      name="password"
-                      Icon={<SecurityIcon size="xs" />}
-                      label="Password"
-                      type="password"
-                      className="mb-auto"
-                      fullWIdth
-                    />
-                  </>
-                ),
-              },
-              {
-                title: "Avatar",
-                Icon: <CameraIcon />,
-                content: (
-                  <div className="flex justify-center mx-[0] my-[23.5px]">
-                    <AvatarUpload
-                      setAvatar={(avatar) => {
-                        setUserDetails((_) => ({ ..._, avatar }));
-                      }}
-                      avatar={userDetails.avatar}
-                    />
-                  </div>
-                ),
-              },
-            ]}
-          />
-          <hr className="mb-4" />
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={() => handleCreateUser(true)}
-              className="outline-button w-full"
-              type="button"
-            >
-              Create & add another
-            </button>
-            <button
-              className="primary-button"
-              type="button"
-              onClick={() => handleCreateUser()}
-            >
-              Create
-            </button>
-          </div>
-        </form>
-      }
-    />
+    <BaseModal
+      isOpen={isOpen}
+      setIsOpen={(_isOpen) => setIsOpen(_isOpen)}
+      header="Create user"
+    >
+      <form noValidate>
+        <Tabs
+          tabs={[
+            {
+              title: "General",
+              Icon: <OverviewIcon />,
+              content: (
+                <>
+                  <Input
+                    onChange={handleInputChange}
+                    value={userDetails.name}
+                    fullWIdth
+                    name="name"
+                    Icon={<AvatarIcon size="xs" />}
+                    label="Name"
+                    autoFocus
+                  />
+                  <Input
+                    onChange={handleInputChange}
+                    value={userDetails.email}
+                    Icon={<EmailIcon size="xs" />}
+                    label="Email"
+                    type="email"
+                    name="email"
+                    fullWIdth
+                  />
+                  <Input
+                    onChange={handleInputChange}
+                    value={userDetails.password}
+                    name="password"
+                    Icon={<SecurityIcon size="xs" />}
+                    label="Password"
+                    type="password"
+                    className="mb-auto"
+                    fullWIdth
+                  />
+                </>
+              ),
+            },
+            {
+              title: "Avatar",
+              Icon: <CameraIcon />,
+              content: (
+                <div className="flex justify-center mx-[0] my-[23.5px]">
+                  <AvatarUpload
+                    setAvatar={(avatar) => {
+                      setUserDetails((_) => ({ ..._, avatar }));
+                    }}
+                    avatar={userDetails.avatar}
+                  />
+                </div>
+              ),
+            },
+          ]}
+        />
+        <hr className="mb-4" />
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => handleCreateUser(true)}
+            className="outline-button w-full"
+            type="button"
+          >
+            Create & add another
+          </button>
+          <button
+            className="primary-button"
+            type="button"
+            onClick={() => handleCreateUser()}
+          >
+            Create
+          </button>
+        </div>
+      </form>
+    </BaseModal>
   );
 };
 

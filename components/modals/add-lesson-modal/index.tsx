@@ -1,7 +1,6 @@
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import Modal from "@/components/modal";
 import { supabaseClient } from "@/utils/supabase/client";
 import {
   addMinutes,
@@ -12,10 +11,18 @@ import {
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import { getNextMorning } from "@/utils/get-next-morning";
-import type { ChangeEvent, FunctionComponent } from "react";
+import type {
+  ChangeEvent,
+  Dispatch,
+  FunctionComponent,
+  SetStateAction,
+} from "react";
 
 interface IProps {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   courseId: string;
   closeModal: () => void;
   onDone: () => void;
@@ -25,6 +32,8 @@ const AddLessonModal: FunctionComponent<IProps> = ({
   courseId,
   closeModal,
   onDone,
+  isOpen,
+  setIsOpen,
 }) => {
   const [lessonName, setLessonName] = useState("");
   const [starts, setStarts] = useState<Date>(getNextMorning());
@@ -66,45 +75,37 @@ const AddLessonModal: FunctionComponent<IProps> = ({
   };
 
   return (
-    <Modal
-      close={closeModal}
-      title="Create lesson"
-      content={
-        <form onSubmit={handleCreateLesson}>
-          <Input
-            fullWIdth
-            value={lessonName}
-            onChange={(e) => setLessonName(e.target.value)}
-            name="title"
-            Icon={<LessonsIcon size="xs" />}
-            placeholder="Lesson name"
-            className="mb-4"
-          />
-          <DateInput
-            date={starts}
-            onChange={handleChangeDate}
-            label="Starts at"
-          />
-          <Input
-            fullWIdth
-            label="Duration"
-            type="number"
-            Icon={<LessonsIcon />}
-            value={`${millisecondsToMinutes(duration)}`}
-            onChange={handleChangeDuration}
-            className="mt-2"
-          />
-          <hr className="my-3" />
-          <button
-            disabled={!lessonName}
-            className="primary-button"
-            type="submit"
-          >
-            Create
-          </button>
-        </form>
-      }
-    />
+    <BaseModal setIsOpen={setIsOpen} isOpen={isOpen} header="Create lesson">
+      <form onSubmit={handleCreateLesson}>
+        <Input
+          fullWIdth
+          value={lessonName}
+          onChange={(e) => setLessonName(e.target.value)}
+          name="title"
+          Icon={<LessonsIcon size="xs" />}
+          placeholder="Lesson name"
+          className="mb-4"
+        />
+        <DateInput
+          date={starts}
+          onChange={handleChangeDate}
+          label="Starts at"
+        />
+        <Input
+          fullWIdth
+          label="Duration"
+          type="number"
+          Icon={<LessonsIcon />}
+          value={`${millisecondsToMinutes(duration)}`}
+          onChange={handleChangeDuration}
+          className="mt-2"
+        />
+        <hr className="my-3" />
+        <button disabled={!lessonName} className="primary-button" type="submit">
+          Create
+        </button>
+      </form>
+    </BaseModal>
   );
 };
 

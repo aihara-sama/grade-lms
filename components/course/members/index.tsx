@@ -6,7 +6,6 @@ import AvatarIcon from "@/components/icons/avatar-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
-import Modal from "@/components/modal";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import EnrollUsers from "@/components/users/enroll-users";
@@ -15,6 +14,7 @@ import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import IconTitle from "@/components/icon-title";
 import type { Database } from "@/types/supabase.type";
 import type { User as IUser } from "@supabase/supabase-js";
@@ -150,33 +150,26 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
           ),
         }))}
       />
-      {isDeleteBulkMembersModalOpen && (
-        <Modal
-          close={() => setIsDeleteBulkMembersModalOpen(false)}
-          title="Dispel Members"
-          content={
-            <>
-              <p className="mb-4">
-                Are you sure you want to dispel selected members?
-              </p>
-              <div className="flex justify-end gap-3">
-                <button
-                  className="outline-button w-full"
-                  onClick={() => setIsDeleteBulkMembersModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="primary-button"
-                  onClick={handleBulkDispelMembers}
-                >
-                  Dispel
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
+      <BaseModal
+        setIsOpen={() => setIsDeleteBulkMembersModalOpen(false)}
+        isOpen={isDeleteBulkMembersModalOpen}
+        header="Dispel Members"
+      >
+        <p className="mb-4">
+          Are you sure you want to dispel selected members?
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            className="outline-button w-full"
+            onClick={() => setIsDeleteBulkMembersModalOpen(false)}
+          >
+            Cancel
+          </button>
+          <button className="primary-button" onClick={handleBulkDispelMembers}>
+            Dispel
+          </button>
+        </div>
+      </BaseModal>
     </>
   );
 };

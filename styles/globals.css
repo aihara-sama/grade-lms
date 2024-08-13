@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    @apply overflow-x-hidden !important;
+  }
   a {
     @apply hover:text-blue-500;
   }

@@ -1,14 +1,13 @@
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import Modal from "@/components/modal";
 import { getNextMorning } from "@/utils/get-next-morning";
 import { supabaseClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
 import dynamic from "next/dynamic";
-import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { ROLES } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignments.type";
@@ -17,13 +16,16 @@ import type { Lesson } from "@/types/lessons.type";
 import type { Notification } from "@/types/notifications";
 import { getNotificationChannel } from "@/utils/get-notification-channel";
 import type { User } from "@supabase/supabase-js";
+import type { Dispatch, FunctionComponent, SetStateAction } from "react";
+import { useEffect, useState } from "react";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
 interface IProps {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   onDone: () => void;
-  closeModal: () => void;
   assignmentId?: string;
   user: User;
   course: Course;
@@ -31,11 +33,12 @@ interface IProps {
 }
 const CreateAssignmentModal: FunctionComponent<IProps> = ({
   onDone,
-  closeModal,
   assignmentId,
   user,
   course,
   lesson,
+  isOpen,
+  setIsOpen,
 }) => {
   // States
   const [assignment, setAssignment] = useState<Omit<Assignment, "id">>({
@@ -126,57 +129,57 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
   }, []);
 
   return (
-    <Modal
+    <BaseModal
       width="lg"
-      close={closeModal}
-      title="Assignment"
-      content={
-        <div>
-          <Input
-            fullWIdth
-            Icon={<LessonsIcon size="xs" />}
-            placeholder="Assignment name"
-            name="title"
-            onChange={(e) =>
-              setAssignment((prev) => ({ ...prev, title: e.target.value }))
+      setIsOpen={setIsOpen}
+      isOpen={isOpen}
+      header="Assignment"
+    >
+      <div>
+        <Input
+          fullWIdth
+          Icon={<LessonsIcon size="xs" />}
+          placeholder="Assignment name"
+          name="title"
+          onChange={(e) =>
+            setAssignment((prev) => ({ ...prev, title: e.target.value }))
+          }
+          value={assignment.title}
+        />
+        <p>Description</p>
+        <div className="min-h-[320px]">
+          {" "}
+          <Editor
+            onChange={(data) =>
+              setAssignment((prev) => ({
+                ...prev,
+                body: JSON.stringify(data),
+              }))
             }
-            value={assignment.title}
+            data={JSON.parse(assignment.body)}
           />
-          <p>Description</p>
-          <div className="min-h-[320px]">
-            {" "}
-            <Editor
-              onChange={(data) =>
-                setAssignment((prev) => ({
-                  ...prev,
-                  body: JSON.stringify(data),
-                }))
-              }
-              data={JSON.parse(assignment.body)}
+        </div>
+
+        <div className="flex gap-3 items-center mt-3">
+          <div className="pr-3 border-r-2 border-gray-200">
+            <DateInput
+              date={new Date(assignment.due_date)}
+              onChange={handleChangeDate}
+              label="Due date"
+              popperPlacement="top-start"
             />
           </div>
-
-          <div className="flex gap-3 items-center mt-3">
-            <div className="pr-3 border-r-2 border-gray-200">
-              <DateInput
-                date={new Date(assignment.due_date)}
-                onChange={handleChangeDate}
-                label="Due date"
-                popperPlacement="top-start"
-              />
-            </div>
-            <button className="outline-button">Create & add another</button>
-            <button
-              disabled={!assignment.title}
-              className="primary-button"
-              onClick={handleCreateAssignment}
-            >
-              Create
-            </button>
-          </div>
+          <button className="outline-button">Create & add another</button>
+          <button
+            disabled={!assignment.title}
+            className="primary-button"
+            onClick={handleCreateAssignment}
+          >
+            Create
+          </button>
         </div>
-      }
-    />
+      </div>
+    </BaseModal>
   );
 };
 

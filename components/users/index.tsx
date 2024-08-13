@@ -10,7 +10,6 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
-import Modal from "@/components/modal";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import CreateUser from "@/components/users/create-user";
@@ -18,6 +17,7 @@ import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import BaseModal from "@/components/common/modals/base-modal";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import type { UserCourses } from "@/types/user-courses.type";
@@ -203,82 +203,70 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
           ),
         }))}
       />
-      {isDeleteUsersModalOpen && (
-        <Modal
-          close={() => setIsDeleteUsersModalOpen(false)}
-          title="Delete Users"
-          content={
-            <>
-              <p className="mb-4">
-                Are you sure you want to delete selected users?
-              </p>
-              <div className="flex justify-end gap-3">
-                <button
-                  className="outline-button w-full"
-                  onClick={() => setIsDeleteUsersModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button className="primary-button" onClick={handleDeleteUsers}>
-                  Delete
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
-      {isEnrollUsersModalOpen && (
-        <Modal
-          close={() => setIsEnrollUsersModalOpen(false)}
-          title="Enrollment"
-          content={
-            <>
-              <p className="mb-3 text-neutral-500">Select courses to enroll</p>
-              <Table
-                data={courses.map(({ id, title }) => ({
-                  Name: (
-                    <CardTitle
-                      href={`/dashboard/courses/${id}/overview`}
-                      checked={coursesIds.includes(id)}
-                      Icon={<CourseIcon />}
-                      title={title}
-                      subtitle="Active"
-                      onClick={() => {}}
-                      onToggle={(checked) =>
-                        checked
-                          ? setCoursesIds((prev) => [...prev, id])
-                          : setCoursesIds((prev) =>
-                              prev.filter((_id) => _id !== id)
-                            )
-                      }
-                    />
-                  ),
-                }))}
+      <BaseModal
+        setIsOpen={(isOpen) => setIsDeleteUsersModalOpen(isOpen)}
+        isOpen={isDeleteUsersModalOpen}
+        header="Delete Users"
+      >
+        <p className="mb-4">Are you sure you want to delete selected users?</p>
+        <div className="flex justify-end gap-3">
+          <button
+            className="outline-button w-full"
+            onClick={() => setIsDeleteUsersModalOpen(false)}
+          >
+            Cancel
+          </button>
+          <button className="primary-button" onClick={handleDeleteUsers}>
+            Delete
+          </button>
+        </div>
+      </BaseModal>
+      <BaseModal
+        isOpen={isEnrollUsersModalOpen}
+        setIsOpen={(isOpen) => setIsEnrollUsersModalOpen(isOpen)}
+        header="Enrollment"
+      >
+        <p className="mb-3 text-neutral-500">Select courses to enroll</p>
+        <Table
+          data={courses.map(({ id, title }) => ({
+            Name: (
+              <CardTitle
+                href={`/dashboard/courses/${id}/overview`}
+                checked={coursesIds.includes(id)}
+                Icon={<CourseIcon />}
+                title={title}
+                subtitle="Active"
+                onClick={() => {}}
+                onToggle={(checked) =>
+                  checked
+                    ? setCoursesIds((prev) => [...prev, id])
+                    : setCoursesIds((prev) => prev.filter((_id) => _id !== id))
+                }
               />
-              <div className="flex justify-end gap-3">
-                <button
-                  className="outline-button w-full"
-                  onClick={() => setIsEnrollUsersModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  disabled={!coursesIds.length}
-                  className="primary-button"
-                  onClick={() =>
-                    handleEnrollUsers(
-                      enrollUserId ? [enrollUserId] : usersIds,
-                      coursesIds
-                    )
-                  }
-                >
-                  Enroll
-                </button>
-              </div>
-            </>
-          }
+            ),
+          }))}
         />
-      )}
+        <div className="flex justify-end gap-3">
+          <button
+            className="outline-button w-full"
+            onClick={() => setIsEnrollUsersModalOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!coursesIds.length}
+            className="primary-button"
+            onClick={() =>
+              handleEnrollUsers(
+                enrollUserId ? [enrollUserId] : usersIds,
+                coursesIds
+              )
+            }
+          >
+            Enroll
+          </button>
+        </div>
+      </BaseModal>
     </>
   );
 };

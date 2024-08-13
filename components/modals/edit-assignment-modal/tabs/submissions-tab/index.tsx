@@ -14,6 +14,9 @@ interface IProps {
 
 const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string>();
+  const [isViewSubmissonModalOpen, setIsViewSubmissonModalOpen] =
+    useState(false);
+
   return (
     <div>
       <Table
@@ -40,13 +43,12 @@ const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
           ),
         }))}
       />
-      {selectedSubmissionId && (
-        <ViewSubmissionModal
-          closeModal={() => setSelectedSubmissionId(undefined)}
-          onDone={() => {}}
-          submissionId={selectedSubmissionId}
-        />
-      )}
+      <ViewSubmissionModal
+        isOpen={isViewSubmissonModalOpen}
+        setIsOpen={setIsViewSubmissonModalOpen}
+        onDone={() => {}}
+        submissionId={selectedSubmissionId}
+      />
     </div>
   );
 };

@@ -6,7 +6,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import CreateLesson from "@/components/live-lesson/create-lesson";
-import LessonModal from "@/components/modals/lesson-modal";
+import EditLessonModal from "@/components/modals/edit-lesson-modal";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import { supabaseClient } from "@/utils/supabase/client";
@@ -14,8 +14,8 @@ import { format } from "date-fns";
 import { useEffect, useState } from "react";
 
 import CardTitle from "@/components/card-title";
+import BaseModal from "@/components/common/modals/base-modal";
 import DeleteIcon from "@/components/icons/delete-icon";
-import Modal from "@/components/modal";
 import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -145,40 +145,34 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
         }))}
       />
       {isLessonModalOpen && (
-        <LessonModal
+        <EditLessonModal
           lesson={lessons.find(({ id }) => id === selectedLessonId)}
-          close={() => setIsLessonModalOpen(false)}
+          setIsOpen={() => setIsLessonModalOpen(false)}
           onDone={() => getLessons()}
           courses={[]}
+          isOpen={isLessonModalOpen}
         />
       )}
-      {isDeleteBulkLessonsModalOpen && (
-        <Modal
-          close={() => setIsDeleteBulkLessonsModalOpen(false)}
-          title="Delete Lessons"
-          content={
-            <>
-              <p className="mb-4">
-                Are you sure you want to delete selected lessons?
-              </p>
-              <div className="flex justify-end gap-3">
-                <button
-                  className="outline-button w-full"
-                  onClick={() => setIsDeleteBulkLessonsModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="primary-button"
-                  onClick={handleBulkDeleteLessons}
-                >
-                  Delete
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
+      <BaseModal
+        setIsOpen={() => setIsDeleteBulkLessonsModalOpen(false)}
+        isOpen={isDeleteBulkLessonsModalOpen}
+        header="Delete Lessons"
+      >
+        <p className="mb-4">
+          Are you sure you want to delete selected lessons?
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            className="outline-button w-full"
+            onClick={() => setIsDeleteBulkLessonsModalOpen(false)}
+          >
+            Cancel
+          </button>
+          <button className="primary-button" onClick={handleBulkDeleteLessons}>
+            Delete
+          </button>
+        </div>
+      </BaseModal>
     </>
   );
 };
