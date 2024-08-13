@@ -4,7 +4,6 @@ import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CrownIcon from "@/components/icons/crown-icon";
 import Input from "@/components/input";
-import Select from "@/components/select";
 import { i18n } from "@/i18n-config";
 import { supabaseClient } from "@/utils/supabase/client";
 import { toCapitalCase } from "@/utils/to-capital-case";
@@ -12,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import Select from "@/components/common/select";
 import type { Locale } from "@/i18n-config";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import type { getDictionary } from "@/utils/get-dictionary";
@@ -128,7 +128,7 @@ const Profile: FunctionComponent<IProps> = ({ user, dictionary }) => {
           <p className="text-2xl font-bold text-neutral-600">Preferences</p>
           <div className="mt-8 flex gap-1">
             <Select
-              items={i18n.locales.map((_locale: Locale) => ({
+              options={i18n.locales.map((_locale: Locale) => ({
                 title: toCapitalCase(
                   new Intl.DisplayNames([pathName.split("/")[1]], {
                     type: "language",
@@ -139,9 +139,15 @@ const Profile: FunctionComponent<IProps> = ({ user, dictionary }) => {
               label="Language"
               onChange={({ id }) => {
                 router.push(redirectedPathName(id.toLowerCase() as Locale));
-                toast.success("Language changed");
               }}
-              defaultItemId={toCapitalCase(pathName.split("/")[1])}
+              defaultValue={{
+                title: toCapitalCase(
+                  new Intl.DisplayNames([pathName.split("/")[1]], {
+                    type: "language",
+                  }).of(locale)
+                ),
+                id: toCapitalCase(locale),
+              }}
             />
           </div>
         </div>

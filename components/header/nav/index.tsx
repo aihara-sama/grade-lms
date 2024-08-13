@@ -1,4 +1,4 @@
-import type { NavItem } from "@/interfaces/navigation.interface";
+import { navItems } from "@/components/header/nav-items";
 import { supabaseClient } from "@/utils/supabase/client";
 import { addMinutes, format } from "date-fns";
 import { useRouter } from "next-nprogress-bar";
@@ -6,11 +6,9 @@ import Link from "next/link";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface Props {
-  navItems: NavItem[];
-}
+interface Props {}
 
-const Nav: FunctionComponent<Props> = ({ navItems }) => {
+const Nav: FunctionComponent<Props> = () => {
   const router = useRouter();
 
   const handleCreateLesson = async () => {
@@ -34,7 +32,7 @@ const Nav: FunctionComponent<Props> = ({ navItems }) => {
     <div className="hidden md:flex items-center gap-8 ml-9">
       {navItems.map(({ title, href, Icon }, idx) => (
         <Link href={href} key={idx} className="flex items-center gap-2">
-          {Icon}
+          <Icon />
           <span className="text-sm"> {title}</span>
         </Link>
       ))}

@@ -6,7 +6,6 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
 import Modal from "@/components/modal";
-import Select from "@/components/select";
 import { supabaseClient } from "@/utils/supabase/client";
 import {
   addMinutes,
@@ -18,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import Select from "@/components/common/select";
 import type { Database } from "@/types/supabase.type";
 import type { ChangeEvent, FunctionComponent } from "react";
 
@@ -46,7 +46,9 @@ const LessonModal: FunctionComponent<IProps> = ({
   const [starts, setStarts] = useState<Date>(new Date(lesson.starts));
   const [ends, setEnds] = useState<Date>(new Date(lesson.ends));
   const [lessonTitle, setLessonTitle] = useState<string>(lesson.title);
-  const [courseId, setCourseId] = useState(lesson.course_id);
+  const [course, setCourse] = useState(
+    courses.find(({ id }) => id === lesson.course_id)
+  );
 
   // Vars
   const duration = +new Date(ends) - +new Date(starts);
@@ -59,7 +61,7 @@ const LessonModal: FunctionComponent<IProps> = ({
       title: lessonTitle,
       starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
       ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-      course_id: courseId,
+      course_id: course.id,
       id: lesson.id,
     });
 
@@ -126,12 +128,11 @@ const LessonModal: FunctionComponent<IProps> = ({
           <form onSubmit={handleSaveLesson} id="create-lesson-form">
             {includeCoursesSelect && (
               <Select
-                fullWidth
                 label="Course"
-                defaultItemId={courseId}
-                onChange={(item) => setCourseId(item.id)}
-                items={courses}
-                useBottomSpacing
+                defaultValue={course}
+                onChange={(item) => setCourse(item)}
+                options={courses}
+                useUnselect
               />
             )}
             <Input

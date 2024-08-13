@@ -1,15 +1,13 @@
 "use client";
 
+import { navItems } from "@/components/header/nav-items";
 import Logo from "@/components/logo";
-import type { NavItem } from "@/interfaces/navigation.interface";
 import clsx from "clsx";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
 
-interface Props {
-  navItems: NavItem[];
-}
-const MobileDrawer: FunctionComponent<Props> = ({ navItems }) => {
+interface Props {}
+const MobileDrawer: FunctionComponent<Props> = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
@@ -37,7 +35,7 @@ const MobileDrawer: FunctionComponent<Props> = ({ navItems }) => {
           <div className="flex flex-col gap-4 mt-4">
             {navItems.map(({ title, href, Icon }, idx) => (
               <Link href={href} key={idx} className="flex items-center gap-2">
-                {Icon}
+                <Icon />
                 <span className="text-md"> {title}</span>
               </Link>
             ))}

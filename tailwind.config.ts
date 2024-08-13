@@ -63,6 +63,7 @@ const config: Config = {
           500: "#d9d9d9",
         },
       },
+      popper: {},
     },
   },
   // eslint-disable-next-line global-require

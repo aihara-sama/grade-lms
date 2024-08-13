@@ -1,7 +1,6 @@
 import ContentWrapper from "@/components/content-wrapper";
 import Header from "@/components/header";
 import { createClient } from "@/utils/supabase/server";
-
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {

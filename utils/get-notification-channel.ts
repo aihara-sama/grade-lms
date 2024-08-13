@@ -10,3 +10,6 @@ export const getNotificationChannel = (name: string) => {
 
   return channel;
 };
+export const closeNotificationChannel = () => {
+  channel = undefined;
+};

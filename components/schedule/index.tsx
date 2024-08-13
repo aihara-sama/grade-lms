@@ -5,7 +5,6 @@ import ArrowRightIcon from "@/components/icons/arrow-right-icon";
 import LessonModal from "@/components/modals/lesson-modal";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
-import Select from "@/components/select";
 import { useSchedule } from "@/hooks/useSchedule";
 import { getEventWidth } from "@/utils/get-event-width";
 import { supabaseClient } from "@/utils/supabase/client";
@@ -22,6 +21,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import Select from "@/components/common/select";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import type { Database } from "@/types/supabase.type";
@@ -38,10 +38,9 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const [days, setDays] = useState(getWeekDays());
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [hoveredDate, setHoveredDate] = useState<string>();
-  const [defaultCourseId, setDefaulltCourseId] = useState<string>(null);
-  const [courses, setCourses] = useState<Pick<Course, "id" | "title">[]>([
-    { title: "No course", id: null },
-  ]);
+  const [courses, setCourses] = useState<Pick<Course, "id" | "title">[]>([]);
+  const [selectedCourse, setSelectedCourse] =
+    useState<Pick<Course, "id" | "title">>(null);
 
   // Zustand
   const canDropEvent = useSchedule((state) => state.canDropEvent);
@@ -106,7 +105,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       .eq("id", user.id)
       .single();
     if (error) toast.error(error.message);
-    else setCourses([{ title: "No course", id: null }, ...data.courses]);
+    else setCourses(data.courses);
   };
   const handleSaveLesson = async (
     newStart: string,
@@ -247,12 +246,12 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     getCourses();
   }, []);
   useEffect(() => {
-    if (defaultCourseId) {
-      getLessonsByCourseId(defaultCourseId);
+    if (selectedCourse) {
+      getLessonsByCourseId(selectedCourse.id);
     } else {
       getLessons();
     }
-  }, [defaultCourseId, days]);
+  }, [selectedCourse, days]);
   useEffect(() => {
     document.querySelector(`[data-hour-label="8:00 AM"]`).scrollIntoView({
       behavior: "smooth",
@@ -298,9 +297,10 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
         </div>
         <Select
           label="Course"
-          onChange={(item) => setDefaulltCourseId(item.id)}
-          items={courses}
-          defaultItemId={defaultCourseId}
+          options={courses}
+          onChange={(item) => setSelectedCourse(item)}
+          defaultValue={selectedCourse}
+          useUnselect
         />
       </div>
 

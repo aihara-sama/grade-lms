@@ -4,7 +4,10 @@ import CloseIcon from "@/components/icons/close-icon";
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { ROLES } from "@/interfaces/user.interface";
-import { getNotificationChannel } from "@/utils/get-notification-channel";
+import {
+  closeNotificationChannel,
+  getNotificationChannel,
+} from "@/utils/get-notification-channel";
 import { parseNotification } from "@/utils/parse-notification";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -61,12 +64,15 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
       (user.user_metadata as IUserMetadata).role === ROLES.TEACHER
         ? user.id
         : (user.user_metadata as IUserMetadata).creator_id;
+    const channel = getNotificationChannel(room);
 
-    getNotificationChannel(room)
+    channel
       .on("broadcast", { event: "notification" }, () => {
         setIsNewNotification(true);
       })
       .subscribe();
+
+    return closeNotificationChannel();
   }, []);
 
   const readNotification = async (notificationId: string) => {
