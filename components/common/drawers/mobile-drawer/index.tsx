@@ -1,36 +1,25 @@
 "use client";
 
+import BaseDrawer from "@/components/common/drawers/base-drawer";
+import Hamburger from "@/components/hamburger";
 import { navItems } from "@/components/header/nav-items";
 import Logo from "@/components/logo";
-import clsx from "clsx";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
 
 interface Props {}
 const MobileDrawer: FunctionComponent<Props> = () => {
   const [isOpen, setIsOpen] = useState(false);
+
   return (
     <>
-      {/* Hamburger */}
-      <div
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="flex md:hidden h-5 w-6 z-[2] flex-col justify-between cursor-pointer ml-4 left-5 top-4"
+      <Hamburger onClick={() => setIsOpen(true)} />
+      <BaseDrawer
+        header={<Logo />}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        placement="left"
       >
-        {[...Array(3)].map((_, idx) => (
-          <span className="block h-1 w-full rounded-lg bg-black" key={idx} />
-        ))}
-      </div>
-
-      {/* Actual Drawer */}
-      <div
-        className={clsx(
-          "bg-white md:-left-full transition-[0.4s] duration-[left] absolute w-full z-[1] inset-y-0 -left-full",
-          { "left-0": isOpen }
-        )}
-      >
-        <div className="shadow-lg py-4 pl-7 flex">
-          <Logo />
-        </div>
         <div className="pl-7">
           <div className="flex flex-col gap-4 mt-4">
             {navItems.map(({ title, href, Icon }, idx) => (
@@ -41,7 +30,7 @@ const MobileDrawer: FunctionComponent<Props> = () => {
             ))}
           </div>
         </div>
-      </div>
+      </BaseDrawer>
     </>
   );
 };

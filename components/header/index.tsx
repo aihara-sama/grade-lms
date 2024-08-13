@@ -1,8 +1,8 @@
 "use client";
 
+import MobileDrawer from "@/components/common/drawers/mobile-drawer";
+import NotificationsDrawer from "@/components/common/drawers/notifications-drawer";
 import UserPopper from "@/components/common/poppers/user-popper";
-import MobileDrawer from "@/components/drawers/mobile-drawer";
-import NotificationsDrawer from "@/components/drawers/notifications-drawer";
 import Nav from "@/components/header/nav";
 import Logo from "@/components/logo";
 import type { IUserMetadata } from "@/interfaces/user.interface";

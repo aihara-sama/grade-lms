@@ -1,6 +1,6 @@
 "use client";
 
-import CloseIcon from "@/components/icons/close-icon";
+import BaseDrawer from "@/components/common/drawers/base-drawer";
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { ROLES } from "@/interfaces/user.interface";
@@ -11,7 +11,6 @@ import {
 import { parseNotification } from "@/utils/parse-notification";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import clsx from "clsx";
 import { formatDistanceToNowStrict } from "date-fns";
 import Link from "next/link";
 import { useEffect, useState, type FunctionComponent } from "react";
@@ -94,12 +93,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      getNotifications();
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    getNotifications();
   }, [isOpen]);
 
   useEffect(() => {
@@ -108,12 +102,6 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
 
   return (
     <>
-      {isOpen && (
-        <div
-          className="fixed top-0 bottom-0 left-0 right-0 backdrop-filter backdrop-blur-[2px] z-[99] bg-mask"
-          onClick={() => setIsOpen(false)}
-        ></div>
-      )}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className="icon-button relative"
@@ -124,23 +112,16 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
         )}
       </button>
 
-      {/* Actual Drawer */}
-      <div
-        className={clsx(
-          "z-[999] bg-white transition-[0.4s] duration-[right] absolute inset-y-0 -right-full w-[450px]",
-          { "right-0": isOpen }
-        )}
-      >
-        <div className="shadow-lg py-4 px-7">
-          <div className="flex items-center">
-            <div className="text-center flex-1 text-md font-bold">
-              Notifications
-            </div>
-            <button onClick={() => setIsOpen(false)} className="icon-button">
-              <CloseIcon />
-            </button>
+      <BaseDrawer
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
+        placement="right"
+        header={
+          <div className="text-center flex-1 text-md font-bold">
+            Notifications
           </div>
-        </div>
+        }
+      >
         <div className="max-h-[calc(100vh-88px)] overflow-auto py-4">
           {notifications.map((notification) => {
             const { href, body, textHref, title } =
@@ -184,7 +165,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
             );
           })}
         </div>
-      </div>
+      </BaseDrawer>
     </>
   );
 };

@@ -14,7 +14,6 @@ interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   anchorEl: MutableRefObject<HTMLElement>;
-  className?: string;
   width?: "sm" | "md" | "lg" | "full";
 }
 
@@ -23,7 +22,7 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
   setIsOpen,
   children,
   anchorEl,
-  width,
+  width = "full",
 }) => {
   // Refs
   const rootRef = useRef<HTMLDivElement>(null);
@@ -57,7 +56,7 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
         className={`mt-2 ${clsx({
           "w-60": width === "md",
           "w-full": width === "full",
-        })} w-full bg-white shadow-md absolute right-0 py-[14px] rounded-[3px] z-[999] transition-all duration-300 ease-in-out ${
+        })} bg-white shadow-md absolute right-0 py-[14px] rounded-[3px] z-[999] transition-all duration-300 ease-in-out ${
           isOpen
             ? "opacity-100 translate-y-0 visible"
             : "invisible opacity-0 translate-y-3"
