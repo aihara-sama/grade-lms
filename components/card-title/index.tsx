@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { useState, type FunctionComponent } from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
+import { useState } from "react";
 
 interface IProps {
   Icon: JSX.Element;
   title: string;
   checked?: boolean;
   subtitle: string;
-  onClick: () => void;
+  onClick?: () => void;
   onToggle?: (checked: boolean) => void;
   href?: string;
 }
@@ -20,17 +21,26 @@ const CardTitle: FunctionComponent<IProps> = ({
   onClick,
   onToggle,
 }) => {
+  // State
   const [isCardHovered, setIsCardHovered] = useState(false);
+
+  // Hanlders
+  const handleMouseEnter = () => setIsCardHovered(true);
+  const handleMouseLeave = () => setIsCardHovered(false);
+  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onToggle(e.target.checked);
+
+  // View
   return (
     <div
       className="text-primary flex items-center gap-3"
-      onMouseEnter={() => setIsCardHovered(true)}
-      onMouseLeave={() => setIsCardHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {onToggle && (isCardHovered || checked) ? (
         <input
           className="m-2 cursor-pointer w-4 h-4"
-          onChange={(e) => onToggle(e.target.checked)}
+          onChange={handleCheckboxChange}
           type="checkbox"
         />
       ) : (

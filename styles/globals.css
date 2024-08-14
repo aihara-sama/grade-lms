@@ -71,6 +71,10 @@
   .section-title {
     @apply text-xl font-bold my-3 text-neutral-600;
   }
+
+  .popper-list-item {
+    @apply cursor-pointer hover:bg-gray-100 hover:text-link p-2 px-3 flex items-center gap-2;
+  }
 }
 @layer utilities {
   .hide-whiteboard-elements {

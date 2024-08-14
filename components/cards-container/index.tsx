@@ -9,7 +9,7 @@ const CardsContainer: FunctionComponent<PropsWithChildren<IProps>> = ({
   title,
 }) => {
   return (
-    <div className="mb-[24px]">
+    <div className="mb-6">
       {title && <p className="section-title">{title}</p>}
       <div className="flex flex-wrap gap-6">{children}</div>
     </div>

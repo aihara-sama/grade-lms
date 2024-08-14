@@ -11,7 +11,7 @@ const Table: FunctionComponent<IProps> = ({ data }) => {
 
   return (
     <div className="relative">
-      <div className="min-h-[430px] overflow-auto flex flex-col">
+      <div className="flex flex-col">
         <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
           {keys.map((key) => (
             <div
@@ -22,19 +22,21 @@ const Table: FunctionComponent<IProps> = ({ data }) => {
             </div>
           ))}
         </div>
-        <div className="p-2 flex flex-col gap-2">
-          {data.map((row, idx) => (
-            <div key={idx} className="flex items-center gap-3 px-3 py-1">
-              {keys.map((key, i) => (
-                <div
-                  className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
-                  key={i}
-                >
-                  {row[key]}
-                </div>
-              ))}
-            </div>
-          ))}
+        <div className="p-2 max-h-[400px] overflow-auto">
+          <div className="p-2">
+            {data.map((row, idx) => (
+              <div key={idx} className="flex items-center gap-3 px-3 py-1">
+                {keys.map((key, i) => (
+                  <div
+                    className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
+                    key={i}
+                  >
+                    {row[key]}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
