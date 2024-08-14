@@ -2,38 +2,34 @@
 
 import clsx from "clsx";
 import type {
-  Dispatch,
   FunctionComponent,
-  MutableRefObject,
+  MouseEvent,
   PropsWithChildren,
-  SetStateAction,
+  ReactNode,
 } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  anchorEl: MutableRefObject<HTMLElement>;
+  trigger: ReactNode;
   width?: "sm" | "md" | "lg" | "full";
 }
 
 const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
-  isOpen,
-  setIsOpen,
+  // isOpen,
+  // setIsOpen,
   children,
-  anchorEl,
+  trigger,
   width = "full",
 }) => {
+  // State
+  const [isOpen, setIsOpen] = useState(false);
+
   // Refs
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Handlers
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      !rootRef.current?.contains(event.target as Node) &&
-      !anchorEl.current?.contains(event.target as Node) &&
-      anchorEl.current !== (event.target as Node)
-    ) {
+  const handleClickOutside = (event: Event) => {
+    if (!rootRef.current?.contains(event.target as Node)) {
       setIsOpen(false);
     }
   };
@@ -47,13 +43,19 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
     };
   }, []);
 
+  const handleChildrenClick = (e: MouseEvent) => {
+    const { tagName } = e.target as Element;
+    if (tagName === "LI" || tagName === "A") {
+      setIsOpen(false);
+    }
+  };
+
   return (
-    <div
-      className={`relative ${isOpen ? "visible" : "invisible"}`}
-      ref={rootRef}
-    >
+    <div className="relative" ref={rootRef}>
+      <div onClick={() => setIsOpen((prev) => !prev)}>{trigger}</div>
       <div
         className={`mt-2 ${clsx({
+          "w-44": width === "sm",
           "w-60": width === "md",
           "w-full": width === "full",
         })} bg-white shadow-md absolute right-0 py-[14px] rounded-[3px] z-[999] transition-all duration-300 ease-in-out ${
@@ -61,6 +63,7 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
             ? "opacity-100 translate-y-0 visible"
             : "invisible opacity-0 translate-y-3"
         }`}
+        onClick={handleChildrenClick}
       >
         {children}
       </div>

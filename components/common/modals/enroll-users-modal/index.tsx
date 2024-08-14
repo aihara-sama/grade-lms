@@ -61,7 +61,7 @@ const EnrollUsersModal: FunctionComponent<IProps> = ({
   }, []);
 
   return (
-    <BaseModal setIsOpen={setIsOpen} isOpen={isOpen} header="Enroll users">
+    <BaseModal setIsOpen={setIsOpen} isOpen={isOpen} title="Enroll users">
       <div>
         <div className="mb-[12px] flex flex-col gap-[12px]">
           {users.map((u) => (

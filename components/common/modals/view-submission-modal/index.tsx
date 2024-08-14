@@ -68,7 +68,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
       width="lg"
       setIsOpen={setIsOpen}
       isOpen={isOpen}
-      header="Submission"
+      title="Submission"
     >
       {!submission ? (
         <Skeleton className="min-h-[471px]" />

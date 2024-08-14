@@ -47,7 +47,7 @@ const DeleteButton: FunctionComponent<IProps> = ({
       <BaseModal
         isOpen={isDeleteRecordModalOpen}
         setIsOpen={setIsDeleteRecordModalOpen}
-        header={`Delete ${record}`}
+        title={`Delete ${record}`}
       >
         <p className="mb-4">Are you sure you want to delete this {record}?</p>
         <div className="flex justify-end gap-3">

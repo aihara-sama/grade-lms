@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, type FunctionComponent } from "react";
+import { type FunctionComponent } from "react";
 
 import BasePopper from "@/components/common/poppers/base-popper";
 import LogoutIcon from "@/components/icons/logout-icon";
@@ -26,14 +26,8 @@ interface IProps {
 }
 
 const UserPopper: FunctionComponent<IProps> = ({ role, userName, avatar }) => {
-  // State
-  const [isOpen, setIsOpen] = useState(false);
-
   // Hooks
   const router = useRouter();
-
-  // Refs
-  const anchorEl = useRef<HTMLDivElement>();
 
   // Handlers
   const handleSignOut = async () => {
@@ -46,25 +40,18 @@ const UserPopper: FunctionComponent<IProps> = ({ role, userName, avatar }) => {
   // View
   return (
     <>
-      <div
-        ref={anchorEl}
-        onClick={() => {
-          setIsOpen((prev) => !prev);
-        }}
-        className="cursor-pointer"
-      >
-        <img
-          className="rounded-[50%] w-7 h-7 object-cover"
-          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
-          alt=""
-        />
-      </div>
       <div>
         <BasePopper
           width="md"
-          anchorEl={anchorEl}
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
+          trigger={
+            <div className="cursor-pointer">
+              <img
+                className="rounded-[50%] w-7 h-7 object-cover"
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
+                alt=""
+              />
+            </div>
+          }
         >
           <div className="ml-4 flex items-center gap-2">
             <img
@@ -79,29 +66,27 @@ const UserPopper: FunctionComponent<IProps> = ({ role, userName, avatar }) => {
           </div>
 
           <hr className="my-3" />
-          <div className="flex flex-col">
+          <ul className="flex flex-col">
             {menu.map(({ title, href, Icon }, idx) => (
-              <Link
-                onClick={() => setIsOpen(false)}
-                href={href}
-                key={idx}
-                className="px-[14px] py-[10px] flex gap-2 items-center rounded-[3px] text-sm cursor-pointer hover:bg-gray-100 hover:text-link"
-              >
-                <Icon />
-                {title}
-              </Link>
+              <li>
+                <Link
+                  href={href}
+                  key={idx}
+                  className="px-[14px] py-[10px] flex gap-2 items-center rounded-[3px] text-sm cursor-pointer hover:bg-gray-100 hover:text-link"
+                >
+                  <Icon />
+                  {title}
+                </Link>
+              </li>
             ))}
-            <div
+            <li
               className="px-[14px] py-[10px] flex gap-2 items-center rounded-[3px] text-sm cursor-pointer hover:bg-gray-100 hover:text-link"
-              onClick={() => {
-                setIsOpen(false);
-                handleSignOut();
-              }}
+              onClick={handleSignOut}
             >
               <LogoutIcon />
               Logout
-            </div>
-          </div>
+            </li>
+          </ul>
         </BasePopper>
       </div>
     </>

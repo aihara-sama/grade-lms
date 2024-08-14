@@ -27,7 +27,7 @@ const Table: FunctionComponent<IProps> = ({ data }) => {
             <div key={idx} className="flex items-center gap-3 px-3 py-1">
               {keys.map((key, i) => (
                 <div
-                  className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3] last-of-type:flex last-of-type:justify-end last-of-type:overflow-auto"
+                  className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
                   key={i}
                 >
                   {row[key]}

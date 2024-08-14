@@ -206,7 +206,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
       <BaseModal
         setIsOpen={(isOpen) => setIsDeleteUsersModalOpen(isOpen)}
         isOpen={isDeleteUsersModalOpen}
-        header="Delete Users"
+        title="Delete Users"
       >
         <p className="mb-4">Are you sure you want to delete selected users?</p>
         <div className="flex justify-end gap-3">
@@ -224,7 +224,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
       <BaseModal
         isOpen={isEnrollUsersModalOpen}
         setIsOpen={(isOpen) => setIsEnrollUsersModalOpen(isOpen)}
-        header="Enrollment"
+        title="Enrollment"
       >
         <p className="mb-3 text-neutral-500">Select courses to enroll</p>
         <Table

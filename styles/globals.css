@@ -16,6 +16,9 @@
   input {
     @apply text-sm pl-8 pr-4 py-[7.5px] rounded-md border border-gray-500;
   }
+  li {
+    list-style-type: none; /* Remove prefix from unordered list */
+  }
 
   /* Scrollbar ↴ */
   *::-webkit-scrollbar {

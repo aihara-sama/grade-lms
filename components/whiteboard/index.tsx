@@ -225,7 +225,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
       </div>
       {isExtendLessonModalOpen && (
         <BaseModal
-          header="Extend lesson"
+          title="Extend lesson"
           setIsOpen={() => setIsExtendLessonModalOpen(false)}
           isOpen={isExtendLessonModalOpen}
         >

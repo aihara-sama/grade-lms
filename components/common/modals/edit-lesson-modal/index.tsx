@@ -117,7 +117,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
     <BaseModal
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      header="Edit lesson"
+      title="Edit lesson"
       headerButtons={
         <>
           {lesson?.course_id && (

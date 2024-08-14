@@ -53,7 +53,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
       <BaseModal
         setIsOpen={setIsCreateCourseModalOpen}
         isOpen={isCreateCourseModalOpen}
-        header="Create course"
+        title="Create course"
       >
         <form action={submitCreateCourse}>
           <Input

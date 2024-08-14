@@ -136,7 +136,7 @@ const Assignments: FunctionComponent<IProps> = ({
       <BaseModal
         setIsOpen={() => setIsDeleteBulkAssignmentsModalOpen(false)}
         isOpen={isDeleteBulkAssignmentsModalOpen}
-        header="Delete Assignments"
+        title="Delete Assignments"
       >
         <p className="mb-4">
           Are you sure you want to delete selected assignments?

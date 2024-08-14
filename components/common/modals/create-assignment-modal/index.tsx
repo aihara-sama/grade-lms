@@ -133,7 +133,7 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
       width="lg"
       setIsOpen={setIsOpen}
       isOpen={isOpen}
-      header="Assignment"
+      title="Assignment"
     >
       <div>
         <Input

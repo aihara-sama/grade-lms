@@ -156,7 +156,7 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, userId }) => {
       <BaseModal
         setIsOpen={() => setIsDeleteBulkLessonsModalOpen(false)}
         isOpen={isDeleteBulkLessonsModalOpen}
-        header="Delete Lessons"
+        title="Delete Lessons"
       >
         <p className="mb-4">
           Are you sure you want to delete selected lessons?

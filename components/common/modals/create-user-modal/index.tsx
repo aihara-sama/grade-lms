@@ -68,7 +68,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
     <BaseModal
       isOpen={isOpen}
       setIsOpen={(_isOpen) => setIsOpen(_isOpen)}
-      header="Create user"
+      title="Create user"
     >
       <form noValidate>
         <Tabs

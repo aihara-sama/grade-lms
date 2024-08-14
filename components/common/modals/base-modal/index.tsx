@@ -13,12 +13,12 @@ interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   width?: "md" | "lg";
-  header: ReactNode;
+  title: string;
   headerButtons?: ReactNode;
 }
 
 const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
-  header,
+  title,
   children,
   headerButtons,
   isOpen,
@@ -57,7 +57,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
         }`}
       >
         <div className="px-6 py-3 flex items-center justify-between shadow-sm">
-          <div className="font-bold text-neutral-600">{header}</div>
+          <div className="font-bold text-neutral-600">{title}</div>
           <div className="flex items-center">
             {headerButtons}
             <button className="icon-button" onClick={() => setIsOpen(false)}>

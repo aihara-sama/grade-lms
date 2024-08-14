@@ -75,7 +75,7 @@ const AddLessonModal: FunctionComponent<IProps> = ({
   };
 
   return (
-    <BaseModal setIsOpen={setIsOpen} isOpen={isOpen} header="Create lesson">
+    <BaseModal setIsOpen={setIsOpen} isOpen={isOpen} title="Create lesson">
       <form onSubmit={handleCreateLesson}>
         <Input
           fullWIdth

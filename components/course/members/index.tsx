@@ -153,7 +153,7 @@ const Members: FunctionComponent<IProps> = ({ courseId, user }) => {
       <BaseModal
         setIsOpen={() => setIsDeleteBulkMembersModalOpen(false)}
         isOpen={isDeleteBulkMembersModalOpen}
-        header="Dispel Members"
+        title="Dispel Members"
       >
         <p className="mb-4">
           Are you sure you want to dispel selected members?
