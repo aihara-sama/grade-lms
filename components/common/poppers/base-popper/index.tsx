@@ -76,7 +76,7 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
           "w-44": width === "sm",
           "w-60": width === "md",
           "w-full": width === "full",
-        })} bg-white shadow-md absolute right-0 ${isVisible ? "py-[14px]" : ""} rounded-[3px] z-[999] transition-fade duration-300 ease-in-out ${
+        })} overflow-auto bg-white max-h-[calc(100vh-70px)] shadow-md absolute right-0 ${isVisible ? "py-[14px]" : ""} rounded-[3px] z-[999] transition-fade duration-300 ease-in-out ${
           isOpen
             ? "opacity-100 translate-y-0 visible"
             : "invisible opacity-0 translate-y-3"

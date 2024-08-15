@@ -9,7 +9,7 @@
   }
   body {
     @apply overflow-x-hidden !important;
-    @apply pb-3;
+    @apply overflow-y-auto;
   }
   a {
     @apply hover:text-blue-500;

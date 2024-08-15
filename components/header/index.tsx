@@ -27,7 +27,7 @@ const Header: FunctionComponent<IProps> = ({ user }) => {
   }, []);
 
   return (
-    <div className="flex p-4 items-center shadow-lg fixed inset-x-0 bg-white z-[99]">
+    <div className="flex p-4 items-center shadow-lg fixed inset-x-0 top-0 bg-white z-[99]">
       <Logo />
       {!!user && (
         <>

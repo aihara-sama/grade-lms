@@ -36,6 +36,7 @@
     "@excalidraw/excalidraw": "^0.17.3",
     "@formatjs/intl-localematcher": "0.2.32",
     "@paypal/react-paypal-js": "^7.8.3",
+    "@popperjs/core": "^2.11.8",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.41.1",
     "chart.js": "^4.4.1",
@@ -52,6 +53,7 @@
     "react-datepicker": "^6.1.0",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
+    "react-popper": "^2.3.0",
     "uuid": "^9.0.1",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"

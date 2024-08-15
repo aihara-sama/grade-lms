@@ -21,6 +21,7 @@ import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { getDictionary } from "@/utils/get-dictionary";
+import { isElementInViewport } from "@/utils/is-element-in-viewport";
 import type { User as AuthenticatedUser } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 
@@ -38,7 +39,6 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>();
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
-  console.log({ selectedCoursesIds });
 
   // Handdlers
   const fetchOwnedCourses = async () => {
@@ -102,6 +102,18 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const deselectAllCourses = () => {
     setSelectedCoursesIds([]);
   };
+  const handleCoursesScroll = () => {
+    const lastCourse = document.getElementById("last-course");
+    console.log(isElementInViewport(lastCourse));
+  };
+
+  useEffect(() => {
+    document.body.addEventListener("scroll", handleCoursesScroll);
+
+    return () => {
+      document.body.removeEventListener("scroll", handleCoursesScroll);
+    };
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -109,7 +121,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   }, []);
 
   return (
-    <>
+    <div className="pb-8">
       <CardsContainer>
         <Total
           Icon={<CoursesIcon size="lg" />}
@@ -163,7 +175,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
             Lessons: lessons[0].count,
             Members: members[0].count,
             "": (
-              <div>
+              <div id="last-course">
                 <BasePopper
                   width="sm"
                   trigger={
@@ -222,7 +234,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
         setIsOpen={setIsEnrollUsersModalOpen}
         onEnrolled={fetchOwnedCourses}
       />
-    </>
+    </div>
   );
 };
 
