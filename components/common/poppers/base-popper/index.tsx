@@ -23,13 +23,11 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
 }) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
-  const [triggerWrapperRect, setTriggerWrapperRect] = useState<DOMRect>();
-  const [childrenWrapperWidth, setChlidrenWrapperWidth] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnim, setIsAnim] = useState(false);
 
   // Refs
   const rootRef = useRef<HTMLDivElement>(null);
-  const childrenWrapperRef = useRef<HTMLDivElement>(null);
-  const triggerWrapperRef = useRef<HTMLDivElement>(null);
 
   // Handlers
   const handleClickOutside = (event: Event) => {
@@ -37,10 +35,9 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
       setIsOpen(false);
     }
   };
-  const handleChildrenClick = (e: MouseEvent) => {
-    const { tagName } = e.target as Element;
-    if (tagName === "LI" || tagName === "A") {
-      setIsOpen(false);
+  const handleTransitionEnd = () => {
+    if (!isAnim) {
+      setIsVisible(false);
     }
   };
 
@@ -52,44 +49,42 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // To avoid rendering children when not open
   useEffect(() => {
-    setTriggerWrapperRect(triggerWrapperRef.current.getBoundingClientRect());
-    setChlidrenWrapperWidth(childrenWrapperRef?.current.clientWidth);
-  }, []);
+    if (isOpen) {
+      setIsAnim(true);
+      setIsVisible(true);
+    }
+    if (!isOpen) {
+      setIsAnim(false);
+    }
+  }, [isOpen]);
+
+  const handleChildrenClick = (e: MouseEvent) => {
+    const { tagName } = e.target as Element;
+    if (tagName === "LI" || tagName === "A") {
+      setIsOpen(false);
+    }
+  };
 
   return (
     <div className="relative" ref={rootRef}>
+      <div onClick={() => setIsOpen((prev) => !prev)}>{trigger}</div>
       <div
-        onClick={() => {
-          setTriggerWrapperRect(
-            triggerWrapperRef.current.getBoundingClientRect()
-          );
-          setIsOpen((prev) => !prev);
-        }}
-        ref={triggerWrapperRef}
-      >
-        {trigger}
-      </div>
-      <div
-        style={{
-          top: `${triggerWrapperRect?.bottom}px`,
-          // eslint-disable-next-line
-          left: `${triggerWrapperRect?.right - childrenWrapperWidth}px`,
-          transitionProperty: "transform, opacity, visibility",
-        }}
         className={`mt-2 ${clsx({
           "w-44": width === "sm",
           "w-60": width === "md",
           "w-full": width === "full",
-        })} bg-white shadow-md fixed py-[14px] rounded-[3px] z-[999] duration-300 ease-in-out ${
+        })} bg-white shadow-md absolute right-0 ${isVisible ? "py-[14px]" : ""} rounded-[3px] z-[999] transition-fade duration-300 ease-in-out ${
           isOpen
             ? "opacity-100 translate-y-0 visible"
             : "invisible opacity-0 translate-y-3"
         }`}
         onClick={handleChildrenClick}
-        ref={childrenWrapperRef}
+        onTransitionEnd={handleTransitionEnd}
       >
-        {children}
+        {isVisible && children}
       </div>
     </div>
   );

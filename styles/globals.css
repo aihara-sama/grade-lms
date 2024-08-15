@@ -22,13 +22,13 @@
 
   /* Scrollbar ↴ */
   *::-webkit-scrollbar {
-    @apply w-1 h-1 bg-white;
+    @apply size-1 bg-white;
   }
   *::-webkit-scrollbar-track {
     @apply bg-white;
   }
   *::-webkit-scrollbar-thumb {
-    @apply bg-black/20 outline outline-1 outline-transparent rounded-[4px] w-1;
+    @apply bg-black/20 outline outline-1 outline-transparent rounded-[4px];
   }
   /* ^ Scrollbar ^ */
 }

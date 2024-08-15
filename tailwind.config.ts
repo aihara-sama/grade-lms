@@ -63,7 +63,13 @@ const config: Config = {
           500: "#d9d9d9",
         },
       },
-      popper: {},
+      transitionProperty: {
+        fade: "visibility, transform, opacity",
+      },
+      screens: {
+        "sm-h": { raw: "(min-height: 500px)" },
+        // => @media (min-height: 800px) { ... }
+      },
     },
   },
   // eslint-disable-next-line global-require
