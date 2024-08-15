@@ -10,7 +10,7 @@ const Table: FunctionComponent<IProps> = ({ data }) => {
   const keys = Object.keys(data[0] || {});
 
   return (
-    <div className="relative shadow-md rounded-b-md">
+    <div className="relative shadow-md rounded-b-md flex-1">
       <div className="flex flex-col">
         <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
           {keys.map((key) => (
@@ -22,7 +22,7 @@ const Table: FunctionComponent<IProps> = ({ data }) => {
             </div>
           ))}
         </div>
-        <div className="p-2 ">
+        <div className="">
           <div className="p-2">
             {data.map((row, idx) => (
               <div key={idx} className="flex items-center gap-3 px-3 py-1">

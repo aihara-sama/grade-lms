@@ -147,55 +147,57 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
           </button>
         </div>
       )}
-      <Table
-        data={courses.map(({ id, title, lessons, users: members }) => ({
-          Name: (
-            <CardTitle
-              href={`/dashboard/courses/${id}/overview`}
-              checked={selectedCoursesIds.includes(id)}
-              Icon={<CourseIcon />}
-              title={title}
-              subtitle="Active"
-              onToggle={(checked) => onCourseToggle(checked, id)}
-            />
-          ),
-          Lessons: lessons[0].count,
-          Members: members[0].count,
-          "": (
-            <div>
-              <BasePopper
-                width="sm"
-                trigger={
-                  <button className="icon-button text-neutral-500">
-                    <DotsIcon />
-                  </button>
-                }
-              >
-                <ul className="flex flex-col ">
-                  <li
-                    onClick={() => {
-                      setSelectedCourseId(id);
-                      setIsEnrollUsersModalOpen(true);
-                    }}
-                    className="popper-list-item"
-                  >
-                    <UsersIcon /> Enroll
-                  </li>
-                  <li
-                    onClick={() => {
-                      setSelectedCourseId(id);
-                      setIsDeleteCourseModalOpen(true);
-                    }}
-                    className="popper-list-item"
-                  >
-                    <DeleteIcon /> Delete
-                  </li>
-                </ul>
-              </BasePopper>
-            </div>
-          ),
-        }))}
-      />
+      <div className="flex-1 flex">
+        <Table
+          data={courses.map(({ id, title, lessons, users: members }) => ({
+            Name: (
+              <CardTitle
+                href={`/dashboard/courses/${id}/overview`}
+                checked={selectedCoursesIds.includes(id)}
+                Icon={<CourseIcon />}
+                title={title}
+                subtitle="Active"
+                onToggle={(checked) => onCourseToggle(checked, id)}
+              />
+            ),
+            Lessons: lessons[0].count,
+            Members: members[0].count,
+            "": (
+              <div>
+                <BasePopper
+                  width="sm"
+                  trigger={
+                    <button className="icon-button text-neutral-500">
+                      <DotsIcon />
+                    </button>
+                  }
+                >
+                  <ul className="flex flex-col ">
+                    <li
+                      onClick={() => {
+                        setSelectedCourseId(id);
+                        setIsEnrollUsersModalOpen(true);
+                      }}
+                      className="popper-list-item"
+                    >
+                      <UsersIcon /> Enroll
+                    </li>
+                    <li
+                      onClick={() => {
+                        setSelectedCourseId(id);
+                        setIsDeleteCourseModalOpen(true);
+                      }}
+                      className="popper-list-item"
+                    >
+                      <DeleteIcon /> Delete
+                    </li>
+                  </ul>
+                </BasePopper>
+              </div>
+            ),
+          }))}
+        />
+      </div>
 
       <PromptModal
         setIsOpen={setIsDeleteCoursesModalOpen}

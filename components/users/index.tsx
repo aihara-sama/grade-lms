@@ -157,52 +157,54 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
           </button>
         </div>
       )}
-      <Table
-        data={users.map(({ name, role, id, avatar }) => ({
-          Name: (
-            <CardTitle
-              href={`/users/${id}`}
-              checked={usersIds.includes(id)}
-              Icon={
-                <img
-                  className="rounded-[50%] w-8 h-8"
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
-                  alt=""
-                />
-              }
-              title={name}
-              subtitle={role}
-              onClick={() => {}}
-              onToggle={(checked) =>
-                checked
-                  ? setUsersIds((prev) => [...prev, id])
-                  : setUsersIds((prev) => prev.filter((_id) => _id !== id))
-              }
-            />
-          ),
-          Action: (
-            <div className="flex gap-2">
-              <DeleteButton
-                onDone={getUsers}
-                action={deleteUser}
-                record="user"
-                id={id}
-                key={id}
+      <div className="flex-1 flex">
+        <Table
+          data={users.map(({ name, role, id, avatar }) => ({
+            Name: (
+              <CardTitle
+                href={`/users/${id}`}
+                checked={usersIds.includes(id)}
+                Icon={
+                  <img
+                    className="rounded-[50%] w-8 h-8"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
+                    alt=""
+                  />
+                }
+                title={name}
+                subtitle={role}
+                onClick={() => {}}
+                onToggle={(checked) =>
+                  checked
+                    ? setUsersIds((prev) => [...prev, id])
+                    : setUsersIds((prev) => prev.filter((_id) => _id !== id))
+                }
               />
-              <button
-                className="primary-button w-auto"
-                onClick={() => {
-                  setEnrollUserId(id);
-                  setIsEnrollUsersModalOpen(true);
-                  getUnenrolledCourses(id);
-                }}
-              >
-                Enroll
-              </button>
-            </div>
-          ),
-        }))}
-      />
+            ),
+            Action: (
+              <div className="flex gap-2">
+                <DeleteButton
+                  onDone={getUsers}
+                  action={deleteUser}
+                  record="user"
+                  id={id}
+                  key={id}
+                />
+                <button
+                  className="primary-button w-auto"
+                  onClick={() => {
+                    setEnrollUserId(id);
+                    setIsEnrollUsersModalOpen(true);
+                    getUnenrolledCourses(id);
+                  }}
+                >
+                  Enroll
+                </button>
+              </div>
+            ),
+          }))}
+        />
+      </div>
       <BaseModal
         setIsOpen={(isOpen) => setIsDeleteUsersModalOpen(isOpen)}
         isOpen={isDeleteUsersModalOpen}
@@ -246,7 +248,7 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
             ),
           }))}
         />
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 mt-4">
           <button
             className="outline-button w-full"
             onClick={() => setIsEnrollUsersModalOpen(false)}

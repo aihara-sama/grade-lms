@@ -118,7 +118,7 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
           ),
         }))}
       />
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-end gap-3 mt-4">
         <button className="outline-button" onClick={closeModal}>
           Cancel
         </button>

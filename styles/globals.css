@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  html,
+  body {
+    height: 100%;
+  }
   body {
     @apply overflow-x-hidden !important;
+    @apply pb-3;
   }
   a {
     @apply hover:text-blue-500;

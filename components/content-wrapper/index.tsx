@@ -12,7 +12,7 @@ const ContentWrapper: FunctionComponent<IProps> = ({ children }) => {
   const { isExpanded } = useIsLessonHrExpanded();
   return (
     <div
-      className={`mt-[68px] flex flex-1 flex-col p-6 max-w-[1432px] mx-[auto] ${clsx(isExpanded && "[max-width:unset] [margin:unset]")}`}
+      className={`h-[calc(100%-68px)] mt-[68px] flex flex-1 flex-col p-6 max-w-[1432px] mx-[auto] ${clsx(isExpanded && "[max-width:unset] [margin:unset]")}`}
     >
       {children}
     </div>

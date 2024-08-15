@@ -15,8 +15,10 @@ const Page: NextPage<IProps> = async ({ params: { lang } }) => {
   } = await createClient().auth.getUser();
 
   return (
-    <div>
-      <p className="page-title">{dictionary["server-component"].courses}</p>
+    <div className="h-full flex flex-col">
+      <div>
+        <p className="page-title">{dictionary["server-component"].courses}</p>
+      </div>
       <p className="text-neutral-500">View and manage courses</p>
       <hr className="my-2 mb-4" />
       <Courses dictionary={dictionary} user={user} />

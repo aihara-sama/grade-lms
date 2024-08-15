@@ -7,7 +7,7 @@ const Page = async () => {
   } = await createClient().auth.getUser();
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <p className="page-title">Users</p>
       <p className="text-neutral-500">View and manage users</p>
       <hr className="my-2 mb-4" />

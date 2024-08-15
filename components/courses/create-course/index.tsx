@@ -51,6 +51,7 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
         Create
       </button>
       <BaseModal
+        isExpanded={false}
         setIsOpen={setIsCreateCourseModalOpen}
         isOpen={isCreateCourseModalOpen}
         title="Create course"

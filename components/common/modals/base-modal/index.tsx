@@ -15,6 +15,7 @@ interface IProps {
   width?: "md" | "lg";
   title: string;
   headerButtons?: ReactNode;
+  isExpanded?: boolean;
 }
 
 const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
@@ -23,6 +24,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
   headerButtons,
   isOpen,
   setIsOpen,
+  isExpanded = true,
   width = "md",
 }) => {
   // State
@@ -63,20 +65,20 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
 
   return (
     <div
-      className={`fixed inset-5 z-[999] ${isOpen ? "visible" : "invisible"}`}
+      className={`fixed inset-3 z-[999] ${isOpen ? "visible" : "invisible"}`}
     >
       {/* Mask ↴ */}
       <div
-        className={`fixed inset-0 backdrop-filter z-[99]  transition-all ${isOpen ? "backdrop-blur-[2px] bg-mask visible" : "invisible bg-transparent backdrop-blur-0"}`}
+        className={`fixed inset-0 backdrop-filter z-[99] transition-all ${isOpen ? "backdrop-blur-[2px] bg-mask visible" : "invisible bg-transparent backdrop-blur-0"}`}
         onClick={() => setIsOpen(false)}
       ></div>
       {/* ^ Mask ^ */}
       <div
-        className={`flex flex-col relative top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 sm-h:h-auto h-full z-[999] w-full ${width === "md" ? "sm:w-[400px]" : "sm:w-[680px]"}`}
+        className={`${isExpanded ? "h-[min(500px,100%)]" : "max-h-[90vh]"} flex flex-col relative top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 z-[999] w-full ${width === "md" ? "sm:w-[400px]" : "sm:w-[680px]"}`}
       >
         <div
           onTransitionEnd={handleTransitionEnd}
-          className={`pb-3 overflow-auto transition-fade flex items-center flex-col rounded-md shadow-md bg-white ${
+          className={`${isExpanded ? "h-[min(500px,100%)]" : "max-h-[90vh]"} pb-3 overflow-auto transition-fade flex items-center flex-col rounded-md shadow-md bg-white ${
             isOpen ? "opacity-100 translate-y-0" : " opacity-0 translate-y-10"
           }`}
         >
@@ -89,7 +91,9 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
               </button>
             </div>
           </div>
-          <div className="overflow-auto w-full px-6 pt-3">
+          <div
+            className={`overflow-auto w-full px-6 pt-3 flex flex-col ${isExpanded ? "h-[min(500px,100%)]" : "max-h-[90vh]"}`}
+          >
             {isVisible && children}
           </div>
         </div>
