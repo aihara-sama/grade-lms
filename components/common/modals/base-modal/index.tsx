@@ -77,7 +77,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
         <div
           onTransitionEnd={handleTransitionEnd}
           className={`pb-3 overflow-auto transition-fade flex items-center flex-col rounded-md shadow-md bg-white ${
-            isOpen ? "opacity-100 translate-y-0 " : " opacity-0 translate-y-10"
+            isOpen ? "opacity-100 translate-y-0" : " opacity-0 translate-y-10"
           }`}
         >
           <div className="w-full px-6 py-3 flex items-center justify-between shadow-sm">

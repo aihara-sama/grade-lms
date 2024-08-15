@@ -39,6 +39,7 @@ const CardTitle: FunctionComponent<IProps> = ({
     >
       {onToggle && (isCardHovered || checked) ? (
         <input
+          checked={checked}
           className="m-2 cursor-pointer w-4 h-4"
           onChange={handleCheckboxChange}
           type="checkbox"

@@ -15,6 +15,7 @@ import CardTitle from "@/components/card-title";
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
+import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
@@ -37,6 +38,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>();
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
+  console.log({ selectedCoursesIds });
 
   // Handdlers
   const fetchOwnedCourses = async () => {
@@ -94,6 +96,12 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
       setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
     }
   };
+  const selectAllCourses = () => {
+    setSelectedCoursesIds(courses.map(({ id }) => id));
+  };
+  const deselectAllCourses = () => {
+    setSelectedCoursesIds([]);
+  };
 
   // Effects
   useEffect(() => {
@@ -117,7 +125,20 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
           className="w-auto"
         />
       ) : (
-        <div className="mb-3">
+        <div className="mb-3 flex gap-3">
+          <button
+            onClick={
+              selectedCoursesIds.length === courses.length
+                ? deselectAllCourses
+                : selectAllCourses
+            }
+            className="outline-button flex font-semibold gap-2 items-center"
+          >
+            {selectedCoursesIds.length === courses.length
+              ? `${selectedCoursesIds.length} Deselect`
+              : "Select all"}{" "}
+            <CheckIcon size="xs" />
+          </button>
           <button
             onClick={openDeleteCoursesModal}
             className="outline-button flex font-semibold gap-2 items-center"
