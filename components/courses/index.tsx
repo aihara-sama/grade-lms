@@ -21,7 +21,6 @@ import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { getDictionary } from "@/utils/get-dictionary";
-import { isElementInViewport } from "@/utils/is-element-in-viewport";
 import type { User as AuthenticatedUser } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 
@@ -46,8 +45,11 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
       .from("users")
       .select("courses(*, lessons(count), users(count))")
       .eq("id", user.id)
+      .limit(20, { foreignTable: "courses" })
+      .order("title", { foreignTable: "courses", ascending: true })
       .returns<Record<"courses", CourseWithRefsCount[]>[]>()
       .single();
+    console.log({ data });
 
     if (error) {
       toast.error("Something went wrong");
@@ -102,16 +104,30 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const deselectAllCourses = () => {
     setSelectedCoursesIds([]);
   };
-  const handleCoursesScroll = () => {
-    const lastCourse = document.getElementById("last-course");
-    console.log(isElementInViewport(lastCourse));
+  const handleCoursesScroll = async () => {
+    const scrollPosition = window.innerHeight + window.scrollY;
+    const bottomPosition = document.documentElement.scrollHeight - 100;
+
+    if (scrollPosition >= bottomPosition) {
+      const { data } = await supabaseClient
+        .from("users")
+        .select("courses(*, lessons(count), users(count))")
+        .eq("id", user.id)
+        .range(20, 39, { foreignTable: "courses" }) // Fetch courses from index 21 to 40
+        .order("title", { foreignTable: "courses", ascending: true })
+        .returns<Record<"courses", CourseWithRefsCount[]>[]>()
+        .single();
+      setCourses((prev) => [...prev, ...data.courses]);
+
+      console.log({ data });
+    }
   };
 
   useEffect(() => {
-    document.body.addEventListener("scroll", handleCoursesScroll);
+    document.addEventListener("scroll", handleCoursesScroll);
 
     return () => {
-      document.body.removeEventListener("scroll", handleCoursesScroll);
+      document.removeEventListener("scroll", handleCoursesScroll);
     };
   }, []);
 
@@ -161,7 +177,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
       )}
       <div className="flex-1 flex">
         <Table
-          data={courses.map(({ id, title, lessons, users: members }) => ({
+          data={courses.map(({ id, title, lessons, users: members }, idx) => ({
             Name: (
               <CardTitle
                 href={`/dashboard/courses/${id}/overview`}
@@ -175,7 +191,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
             Lessons: lessons[0].count,
             Members: members[0].count,
             "": (
-              <div id="last-course">
+              <div data-last-course={courses.length - 1 === idx}>
                 <BasePopper
                   width="sm"
                   trigger={
