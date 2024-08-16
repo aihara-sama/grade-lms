@@ -187,12 +187,16 @@ end;
 $$ language plpgsql;
 
 
-create or replace function delete_courses_by_user(p_user_id uuid)
+create or replace function delete_courses_by_user_with_title_filter(p_user_id uuid, p_title_pattern text)
 returns void as $$
 begin
   delete from courses
   where id in (
-    select course_id from user_courses where user_id = p_user_id
+    select course_id
+    from user_courses
+    join courses on user_courses.course_id = courses.id
+    where user_courses.user_id = p_user_id
+      and (p_title_pattern = '' or courses.title ILIKE '%' || p_title_pattern || '%')
   );
 end;
 $$ language plpgsql;

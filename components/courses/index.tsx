@@ -21,7 +21,9 @@ import type { getDictionary } from "@/utils/get-dictionary";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User as AuthenticatedUser } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
-import { useEffect, useRef, useState, type FunctionComponent } from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import toast from "react-hot-toast";
 
 interface IProps {
@@ -40,13 +42,25 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(false);
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
+  const [searchText, setSearchText] = useState("");
+
+  // Refs
   const hasMoreCoursesRef = useRef(false);
   const isSelectedAllRef = useRef(false);
+
   // Handdlers
   const fetchTotalOwnedCoursesCount = async () =>
     supabaseClient
       .from("users")
       .select("courses(count)")
+      .eq("id", user.id)
+      .returns<Record<"courses", { count: number }[]>[]>()
+      .single();
+  const fetchTotalOwnedCoursesCountBySearch = async () =>
+    supabaseClient
+      .from("users")
+      .select("courses(count)")
+      .ilike("courses.title", `%${searchText}%`)
       .eq("id", user.id)
       .returns<Record<"courses", { count: number }[]>[]>()
       .single();
@@ -101,8 +115,9 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
     supabaseClient.from("courses").delete().in("id", ids);
 
   const deleteAllOwnedCourses = () =>
-    supabaseClient.rpc("delete_courses_by_user", {
+    supabaseClient.rpc("delete_courses_by_user_with_title_filter", {
       p_user_id: user.id,
+      p_title_pattern: searchText,
     });
 
   const deleteSelectedCourses = async () => {
@@ -167,6 +182,28 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
       }
     }
   };
+  const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+  const handleSearch = async () => {
+    const { data, error } = await supabaseClient
+      .from("users")
+      .select("courses(*, lessons(count), users(count))")
+      .ilike("courses.title", `%${searchText}%`)
+      .eq("id", user.id)
+      .limit(20, { foreignTable: "courses" })
+      .order("title", { foreignTable: "courses", ascending: true })
+      .returns<Record<"courses", CourseWithRefsCount[]>[]>()
+      .single();
+    const coursesCount = await fetchTotalOwnedCoursesCountBySearch();
+    console.log({ data });
+    if (error || coursesCount.error) {
+      toast.error("Something went wrong");
+    } else {
+      setCourses(data.courses);
+      setTotalCoursesCount(coursesCount.data.courses[0].count);
+    }
+  };
 
   useEffect(() => {
     const throttled = throttle(handleCoursesScroll, 100);
@@ -181,6 +218,10 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   useEffect(() => {
     fetchCourses();
   }, []);
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchText]);
 
   return (
     <div className="pb-8">
@@ -197,6 +238,8 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
           Icon={<SearchIcon size="xs" />}
           placeholder={dictionary.search}
           className="w-auto"
+          value={searchText}
+          onChange={handleSearchInputChange}
         />
       ) : (
         <div className="mb-3 flex gap-3">

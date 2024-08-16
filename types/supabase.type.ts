@@ -368,9 +368,10 @@ export type Database = {
         };
         Returns: string;
       };
-      delete_courses_by_user: {
+      delete_courses_by_user_with_title_filter: {
         Args: {
           p_user_id: string;
+          p_title_pattern: string;
         };
         Returns: undefined;
       };
