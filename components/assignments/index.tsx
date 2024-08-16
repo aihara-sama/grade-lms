@@ -108,7 +108,10 @@ const Assignments: FunctionComponent<IProps> = ({
         data={assignments.map(({ id, title }) => ({
           Name: (
             <CardTitle
-              onClick={() => setCurrentAssignmentId(id)}
+              onClick={() => {
+                setCurrentAssignmentId(id);
+                setIsEditAssignmentModalOpen(true);
+              }}
               checked={assignmentsIds.includes(id)}
               Icon={<AssignmentsIcon size="md" />}
               title={title}

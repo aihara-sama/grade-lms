@@ -75,7 +75,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
 
       setAssignment(data);
     })();
-  }, []);
+  }, [assignmentId]);
 
   return (
     <BaseModal
