@@ -185,3 +185,14 @@ begin
     where uc.user_id is null;
 end;
 $$ language plpgsql;
+
+
+create or replace function delete_courses_by_user(p_user_id uuid)
+returns void as $$
+begin
+  delete from courses
+  where id in (
+    select course_id from user_courses where user_id = p_user_id
+  );
+end;
+$$ language plpgsql;

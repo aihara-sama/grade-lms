@@ -368,6 +368,12 @@ export type Database = {
         };
         Returns: string;
       };
+      delete_courses_by_user: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: undefined;
+      };
       get_courses_not_assigned_to_user: {
         Args: {
           p_user_id: string;

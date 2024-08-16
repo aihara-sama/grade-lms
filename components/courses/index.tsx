@@ -1,27 +1,27 @@
 "use client";
 
-import CardsContainer from "@/components/cards-container";
-import CreateCourse from "@/components/courses/create-course";
-import CourseIcon from "@/components/icons/course-icon";
-import CoursesIcon from "@/components/icons/courses-icon";
-import SearchIcon from "@/components/icons/search-icon";
-import Input from "@/components/input";
-import Table from "@/components/table";
-import Total from "@/components/total";
-import { supabaseClient } from "@/utils/supabase/client";
-import { useEffect, useState, type FunctionComponent } from "react";
-
 import CardTitle from "@/components/card-title";
+import CardsContainer from "@/components/cards-container";
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
+import CreateCourse from "@/components/courses/create-course";
 import CheckIcon from "@/components/icons/check-icon";
+import CourseIcon from "@/components/icons/course-icon";
+import CoursesIcon from "@/components/icons/courses-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
+import SearchIcon from "@/components/icons/search-icon";
 import UsersIcon from "@/components/icons/users-icon";
+import Input from "@/components/input";
+import Table from "@/components/table";
+import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { getDictionary } from "@/utils/get-dictionary";
+import { supabaseClient } from "@/utils/supabase/client";
 import type { User as AuthenticatedUser } from "@supabase/supabase-js";
+import throttle from "lodash.throttle";
+import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface IProps {
@@ -38,10 +38,21 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>();
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
-
+  const [isCoursesLoading, setIsCoursesLoading] = useState(false);
+  const [totalCoursesCount, setTotalCoursesCount] = useState(0);
+  const hasMoreCoursesRef = useRef(false);
+  const isSelectedAllRef = useRef(false);
   // Handdlers
-  const fetchOwnedCourses = async () => {
-    const { data, error } = await supabaseClient
+  const fetchTotalOwnedCoursesCount = async () =>
+    supabaseClient
+      .from("users")
+      .select("courses(count)")
+      .eq("id", user.id)
+      .returns<Record<"courses", { count: number }[]>[]>()
+      .single();
+
+  const fetchOwnedCourses = async () =>
+    supabaseClient
       .from("users")
       .select("courses(*, lessons(count), users(count))")
       .eq("id", user.id)
@@ -49,14 +60,25 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
       .order("title", { foreignTable: "courses", ascending: true })
       .returns<Record<"courses", CourseWithRefsCount[]>[]>()
       .single();
-    console.log({ data });
 
-    if (error) {
+  const fetchCourses = async () => {
+    setIsCoursesLoading(true);
+
+    const [ownedCourses, ownedCoursesCount] = await Promise.all([
+      fetchOwnedCourses(),
+      fetchTotalOwnedCoursesCount(),
+    ]);
+
+    if (ownedCourses.error || ownedCoursesCount.error) {
       toast.error("Something went wrong");
     } else {
-      setCourses(data.courses);
+      setCourses(ownedCourses.data.courses);
+      setTotalCoursesCount(ownedCoursesCount.data.courses[0].count);
+      hasMoreCoursesRef.current = ownedCourses.data.courses.length === 20;
     }
+    setIsCoursesLoading(false);
   };
+
   const deleteSelectedCourse = async () => {
     const { error } = await supabaseClient
       .from("courses")
@@ -72,21 +94,28 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
         prev.filter((id) => id !== selectedCourseId)
       );
       setIsDeleteCourseModalOpen(false);
-      fetchOwnedCourses();
+      fetchCourses();
     }
   };
+  const deleteCoursesByIds = (ids: string[]) =>
+    supabaseClient.from("courses").delete().in("id", ids);
+
+  const deleteAllOwnedCourses = () =>
+    supabaseClient.rpc("delete_courses_by_user", {
+      p_user_id: user.id,
+    });
+
   const deleteSelectedCourses = async () => {
-    const { error } = await supabaseClient
-      .from("courses")
-      .delete()
-      .in("id", selectedCoursesIds);
+    const { error } = await (isSelectedAllRef.current
+      ? deleteAllOwnedCourses()
+      : deleteCoursesByIds(selectedCoursesIds));
 
     if (error) toast.error("Something went wrong");
 
     setSelectedCoursesIds([]);
     setIsDeleteCoursesModalOpen(false);
 
-    fetchOwnedCourses();
+    fetchCourses();
   };
   const openDeleteCoursesModal = () => {
     setIsDeleteCoursesModalOpen(true);
@@ -94,46 +123,63 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const onCourseToggle = (checked: boolean, courseId: string) => {
     if (checked) {
       setSelectedCoursesIds((prev) => [...prev, courseId]);
+      isSelectedAllRef.current =
+        totalCoursesCount === selectedCoursesIds.length + 1;
     } else {
       setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
+      isSelectedAllRef.current =
+        totalCoursesCount === selectedCoursesIds.length - 1;
     }
   };
   const selectAllCourses = () => {
     setSelectedCoursesIds(courses.map(({ id }) => id));
+    isSelectedAllRef.current = true;
   };
   const deselectAllCourses = () => {
     setSelectedCoursesIds([]);
+    isSelectedAllRef.current = false;
   };
   const handleCoursesScroll = async () => {
-    const scrollPosition = window.innerHeight + window.scrollY;
-    const bottomPosition = document.documentElement.scrollHeight - 100;
+    if (!isCoursesLoading && hasMoreCoursesRef.current) {
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const bottomPosition = document.documentElement.scrollHeight - 100;
 
-    if (scrollPosition >= bottomPosition) {
-      const { data } = await supabaseClient
-        .from("users")
-        .select("courses(*, lessons(count), users(count))")
-        .eq("id", user.id)
-        .range(20, 39, { foreignTable: "courses" }) // Fetch courses from index 21 to 40
-        .order("title", { foreignTable: "courses", ascending: true })
-        .returns<Record<"courses", CourseWithRefsCount[]>[]>()
-        .single();
-      setCourses((prev) => [...prev, ...data.courses]);
-
-      console.log({ data });
+      if (scrollPosition >= bottomPosition) {
+        setIsCoursesLoading(true);
+        const { data } = await supabaseClient
+          .from("users")
+          .select("courses(*, lessons(count), users(count))")
+          .eq("id", user.id)
+          .range(20, 39, { foreignTable: "courses" }) // Fetch courses from index 21 to 40
+          .order("title", { foreignTable: "courses", ascending: true })
+          .returns<Record<"courses", CourseWithRefsCount[]>[]>()
+          .single();
+        setCourses((prev) => [...prev, ...data.courses]);
+        hasMoreCoursesRef.current = data.courses.length === 20;
+        setIsCoursesLoading(false);
+        if (isSelectedAllRef.current) {
+          setSelectedCoursesIds((prev) => [
+            ...prev,
+            ...data.courses.map(({ id }) => id),
+          ]);
+        }
+        console.log({ data });
+      }
     }
   };
 
   useEffect(() => {
-    document.addEventListener("scroll", handleCoursesScroll);
+    const throttled = throttle(handleCoursesScroll, 100);
+    document.addEventListener("scroll", throttled);
 
     return () => {
-      document.removeEventListener("scroll", handleCoursesScroll);
+      document.removeEventListener("scroll", throttled);
     };
   }, []);
 
   // Effects
   useEffect(() => {
-    fetchOwnedCourses();
+    fetchCourses();
   }, []);
 
   return (
@@ -141,10 +187,10 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
       <CardsContainer>
         <Total
           Icon={<CoursesIcon size="lg" />}
-          total={courses.length}
+          total={totalCoursesCount}
           title="Total courses"
         />
-        <CreateCourse userId={user.id} onDone={fetchOwnedCourses} />
+        <CreateCourse userId={user.id} onDone={fetchCourses} />
       </CardsContainer>
       {!selectedCoursesIds.length ? (
         <Input
@@ -156,15 +202,14 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
         <div className="mb-3 flex gap-3">
           <button
             onClick={
-              selectedCoursesIds.length === courses.length
-                ? deselectAllCourses
-                : selectAllCourses
+              isSelectedAllRef.current ? deselectAllCourses : selectAllCourses
             }
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {selectedCoursesIds.length === courses.length
-              ? `${selectedCoursesIds.length} Deselect`
-              : "Select all"}{" "}
+            {isSelectedAllRef.current
+              ? totalCoursesCount
+              : selectedCoursesIds.length}{" "}
+            {isSelectedAllRef.current ? `Deselect` : "Select all"}{" "}
             <CheckIcon size="xs" />
           </button>
           <button
@@ -248,7 +293,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
         courseId={selectedCourseId}
         isOpen={isEnrollUsersModalOpen}
         setIsOpen={setIsEnrollUsersModalOpen}
-        onEnrolled={fetchOwnedCourses}
+        onEnrolled={fetchCourses}
       />
     </div>
   );
