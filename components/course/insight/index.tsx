@@ -34,52 +34,51 @@ const Insight: FunctionComponent<IProps> = ({
   data,
   labels,
   label,
-  shouldCalcRightSide = true, // default is true
+  shouldCalcRightSide = true,
 }) => {
   const [chartWidth, setChartWidth] = useState(0);
 
   useEffect(() => {
-    const handleSetChartWidth = () => {
+    const calculateChartWidth = () => {
       const contentPadding = 48;
       const rightPanel = 300;
       const contentGap = 30;
       const insightsGap = 20;
-      let newChartWidth: number;
+
+      let widthAdjustment = 0;
 
       if (shouldCalcRightSide) {
         if (window.innerWidth < 1280) {
-          newChartWidth = window.innerWidth - contentPadding - insightsGap;
+          widthAdjustment = -contentPadding - insightsGap;
         } else if (window.innerWidth >= 1432) {
-          newChartWidth =
-            window.innerWidth -
-            (window.innerWidth - 1432) -
+          widthAdjustment =
+            -(window.innerWidth - 1432) -
             rightPanel -
             contentGap -
             contentPadding;
         } else {
-          newChartWidth =
-            window.innerWidth - rightPanel - contentGap - contentPadding;
+          widthAdjustment = -rightPanel - contentGap - contentPadding;
         }
       } else {
-        // Use ternary operator for concise conditional logic
-        newChartWidth =
+        widthAdjustment =
           window.innerWidth >= 1432
-            ? window.innerWidth -
-              (window.innerWidth - 1432) -
+            ? -(window.innerWidth - 1432) -
               rightPanel -
               contentGap -
               contentPadding
-            : window.innerWidth - rightPanel - contentGap - contentPadding;
+            : -rightPanel - contentGap - contentPadding;
       }
 
-      if (window.innerWidth >= 768) newChartWidth /= 2;
-      setChartWidth(newChartWidth);
+      // Apply additional width adjustments based on screen size
+      const baseWidth = window.innerWidth + widthAdjustment;
+      const finalWidth = window.innerWidth >= 768 ? baseWidth / 2 : baseWidth;
+      setChartWidth(finalWidth);
     };
 
-    handleSetChartWidth();
-    window.addEventListener("resize", handleSetChartWidth);
+    calculateChartWidth();
+    window.addEventListener("resize", calculateChartWidth);
 
-    return () => window.removeEventListener("resize", handleSetChartWidth);
+    return () => window.removeEventListener("resize", calculateChartWidth);
   }, [shouldCalcRightSide]);
 
   return (
