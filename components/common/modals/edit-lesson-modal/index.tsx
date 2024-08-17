@@ -60,15 +60,13 @@ const EditLessonModal: FunctionComponent<IProps> = ({
   const handleSaveLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { error } = await supabaseClient
-      .from("lessons")
-      .update({
-        title: lessonTitle,
-        starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
-        ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-        course_id: course?.id || null,
-      })
-      .eq("id", lesson.id);
+    const { error } = await supabaseClient.from("lessons").upsert({
+      title: lessonTitle,
+      starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
+      ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
+      course_id: course?.id || null,
+      id: lesson.id,
+    });
 
     if (error) {
       toast(error.message);

@@ -7,7 +7,7 @@ import type { INavItem } from "@/interfaces/menu.interface";
 export const navItems: INavItem[] = [
   {
     title: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     Icon: OverviewIcon,
   },
   {

@@ -71,7 +71,7 @@
   }
 
   .page-title {
-    @apply text-3xl font-bold whitespace-nowrap overflow-ellipsis text-neutral-600 max-w-[400px] overflow-hidden;
+    @apply text-3xl font-bold text-neutral-600 max-w-[400px] whitespace-nowrap overflow-ellipsis overflow-hidden;
   }
   .section-title {
     @apply text-xl font-bold my-3 text-neutral-600;
@@ -82,6 +82,25 @@
   }
 }
 @layer utilities {
+  .text-truncation {
+    @apply whitespace-nowrap overflow-ellipsis overflow-hidden;
+  }
+  .truncate-fade {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 80%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 80%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
   .hide-whiteboard-elements {
     & > .excalidraw {
       & > .App-menu_top,

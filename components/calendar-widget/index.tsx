@@ -67,12 +67,12 @@ const CalendarWidget: React.FC<IProps> = ({ onChange }) => {
 
   const getDayStyle = (day: Date) => {
     if (!isSameMonth(day, currentDate)) {
-      return "text-gray-400 "; // Light color for days not in the current month
+      return "text-gray-400 hover:bg-gray-100 active:bg-gray-200"; // Light color for days not in the current month
     }
     if (selectedDate && isSameDay(day, selectedDate)) {
       return "bg-blue-100 text-white  hover:bg-blue-200 active:bg-blue-300";
     }
-    return "text-gray-800  ";
+    return "text-gray-800 hover:bg-gray-100 active:bg-gray-200";
   };
 
   const daysForDisplay = getDaysForDisplay();
@@ -101,7 +101,7 @@ const CalendarWidget: React.FC<IProps> = ({ onChange }) => {
         {daysForDisplay.map((day, index) => (
           <div
             key={index}
-            className={`transition-colors font-bold hover:bg-gray-100 active:bg-gray-200 h-[36px] flex items-center justify-center rounded cursor-pointer ${getDayStyle(day)}`}
+            className={`transition-colors font-bold h-[36px] flex items-center justify-center rounded cursor-pointer ${getDayStyle(day)}`}
             onClick={() => handleDayClick(day)}
           >
             {format(day, "d")}
