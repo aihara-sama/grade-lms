@@ -54,8 +54,6 @@ const DashboardSchedule: FunctionComponent<IProps> = ({ user }) => {
     (async () => {
       const { data, error } = await fetchLessonsByStartDate(scheduleDate);
 
-      console.log({ data });
-
       if (error) {
         toast.error("Something went wrong");
       } else {
@@ -69,13 +67,13 @@ const DashboardSchedule: FunctionComponent<IProps> = ({ user }) => {
       <CalendarWidget onChange={handleDayChange} />
       <div className="mt-4">
         <h2 className="font-bold text-lg">My schedule</h2>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 max-h-[300px] overflow-auto pr-2">
           {schedule.map((lesson) => (
             <div key={lesson.id}>
               <div className="flex justify-between items-center">
                 <div
                   title={lesson.course.title}
-                  className="w-full text-base text-neutral-500 truncate-fade max-w-[160px]"
+                  className="w-full text-base text-neutral-500 truncate-fade max-w-[140px]"
                 >
                   {lesson.course.title}
                 </div>

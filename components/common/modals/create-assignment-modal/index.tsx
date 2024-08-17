@@ -41,7 +41,9 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
   setIsOpen,
 }) => {
   // States
-  const [assignment, setAssignment] = useState<Omit<Assignment, "id">>({
+  const [assignment, setAssignment] = useState<
+    Omit<Assignment, "id" | "created_at">
+  >({
     lesson_id: lesson.id,
     title: "",
     body: "{}",

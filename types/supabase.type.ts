@@ -12,6 +12,7 @@ export type Database = {
       assignments: {
         Row: {
           body: string;
+          created_at: string;
           due_date: string;
           id: string;
           lesson_id: string;
@@ -19,6 +20,7 @@ export type Database = {
         };
         Insert: {
           body?: string;
+          created_at?: string;
           due_date: string;
           id?: string;
           lesson_id: string;
@@ -26,6 +28,7 @@ export type Database = {
         };
         Update: {
           body?: string;
+          created_at?: string;
           due_date?: string;
           id?: string;
           lesson_id?: string;

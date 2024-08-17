@@ -110,7 +110,8 @@ create table assignments (
   lesson_id uuid references public.lessons on delete cascade not null,
   title text not null,
   body text default '{}' not null,
-  due_date timestamp not null
+  due_date timestamp not null,
+  created_at timestamp not null default now()
 );
 
 create table submissions (

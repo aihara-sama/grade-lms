@@ -1,11 +1,11 @@
 "use client";
 
 import CardsContainer from "@/components/cards-container";
-import DashboardInsights from "@/components/dashboard/dashboard-insights";
-import DashboardSchedule from "@/components/dashboard/dashboard-schedule";
-import LatestCourses from "@/components/dashboard/latest-courses";
+import DashboardSchedule from "@/components/common/dashboard/dashboard-schedule";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
+import LatestCourses from "@/components/teacher-dashboard/latest-courses";
+import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { supabaseClient } from "@/utils/supabase/client";
@@ -19,7 +19,7 @@ interface IProps {
   totalUsersCount: number;
 }
 
-const Dashboard: FunctionComponent<IProps> = ({
+const TeacherDashboard: FunctionComponent<IProps> = ({
   user,
   totalUsersCount,
   totalCoursesCount,
@@ -106,7 +106,7 @@ const Dashboard: FunctionComponent<IProps> = ({
           courses={latestCourses}
           onCourseCreated={handleGetCourses}
         />
-        <DashboardInsights user={user} courses={latestCourses} />
+        <TeacherInsights user={user} courses={latestCourses} />
       </div>
       <div className="w-[278px]">
         <DashboardSchedule user={user} />
@@ -115,4 +115,4 @@ const Dashboard: FunctionComponent<IProps> = ({
   );
 };
 
-export default Dashboard;
+export default TeacherDashboard;
