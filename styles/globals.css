@@ -82,6 +82,9 @@
   }
 }
 @layer utilities {
+  .interactive {
+    @apply cursor-pointer hover:bg-gray-100/50 active:bg-gray-200/50;
+  }
   .text-truncation {
     @apply whitespace-nowrap overflow-ellipsis overflow-hidden;
   }
