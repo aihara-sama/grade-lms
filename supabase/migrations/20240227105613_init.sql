@@ -11,7 +11,8 @@ create table users (
   email text not null,
   avatar text not null,
   preferred_locale text not null,
-  fcm_token text
+  fcm_token text,
+  created_at timestamp not null default now()
 );
 alter table users enable row level security;
 create policy "Can view user's data." on users for select using (true);
@@ -40,7 +41,8 @@ create table courses (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
   -- user_id uuid references auth.users on delete cascade not null,
-  title text not null
+  title text not null,
+  created_at timestamp not null default now()
 );
 alter table courses enable row level security;
 create policy "Can view course's data." on courses for select using (true);

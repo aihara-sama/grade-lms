@@ -43,14 +43,17 @@ export type Database = {
       };
       courses: {
         Row: {
+          created_at: string;
           id: string;
           title: string;
         };
         Insert: {
+          created_at?: string;
           id?: string;
           title: string;
         };
         Update: {
+          created_at?: string;
           id?: string;
           title?: string;
         };
@@ -315,6 +318,7 @@ export type Database = {
       users: {
         Row: {
           avatar: string;
+          created_at: string;
           creator_id: string | null;
           email: string;
           fcm_token: string | null;
@@ -325,6 +329,7 @@ export type Database = {
         };
         Insert: {
           avatar: string;
+          created_at?: string;
           creator_id?: string | null;
           email: string;
           fcm_token?: string | null;
@@ -335,6 +340,7 @@ export type Database = {
         };
         Update: {
           avatar?: string;
+          created_at?: string;
           creator_id?: string | null;
           email?: string;
           fcm_token?: string | null;
@@ -380,6 +386,7 @@ export type Database = {
           p_user_id: string;
         };
         Returns: {
+          created_at: string;
           id: string;
           title: string;
         }[];
@@ -390,6 +397,7 @@ export type Database = {
         };
         Returns: {
           avatar: string;
+          created_at: string;
           creator_id: string | null;
           email: string;
           fcm_token: string | null;

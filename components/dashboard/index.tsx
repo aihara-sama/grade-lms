@@ -1,19 +1,15 @@
 "use client";
 
 import CardsContainer from "@/components/cards-container";
-import CreateCourseModal from "@/components/common/modals/create-course-modal";
+import DashboardInsights from "@/components/dashboard/dashboard-insights";
 import DashboardSchedule from "@/components/dashboard/dashboard-schedule";
+import LatestCourses from "@/components/dashboard/latest-courses";
 import AvatarIcon from "@/components/icons/avatar-icon";
-import CourseIcon from "@/components/icons/course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
-import LessonsIcon from "@/components/icons/lessons-icon";
-import PlusIcon from "@/components/icons/plus-icon";
-import UsersIcon from "@/components/icons/users-icon";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import Link from "next/link";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
@@ -31,9 +27,6 @@ const Dashboard: FunctionComponent<IProps> = ({
   const [usersCount] = useState(totalUsersCount);
   const [coursesCount, setCoursesCount] = useState(totalCoursesCount);
   const [latestCourses, setLatestCourses] = useState<CourseWithRefsCount[]>([]);
-  const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
-
-  const openCreateCourseModal = () => setIsCreateCourseModalOpen(true);
 
   // const fetchUsersCount = () =>
   //   supabaseClient
@@ -57,6 +50,7 @@ const Dashboard: FunctionComponent<IProps> = ({
       .select("courses(*, users(count), lessons(count))")
       .eq("id", user.id)
       .limit(10)
+      .order("created_at", { ascending: true, referencedTable: "courses" })
       .returns<Record<"courses", CourseWithRefsCount[]>[]>()
       .single();
 
@@ -83,7 +77,6 @@ const Dashboard: FunctionComponent<IProps> = ({
   useEffect(() => {
     (async () => {
       const { data, error } = await fetchLatestCourses();
-      console.log({ data });
 
       if (error) {
         toast.error("Something went wrong");
@@ -95,7 +88,7 @@ const Dashboard: FunctionComponent<IProps> = ({
 
   return (
     <div className="flex gap-8">
-      <div className="flex-1">
+      <div className="flex-1 overflow-hidden">
         <CardsContainer>
           <Total
             Icon={<CoursesIcon size="lg" />}
@@ -109,53 +102,15 @@ const Dashboard: FunctionComponent<IProps> = ({
           />
         </CardsContainer>
         <hr className="my-4" />
-        <h2 className="font-bold text-lg">Latest courses</h2>
-        <div className="flex gap-4 mt-2 flex-nowrap overflow-auto">
-          {latestCourses.map((course) => (
-            <Link
-              href={`/dashboard/courses/${course.id}/overview`}
-              key={course.id}
-              className="border border-neutral-300 rounded-lg px-4 py-2 flex items-center justify-between min-w-56 interactive"
-            >
-              <div className="flex gap-2 w-full">
-                <CourseIcon className="" size="sm" />
-                <div
-                  className="text-sm flex-1 truncate-fade max-w-24 w-full font-semibold"
-                  title={course.title}
-                >
-                  {course.title}
-                </div>
-              </div>
-              <div className="flex gap-3 items-center text-neutral-600">
-                <div>
-                  <div>
-                    <UsersIcon size="xs" />
-                  </div>
-                  <div>{course.users[0].count}</div>
-                </div>
-                <div>
-                  <div>
-                    <LessonsIcon size="xs" />
-                  </div>
-                  <div>{course.lessons[0].count}</div>
-                </div>
-              </div>
-            </Link>
-          ))}
-          <div
-            onClick={openCreateCourseModal}
-            className="size-14 rounded-lg border border-neutral-300 flex items-center justify-center text-neutral-500 interactive"
-          >
-            <PlusIcon size="sm" />
-          </div>
-        </div>
+        <LatestCourses
+          courses={latestCourses}
+          onCourseCreated={handleGetCourses}
+        />
+        <DashboardInsights user={user} courses={latestCourses} />
       </div>
-      <DashboardSchedule user={user} />
-      <CreateCourseModal
-        onDone={handleGetCourses}
-        isOpen={isCreateCourseModalOpen}
-        setIsOpen={setIsCreateCourseModalOpen}
-      />
+      <div className="w-[278px]">
+        <DashboardSchedule user={user} />
+      </div>
     </div>
   );
 };
