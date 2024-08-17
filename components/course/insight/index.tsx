@@ -22,13 +22,20 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
 interface IProps {
   labels: string[];
   data: number[];
   label: string;
+  shouldCalcRightSide?: boolean;
 }
 
-const Insight: FunctionComponent<IProps> = ({ data, labels, label }) => {
+const Insight: FunctionComponent<IProps> = ({
+  data,
+  labels,
+  label,
+  shouldCalcRightSide = true, // default is true
+}) => {
   const [chartWidth, setChartWidth] = useState(0);
 
   useEffect(() => {
@@ -37,31 +44,44 @@ const Insight: FunctionComponent<IProps> = ({ data, labels, label }) => {
       const rightPanel = 300;
       const contentGap = 30;
       const insightsGap = 20;
-
       let newChartWidth: number;
 
-      if (window.innerWidth < 1280) {
-        newChartWidth = window.innerWidth - contentPadding - insightsGap;
-      } else if (window.innerWidth >= 1432) {
-        newChartWidth =
-          window.innerWidth -
-          (window.innerWidth - 1432) -
-          rightPanel -
-          contentGap -
-          contentPadding;
+      if (shouldCalcRightSide) {
+        if (window.innerWidth < 1280) {
+          newChartWidth = window.innerWidth - contentPadding - insightsGap;
+        } else if (window.innerWidth >= 1432) {
+          newChartWidth =
+            window.innerWidth -
+            (window.innerWidth - 1432) -
+            rightPanel -
+            contentGap -
+            contentPadding;
+        } else {
+          newChartWidth =
+            window.innerWidth - rightPanel - contentGap - contentPadding;
+        }
       } else {
+        // Use ternary operator for concise conditional logic
         newChartWidth =
-          window.innerWidth - rightPanel - contentGap - contentPadding;
+          window.innerWidth >= 1432
+            ? window.innerWidth -
+              (window.innerWidth - 1432) -
+              rightPanel -
+              contentGap -
+              contentPadding
+            : window.innerWidth - rightPanel - contentGap - contentPadding;
       }
 
       if (window.innerWidth >= 768) newChartWidth /= 2;
       setChartWidth(newChartWidth);
     };
-    handleSetChartWidth();
 
+    handleSetChartWidth();
     window.addEventListener("resize", handleSetChartWidth);
+
     return () => window.removeEventListener("resize", handleSetChartWidth);
-  }, []);
+  }, [shouldCalcRightSide]);
+
   return (
     <div className="flex-[1] h-[300px]">
       <div

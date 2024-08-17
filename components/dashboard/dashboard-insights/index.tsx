@@ -75,7 +75,12 @@ const DashboardInsights: FunctionComponent<IProps> = ({ user, courses }) => {
       <p className="section-title">Insights</p>
       <div className="flex gap-5 flex-col md:flex-row">
         {usersInsights.length ? (
-          <Insight label="Users" data={usersInsights} labels={getWeekNames()} />
+          <Insight
+            shouldCalcRightSide={false}
+            label="Users"
+            data={usersInsights}
+            labels={getWeekNames()}
+          />
         ) : (
           <div className="flex-1">
             <ChartSkeleton record="Users" />
@@ -83,6 +88,7 @@ const DashboardInsights: FunctionComponent<IProps> = ({ user, courses }) => {
         )}
         {coursesInsights.length ? (
           <Insight
+            shouldCalcRightSide={false}
             label="Courses"
             data={coursesInsights}
             labels={getWeekNames()}
