@@ -3,7 +3,7 @@
 import CrossEyeIcon from "@/components/icons/cross-eye-icon";
 import EyeIcon from "@/components/icons/eye-icon";
 import type { FunctionComponent, InputHTMLAttributes } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   Icon: JSX.Element;
@@ -27,10 +27,19 @@ const Input: FunctionComponent<IProps> = ({
   ...inputProps
 }) => {
   const [inputType, setInputType] = useState(type);
+  const inputRef = useRef<HTMLInputElement>();
 
   const handleToggleVisibility = () => {
     setInputType((prevType) => (prevType === "password" ? "text" : "password"));
   };
+
+  useEffect(() => {
+    if (inputProps.autoFocus) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 150);
+    }
+  }, []);
 
   return (
     <div onClick={onClick} className={`mb-3 ${className}`}>
@@ -42,6 +51,7 @@ const Input: FunctionComponent<IProps> = ({
           {Icon}
         </div>
         <input
+          ref={inputRef}
           value={value}
           type={inputType}
           placeholder={placeholder}

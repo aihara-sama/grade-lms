@@ -68,7 +68,7 @@ const UserPopper: FunctionComponent<IProps> = ({ role, userName, avatar }) => {
           <hr className="my-3" />
           <ul className="flex flex-col">
             {menu.map(({ title, href, Icon }, idx) => (
-              <li>
+              <li key={idx}>
                 <Link
                   href={href}
                   key={idx}

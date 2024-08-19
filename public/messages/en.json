@@ -1,8 +1,5 @@
 {
-  "server": {
-    "courses": "Courses",
-    "d": "D"
-  },
+  "courses": "Courses",
   "search": "Search",
   "profile": "Profile",
   "failed-to-delete-course": "Failed to delete course",

@@ -1,11 +1,20 @@
 import BaseModal from "@/components/common/modals/base-modal";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/utils/supabase/client";
-import type { Dispatch, SetStateAction, FunctionComponent } from "react";
+import { createCourse } from "@/db/course";
+import type { TablesInsert } from "@/types/supabase.type";
+import type {
+  ChangeEvent,
+  Dispatch,
+  FunctionComponent,
+  SetStateAction,
+} from "react";
 import { useState } from "react";
-
 import toast from "react-hot-toast";
+
+const initCourse: TablesInsert<"courses"> = {
+  title: "",
+};
 
 interface IProps {
   isOpen: boolean;
@@ -18,23 +27,28 @@ const CreateCourseModal: FunctionComponent<IProps> = ({
   setIsOpen,
   onDone,
 }) => {
-  const [courseTitle, setCourseTitle] = useState("");
+  // State
+  const [course, setCourse] = useState<TablesInsert<"courses">>(initCourse);
 
+  // Handlers
+  const closeCreateCourseModal = () => setIsOpen(false);
+
+  const handeChangeCourseTitle = (e: ChangeEvent<HTMLInputElement>) => {
+    setCourse({
+      title: e.target.value,
+    });
+  };
   const submitCreateCourse = async (formData: FormData) => {
-    const { error } = await supabaseClient
-      .from("courses")
-      .insert({
+    try {
+      await createCourse({
         title: formData.get("title") as string,
-      })
-      .select("id")
-      .single();
-
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Course created");
-      setIsOpen(false);
-      setCourseTitle("");
+      });
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      toast.success("Course created");
+      closeCreateCourseModal();
+      setCourse(initCourse);
       onDone();
     }
   };
@@ -48,16 +62,16 @@ const CreateCourseModal: FunctionComponent<IProps> = ({
     >
       <form action={submitCreateCourse}>
         <Input
-          autoFocus
           fullWIdth
           name="title"
           label="Course name"
-          value={courseTitle}
+          value={course.title}
           Icon={<CoursesIcon />}
           placeholder="My course..."
-          onChange={(e) => setCourseTitle(e.target.value)}
+          onChange={handeChangeCourseTitle}
+          autoFocus
         />
-        <button disabled={!courseTitle} className="primary-button w-full">
+        <button disabled={!course.title} className="primary-button w-full">
           Create
         </button>
       </form>

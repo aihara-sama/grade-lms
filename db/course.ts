@@ -1,4 +1,5 @@
 import type { CourseWithRefsCount } from "@/types/courses.type";
+import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
 import { supabaseClient } from "@/utils/supabase/client";
 
@@ -32,7 +33,7 @@ export const getCoursesCountByTitleAndUserId = async (
 
   if (result.error) throw new Error(t("failed-to-load-courses-count"));
 
-  return result;
+  return result.data.courses[0].count;
 };
 
 export const getCoursesByTitleAndUserId = async (
@@ -52,7 +53,7 @@ export const getCoursesByTitleAndUserId = async (
 
   if (result.error) throw new Error(t("failed-to-load-courses"));
 
-  return result;
+  return result.data.courses;
 };
 
 export const getCoursesByUserId = async (userId: string) => {
@@ -71,8 +72,9 @@ export const getCoursesByUserId = async (userId: string) => {
   return result.data.courses;
 };
 
-export const getRangeCoursesByUserId = async (
+export const getOffsetCoursesByTitleAndUserId = async (
   userId: string,
+  title: string,
   from: number,
   to: number
 ) => {
@@ -81,6 +83,7 @@ export const getRangeCoursesByUserId = async (
     .from("users")
     .select("courses(*, lessons(count), users(count))")
     .eq("id", userId)
+    .ilike("courses.title", `%${title}%`)
     .range(from, to, { foreignTable: "courses" })
     .order("title", { foreignTable: "courses", ascending: true })
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
@@ -88,15 +91,12 @@ export const getRangeCoursesByUserId = async (
 
   if (result.error) throw new Error(t("failed-to-load-courses"));
 
-  return result;
+  return result.data.courses;
 };
 
-export const createCourse = async (title: string) => {
+export const createCourse = async (course: TablesInsert<"courses">) => {
   const t = await loadMessages();
-
-  const result = await supabaseClient.from("courses").insert({
-    title,
-  });
+  const result = await supabaseClient.from("courses").insert(course);
 
   if (result.error) throw new Error(t("failed-to-create-course"));
 };
@@ -119,6 +119,24 @@ export const deleteCoursesByCourseIds = async (courseIds: string[]) => {
     .from("courses")
     .delete()
     .in("id", courseIds);
+
+  if (result.error) throw new Error(t("failed-to-delete-courses"));
+
+  return result;
+};
+
+export const deleteCoursesByTitleAndUserId = async (
+  title: string,
+  userId: string
+) => {
+  const t = await loadMessages();
+  const result = await supabaseClient.rpc(
+    "delete_courses_by_title_and_user_id",
+    {
+      p_user_id: userId,
+      p_title: title,
+    }
+  );
 
   if (result.error) throw new Error(t("failed-to-delete-courses"));
 

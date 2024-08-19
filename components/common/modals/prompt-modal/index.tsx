@@ -19,7 +19,12 @@ const PromptModal: FunctionComponent<IProps> = ({
   actionHandler,
 }) => {
   return (
-    <BaseModal isOpen={isOpen} setIsOpen={setIsOpen} title={`${title}`}>
+    <BaseModal
+      isExpanded={false}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      title={`${title}`}
+    >
       <p className="mb-4">{body}</p>
       <div className="flex justify-end gap-3">
         <button className="outline-button" onClick={() => setIsOpen(false)}>
