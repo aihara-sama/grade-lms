@@ -4,7 +4,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import AddCourseIcon from "@/components/icons/add-course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/utils/supabase/client";
+import { createCourse } from "@/db/course";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
@@ -17,28 +17,19 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
   const [courseTitle, setCourseTitle] = useState("");
 
-  const closeModal = () => {
-    setIsCreateCourseModalOpen(false);
-  };
-  const openModal = () => {
-    setIsCreateCourseModalOpen(true);
-  };
+  const closeModal = () => setIsCreateCourseModalOpen(false);
+  const openModal = () => setIsCreateCourseModalOpen(true);
 
   const submitCreateCourse = async (formData: FormData) => {
-    const { error } = await supabaseClient
-      .from("courses")
-      .insert({
-        title: formData.get("title") as string,
-      })
-      .select("id")
-      .single();
+    try {
+      await createCourse(formData.get("title") as string);
 
-    if (error) {
-      toast(error.message);
-    } else {
       toast("Course created");
       closeModal();
       setCourseTitle("");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
       onDone();
     }
   };

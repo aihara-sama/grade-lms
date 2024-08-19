@@ -4,7 +4,6 @@ import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CrownIcon from "@/components/icons/crown-icon";
 import Input from "@/components/input";
-import { i18n } from "@/i18n-config";
 import { supabaseClient } from "@/utils/supabase/client";
 import { toCapitalCase } from "@/utils/to-capital-case";
 import { usePathname, useRouter } from "next/navigation";
@@ -12,20 +11,21 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import Select from "@/components/common/select";
-import type { Locale } from "@/i18n-config";
+import type { Locale } from "@/i18n";
+import { DEFAULT_LOCALE, locales } from "@/i18n";
 import type { IUserMetadata } from "@/interfaces/user.interface";
-import type { getDictionary } from "@/utils/get-dictionary";
 import type { User } from "@supabase/supabase-js";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 interface IProps {
   user: User;
-  dictionary: Awaited<ReturnType<typeof getDictionary>>;
 }
 
-const Profile: FunctionComponent<IProps> = ({ user, dictionary }) => {
+const Profile: FunctionComponent<IProps> = ({ user }) => {
   const router = useRouter();
   const pathName = usePathname();
+  const t = useTranslations();
 
   const [avatar, setAvatar] = useState(
     (user.user_metadata as IUserMetadata).avatar
@@ -33,12 +33,14 @@ const Profile: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const [userName, setUserName] = useState(
     (user.user_metadata as IUserMetadata).name
   );
-  const locale = pathName.split("/")[1];
+  const locale = locales.includes(pathName.split("/")[1] as Locale)
+    ? pathName.split("/")[1]
+    : DEFAULT_LOCALE;
 
   const redirectedPathName = (_locale: Locale) => {
     if (!pathName) return "/";
     const segments = pathName.split("/");
-    segments[1] = _locale;
+    segments.splice(1, +(_locale === DEFAULT_LOCALE), _locale);
     return segments.join("/");
   };
 
@@ -98,9 +100,7 @@ const Profile: FunctionComponent<IProps> = ({ user, dictionary }) => {
       <div className="md:mt-72 mt-[350px]">
         <hr />
         <div className="mt-16">
-          <p className="text-2xl font-bold text-neutral-600">
-            {dictionary.profile}
-          </p>
+          <p className="text-2xl font-bold text-neutral-600">{t("profile")}</p>
           <div className="flex mt-6 items-end gap-[4px]">
             <Input
               onChange={(e) => setUserName(e.target.value)}
@@ -128,9 +128,9 @@ const Profile: FunctionComponent<IProps> = ({ user, dictionary }) => {
           <p className="text-2xl font-bold text-neutral-600">Preferences</p>
           <div className="mt-8 flex gap-1">
             <Select
-              options={i18n.locales.map((_locale: Locale) => ({
+              options={locales.map((_locale: Locale) => ({
                 title: toCapitalCase(
-                  new Intl.DisplayNames([pathName.split("/")[1]], {
+                  new Intl.DisplayNames([locale], {
                     type: "language",
                   }).of(_locale)
                 ),
@@ -142,7 +142,7 @@ const Profile: FunctionComponent<IProps> = ({ user, dictionary }) => {
               }}
               defaultValue={{
                 title: toCapitalCase(
-                  new Intl.DisplayNames([pathName.split("/")[1]], {
+                  new Intl.DisplayNames([locale], {
                     type: "language",
                   }).of(locale)
                 ),

@@ -1,3 +1,6 @@
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+
 import "@/styles/globals.css";
 
 import ProgressBar from "@/components/pregress-bar";
@@ -11,15 +14,28 @@ const latoFont = Lato({
   subsets: ["latin"],
 });
 
-const Layout: FunctionComponent<PropsWithChildren> = ({ children }) => {
+interface IProps {
+  params: { locale: string };
+}
+
+const Layout: FunctionComponent<PropsWithChildren<IProps>> = async ({
+  children,
+  params: { locale },
+}) => {
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages({ locale });
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body className={`${latoFont.className}`}>
-        <PaypalProvider>
-          {children}
-          <Toaster />
-          <ProgressBar />
-        </PaypalProvider>
+        <NextIntlClientProvider messages={messages}>
+          <PaypalProvider>
+            {children}
+            <Toaster />
+            <ProgressBar />
+          </PaypalProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

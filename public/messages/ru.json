@@ -1,0 +1,9 @@
+{
+  "search": "Пойск",
+  "profile": "Профиль",
+  "failed-to-delete-course": "Не удалось удалить курс",
+  "failed-to-delete-courses": "Не удалось удалить курсы",
+  "failed-to-create-course": "Не удалось создать курс",
+  "failed-to-load-courses": "Не удалось загрузить курсы",
+  "failed-to-load-courses-count": "Не удалось загрузить количество курсов"
+}

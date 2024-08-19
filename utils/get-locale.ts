@@ -1,4 +1,4 @@
-import { i18n } from "@/i18n-config";
+import { DEFAULT_LOCALE, locales } from "@/i18n";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
 import type { NextRequest } from "next/server";
@@ -10,9 +10,6 @@ export const getLocale = (request: NextRequest): string | undefined => {
     negotiatorHeaders[key] = value;
   });
 
-  // @ts-ignore locales are readonly
-  const { locales } = i18n;
-
   // Use negotiator and intl-localematcher to get best locale
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages(
     // @ts-ignore locales are readonly
@@ -20,7 +17,7 @@ export const getLocale = (request: NextRequest): string | undefined => {
   );
 
   // @ts-ignore locales are readonly
-  const locale = matchLocale(languages, locales, i18n.defaultLocale);
+  const locale = matchLocale(languages, locales, DEFAULT_LOCALE);
 
   return locale;
 };

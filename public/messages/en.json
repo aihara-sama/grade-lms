@@ -1,0 +1,13 @@
+{
+  "server": {
+    "courses": "Courses",
+    "d": "D"
+  },
+  "search": "Search",
+  "profile": "Profile",
+  "failed-to-delete-course": "Failed to delete course",
+  "failed-to-delete-courses": "Failed to delete courses",
+  "failed-to-create-course": "Failed to create course",
+  "failed-to-load-courses": "Failed to load course",
+  "failed-to-load-courses-count": "Failed to load course"
+}

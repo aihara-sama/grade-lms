@@ -17,21 +17,29 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
-import type { getDictionary } from "@/utils/get-dictionary";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User as AuthenticatedUser } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import {
+  deleteCourseByCourseId,
+  deleteCoursesByCourseIds,
+  getCoursesByTitleAndUserId,
+  getCoursesByUserId,
+  getCoursesCountByTitleAndUserId,
+  getCoursesCountByUserId,
+  getRangeCoursesByUserId,
+} from "@/db/course";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
 interface IProps {
   user: AuthenticatedUser;
-  dictionary: Awaited<ReturnType<typeof getDictionary>>;
 }
 
-const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
+const Courses: FunctionComponent<IProps> = ({ user }) => {
   // State
   const [isDeleteCoursesModalOpen, setIsDeleteCoursesModalOpen] =
     useState(false);
@@ -43,76 +51,47 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const [isCoursesLoading, setIsCoursesLoading] = useState(false);
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
   const [searchText, setSearchText] = useState("");
-
+  const t = useTranslations();
   // Refs
   const hasMoreCoursesRef = useRef(false);
   const isSelectedAllRef = useRef(false);
 
   // Handdlers
-  const fetchTotalOwnedCoursesCount = async () =>
-    supabaseClient
-      .from("users")
-      .select("courses(count)")
-      .eq("id", user.id)
-      .returns<Record<"courses", { count: number }[]>[]>()
-      .single();
-  const fetchTotalOwnedCoursesCountBySearch = async () =>
-    supabaseClient
-      .from("users")
-      .select("courses(count)")
-      .ilike("courses.title", `%${searchText}%`)
-      .eq("id", user.id)
-      .returns<Record<"courses", { count: number }[]>[]>()
-      .single();
-
-  const fetchOwnedCourses = async () =>
-    supabaseClient
-      .from("users")
-      .select("courses(*, lessons(count), users(count))")
-      .eq("id", user.id)
-      .limit(20, { foreignTable: "courses" })
-      .order("title", { foreignTable: "courses", ascending: true })
-      .returns<Record<"courses", CourseWithRefsCount[]>[]>()
-      .single();
-
   const fetchCourses = async () => {
     setIsCoursesLoading(true);
+    // toast.error(t("failed-to-create-course"));
+    try {
+      const [coursesByUserId, coursesCountByUserId] = await Promise.all([
+        getCoursesByUserId(user.id),
+        getCoursesCountByUserId(user.id),
+      ]);
 
-    const [ownedCourses, ownedCoursesCount] = await Promise.all([
-      fetchOwnedCourses(),
-      fetchTotalOwnedCoursesCount(),
-    ]);
-
-    if (ownedCourses.error || ownedCoursesCount.error) {
-      toast.error("Something went wrong");
-    } else {
-      setCourses(ownedCourses.data.courses);
-      setTotalCoursesCount(ownedCoursesCount.data.courses[0].count);
-      hasMoreCoursesRef.current = ownedCourses.data.courses.length === 20;
+      setCourses(coursesByUserId);
+      setTotalCoursesCount(coursesCountByUserId);
+      hasMoreCoursesRef.current = coursesByUserId.length === 20;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsCoursesLoading(false);
     }
-    setIsCoursesLoading(false);
   };
 
   const deleteSelectedCourse = async () => {
-    const { error } = await supabaseClient
-      .from("courses")
-      .delete()
-      .eq("id", selectedCourseId);
+    try {
+      await deleteCourseByCourseId(selectedCourseId);
 
-    if (error) {
-      toast.error("Something went wrong");
-    } else {
-      toast.success("Success");
       setSelectedCourseId(undefined);
       setSelectedCoursesIds((prev) =>
         prev.filter((id) => id !== selectedCourseId)
       );
       setIsDeleteCourseModalOpen(false);
       fetchCourses();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      toast.success("Success");
     }
   };
-  const deleteCoursesByIds = (ids: string[]) =>
-    supabaseClient.from("courses").delete().in("id", ids);
 
   const deleteAllOwnedCourses = () =>
     supabaseClient.rpc("delete_courses_by_user_with_title_filter", {
@@ -123,7 +102,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   const deleteSelectedCourses = async () => {
     const { error } = await (isSelectedAllRef.current
       ? deleteAllOwnedCourses()
-      : deleteCoursesByIds(selectedCoursesIds));
+      : deleteCoursesByCourseIds(selectedCoursesIds));
 
     if (error) toast.error("Something went wrong");
 
@@ -161,14 +140,8 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
 
       if (scrollPosition >= bottomPosition) {
         setIsCoursesLoading(true);
-        const { data } = await supabaseClient
-          .from("users")
-          .select("courses(*, lessons(count), users(count))")
-          .eq("id", user.id)
-          .range(20, 39, { foreignTable: "courses" }) // Fetch courses from index 21 to 40
-          .order("title", { foreignTable: "courses", ascending: true })
-          .returns<Record<"courses", CourseWithRefsCount[]>[]>()
-          .single();
+        const { data } = await getRangeCoursesByUserId(user.id, 20, 39);
+
         setCourses((prev) => [...prev, ...data.courses]);
         hasMoreCoursesRef.current = data.courses.length === 20;
         setIsCoursesLoading(false);
@@ -178,7 +151,6 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
             ...data.courses.map(({ id }) => id),
           ]);
         }
-        console.log({ data });
       }
     }
   };
@@ -186,17 +158,14 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
     setSearchText(e.target.value);
   };
   const handleSearch = async () => {
-    const { data, error } = await supabaseClient
-      .from("users")
-      .select("courses(*, lessons(count), users(count))")
-      .ilike("courses.title", `%${searchText}%`)
-      .eq("id", user.id)
-      .limit(20, { foreignTable: "courses" })
-      .order("title", { foreignTable: "courses", ascending: true })
-      .returns<Record<"courses", CourseWithRefsCount[]>[]>()
-      .single();
-    const coursesCount = await fetchTotalOwnedCoursesCountBySearch();
-    console.log({ data });
+    const { data, error } = await getCoursesByTitleAndUserId(
+      searchText,
+      user.id
+    );
+    const coursesCount = await getCoursesCountByTitleAndUserId(
+      searchText,
+      user.id
+    );
     if (error || coursesCount.error) {
       toast.error("Something went wrong");
     } else {
@@ -224,7 +193,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
   }, [searchText]);
 
   return (
-    <div className="pb-8">
+    <div className="pb-8 flex-1 flex flex-col">
       <CardsContainer>
         <Total
           Icon={<CoursesIcon size="lg" />}
@@ -236,7 +205,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
       {!selectedCoursesIds.length ? (
         <Input
           Icon={<SearchIcon size="xs" />}
-          placeholder={dictionary.search}
+          placeholder={t("search")}
           className="w-auto"
           value={searchText}
           onChange={handleSearchInputChange}
@@ -288,7 +257,7 @@ const Courses: FunctionComponent<IProps> = ({ user, dictionary }) => {
                     </button>
                   }
                 >
-                  <ul className="flex flex-col ">
+                  <ul className="flex flex-col">
                     <li
                       onClick={() => {
                         setSelectedCourseId(id);

@@ -10,8 +10,16 @@ import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import { useEffect, useState, type FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
+// const handleRequest = async (builder: ?, success: string, error: string) => {
+//   const result = await builder;
+
+//   if (result.error) toast.error(error);
+//   else toast.success(success);
+// };
 
 interface IProps {
   user: User;

@@ -44,7 +44,8 @@
     ".next/types/**/*.ts",
     "**/*.tsx",
     "**/*.ts",
-    "**/*.css"
+    "**/*.css",
+    "global.d.ts"
   ],
   "exclude": ["node_modules", "supabase"]
 }
