@@ -54,7 +54,7 @@ export async function updateSession(
 
   const { error } = await supabase.auth.getUser();
   const locale = getLocale(request);
-
+  console.error({ error });
   if (error)
     return NextResponse.redirect(new URL(`/${locale}/sign-up`, request.url));
 

@@ -9,7 +9,6 @@ const Page = async () => {
   const {
     data: { user },
   } = await createClient().auth.getUser();
-  console.log(user.role);
 
   let Dashborad: ReactNode;
 
