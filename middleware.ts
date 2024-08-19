@@ -23,11 +23,16 @@ export async function middleware(request: NextRequest) {
     "i"
   );
   const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
+  console.log({
+    isPublicPage,
+  });
 
   if (isPublicPage) {
     return intlMiddleware(request);
   }
-  return updateSession(request, intlMiddleware(request));
+
+  const res = intlMiddleware(request);
+  return updateSession(request, res);
 }
 
 export const config = {
