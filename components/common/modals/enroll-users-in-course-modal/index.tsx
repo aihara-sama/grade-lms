@@ -1,10 +1,6 @@
 import Avatar from "@/components/avatar";
 import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
-import BasePopper from "@/components/common/poppers/base-popper";
-import DeleteIcon from "@/components/icons/delete-icon";
-import DotsIcon from "@/components/icons/dots-icon";
-import UsersIcon from "@/components/icons/users-icon";
 import Table from "@/components/table";
 import type { User } from "@/types/users";
 import { supabaseClient } from "@/utils/supabase/client";
@@ -95,27 +91,7 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
               onToggle={(checked) => onUserToggle(checked, id)}
             />
           ),
-          "": (
-            <div>
-              <BasePopper
-                width="sm"
-                trigger={
-                  <button className="icon-button text-neutral-500">
-                    <DotsIcon />
-                  </button>
-                }
-              >
-                <ul className="flex flex-col ">
-                  <li onClick={() => {}} className="popper-list-item">
-                    <UsersIcon /> Enroll
-                  </li>
-                  <li onClick={() => {}} className="popper-list-item">
-                    <DeleteIcon /> Delete
-                  </li>
-                </ul>
-              </BasePopper>
-            </div>
-          ),
+          "": "",
         }))}
       />
       <div className="flex justify-end gap-3 mt-4">

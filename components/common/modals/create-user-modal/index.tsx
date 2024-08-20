@@ -1,6 +1,5 @@
 "use client";
 
-import { createUser } from "@/actions/create-user";
 import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CameraIcon from "@/components/icons/camera-icon";
@@ -9,12 +8,13 @@ import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
 import Tabs from "@/components/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import type { InputType as UserInputType } from "@/actions/create-user-action/types";
 import BaseModal from "@/components/common/modals/base-modal";
-import type { IUserMetadata } from "@/interfaces/user.interface";
-import type { User } from "@supabase/supabase-js";
+import { createUser } from "@/db/user";
+import { useTranslations } from "next-intl";
 import type {
   ChangeEvent,
   Dispatch,
@@ -26,10 +26,9 @@ interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   onDone: () => void;
-  user: User;
 }
 
-const initUserDetails = {
+const initUserDetails: UserInputType = {
   name: "",
   email: "",
   password: "",
@@ -38,36 +37,44 @@ const initUserDetails = {
 
 const CreateUserModal: FunctionComponent<IProps> = ({
   onDone,
-  user,
   isOpen,
   setIsOpen,
 }) => {
   const [userDetails, setUserDetails] = useState(initUserDetails);
 
+  const t = useTranslations();
+
   const handleCreateUser = async (createAnother?: boolean) => {
-    const { error } = await createUser({
-      ...userDetails,
-      preferred_locale: (user.user_metadata as IUserMetadata).preferred_locale,
-    });
+    console.log("handleCreateUser");
 
-    toast(error || "User created");
-
-    if (!error) {
+    try {
+      await createUser(userDetails);
+      setUserDetails(initUserDetails);
       if (!createAnother) {
         setIsOpen(false);
       }
-      setUserDetails(initUserDetails);
       onDone();
+      toast.success(t("user_created"));
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
-  };
+
+  const handleAvatarChange = (avatar: string) =>
+    setUserDetails((_) => ({ ..._, avatar }));
+
+  useEffect(() => {
+    if (!isOpen) setUserDetails(initUserDetails);
+  }, [isOpen]);
+
   return (
     <BaseModal
+      isExpanded={false}
       isOpen={isOpen}
-      setIsOpen={(_isOpen) => setIsOpen(_isOpen)}
+      setIsOpen={setIsOpen}
       title="Create user"
     >
       <form noValidate>
@@ -115,9 +122,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
               content: (
                 <div className="flex justify-center mx-[0] my-[23.5px]">
                   <AvatarUpload
-                    setAvatar={(avatar) => {
-                      setUserDetails((_) => ({ ..._, avatar }));
-                    }}
+                    onChange={handleAvatarChange}
                     avatar={userDetails.avatar}
                   />
                 </div>
@@ -129,7 +134,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={() => handleCreateUser(true)}
-            className="outline-button w-full"
+            className="outline-button"
             type="button"
           >
             Create & add another

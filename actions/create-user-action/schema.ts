@@ -17,14 +17,6 @@ export const CreateUser = z.object({
     .min(1, {
       message: "Avatar is required",
     }),
-  preferred_locale: z
-    .string({
-      required_error: "Preferred locale is required",
-      invalid_type_error: "Preferred locale is required",
-    })
-    .length(2, {
-      message: "Preferred locale is required",
-    }),
   email: z.string().email(),
   password: z
     .string({

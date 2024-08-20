@@ -1,3 +1,4 @@
+import { COURSES_GET_LIMIT } from "@/constants";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
@@ -13,7 +14,7 @@ export const getCoursesCountByUserId = async (userId: string) => {
     .returns<Record<"courses", { count: number }[]>[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed-to-load-courses-count"));
+  if (result.error) throw new Error(t("failed_to_load_courses_count"));
 
   return result.data.courses[0].count;
 };
@@ -31,7 +32,7 @@ export const getCoursesCountByTitleAndUserId = async (
     .returns<Record<"courses", { count: number }[]>[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed-to-load-courses-count"));
+  if (result.error) throw new Error(t("failed_to_load_courses_count"));
 
   return result.data.courses[0].count;
 };
@@ -46,12 +47,12 @@ export const getCoursesByTitleAndUserId = async (
     .select("courses(*, lessons(count), users(count))")
     .ilike("courses.title", `%${title}%`)
     .eq("id", userId)
-    .limit(20, { foreignTable: "courses" })
+    .limit(COURSES_GET_LIMIT, { foreignTable: "courses" })
     .order("title", { foreignTable: "courses", ascending: true })
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed-to-load-courses"));
+  if (result.error) throw new Error(t("failed_to_load_courses"));
 
   return result.data.courses;
 };
@@ -62,14 +63,26 @@ export const getCoursesByUserId = async (userId: string) => {
     .from("users")
     .select("courses(*, lessons(count), users(count))")
     .eq("id", userId)
-    .limit(20, { foreignTable: "courses" })
+    .limit(COURSES_GET_LIMIT, { foreignTable: "courses" })
     .order("title", { foreignTable: "courses", ascending: true })
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed-to-load-courses"));
+  if (result.error) throw new Error(t("failed_to_load_courses"));
 
   return result.data.courses;
+};
+export const getUnenrolledCoursesByUserId = async (userId: string) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .rpc("get_courses_not_assigned_to_user", {
+      p_user_id: userId,
+    })
+    .returns<CourseWithRefsCount[]>();
+
+  if (result.error) throw new Error(t("failed_to_load_courses"));
+
+  return result.data;
 };
 
 export const getOffsetCoursesByTitleAndUserId = async (
@@ -89,7 +102,7 @@ export const getOffsetCoursesByTitleAndUserId = async (
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed-to-load-courses"));
+  if (result.error) throw new Error(t("failed_to_load_courses"));
 
   return result.data.courses;
 };
@@ -98,7 +111,7 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
   const t = await loadMessages();
   const result = await supabaseClient.from("courses").insert(course);
 
-  if (result.error) throw new Error(t("failed-to-create-course"));
+  if (result.error) throw new Error(t("failed_to_create_course"));
 };
 
 // Delete
@@ -109,7 +122,7 @@ export const deleteCourseByCourseId = async (courseId: string) => {
     .delete()
     .eq("id", courseId);
 
-  if (result.error) throw new Error(t("failed-to-delete-course"));
+  if (result.error) throw new Error(t("failed_to_delete_course"));
 
   return result;
 };
@@ -120,7 +133,7 @@ export const deleteCoursesByCourseIds = async (courseIds: string[]) => {
     .delete()
     .in("id", courseIds);
 
-  if (result.error) throw new Error(t("failed-to-delete-courses"));
+  if (result.error) throw new Error(t("failed_to_delete_courses"));
 
   return result;
 };
@@ -138,7 +151,7 @@ export const deleteCoursesByTitleAndUserId = async (
     }
   );
 
-  if (result.error) throw new Error(t("failed-to-delete-courses"));
+  if (result.error) throw new Error(t("failed_to_delete_courses"));
 
   return result;
 };

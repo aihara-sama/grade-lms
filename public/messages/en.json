@@ -2,9 +2,28 @@
   "courses": "Courses",
   "search": "Search",
   "profile": "Profile",
-  "failed-to-delete-course": "Failed to delete course",
-  "failed-to-delete-courses": "Failed to delete courses",
-  "failed-to-create-course": "Failed to create course",
-  "failed-to-load-courses": "Failed to load course",
-  "failed-to-load-courses-count": "Failed to load course"
+  "failed_to_delete_course": "Failed to delete course",
+  "failed_to_delete_courses": "Failed to delete courses",
+  "failed_to_create_course": "Failed to create course",
+  "failed_to_load_courses": "Failed to load course",
+  "failed_to_load_courses_count": "Failed to load course",
+  "user_deleted": "User successfully deleted",
+  "user_enrolled": "User successfully enrolled",
+  "users_enrolled": "Users successfully enrolled",
+  "something_went_wrong": "Something went wrong",
+  "user_created": "User successfully created",
+  "auth": {
+    "an_email_address_is_too_long": "An email address is too long",
+    "unauthorized": "Unauthorized",
+    "user_not_found": "User not found",
+    "user_already_registered": "A user with this email address has already been registered",
+    "forbidden": "Forbidden"
+  },
+
+  "failed_to_load_users": "Failed to load users",
+  "failed_to_load_users_count": "Failed to load users count",
+  "failed_to_delete_users": "Failed to delete users",
+  "failed_to_delete_user": "Failed to delete user",
+  "failed_to_enroll_user": "Failed to enroll users",
+  "failed_to_enroll_users": "Failed to enroll users"
 }

@@ -1,4 +1,4 @@
-import type { CreateUser } from "@/actions/create-user/schema";
+import type { CreateUser } from "@/actions/create-user-action/schema";
 import type { ActionState } from "@/utils/create-safe-action";
 import type { z } from "zod";
 

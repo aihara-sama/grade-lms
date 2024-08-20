@@ -1,7 +1,7 @@
 "use server";
 
-import { CreateUser } from "@/actions/create-user/schema";
-import type { InputType, ReturnType } from "@/actions/create-user/types";
+import { CreateUser } from "@/actions/create-user-action/schema";
+import type { InputType, ReturnType } from "@/actions/create-user-action/types";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { ROLES } from "@/interfaces/user.interface";
 import { createSafeAction } from "@/utils/create-safe-action";
@@ -35,7 +35,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       creator_id: user.id,
       role: ROLES.STUDENT,
       avatar: payload.avatar,
-      preferred_locale: payload.preferred_locale,
+      preferred_locale: (user.user_metadata as IUserMetadata).preferred_locale,
     } as IUserMetadata,
     email_confirm: true,
   });
@@ -46,4 +46,4 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
   };
 };
 
-export const createUser = createSafeAction(CreateUser, handler);
+export const createUserAction = createSafeAction(CreateUser, handler);

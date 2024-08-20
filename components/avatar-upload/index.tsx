@@ -7,11 +7,11 @@ import toast from "react-hot-toast";
 import { v4 as uuid } from "uuid";
 
 interface IProps {
-  setAvatar: (avatar: string) => void;
+  onChange: (avatar: string) => void;
   avatar: string;
 }
 
-const AvatarUpload: FunctionComponent<IProps> = ({ setAvatar, avatar }) => {
+const AvatarUpload: FunctionComponent<IProps> = ({ onChange, avatar }) => {
   const handleChangeAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
     const avatarFile = e.target.files[0];
 
@@ -22,7 +22,7 @@ const AvatarUpload: FunctionComponent<IProps> = ({ setAvatar, avatar }) => {
     if (error) {
       toast.error("Something went wrong");
     } else {
-      setAvatar(data.path);
+      onChange(data.path);
     }
   };
 

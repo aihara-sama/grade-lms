@@ -1,11 +1,8 @@
 "use client";
 
-import { deleteUser } from "@/actions/delete-user";
-import DeleteButton from "@/components/buttons/delete-button";
 import CardTitle from "@/components/card-title";
 import CardsContainer from "@/components/cards-container";
 import AvatarIcon from "@/components/icons/avatar-icon";
-import CourseIcon from "@/components/icons/course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
@@ -13,138 +10,196 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import CreateUser from "@/components/users/create-user";
-import { supabaseClient } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-import BaseModal from "@/components/common/modals/base-modal";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
-import type { UserCourses } from "@/types/user-courses.type";
+import Avatar from "@/components/avatar";
+import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses";
+import PromptModal from "@/components/common/modals/prompt-modal";
+import UserOptionsPopper from "@/components/common/poppers/user-options-popper";
+import CheckIcon from "@/components/icons/check-icon";
+import Skeleton from "@/components/skeleton";
+import { USERS_GET_LIMIT } from "@/constants";
+import {
+  deleteUsersByCreatorId,
+  getOffsetUsersByNameAndCreatorId,
+  getUsersByCreatorId,
+  getUsersByNameAndCreatorId,
+  getUsersCountByCreatorId,
+  getUsersCountByTitleAndUserId,
+} from "@/db/user";
 import type { User } from "@/types/users";
-import type { User as IUser } from "@supabase/supabase-js";
-import type { FunctionComponent } from "react";
-
-const parseUsersCoursesIds = (usersIds: string[], coursesIds: string[]) => {
-  const userCourses: Omit<UserCourses, "created_at">[] = [];
-
-  for (let idx = 0; idx < usersIds.length; idx++) {
-    const userId = usersIds[idx];
-
-    for (let i = 0; i < coursesIds.length; i++) {
-      const courseId = coursesIds[i];
-
-      userCourses.push({
-        course_id: courseId,
-        user_id: userId,
-      });
-    }
-  }
-
-  return userCourses;
-};
+import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import type { User as AuthUser } from "@supabase/supabase-js";
+import throttle from "lodash.throttle";
+import { useTranslations } from "next-intl";
+import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {
-  user: IUser;
+  currentUser: AuthUser;
 }
 
-const Users: FunctionComponent<IProps> = ({ user }) => {
+const Users: FunctionComponent<IProps> = ({ currentUser }) => {
   // State
   const [users, setUsers] = useState<User[]>([]);
-  const [courses, setCourses] = useState<
-    (Course & {
-      lessons: Lesson[];
-      users: User[];
-    })[]
-  >([]);
   const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
-  const [isEnrollUsersModalOpen, setIsEnrollUsersModalOpen] = useState(false);
-  const [usersIds, setUsersIds] = useState<string[]>([]);
-  const [coursesIds, setCoursesIds] = useState<string[]>([]);
-  const [enrollUserId, setEnrollUserId] = useState("");
+  const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
+  const [isUsersLoading, setIsUsersLoading] = useState(true);
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [usersSearchText, setUsersSearchText] = useState("");
+  const [isEnrollUsersInCoursesModalOpen, setIsEnrollUsersInCoursesModalOpen] =
+    useState(false);
+
+  // Refs
+  const isSelectedAllRef = useRef(false);
+  const usersSearchTextRef = useRef("");
+  const usersOffsetRef = useRef(USERS_GET_LIMIT);
+
+  // Hooks
+  const t = useTranslations();
 
   // Handlers
-  const getUsers = async () => {
-    const data = await supabaseClient
-      .from("users")
-      .select("*")
-      .eq("creator_id", user.id);
-    setUsers(data.data);
-  };
-  const handleDeleteUsers = async () => {
-    const { error } = await supabaseClient
-      .from("users")
-      .delete()
-      .in("id", usersIds);
+  const fetchUsersWithCount = async () => {
+    setIsUsersLoading(true);
 
-    if (error) toast.error("Something went wrong");
-
-    setUsersIds([]);
-    setIsDeleteUsersModalOpen(false);
-
-    getUsers();
-  };
-  const handleEnrollUsers = async (
-    _usersIds: string[],
-    _coursesIds: string[]
-  ) => {
-    const { error } = await supabaseClient
-      .from("user_courses")
-      .upsert(parseUsersCoursesIds(_usersIds, _coursesIds));
-
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Users enrolled");
-      setIsEnrollUsersModalOpen(false);
+    try {
+      const [usersByCreatorId, usersCountByCreatorIdId] = await Promise.all([
+        getUsersByCreatorId(currentUser.id),
+        getUsersCountByCreatorId(currentUser.id),
+      ]);
+      setUsers(usersByCreatorId);
+      setTotalUsersCount(usersCountByCreatorIdId);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsUsersLoading(false);
     }
   };
-  const getCourses = async () => {
-    const data = await supabaseClient
-      .from("users")
-      .select("id, courses(*, lessons(*), users(*))")
-      .eq("id", user.id)
-      .single();
+  const handleDeleteUsers = async () => {
+    try {
+      await deleteUsersByCreatorId(currentUser.id, selectedUsersIds);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setSelectedUsersIds([]);
+      setIsDeleteUsersModalOpen(false);
 
-    setCourses(data.data.courses);
-  };
-  const getUnenrolledCourses = async (userId: string) => {
-    const data = await supabaseClient
-      .rpc("get_courses_not_assigned_to_user", {
-        p_user_id: userId,
-      })
-      .returns<typeof courses>();
-
-    setCourses(data.data);
+      fetchUsersWithCount();
+    }
   };
 
+  const fetchUsersBySearch = async () => {
+    try {
+      const [usersByTitleAndUserId, usersCountByTitleAndUserId] =
+        await Promise.all([
+          getUsersByNameAndCreatorId(
+            usersSearchTextRef.current,
+            currentUser.id
+          ),
+          getUsersCountByTitleAndUserId(
+            usersSearchTextRef.current,
+            currentUser.id
+          ),
+        ]);
+
+      setUsers(usersByTitleAndUserId);
+      setTotalUsersCount(usersCountByTitleAndUserId);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const selectAllUsers = () => {
+    setSelectedUsersIds(users.map(({ id }) => id));
+    isSelectedAllRef.current = true;
+  };
+  const deselectAllUsers = () => {
+    setSelectedUsersIds([]);
+    isSelectedAllRef.current = false;
+  };
+  const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUsersSearchText((usersSearchTextRef.current = e.target.value));
+    fetchUsersBySearch();
+  };
+  const onUserToggle = (checked: boolean, userId: string) => {
+    if (checked) {
+      setSelectedUsersIds((prev) => [...prev, userId]);
+      isSelectedAllRef.current =
+        totalUsersCount === selectedUsersIds.length + 1;
+    } else {
+      setSelectedUsersIds((prev) => prev.filter((_id) => _id !== userId));
+      isSelectedAllRef.current =
+        totalUsersCount === selectedUsersIds.length - 1;
+    }
+  };
+  const handleCoursesScroll = async () => {
+    if (isDocCloseToBottom()) {
+      try {
+        const offsetUsersByUserId = await getOffsetUsersByNameAndCreatorId(
+          usersSearchTextRef.current,
+          currentUser.id,
+          usersOffsetRef.current,
+          usersOffsetRef.current + USERS_GET_LIMIT - 1
+        );
+
+        setUsers((prev) => [...prev, ...offsetUsersByUserId]);
+
+        if (isSelectedAllRef.current) {
+          setSelectedUsersIds((prev) => [
+            ...prev,
+            ...offsetUsersByUserId.map(({ id }) => id),
+          ]);
+        }
+
+        usersOffsetRef.current += offsetUsersByUserId.length;
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    }
+  };
+
+  // Effects
   useEffect(() => {
-    getUsers();
+    const throttled = throttle(handleCoursesScroll, 300);
+    document.addEventListener("scroll", throttled);
+
+    return () => {
+      document.removeEventListener("scroll", throttled);
+    };
   }, []);
+  useEffect(() => {
+    fetchUsersWithCount();
+  }, []);
+  useEffect(() => {
+    usersSearchTextRef.current = usersSearchText;
+  }, [usersSearchText]);
 
   return (
     <>
       <CardsContainer>
         <Total
           Icon={<AvatarIcon size="lg" />}
-          total={users.length}
+          total={totalUsersCount}
           title="Total users"
         />
-        <CreateUser user={user} onDone={getUsers} />
+        <CreateUser onDone={fetchUsersWithCount} />
       </CardsContainer>
-      {!usersIds.length ? (
-        <Input
-          Icon={<SearchIcon size="xs" />}
-          placeholder="Search"
-          className="w-auto"
-        />
-      ) : (
+      {selectedUsersIds.length ? (
         <div className="mb-3 gap-2 flex">
           <button
-            onClick={() => {
-              setIsEnrollUsersModalOpen(true);
-              getCourses();
-            }}
+            onClick={
+              isSelectedAllRef.current ? deselectAllUsers : selectAllUsers
+            }
+            className="outline-button flex font-semibold gap-2 items-center"
+          >
+            {isSelectedAllRef.current
+              ? totalUsersCount
+              : selectedUsersIds.length}{" "}
+            {isSelectedAllRef.current ? `Deselect` : "Select all"}{" "}
+            <CheckIcon size="xs" />
+          </button>
+          <button
+            onClick={() => setIsEnrollUsersInCoursesModalOpen(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Enroll <CoursesIcon />
@@ -156,119 +211,59 @@ const Users: FunctionComponent<IProps> = ({ user }) => {
             Delete <DeleteIcon />
           </button>
         </div>
+      ) : (
+        <Input
+          Icon={<SearchIcon size="xs" />}
+          placeholder={t("search")}
+          onChange={handleSearchInputChange}
+          className="w-auto"
+          value={usersSearchText}
+        />
       )}
-      <div className="flex-1 flex">
-        <Table
-          data={users.map(({ name, role, id, avatar }) => ({
-            Name: (
-              <CardTitle
-                href={`/users/${id}`}
-                checked={usersIds.includes(id)}
-                Icon={
-                  <img
-                    className="rounded-[50%] w-8 h-8"
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
-                    alt=""
-                  />
-                }
-                title={name}
-                subtitle={role}
-                onClick={() => {}}
-                onToggle={(checked) =>
-                  checked
-                    ? setUsersIds((prev) => [...prev, id])
-                    : setUsersIds((prev) => prev.filter((_id) => _id !== id))
-                }
-              />
-            ),
-            Action: (
-              <div className="flex gap-2">
-                <DeleteButton
-                  onDone={getUsers}
-                  action={deleteUser}
-                  record="user"
-                  id={id}
-                  key={id}
+      {isUsersLoading ? (
+        <Skeleton />
+      ) : (
+        <div className="flex-1 flex">
+          <Table
+            data={users.map(({ name, role, id, avatar }) => ({
+              Name: (
+                <CardTitle
+                  href={`/users/${id}`}
+                  checked={selectedUsersIds.includes(id)}
+                  Icon={<Avatar avatar={avatar} />}
+                  title={name}
+                  subtitle={role}
+                  onToggle={(checked) => onUserToggle(checked, id)}
                 />
-                <button
-                  className="primary-button w-auto"
-                  onClick={() => {
-                    setEnrollUserId(id);
-                    setIsEnrollUsersModalOpen(true);
-                    getUnenrolledCourses(id);
-                  }}
-                >
-                  Enroll
-                </button>
-              </div>
-            ),
-          }))}
-        />
-      </div>
-      <BaseModal
-        setIsOpen={(isOpen) => setIsDeleteUsersModalOpen(isOpen)}
+              ),
+              "": (
+                <UserOptionsPopper
+                  onDone={fetchUsersBySearch}
+                  setSelectedUsersIds={setSelectedUsersIds}
+                  userId={id}
+                  currentUser={currentUser}
+                />
+              ),
+            }))}
+          />
+        </div>
+      )}
+
+      <PromptModal
         isOpen={isDeleteUsersModalOpen}
+        setIsOpen={setIsDeleteUsersModalOpen}
         title="Delete Users"
-      >
-        <p className="mb-4">Are you sure you want to delete selected users?</p>
-        <div className="flex justify-end gap-3">
-          <button
-            className="outline-button w-full"
-            onClick={() => setIsDeleteUsersModalOpen(false)}
-          >
-            Cancel
-          </button>
-          <button className="primary-button" onClick={handleDeleteUsers}>
-            Delete
-          </button>
-        </div>
-      </BaseModal>
-      <BaseModal
-        isOpen={isEnrollUsersModalOpen}
-        setIsOpen={(isOpen) => setIsEnrollUsersModalOpen(isOpen)}
-        title="Enrollment"
-      >
-        <p className="mb-3 text-neutral-500">Select courses to enroll</p>
-        <Table
-          data={courses.map(({ id, title }) => ({
-            Name: (
-              <CardTitle
-                href={`/dashboard/courses/${id}/overview`}
-                checked={coursesIds.includes(id)}
-                Icon={<CourseIcon />}
-                title={title}
-                subtitle="Active"
-                onClick={() => {}}
-                onToggle={(checked) =>
-                  checked
-                    ? setCoursesIds((prev) => [...prev, id])
-                    : setCoursesIds((prev) => prev.filter((_id) => _id !== id))
-                }
-              />
-            ),
-          }))}
-        />
-        <div className="flex justify-end gap-3 mt-4">
-          <button
-            className="outline-button w-full"
-            onClick={() => setIsEnrollUsersModalOpen(false)}
-          >
-            Cancel
-          </button>
-          <button
-            disabled={!coursesIds.length}
-            className="primary-button"
-            onClick={() =>
-              handleEnrollUsers(
-                enrollUserId ? [enrollUserId] : usersIds,
-                coursesIds
-              )
-            }
-          >
-            Enroll
-          </button>
-        </div>
-      </BaseModal>
+        action="Delete"
+        actionHandler={handleDeleteUsers}
+        body="Are you sure you want to delete selected users?"
+      />
+      <EnrollUsersInCoursesModal
+        onDone={() => setSelectedUsersIds([])}
+        currentUser={currentUser}
+        usersIds={selectedUsersIds}
+        isOpen={isEnrollUsersInCoursesModalOpen}
+        setIsOpen={setIsEnrollUsersInCoursesModalOpen}
+      />
     </>
   );
 };

@@ -5,7 +5,9 @@ import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
 import { ROLES, type IUserMetadata } from "@/interfaces/user.interface";
+import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import { supabaseClient } from "@/utils/supabase/client";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FunctionComponent } from "react";
@@ -14,6 +16,7 @@ import toast from "react-hot-toast";
 const SignUp: FunctionComponent = () => {
   // Hooks
   const router = useRouter();
+  const t = useTranslations();
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,7 +41,7 @@ const SignUp: FunctionComponent = () => {
       },
     });
 
-    if (error) toast(error.message);
+    if (error) toast(t(serverErrToIntlKey(error.message)));
     else router.push("/dashboard");
   };
 

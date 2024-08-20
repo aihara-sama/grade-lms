@@ -59,6 +59,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
   // Handdlers
   const fetchCoursesWithCount = async () => {
     setIsCoursesLoading(true);
+
     try {
       const [coursesByUserId, coursesCountByUserId] = await Promise.all([
         getCoursesByUserId(user.id),

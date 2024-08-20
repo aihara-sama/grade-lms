@@ -1,21 +1,14 @@
 "use server";
 
-import type { ReturnType } from "@/actions/delete-user/types";
+import type { ReturnType } from "@/actions/delete-user-action/types";
 import { ROLES } from "@/interfaces/user.interface";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
 
 const handler = async (userId: string): Promise<ReturnType> => {
-  const currentUserPromise = createClient().auth.getUser();
-  const targetUserPromise = supabaseAdmin
-    .from("users")
-    .select("creator_id")
-    .eq("id", userId)
-    .single();
-
   const [currentUser, targetUser] = await Promise.all([
-    currentUserPromise,
-    targetUserPromise,
+    createClient().auth.getUser(),
+    supabaseAdmin.from("users").select("creator_id").eq("id", userId).single(),
   ]);
 
   if (!currentUser.data.user) {
@@ -49,4 +42,4 @@ const handler = async (userId: string): Promise<ReturnType> => {
   };
 };
 
-export const deleteUser = handler;
+export const deleteUserAction = handler;

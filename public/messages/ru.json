@@ -2,9 +2,27 @@
   "courses": "Курсы",
   "search": "Пойск",
   "profile": "Профиль",
-  "failed-to-delete-course": "Не удалось удалить курс",
-  "failed-to-delete-courses": "Не удалось удалить курсы",
-  "failed-to-create-course": "Не удалось создать курс",
-  "failed-to-load-courses": "Не удалось загрузить курсы",
-  "failed-to-load-courses-count": "Не удалось загрузить количество курсов"
+  "failed_to_delete_course": "Не удалось удалить курс",
+  "failed_to_delete_courses": "Не удалось удалить курсы",
+  "failed_to_create_course": "Не удалось создать курс",
+  "failed_to_load_courses": "Не удалось загрузить курсы",
+  "failed_to_load_courses_count": "Не удалось загрузить количество курсов",
+  "something_went_wrong": "Что-то пошло не так",
+  "user_deleted": "Пользователь успешно удален",
+  "user_enrolled": "Пользователь успешно зачислен",
+  "users_enrolled": "Пользователи успешно зачислены",
+  "user_created": "Пользователь успешно создан",
+  "auth": {
+    "an_email_address_is_too_long": "Емайл слишком длинный",
+    "user_already_registered": "Пользователь с таким емайл уже существует",
+    "user_not_found": "Пользователь не найден",
+    "unauthorized": "Доступ ограничен",
+    "forbidden": "Доступ запрещён"
+  },
+  "failed_to_load_users": "Не удалось загрузить пользователей",
+  "failed_to_load_users_count": "Не удалось загрузить количество пользователей",
+  "failed_to_delete_users": "Не удалось удалить пользователей",
+  "failed_to_delete_user": "Не удалось удалить пользователя",
+  "failed_to_enroll_user": "Не удалось зачислить пользователя",
+  "failed_to_enroll_users": "Не удалось зачислить пользователей"
 }

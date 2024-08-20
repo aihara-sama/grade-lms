@@ -13,7 +13,7 @@ const Tabs: FunctionComponent<IProps> = ({ tabs }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div className="overflow-auto flex flex-col flex-[1]">
+    <div className="overflow-auto flex flex-col flex-1">
       <div className="flex items-center text-sm gap-[6px] border-b-2 border-t-2 border-gray-200">
         {tabs.map((tab, idx) => (
           <Tab
@@ -25,9 +25,7 @@ const Tabs: FunctionComponent<IProps> = ({ tabs }) => {
           />
         ))}
       </div>
-      <div className="mx-[0] my-[16px] flex-[1] flex flex-col">
-        {tabs[activeTab].content}
-      </div>
+      <div className="my-4 flex-1 flex flex-col">{tabs[activeTab].content}</div>
     </div>
   );
 };
