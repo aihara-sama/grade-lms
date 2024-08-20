@@ -1,30 +1,21 @@
-"use client";
-
-import type { Lesson } from "@/types/lessons.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
 import Link from "next/link";
-import { useEffect, useState, type FunctionComponent } from "react";
+import { type FunctionComponent } from "react";
 
 interface IProps {
   courseId: string;
 }
 
-const OngoingLessonCard: FunctionComponent<IProps> = ({ courseId }) => {
-  const [lesson, setLesson] = useState<Lesson>();
+const OngoingLessonCard: FunctionComponent<IProps> = async ({ courseId }) => {
+  const data = await supabaseClient
+    .from("courses")
+    .select("lessons(*)")
+    .eq("id", courseId)
+    .lte("lessons.starts", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
+    .gte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 
-  useEffect(() => {
-    (async () => {
-      const { data: ongoingCourse } = await supabaseClient
-        .from("courses")
-        .select("id, lessons (*)")
-        .eq("id", courseId)
-        .lte("lessons.starts", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
-        .gte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-
-      if (ongoingCourse[0]?.lessons[0]) setLesson(ongoingCourse[0].lessons[0]);
-    })();
-  }, []);
+  const lesson = data.data?.[0]?.lessons?.[0];
 
   return (
     <div className="relative flex-1 p-6 flex flex-col items-center justify-center">
@@ -38,7 +29,7 @@ const OngoingLessonCard: FunctionComponent<IProps> = ({ courseId }) => {
       <p className="mb-1 text-lg font-bold">{lesson?.title || "No lesson"}</p>
       <Link
         className="mt-3"
-        href={lesson ? `/dashboard/lessons/${lesson.id}` : `lessons`}
+        href={lesson ? `/dashboard/lessons/${lesson?.id}` : `lessons`}
       >
         <button
           className={`${lesson ? "warning-button" : "primary-button"} w-64`}

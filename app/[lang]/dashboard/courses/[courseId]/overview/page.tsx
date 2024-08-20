@@ -8,8 +8,25 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Total from "@/components/total";
 import { ROLES } from "@/interfaces/user.interface";
 import { supabaseClient } from "@/utils/supabase/client";
-
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import type { FunctionComponent } from "react";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { courseId: string };
+}): Promise<Metadata> {
+  const data = await supabaseClient
+    .from("courses")
+    .select("title")
+    .eq("id", params.courseId)
+    .single();
+
+  return {
+    title: data?.data?.title,
+  };
+}
 
 interface IProps {
   params: {
@@ -18,18 +35,22 @@ interface IProps {
 }
 
 const Page: FunctionComponent<IProps> = async ({ params }) => {
-  const { data: currentCourse } = await supabaseClient
+  const data = await supabaseClient
     .from("courses")
-    .select("*, users (*), lessons (*)")
+    .select("*, users(*), lessons(*)")
     .eq("id", params.courseId);
 
-  const { users, lessons, ...courseRest } = currentCourse[0];
+  const currentCourse = data.data?.[0];
+
+  if (!currentCourse) return redirect("/dashboard/courses");
+
+  const { users, lessons, ...courseRest } = currentCourse;
 
   const teacher = users.find((user) => user.role === ROLES.TEACHER);
 
   return (
     <div>
-      <CourseHeader course={currentCourse[0]} />
+      <CourseHeader course={currentCourse} />
       <div className="flex gap-8 flex-1 items-start">
         <div className="flex-1">
           <div className="mb-6">
@@ -39,13 +60,13 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
                 <Total
                   title="Total members"
                   total={users.length}
-                  href={`/dashboard/courses/${courseRest?.id}/members`}
+                  href={`/dashboard/courses/${courseRest.id}/members`}
                   Icon={<AvatarIcon size="lg" />}
                 />
                 <Total
                   title="Total lessons"
                   total={lessons.length}
-                  href={`/dashboard/courses/${courseRest?.id}/lessons`}
+                  href={`/dashboard/courses/${courseRest.id}/lessons`}
                   Icon={<LessonsIcon size="lg" />}
                 />
               </div>
@@ -55,11 +76,7 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
           <CourseInsights courseId={params.courseId} />
         </div>
         <div className="[flex-basis:300px] self-stretch xl:flex flex-col hidden">
-          <Teacher
-            id={teacher.id}
-            name={teacher.name}
-            avatar={teacher.avatar}
-          />
+          <Teacher teacher={teacher} />
           <Students
             users={users.filter((user) => user.role === ROLES.STUDENT)}
           />

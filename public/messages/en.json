@@ -25,5 +25,7 @@
   "failed_to_delete_users": "Failed to delete users",
   "failed_to_delete_user": "Failed to delete user",
   "failed_to_enroll_user": "Failed to enroll users",
-  "failed_to_enroll_users": "Failed to enroll users"
+  "failed_to_enroll_users": "Failed to enroll users",
+  "failed_lo_load_users_insights": "Failed to load users insights",
+  "failed_lo_load_lessons_insights": "Failed to load lessons insights"
 }

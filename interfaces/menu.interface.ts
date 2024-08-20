@@ -1,4 +1,4 @@
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, ReactNode } from "react";
 
 export interface INavItem {
   title: string;
@@ -8,4 +8,9 @@ export interface INavItem {
 export interface ISelectItem {
   title: string;
   id: string;
+}
+export interface ITabItem {
+  title: string;
+  href: string;
+  Icon: ReactNode;
 }

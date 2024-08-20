@@ -1,16 +1,16 @@
 "use client";
 
 import Tab from "@/components/nav-tabs/tab";
+import type { ITabItem } from "@/interfaces/menu.interface";
 import { usePathname } from "next/navigation";
 
-import type { FunctionComponent, ReactNode } from "react";
+import type { FunctionComponent } from "react";
 
-interface IItem {
-  title: string;
-  href: string;
-  Icon: ReactNode;
+interface IProps {
+  tabs: ITabItem[];
 }
-const NavigationTabs: FunctionComponent<{ tabs: IItem[] }> = ({ tabs }) => {
+
+const NavigationTabs: FunctionComponent<IProps> = ({ tabs }) => {
   const pathname = usePathname();
 
   return (

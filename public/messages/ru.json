@@ -24,5 +24,7 @@
   "failed_to_delete_users": "Не удалось удалить пользователей",
   "failed_to_delete_user": "Не удалось удалить пользователя",
   "failed_to_enroll_user": "Не удалось зачислить пользователя",
-  "failed_to_enroll_users": "Не удалось зачислить пользователей"
+  "failed_to_enroll_users": "Не удалось зачислить пользователей",
+  "failed_lo_load_users_insights": "Не удалось загрузить статистику о пользователеях",
+  "failed_lo_load_lessons_insights": "Не удалось загрузить статистику об уроках"
 }

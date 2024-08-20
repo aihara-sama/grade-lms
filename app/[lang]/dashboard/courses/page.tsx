@@ -1,8 +1,12 @@
 import Courses from "@/components/courses";
 import type { Locale } from "@/i18n";
 import { createClient } from "@/utils/supabase/server";
-import type { NextPage } from "next";
+import type { Metadata, NextPage } from "next";
 import { getTranslations } from "next-intl/server";
+
+export const metadata: Metadata = {
+  title: "Courses",
+};
 
 interface IProps {
   params: { locale: Locale };

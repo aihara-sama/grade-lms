@@ -72,6 +72,18 @@ export const getCoursesByUserId = async (userId: string) => {
 
   return result.data.courses;
 };
+export const getCourseByCourseId = async (courseId: string) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("courses")
+    .select("*, users (*), lessons (*)")
+    .eq("id", courseId)
+    .single();
+
+  if (result.error) throw new Error(t("failed_to_load_courses"));
+
+  return result.data;
+};
 export const getUnenrolledCoursesByUserId = async (userId: string) => {
   const t = await loadMessages();
   const result = await supabaseClient

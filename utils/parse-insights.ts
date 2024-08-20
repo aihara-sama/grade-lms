@@ -15,5 +15,10 @@ export const parseInsights = (arr: { timestamp: string }[]) => {
     return acc;
   }, weekNamesRec);
 
-  return dayCounts;
+  const parsedInsights = Object.values(dayCounts);
+
+  // If theres any data
+  if (parsedInsights.some((el) => el !== 0)) return parsedInsights;
+
+  return [];
 };

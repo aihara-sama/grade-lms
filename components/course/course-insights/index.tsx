@@ -9,6 +9,7 @@ import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 interface IProps {
@@ -20,9 +21,12 @@ const CourseInsights: FunctionComponent<IProps> = ({ courseId }) => {
   const [lessonsInsights, setLessonsInsights] = useState<number[]>([]);
   const [usersInsights, setUsersInsights] = useState<number[]>([]);
 
+  // Hooks
+  const t = useTranslations();
+
   // Handlers
-  const getLessonsInsights = () => {
-    return supabaseClient
+  const getLessonsInsights = async () => {
+    const result = await supabaseClient
       .from("courses")
       .select("lessons(timestamp:ends)")
       .eq("id", courseId)
@@ -30,10 +34,15 @@ const CourseInsights: FunctionComponent<IProps> = ({ courseId }) => {
         "lessons.ends",
         format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
       )
-      .lte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+      .lte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
+      .single();
+
+    if (result.error) throw new Error(t("failed_lo_load_lessons_insights"));
+
+    return result.data.lessons;
   };
-  const getUsersInsights = () => {
-    return supabaseClient
+  const getUsersInsights = async () => {
+    const result = await supabaseClient
       .from("user_courses")
       .select("timestamp:created_at")
       .eq("course_id", courseId)
@@ -42,27 +51,26 @@ const CourseInsights: FunctionComponent<IProps> = ({ courseId }) => {
         format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
       )
       .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+
+    if (result.error) throw new Error(t("failed_lo_load_users_insights"));
+
+    return result.data;
   };
 
   // Effects
   useEffect(() => {
     (async () => {
-      const [users, lessons] = await Promise.all([
-        getUsersInsights(),
-        getLessonsInsights(),
-      ]);
+      try {
+        const [usersInsightsData, lessonsInsightsData] = await Promise.all([
+          getUsersInsights(),
+          getLessonsInsights(),
+        ]);
 
-      if (users.data) {
-        setUsersInsights(Object.values(parseInsights(users.data)));
+        setUsersInsights(parseInsights(usersInsightsData));
+        setLessonsInsights(parseInsights(lessonsInsightsData));
+      } catch (error: any) {
+        toast.error(error.message);
       }
-
-      if (lessons.data[0]?.lessons.length) {
-        setLessonsInsights(
-          Object.values(parseInsights(lessons.data[0].lessons))
-        );
-      }
-
-      if (users.error || lessons.error) toast.error("Something went wrong");
     })();
   }, []);
 
