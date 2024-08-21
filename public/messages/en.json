@@ -7,11 +7,14 @@
   "failed_to_create_course": "Failed to create course",
   "failed_to_load_courses": "Failed to load course",
   "failed_to_load_courses_count": "Failed to load course",
-  "user_deleted": "User successfully deleted",
   "user_enrolled": "User successfully enrolled",
   "users_enrolled": "Users successfully enrolled",
   "something_went_wrong": "Something went wrong",
   "user_created": "User successfully created",
+  "user_dispelled": "User successfully dispelled",
+  "users_dispelled": "Users successfully dispelled",
+  "users_deleted": "Users successfully deleted",
+  "user_deleted": "User successfully deleted",
   "auth": {
     "an_email_address_is_too_long": "An email address is too long",
     "unauthorized": "Unauthorized",
@@ -27,5 +30,12 @@
   "failed_to_enroll_user": "Failed to enroll users",
   "failed_to_enroll_users": "Failed to enroll users",
   "failed_lo_load_users_insights": "Failed to load users insights",
-  "failed_lo_load_lessons_insights": "Failed to load lessons insights"
+  "failed_lo_load_lessons_insights": "Failed to load lessons insights",
+  "failed_to_dispel_user": "Failed to dispel user",
+  "failed_to_dispel_users": "Failed to dispel users",
+  "prompts": {
+    "dispel_users": "Are you sure you want to dispel selected users?",
+    "dispel_user": "Are you sure you want to dispel this user?",
+    "delete_users": "Are you sure you want to delete selected users?"
+  }
 }

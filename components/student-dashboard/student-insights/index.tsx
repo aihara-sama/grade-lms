@@ -57,8 +57,6 @@ const StudentInsights: FunctionComponent<IProps> = ({ user }) => {
         fetchAssignmentsInsights(),
       ]);
 
-      console.log({ submissionsData, assignmentsData });
-
       if (submissionsData.data) {
         setSubmissionsInsights(
           Object.values(parseInsights(submissionsData.data))

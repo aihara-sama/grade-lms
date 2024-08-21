@@ -13,7 +13,7 @@ const Tab: FunctionComponent<IProps> = ({ Icon, isActive, title, href }) => {
       href={href}
     >
       <div
-        className={`flex gap-[8px] items-center px-3 py-2 cursor-pointer rounded-[6px] [transition:0.2s_background] text-${isActive ? "link" : "primary"} hover:bg-slate-100`}
+        className={`flex gap-2 items-center px-3 py-2 cursor-pointer rounded-[6px] duration-500 transition-colors ${isActive ? "text-link" : "text-primary"} hover:bg-slate-100`}
       >
         {Icon}
         <span className={`text-sm ${isActive ? "font-medium" : "font-normal"}`}>

@@ -10,7 +10,7 @@ interface IProps {
   tabs: ITabItem[];
 }
 
-const NavigationTabs: FunctionComponent<IProps> = ({ tabs }) => {
+const NavTabs: FunctionComponent<IProps> = ({ tabs }) => {
   const pathname = usePathname();
 
   return (
@@ -27,5 +27,4 @@ const NavigationTabs: FunctionComponent<IProps> = ({ tabs }) => {
     </div>
   );
 };
-
-export default NavigationTabs;
+export default NavTabs;

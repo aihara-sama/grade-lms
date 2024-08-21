@@ -6,7 +6,7 @@ interface IProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   title: string;
   body: string;
-  action: "Delete";
+  action: "Delete" | "Dispel";
   actionHandler: () => void;
 }
 

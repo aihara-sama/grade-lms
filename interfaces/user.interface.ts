@@ -18,9 +18,3 @@ export interface IUserMetadata {
   fcm_token?: string;
   creator_id?: string;
 }
-export interface IUser {
-  id: string;
-  userName: string;
-  role: ROLES;
-  email?: string;
-}

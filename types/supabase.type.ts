@@ -377,6 +377,12 @@ export type Database = {
         };
         Returns: string;
       };
+      delete_auth_users_by_ids: {
+        Args: {
+          user_ids: string[];
+        };
+        Returns: undefined;
+      };
       delete_courses_by_title_and_user_id: {
         Args: {
           p_user_id: string;

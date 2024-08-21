@@ -82,6 +82,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
     <BaseModal isOpen={isOpen} setIsOpen={setIsOpen} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select courses to enroll</p>
       <Table
+        compact
         data={courses.map(({ id, title }) => ({
           Name: (
             <CardTitle

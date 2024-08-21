@@ -203,3 +203,34 @@ begin
   );
 end;
 $$ language plpgsql;
+
+
+-- Step 1: Create the trigger function to delete from auth.users
+create or replace function delete_auth_user()
+returns trigger as $$
+begin
+  delete from auth.users
+  where id = old.id; -- Match by the same UUID
+  return old;
+end;
+$$ language plpgsql;
+
+create policy "Can delete users created by current user" on public.users
+for delete
+using (auth.uid()::text = creator_id);
+
+alter table auth.users enable row level security;
+create policy "Can delete users created by current user" on auth.users
+for delete
+using (auth.uid()::text = (select creator_id from public.users where id = auth.users.id));
+
+create or replace function public.delete_auth_users_by_ids(user_ids uuid[])
+returns void as $$
+begin
+    delete from auth.users
+    where id = any(user_ids)
+      and id in (
+        select id from public.users where creator_id = auth.uid()::text
+      );
+end;
+$$ language plpgsql;

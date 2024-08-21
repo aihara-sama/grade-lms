@@ -4,7 +4,7 @@ import BasePopper from "@/components/common/poppers/base-popper";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
-import { deleteUserByUserId } from "@/db/user";
+import { deleteUsersByUsersIds } from "@/db/user";
 import type { User } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
@@ -37,7 +37,7 @@ const UserOptionsPopper: FunctionComponent<IProps> = ({
 
   const handleDeleteUser = async () => {
     try {
-      await deleteUserByUserId(userId);
+      await deleteUsersByUsersIds([userId]);
     } catch (error: any) {
       toast.error(error.message);
     } finally {

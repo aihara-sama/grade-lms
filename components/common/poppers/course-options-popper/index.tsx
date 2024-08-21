@@ -73,11 +73,11 @@ const CourseOptionsPopper: FunctionComponent<IProps> = ({
         actionHandler={handleDeleteCourse}
       />
       <EnrollUsersInCourseModal
-        currentUserId={user.id}
+        currentUser={user}
         courseId={courseId}
         isOpen={isEnrollUsersModalOpen}
         setIsOpen={setIsEnrollUsersModalOpen}
-        onEnrolled={onDone}
+        onDone={onDone}
       />
     </>
   );

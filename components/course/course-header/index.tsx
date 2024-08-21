@@ -4,7 +4,7 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import MembersIcon from "@/components/icons/members-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
-import NavigationTabs from "@/components/nav-tabs";
+import NavTabs from "@/components/nav-tabs";
 import type { ITabItem } from "@/interfaces/menu.interface";
 import type { Course } from "@/types/courses.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
@@ -53,7 +53,7 @@ const CourseHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
         ]}
       />
       <p className="text-3xl font-bold text-neutral-600 my-3">{course.title}</p>
-      <NavigationTabs tabs={tabs} />
+      <NavTabs tabs={tabs} />
     </>
   );
 };

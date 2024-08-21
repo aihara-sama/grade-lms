@@ -11,23 +11,28 @@ interface IProps {
     courseId: string;
   };
 }
-const Page: FunctionComponent<IProps> = async ({ params }) => {
-  const { data: course, error } = await supabaseClient
-    .from("courses")
-    .select("*")
-    .eq("id", params.courseId)
-    .single();
+const Page: FunctionComponent<IProps> = async ({ params: { courseId } }) => {
+  const [
+    {
+      data: { user: currentUser },
+    },
+    currentCourseData,
+  ] = await Promise.all([
+    createClient().auth.getUser(),
+    supabaseClient
+      .from("courses")
+      .select("*, users(*), lessons(*)")
+      .eq("id", courseId)
+      .single(),
+  ]);
 
-  const {
-    data: { user },
-  } = await createClient().auth.getUser();
-
-  if (error) return redirect("/dashboard/courses");
+  const currentCourse = currentCourseData.data;
+  if (!currentCourse) return redirect("/dashboard/courses");
 
   return (
     <div>
-      <CourseHeader course={course} />
-      <Members user={user} courseId={params.courseId} />
+      <CourseHeader course={currentCourse} />
+      <Members currentUser={currentUser} courseId={currentCourse.id} />
     </div>
   );
 };

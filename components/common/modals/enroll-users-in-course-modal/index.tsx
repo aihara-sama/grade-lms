@@ -2,64 +2,58 @@ import Avatar from "@/components/avatar";
 import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
 import Table from "@/components/table";
-import type { User } from "@/types/users";
-import { supabaseClient } from "@/utils/supabase/client";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
+import { enrollUsersInCourses, getUsersNotInCourse } from "@/db/user";
+import type { User } from "@/types/users";
+import type { User as AuthUser } from "@supabase/supabase-js";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
 interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   courseId: string;
-  currentUserId: string;
-  onEnrolled: () => void;
+  currentUser: AuthUser;
+  onDone: () => void;
 }
 
 const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   isOpen,
   setIsOpen,
   courseId,
-  currentUserId,
-  onEnrolled,
+  currentUser,
+  onDone,
 }) => {
   // State
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
 
-  // Handlers
-  const fetchUsersNotInCourse = async () => {
-    const { data, error } = await supabaseClient
-      .rpc("get_users_not_in_course", {
-        p_course_id: courseId,
-      })
-      .eq("creator_id", currentUserId)
-      .neq("id", currentUserId);
+  // Refs
+  const t = useTranslations();
 
-    if (error) {
-      toast.error("Something went wrong");
-    } else {
-      setUsers(data);
+  // Handlers
+  const closeModal = () => setIsOpen(false);
+
+  const fetchUsersNotInCourse = async () => {
+    try {
+      setUsers(await getUsersNotInCourse(currentUser.id, courseId));
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
   const enrollUsers = async () => {
-    const { error } = await supabaseClient.from("user_courses").insert(
-      selectedUsersIds.map((userId) => ({
-        user_id: userId,
-        course_id: courseId,
-      }))
-    );
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Users enrolled");
-      onEnrolled();
+    try {
+      await enrollUsersInCourses(selectedUsersIds, [courseId]);
+      toast(t("users_enrolled"));
+      setSelectedUsersIds([]);
+      setIsOpen(false);
+      onDone();
+    } catch (error: any) {
+      toast.error(error.message);
     }
-    setSelectedUsersIds([]);
-    setIsOpen(false);
   };
-  const closeModal = () => setIsOpen(false);
   const onUserToggle = (checked: boolean, userId: string) => {
     if (checked) {
       setSelectedUsersIds((prev) => [...prev, userId]);
@@ -71,6 +65,8 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   useEffect(() => {
     if (isOpen) {
       fetchUsersNotInCourse();
+    } else {
+      setSelectedUsersIds([]);
     }
   }, [isOpen]);
 
@@ -78,22 +74,25 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   return (
     <BaseModal isOpen={isOpen} setIsOpen={setIsOpen} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select users to enroll</p>
-      <Table
-        data={users.map(({ id, avatar, name, role }) => ({
-          Name: (
-            <CardTitle
-              href={`/users/${id}`}
-              checked={selectedUsersIds.includes(id)}
-              Icon={<Avatar avatar={avatar} />}
-              title={name}
-              subtitle={role}
-              onClick={() => {}}
-              onToggle={(checked) => onUserToggle(checked, id)}
-            />
-          ),
-          "": "",
-        }))}
-      />
+      <div className="">
+        <Table
+          compact
+          data={users.map(({ id, avatar, name, role }) => ({
+            Name: (
+              <CardTitle
+                href={`/users/${id}`}
+                checked={selectedUsersIds.includes(id)}
+                Icon={<Avatar avatar={avatar} />}
+                title={name}
+                subtitle={role}
+                onClick={() => {}}
+                onToggle={(checked) => onUserToggle(checked, id)}
+              />
+            ),
+            "": "",
+          }))}
+        />
+      </div>
       <div className="flex justify-end gap-3 mt-4">
         <button className="outline-button" onClick={closeModal}>
           Cancel

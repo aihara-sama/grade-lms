@@ -22,7 +22,7 @@ const Page: NextPage<IProps> = async ({ params: { locale } }) => {
   return (
     <div className="h-full flex flex-col">
       <div>
-        <p className="page-title">{t("courses")}</p>
+        <p className="text-3xl font-bold text-neutral-600">{t("courses")}</p>
       </div>
       <p className="text-neutral-500">View and manage courses</p>
       <hr className="my-2 mb-4" />

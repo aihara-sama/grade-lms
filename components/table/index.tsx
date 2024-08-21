@@ -1,16 +1,18 @@
+import clsx from "clsx";
 import { type FunctionComponent, type ReactNode } from "react";
 
 interface IProps {
   data: { [key: string]: ReactNode }[];
+  compact?: boolean;
 }
 
-const Table: FunctionComponent<IProps> = ({ data }) => {
+const Table: FunctionComponent<IProps> = ({ data, compact }) => {
   if (!data.length) return null;
 
   const keys = Object.keys(data[0] || {});
 
   return (
-    <div className="relative shadow-md rounded-b-md flex-1">
+    <div className="relative rounded-md flex-1 border-2 border-neutral-100 ">
       <div className="flex flex-col">
         <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
           {keys.map((key) => (
@@ -22,7 +24,7 @@ const Table: FunctionComponent<IProps> = ({ data }) => {
             </div>
           ))}
         </div>
-        <div className="">
+        <div className={clsx(compact && "overflow-auto h-[280px]")}>
           <div className="p-2">
             {data.map((row, idx) => (
               <div key={idx} className="flex items-center gap-3 px-3 py-1">

@@ -21,7 +21,8 @@ import CheckIcon from "@/components/icons/check-icon";
 import Skeleton from "@/components/skeleton";
 import { USERS_GET_LIMIT } from "@/constants";
 import {
-  deleteUsersByCreatorId,
+  deleteUsersByNameAndCreatorId,
+  deleteUsersByUsersIds,
   getOffsetUsersByNameAndCreatorId,
   getUsersByCreatorId,
   getUsersByNameAndCreatorId,
@@ -63,31 +64,18 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
     setIsUsersLoading(true);
 
     try {
-      const [usersByCreatorId, usersCountByCreatorIdId] = await Promise.all([
+      const [usersByCreatorId, usersCountByCreatorId] = await Promise.all([
         getUsersByCreatorId(currentUser.id),
         getUsersCountByCreatorId(currentUser.id),
       ]);
       setUsers(usersByCreatorId);
-      setTotalUsersCount(usersCountByCreatorIdId);
+      setTotalUsersCount(usersCountByCreatorId);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsUsersLoading(false);
     }
   };
-  const handleDeleteUsers = async () => {
-    try {
-      await deleteUsersByCreatorId(currentUser.id, selectedUsersIds);
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setSelectedUsersIds([]);
-      setIsDeleteUsersModalOpen(false);
-
-      fetchUsersWithCount();
-    }
-  };
-
   const fetchUsersBySearch = async () => {
     try {
       const [usersByTitleAndUserId, usersCountByTitleAndUserId] =
@@ -104,6 +92,22 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
 
       setUsers(usersByTitleAndUserId);
       setTotalUsersCount(usersCountByTitleAndUserId);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const handleDeleteUsers = async () => {
+    try {
+      await (isSelectedAllRef.current
+        ? deleteUsersByNameAndCreatorId(
+            usersSearchTextRef.current,
+            currentUser.id
+          )
+        : deleteUsersByUsersIds(selectedUsersIds));
+      setSelectedUsersIds([]);
+      setIsDeleteUsersModalOpen(false);
+      toast.success(t("users_deleted"));
+      fetchUsersBySearch();
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -182,7 +186,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
           total={totalUsersCount}
           title="Total users"
         />
-        <CreateUser onDone={fetchUsersWithCount} />
+        <CreateUser onDone={fetchUsersBySearch} />
       </CardsContainer>
       {selectedUsersIds.length ? (
         <div className="mb-3 gap-2 flex">
@@ -225,7 +229,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
       ) : (
         <div className="flex-1 flex">
           <Table
-            data={users.map(({ name, role, id, avatar }) => ({
+            data={users.map(({ name, role, id, avatar, email }) => ({
               Name: (
                 <CardTitle
                   href={`/users/${id}`}
@@ -236,6 +240,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
                   onToggle={(checked) => onUserToggle(checked, id)}
                 />
               ),
+              Email: email,
               "": (
                 <UserOptionsPopper
                   onDone={fetchUsersBySearch}
@@ -255,7 +260,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
         title="Delete Users"
         action="Delete"
         actionHandler={handleDeleteUsers}
-        body="Are you sure you want to delete selected users?"
+        body={t("prompts.delete_users")}
       />
       <EnrollUsersInCoursesModal
         onDone={() => setSelectedUsersIds([])}

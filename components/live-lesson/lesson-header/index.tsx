@@ -5,7 +5,7 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
-import NavigationTabs from "@/components/nav-tabs";
+import NavTabs from "@/components/nav-tabs";
 
 import type { Database } from "@/types/supabase.type";
 import type { FunctionComponent, PropsWithChildren, ReactNode } from "react";
@@ -95,7 +95,7 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
           </div>
         </div>
       </div>
-      <NavigationTabs tabs={tabs} />
+      <NavTabs tabs={tabs} />
     </div>
   );
 };
