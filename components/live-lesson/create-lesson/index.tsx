@@ -1,37 +1,31 @@
 "use client";
 
-import AddLessonModal from "@/components/common/modals/create-lesson-modal";
-import AddLessonIcon from "@/components/icons/add-lesson-icon";
+import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
+import CreateLessonIcon from "@/components/icons/add-lesson-icon";
 import { useState, type FunctionComponent } from "react";
 
 interface IProps {
-  courseId: string;
   onDone: () => void;
+  courseId: string;
 }
 
-const CreateLesson: FunctionComponent<IProps> = ({ courseId, onDone }) => {
-  const [isAddLessonModalOpen, setIsAddLessonModalOpen] = useState(false);
+const CreateLesson: FunctionComponent<IProps> = ({ onDone, courseId }) => {
+  const [isCreateLessonModalOpen, setIsCreateLessonModalOpen] = useState(false);
 
-  const closeModal = () => {
-    setIsAddLessonModalOpen(false);
-  };
-  const openModal = () => {
-    setIsAddLessonModalOpen(true);
-  };
+  const openCreateLessonModal = () => setIsCreateLessonModalOpen(true);
 
   return (
     <div className="px-6 py-8 flex flex-col items-center justify-between w-64 rounded-md bg-white border border-light border-dashed text-neutral-600">
-      <AddLessonIcon size="lg" />
+      <CreateLessonIcon size="lg" />
       <hr className="w-full my-3" />
-      <button className="primary-button" onClick={openModal}>
+      <button className="primary-button" onClick={openCreateLessonModal}>
         Create
       </button>
-      <AddLessonModal
-        isOpen={isAddLessonModalOpen}
-        setIsOpen={setIsAddLessonModalOpen}
-        courseId={courseId}
-        closeModal={closeModal}
+      <CreateLessonModal
+        isOpen={isCreateLessonModalOpen}
+        setIsOpen={setIsCreateLessonModalOpen}
         onDone={onDone}
+        courseId={courseId}
       />
     </div>
   );

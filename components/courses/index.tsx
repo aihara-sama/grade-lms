@@ -22,7 +22,7 @@ import CourseOptionsPopper from "@/components/common/poppers/course-options-popp
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT } from "@/constants";
 import {
-  deleteCoursesByCourseIds,
+  deleteCoursesByCoursesIds,
   deleteCoursesByTitleAndUserId,
   getCoursesByTitleAndUserId,
   getCoursesByUserId,
@@ -47,6 +47,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
   const [coursesSearchText, setCoursesSearchText] = useState("");
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -75,27 +76,23 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
     }
   };
 
-  const openDeleteCoursesModal = () => {
-    setIsDeleteCoursesModalOpen(true);
-  };
+  const openDeleteCoursesModal = () => setIsDeleteCoursesModalOpen(true);
   const onCourseToggle = (checked: boolean, courseId: string) => {
     if (checked) {
       setSelectedCoursesIds((prev) => [...prev, courseId]);
-      isSelectedAllRef.current =
-        totalCoursesCount === selectedCoursesIds.length + 1;
+      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length + 1);
     } else {
       setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
-      isSelectedAllRef.current =
-        totalCoursesCount === selectedCoursesIds.length - 1;
+      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
     }
   };
   const selectAllCourses = () => {
     setSelectedCoursesIds(courses.map(({ id }) => id));
-    isSelectedAllRef.current = true;
+    setIsSelectedAll(true);
   };
   const deselectAllCourses = () => {
     setSelectedCoursesIds([]);
-    isSelectedAllRef.current = false;
+    setIsSelectedAll(false);
   };
   const fetchCoursesBySearch = async () => {
     try {
@@ -148,7 +145,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
     try {
       await (isSelectedAllRef.current
         ? deleteCoursesByTitleAndUserId(coursesSearchText, user.id)
-        : deleteCoursesByCourseIds(selectedCoursesIds));
+        : deleteCoursesByCoursesIds(selectedCoursesIds));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -172,7 +169,12 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
   useEffect(() => {
     coursesSearchTextRef.current = coursesSearchText;
   }, [coursesSearchText]);
-
+  useEffect(() => {
+    isSelectedAllRef.current = isSelectedAll;
+  }, [isSelectedAll]);
+  useEffect(() => {
+    setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length);
+  }, [totalCoursesCount]);
   return (
     <div className="pb-8 flex-1 flex flex-col">
       <CardsContainer>
@@ -186,16 +188,11 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
       {selectedCoursesIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
-            onClick={
-              isSelectedAllRef.current ? deselectAllCourses : selectAllCourses
-            }
+            onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAllRef.current
-              ? totalCoursesCount
-              : selectedCoursesIds.length}{" "}
-            {isSelectedAllRef.current ? `Deselect` : "Select all"}{" "}
-            <CheckIcon size="xs" />
+            {isSelectedAll ? totalCoursesCount : selectedCoursesIds.length}{" "}
+            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
             onClick={openDeleteCoursesModal}

@@ -45,8 +45,6 @@ const CreateUserModal: FunctionComponent<IProps> = ({
   const t = useTranslations();
 
   const handleCreateUser = async (createAnother?: boolean) => {
-    console.log("handleCreateUser");
-
     try {
       await createUser(userDetails);
       setUserDetails(initUserDetails);

@@ -50,6 +50,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
   const [usersSearchText, setUsersSearchText] = useState("");
   const [isEnrollUsersInCoursesModalOpen, setIsEnrollUsersInCoursesModalOpen] =
     useState(false);
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -115,11 +116,11 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
 
   const selectAllUsers = () => {
     setSelectedUsersIds(users.map(({ id }) => id));
-    isSelectedAllRef.current = true;
+    setIsSelectedAll(true);
   };
   const deselectAllUsers = () => {
     setSelectedUsersIds([]);
-    isSelectedAllRef.current = false;
+    setIsSelectedAll(false);
   };
   const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsersSearchText((usersSearchTextRef.current = e.target.value));
@@ -128,12 +129,10 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
   const onUserToggle = (checked: boolean, userId: string) => {
     if (checked) {
       setSelectedUsersIds((prev) => [...prev, userId]);
-      isSelectedAllRef.current =
-        totalUsersCount === selectedUsersIds.length + 1;
+      setIsSelectedAll(totalUsersCount === selectedUsersIds.length + 1);
     } else {
       setSelectedUsersIds((prev) => prev.filter((_id) => _id !== userId));
-      isSelectedAllRef.current =
-        totalUsersCount === selectedUsersIds.length - 1;
+      setIsSelectedAll(totalUsersCount === selectedUsersIds.length - 1);
     }
   };
   const handleCoursesScroll = async () => {
@@ -177,7 +176,12 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
   useEffect(() => {
     usersSearchTextRef.current = usersSearchText;
   }, [usersSearchText]);
-
+  useEffect(() => {
+    isSelectedAllRef.current = isSelectedAll;
+  }, [isSelectedAll]);
+  useEffect(() => {
+    setIsSelectedAll(totalUsersCount === selectedUsersIds.length);
+  }, [totalUsersCount]);
   return (
     <>
       <CardsContainer>
@@ -191,16 +195,11 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
       {selectedUsersIds.length ? (
         <div className="mb-3 gap-2 flex">
           <button
-            onClick={
-              isSelectedAllRef.current ? deselectAllUsers : selectAllUsers
-            }
+            onClick={isSelectedAll ? deselectAllUsers : selectAllUsers}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAllRef.current
-              ? totalUsersCount
-              : selectedUsersIds.length}{" "}
-            {isSelectedAllRef.current ? `Deselect` : "Select all"}{" "}
-            <CheckIcon size="xs" />
+            {isSelectedAll ? totalUsersCount : selectedUsersIds.length}{" "}
+            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
             onClick={() => setIsEnrollUsersInCoursesModalOpen(true)}

@@ -4,14 +4,21 @@
   "profile": "Profile",
   "failed_to_delete_course": "Failed to delete course",
   "failed_to_delete_courses": "Failed to delete courses",
+  "failed_to_delete_lessons": "Failed to delete lessons",
+  "failed_to_delete_lesson": "Failed to delete lesson",
   "failed_to_create_course": "Failed to create course",
+  "failed_to_create_lesson": "Failed to create lesson",
   "failed_to_load_courses": "Failed to load course",
-  "failed_to_load_courses_count": "Failed to load course",
+  "failed_to_load_lessons": "Failed to load lessons",
+  "failed_to_load_courses_count": "Failed to load courses count",
+  "failed_to_load_lessons_count": "Failed to load lessons count",
   "user_enrolled": "User successfully enrolled",
   "users_enrolled": "Users successfully enrolled",
   "something_went_wrong": "Something went wrong",
   "user_created": "User successfully created",
   "user_dispelled": "User successfully dispelled",
+  "lesson_deleted": "Lesson successfully deleted",
+  "lesson_created": "Lesson successfully created",
   "users_dispelled": "Users successfully dispelled",
   "users_deleted": "Users successfully deleted",
   "user_deleted": "User successfully deleted",
@@ -36,6 +43,8 @@
   "prompts": {
     "dispel_users": "Are you sure you want to dispel selected users?",
     "dispel_user": "Are you sure you want to dispel this user?",
-    "delete_users": "Are you sure you want to delete selected users?"
+    "delete_users": "Are you sure you want to delete selected users?",
+    "delete_lessons": "Are you sure you want to delete selected lessons?",
+    "delete_lesson": "Are you sure you want to delete selected lesson?"
   }
 }

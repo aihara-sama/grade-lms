@@ -5,14 +5,21 @@
   "failed_to_delete_course": "Не удалось удалить курс",
   "failed_to_delete_courses": "Не удалось удалить курсы",
   "failed_to_create_course": "Не удалось создать курс",
+  "failed_to_create_lesson": "Не удалось создать урок",
   "failed_to_load_courses": "Не удалось загрузить курсы",
+  "failed_to_load_lessons": "Не удалось загрузить уроки",
+  "failed_to_delete_lessons": "Не удалось удалить урокм",
+  "failed_to_delete_lesson": "Не удалось удалить урок",
   "failed_to_load_courses_count": "Не удалось загрузить количество курсов",
+  "failed_to_load_lessons_count": "Не удалось загрузить количество уроков",
   "something_went_wrong": "Что-то пошло не так",
   "user_deleted": "Пользователь успешно удален",
   "users_deleted": "Пользователи успешно удалены",
   "user_enrolled": "Пользователь успешно зачислен",
   "users_enrolled": "Пользователи успешно зачислены",
   "user_created": "Пользователь успешно создан",
+  "lesson_deleted": "Урок успешно удален",
+  "lesson_created": "Урок успешно создан",
   "user_dispelled": "Пользователь успешно отчислен",
   "users_dispelled": "Пользователи успешно отчислены",
   "auth": {
@@ -34,6 +41,8 @@
   "failed_to_dispel_users": "Не удалось очислить пользователей",
   "prompts": {
     "dispel_users": "Вы уверены что хотите отчислить выбранных пользователей",
+    "delete_lessons": "Вы уверены что хотите удалить выбранные уроки",
+    "delete_lesson": "Вы уверены что хотите удалить выбранный урок",
     "dispel_user": "Вы уверены что хотите отчислить этого пользователя",
     "delete_users": "Вы уверены что хотите удалить выбранных пользователей"
   }

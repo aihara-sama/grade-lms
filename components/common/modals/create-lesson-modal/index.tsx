@@ -1,18 +1,20 @@
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/utils/supabase/client";
 import {
   addMinutes,
   format,
   millisecondsToMinutes,
   subMinutes,
 } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import BaseModal from "@/components/common/modals/base-modal";
+import { createLesson } from "@/db/lesson";
+import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
+import { useTranslations } from "next-intl";
 import type {
   ChangeEvent,
   Dispatch,
@@ -20,74 +22,100 @@ import type {
   SetStateAction,
 } from "react";
 
+const initLesson: TablesInsert<"lessons"> = {
+  title: "",
+  starts: format(getNextMorning(), "yyyy-MM-dd'T'HH:mm:ss"),
+  ends: format(addMinutes(getNextMorning(), 30), "yyyy-MM-dd'T'HH:mm:ss"),
+};
+
 interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  courseId: string;
-  closeModal: () => void;
   onDone: () => void;
+  courseId: string;
 }
 
-const AddLessonModal: FunctionComponent<IProps> = ({
-  courseId,
-  closeModal,
+const CreateLessonModal: FunctionComponent<IProps> = ({
   onDone,
   isOpen,
   setIsOpen,
+  courseId,
 }) => {
-  const [lessonName, setLessonName] = useState("");
-  const [starts, setStarts] = useState<Date>(getNextMorning());
-  const [ends, setEnds] = useState<Date>(addMinutes(starts, 30));
-  const duration = +new Date(ends) - +new Date(starts);
+  const [lesson, setLesson] = useState<TablesInsert<"lessons">>({
+    ...initLesson,
+    course_id: courseId,
+  });
+  const duration = +new Date(lesson.ends) - +new Date(lesson.starts);
+
+  // Hooks
+  const t = useTranslations();
 
   const handleChangeDate = (date: Date) => {
-    setStarts(date);
-    setEnds(addMinutes(date, millisecondsToMinutes(duration)));
+    setLesson((_) => ({
+      ..._,
+      starts: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
+      ends: format(
+        addMinutes(date, millisecondsToMinutes(duration)),
+        "yyyy-MM-dd'T'HH:mm:ss"
+      ),
+    }));
   };
 
   const handleCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { error } = await supabaseClient.from("lessons").insert({
-      course_id: courseId,
-      title: (new FormData(e.currentTarget).get("title") as string).trim(),
-      starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
-      ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-    });
+    try {
+      await createLesson(lesson);
 
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Course created");
+      toast(t("lesson_created"));
+      setIsOpen(false);
       onDone();
-      closeModal();
+      setLesson(initLesson);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
   const handleChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
+    let ends: string;
 
     if (+value > millisecondsToMinutes(duration)) {
-      setEnds(addMinutes(ends, 15));
+      ends = format(addMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
     } else if (+value < millisecondsToMinutes(duration) && +value > 15) {
-      setEnds(subMinutes(ends, 15));
+      ends = format(subMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
     }
+
+    setLesson((_) => ({ ..._, ends }));
   };
 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setLesson((_) => ({ ..._, [e.target.name]: e.target.value }));
+
+  useEffect(() => {
+    if (!isOpen) setLesson({ ...initLesson, course_id: courseId });
+  }, [isOpen]);
+
   return (
-    <BaseModal setIsOpen={setIsOpen} isOpen={isOpen} title="Create lesson">
+    <BaseModal
+      isExpanded={false}
+      setIsOpen={setIsOpen}
+      isOpen={isOpen}
+      title="Create lesson"
+    >
       <form onSubmit={handleCreateLesson}>
         <Input
+          autoFocus
           fullWIdth
-          value={lessonName}
-          onChange={(e) => setLessonName(e.target.value)}
+          value={lesson.title}
+          onChange={handleInputChange}
           name="title"
           Icon={<LessonsIcon size="xs" />}
           placeholder="Lesson name"
           className="mb-4"
         />
         <DateInput
-          date={starts}
+          date={new Date(lesson.starts)}
           onChange={handleChangeDate}
           label="Starts at"
         />
@@ -101,12 +129,17 @@ const AddLessonModal: FunctionComponent<IProps> = ({
           className="mt-2"
         />
         <hr className="my-3" />
-        <button disabled={!lessonName} className="primary-button" type="submit">
-          Create
-        </button>
+        <div className="flex justify-end">
+          <button
+            disabled={!lesson.title}
+            className="primary-button"
+            type="submit"
+          >
+            Create
+          </button>
+        </div>
       </form>
     </BaseModal>
   );
 };
-
-export default AddLessonModal;
+export default CreateLessonModal;

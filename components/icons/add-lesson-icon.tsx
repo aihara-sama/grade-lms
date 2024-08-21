@@ -6,7 +6,7 @@ interface Props {
   size?: keyof typeof IconSize;
 }
 
-const AddLessonIcon: FunctionComponent<Props> = ({ className, size }) => {
+const CreateLessonIcon: FunctionComponent<Props> = ({ className, size }) => {
   return (
     <svg
       width={IconSize[size] || 47}
@@ -31,4 +31,4 @@ const AddLessonIcon: FunctionComponent<Props> = ({ className, size }) => {
   );
 };
 
-export default AddLessonIcon;
+export default CreateLessonIcon;

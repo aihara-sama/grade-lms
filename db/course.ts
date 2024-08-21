@@ -138,12 +138,12 @@ export const deleteCourseByCourseId = async (courseId: string) => {
 
   return result;
 };
-export const deleteCoursesByCourseIds = async (courseIds: string[]) => {
+export const deleteCoursesByCoursesIds = async (coursesIds: string[]) => {
   const t = await loadMessages();
   const result = await supabaseClient
     .from("courses")
     .delete()
-    .in("id", courseIds);
+    .in("id", coursesIds);
 
   if (result.error) throw new Error(t("failed_to_delete_courses"));
 

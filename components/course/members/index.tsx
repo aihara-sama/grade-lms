@@ -1,5 +1,6 @@
 "use client";
 
+import Avatar from "@/components/avatar";
 import CardTitle from "@/components/card-title";
 import CardsContainer from "@/components/cards-container";
 import PromptModal from "@/components/common/modals/prompt-modal";
@@ -10,6 +11,7 @@ import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import EnrollUsers from "@/components/users/enroll-users";
@@ -42,8 +44,10 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
     useState(false);
   const [selectedMembersIds, setSelectedMembersIds] = useState<string[]>([]);
   const [members, setMembers] = useState<User[]>([]);
-  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [totalMembersCount, setTotalMembersCount] = useState(0);
   const [membersSearchText, setMembersSearchText] = useState("");
+  const [isMembersLoading, setIsMembersLoading] = useState(true);
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -54,6 +58,7 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
   const t = useTranslations();
 
   const fetchMembersWithCount = async () => {
+    setIsMembersLoading(true);
     try {
       const [usersByCourseId, usersCountByCourseId] = await Promise.all([
         getUsersByCourseId(courseId),
@@ -61,9 +66,11 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
       ]);
 
       setMembers(usersByCourseId);
-      setTotalUsersCount(usersCountByCourseId);
+      setTotalMembersCount(usersCountByCourseId);
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsMembersLoading(false);
     }
   };
 
@@ -79,7 +86,7 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
         ]);
 
       setMembers(usersByTitleAndUserId);
-      setTotalUsersCount(usersCountByTitleAndUserId);
+      setTotalMembersCount(usersCountByTitleAndUserId);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -108,11 +115,20 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
 
   const selectAllMembers = () => {
     setSelectedMembersIds(members.map(({ id }) => id));
-    isSelectedAllRef.current = true;
+    setIsSelectedAll(true);
   };
   const deselectAllMembers = () => {
     setSelectedMembersIds([]);
-    isSelectedAllRef.current = false;
+    setIsSelectedAll(false);
+  };
+  const onMemberToggle = (checked: boolean, memberId: string) => {
+    if (checked) {
+      setSelectedMembersIds((prev) => [...prev, memberId]);
+      setIsSelectedAll(totalMembersCount === selectedMembersIds.length + 1);
+    } else {
+      setSelectedMembersIds((prev) => prev.filter((_id) => _id !== memberId));
+      setIsSelectedAll(totalMembersCount === selectedMembersIds.length - 1);
+    }
   };
   const handleCoursesScroll = async () => {
     if (isDocCloseToBottom()) {
@@ -154,6 +170,12 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
   useEffect(() => {
     fetchMembersWithCount();
   }, []);
+  useEffect(() => {
+    isSelectedAllRef.current = isSelectedAll;
+  }, [isSelectedAll]);
+  useEffect(() => {
+    setIsSelectedAll(totalMembersCount === selectedMembersIds.length);
+  }, [totalMembersCount]);
 
   return (
     <>
@@ -161,11 +183,11 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
       <CardsContainer>
         <Total
           Icon={<AvatarIcon size="lg" />}
-          total={totalUsersCount}
+          total={totalMembersCount}
           title="Total members"
         />
         <EnrollUsers
-          onDone={fetchMembersWithCount}
+          onDone={fetchMembersBySearch}
           courseId={courseId}
           user={currentUser}
         />
@@ -173,16 +195,11 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
       {selectedMembersIds.length ? (
         <div className="mb-3 gap-2 flex">
           <button
-            onClick={
-              isSelectedAllRef.current ? deselectAllMembers : selectAllMembers
-            }
+            onClick={isSelectedAll ? deselectAllMembers : selectAllMembers}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAllRef.current
-              ? totalUsersCount
-              : selectedMembersIds.length}{" "}
-            {isSelectedAllRef.current ? `Deselect` : "Select all"}{" "}
-            <CheckIcon size="xs" />
+            {isSelectedAll ? totalMembersCount : selectedMembersIds.length}{" "}
+            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
             onClick={() => setIsDispelMembersModalOpen(true)}
@@ -200,56 +217,42 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
           value={membersSearchText}
         />
       )}
-      <Table
-        data={members.map(({ name, role, id, avatar }) => ({
-          Name:
-            currentUser.id === id ? (
-              <IconTitle
-                Icon={
-                  <img
-                    className="rounded-[50%] w-8 h-8"
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
-                    alt=""
-                  />
-                }
-                key={id}
-                title={name}
-                subtitle={role}
-                href={`/users/${id}`}
-              />
-            ) : (
-              <CardTitle
-                href={`/users/${id}`}
-                checked={selectedMembersIds.includes(id)}
-                Icon={
-                  <img
-                    className="rounded-[50%] w-8 h-8"
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
-                    alt=""
-                  />
-                }
-                title={name}
-                subtitle={role}
-                onClick={() => {}}
-                onToggle={(checked) =>
-                  checked
-                    ? setSelectedMembersIds((prev) => [...prev, id])
-                    : setSelectedMembersIds((prev) =>
-                        prev.filter((_id) => _id !== id)
-                      )
-                }
+      {isMembersLoading ? (
+        <Skeleton />
+      ) : (
+        <Table
+          data={members.map(({ name, role, id, avatar }) => ({
+            Name:
+              currentUser.id === id ? (
+                <IconTitle
+                  Icon={<Avatar avatar={avatar} />}
+                  key={id}
+                  title={name}
+                  subtitle={role}
+                  href={`/users/${id}`}
+                />
+              ) : (
+                <CardTitle
+                  href={`/users/${id}`}
+                  checked={selectedMembersIds.includes(id)}
+                  Icon={<Avatar avatar={avatar} />}
+                  title={name}
+                  subtitle={role}
+                  onClick={() => {}}
+                  onToggle={(checked) => onMemberToggle(checked, id)}
+                />
+              ),
+            "": (
+              <MemberOptionsPopper
+                onDone={fetchMembersBySearch}
+                setSelectedMembersIds={setSelectedMembersIds}
+                courseId={courseId}
+                memberId={id}
               />
             ),
-          "": (
-            <MemberOptionsPopper
-              onDone={fetchMembersBySearch}
-              setSelectedMembersIds={setSelectedMembersIds}
-              courseId={courseId}
-              memberId={id}
-            />
-          ),
-        }))}
-      />
+          }))}
+        />
+      )}
       <PromptModal
         isOpen={isDispelMembersModalOpen}
         setIsOpen={setIsDispelMembersModalOpen}
