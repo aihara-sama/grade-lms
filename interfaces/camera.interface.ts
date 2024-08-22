@@ -1,4 +1,4 @@
-import type { ROLES } from "@/interfaces/user.interface";
+import type { Role } from "@/interfaces/user.interface";
 
 export interface ICamera {
   stream: MediaStream;
@@ -7,5 +7,5 @@ export interface ICamera {
   isCameraEnabled: boolean;
   anonId: string;
   userName: string;
-  role: ROLES;
+  role: Role;
 }

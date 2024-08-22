@@ -19,7 +19,7 @@ const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId, user }) => {
   const openEnrollUserModal = () => setIsEnrollUsersModalOpen(true);
 
   return (
-    <div className="border border-dashed px-[24px] py-8 flex flex-col items-center justify-between w-[250px] rounded-[5px] border-light bg-white">
+    <div className="border border-dashed px-[24px] py-8 flex flex-col items-center justify-between w-[280px] rounded-[5px] border-light bg-white">
       <AddUserIcon size="lg" />
       <hr className="w-full my-3" />
       <button className="primary-button" onClick={openEnrollUserModal}>

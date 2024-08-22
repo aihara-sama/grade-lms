@@ -6,7 +6,7 @@ import Teacher from "@/components/course/teacher";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Total from "@/components/total";
-import { ROLES } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -47,7 +47,7 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
 
   const { users, lessons, ...courseRest } = currentCourse;
 
-  const teacher = users.find((user) => user.role === ROLES.TEACHER);
+  const teacher = users.find((user) => user.role === Role.TEACHER);
 
   return (
     <div>
@@ -79,7 +79,7 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
         <div className="[flex-basis:300px] self-stretch xl:flex flex-col hidden">
           <Teacher teacher={teacher} />
           <Students
-            users={users.filter((user) => user.role === ROLES.STUDENT)}
+            users={users.filter((user) => user.role === Role.STUDENT)}
           />
         </div>
       </div>

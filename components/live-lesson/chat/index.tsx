@@ -8,14 +8,14 @@ import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 import MessagesIcon from "@/components/icons/messages-icon";
-import type { ROLES } from "@/interfaces/user.interface";
+import type { Role } from "@/interfaces/user.interface";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 interface IProps {
   lessonId: string;
   userName: string;
   avatar: string;
-  userRole: ROLES;
+  userRole: Role;
   channel: RealtimeChannel;
 }
 

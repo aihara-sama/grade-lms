@@ -5,8 +5,12 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import StarIcon from "@/components/icons/star-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
+import {
+  getSubmissionWithAuthorBySubmissionId,
+  updateSubmissionGrade,
+} from "@/db/submission";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
-import { supabaseClient } from "@/utils/supabase/client";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -31,36 +35,33 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
   const [grade, setGrade] = useState<number>();
   const [hoveredGrade, setHoveredGrade] = useState<number>();
 
-  const handleSubmitGrade = async () => {
-    const { error } = await supabaseClient
-      .from("submissions")
-      .update({ grade })
-      .eq("id", submission.id);
+  const t = useTranslations();
 
-    if (error) {
-      toast.error("Something went wrong");
-    } else {
-      toast.success("Grade changed");
+  const handleUpdateGrade = async () => {
+    try {
+      await updateSubmissionGrade(submissionId, grade);
+
+      toast.success(t("grade_updated"));
       setIsOpen(false);
       onDone();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const getSubmission = async () => {
+    try {
+      const submissionData =
+        await getSubmissionWithAuthorBySubmissionId(submissionId);
+      setSubmission(submissionData);
+      setGrade(submissionData.grade);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
   useEffect(() => {
-    (async () => {
-      const { error, data } = await supabaseClient
-        .from("submissions")
-        .select("*, author:users(*)")
-        .eq("id", submissionId)
-        .single();
-      if (error) {
-        toast.error("Something went wrong");
-        setIsOpen(false);
-      } else {
-        setSubmission(data);
-        setGrade(data.grade);
-      }
-    })();
+    if (isOpen) getSubmission();
   }, []);
 
   return (
@@ -71,7 +72,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
       title="Submission"
     >
       {!submission ? (
-        <Skeleton className="min-h-[471px]" />
+        <Skeleton className="" />
       ) : (
         <div>
           <Input
@@ -83,8 +84,9 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
             value={submission.title}
           />
           <p>Description</p>
-          <div className="min-h-[320px]">
+          <div className="">
             <Editor
+              height="md"
               readOnly
               onChange={() => {}}
               data={JSON.parse(submission.body)}
@@ -103,6 +105,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
             <div className="flex gap-2 items-center text-neutral-500">
               {new Array(5).fill(0).map((_, idx) => (
                 <div
+                  key={idx}
                   className="flex"
                   onClick={() => setGrade(idx + 1)}
                   onMouseEnter={() => setHoveredGrade(idx + 1)}
@@ -116,7 +119,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
               ))}
             </div>
             <button
-              onClick={handleSubmitGrade}
+              onClick={handleUpdateGrade}
               disabled={submission.grade === grade}
               className="primary-button w-[100px]"
             >

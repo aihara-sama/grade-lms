@@ -222,7 +222,6 @@ const Lessons: FunctionComponent<IProps> = ({ courseId }) => {
                 Icon={<LessonsIcon size="md" />}
                 title={title}
                 subtitle=""
-                onClick={() => {}}
                 onToggle={(checked) => onLessonToggle(checked, id)}
               />
             ),

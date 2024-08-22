@@ -2,7 +2,7 @@ import { createUserAction } from "@/actions/create-user-action";
 import type { InputType as UserInputType } from "@/actions/create-user-action/types";
 import { deleteUserAction } from "@/actions/delete-user-action";
 import { COURSES_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
-import { ROLES } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import { loadMessages } from "@/utils/load-messages";
 import { parseUsersCoursesIds } from "@/utils/parse-users-courses-ids";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
@@ -185,6 +185,22 @@ export const getUsersNotInCourse = async (userId: string, courseId: string) => {
 
   return result.data;
 };
+export const getAllCourseStudentsIds = async (
+  userId: string,
+  courseId: string
+) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("courses")
+    .select("users(id)")
+    .eq("id", courseId)
+    .neq("users.id", userId)
+    .single();
+
+  if (result.error) throw new Error(t("failed_to_load_users"));
+
+  return result.data.users;
+};
 
 export const deleteUsersByUsersIds = async (usersIds: string[]) => {
   const t = await loadMessages();
@@ -266,7 +282,7 @@ export const dispelAllStudentsByNameFromCourse = async (
     .from("users")
     .select("id")
     .ilike("name", `%${name}%`)
-    .eq("role", ROLES.STUDENT);
+    .eq("role", Role.STUDENT);
 
   if (studentsData.error) throw new Error(t("failed_to_dispel_users"));
 

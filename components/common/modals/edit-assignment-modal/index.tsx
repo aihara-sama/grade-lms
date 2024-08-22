@@ -5,14 +5,16 @@ import SubmissionsTab from "@/components/common/modals/edit-assignment-modal/tab
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Tabs from "@/components/tabs";
-import { supabaseClient } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
 
 import BaseModal from "@/components/common/modals/base-modal";
+import { getAssignmentByAssignmentId, updateAssignment } from "@/db/assignment";
+import { getSubmissionsWithAuthorByAssignmentId } from "@/db/submission";
 import type { Assignment } from "@/types/assignments.type";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
+import { useTranslations } from "next-intl";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 
 interface IProps {
@@ -31,51 +33,45 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
   const [assignment, setAssignment] = useState<Assignment>();
   const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
 
-  const saveAssignment = async (_assignment: Assignment) => {
-    const { error } = await supabaseClient
-      .from("assignments")
-      .update(_assignment)
-      .eq("id", _assignment.id);
+  const t = useTranslations();
 
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Assignment saved");
-      onDone();
+  const saveAssignment = async (_assignment: Assignment) => {
+    try {
+      await updateAssignment(_assignment);
+
+      toast(t("assignment_updated"));
       setIsOpen(false);
+      onDone();
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
-  const getSubmissions = () => {
-    return supabaseClient
-      .from("submissions")
-      .select("*, author:users(*)")
-      .eq("assignment_id", assignmentId);
+  const getSubmissions = async () => {
+    try {
+      setSubmissions(
+        await getSubmissionsWithAuthorByAssignmentId(assignmentId)
+      );
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const getAssignment = async () => {
+    try {
+      setAssignment(await getAssignmentByAssignmentId(assignmentId));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
-    (async () => {
-      const { data, error } = await getSubmissions();
-
-      if (error) {
-        toast(error.message);
-      } else {
-        setSubmissions(data);
-      }
-    })();
+    if (isOpen) getSubmissions();
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const { data } = await supabaseClient
-        .from("assignments")
-        .select("*")
-        .eq("id", assignmentId)
-        .single();
-
-      setAssignment(data);
-    })();
-  }, [assignmentId]);
+    if (isOpen) getAssignment();
+  }, [isOpen]);
 
   return (
     <BaseModal
@@ -84,7 +80,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
       isOpen={isOpen}
       title="Assignment"
     >
-      <div className="min-h-[523px]">
+      <div className="">
         <Tabs
           tabs={[
             {

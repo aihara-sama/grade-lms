@@ -4,7 +4,7 @@ import AvatarIcon from "@/components/icons/avatar-icon";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
-import { ROLES, type IUserMetadata } from "@/interfaces/user.interface";
+import { Role, type IUserMetadata } from "@/interfaces/user.interface";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
@@ -34,7 +34,7 @@ const SignUp: FunctionComponent = () => {
       options: {
         data: {
           name,
-          role: ROLES.TEACHER,
+          role: Role.TEACHER,
           avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
           preferred_locale: "en",
         } as IUserMetadata,

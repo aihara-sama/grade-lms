@@ -14,6 +14,7 @@ interface IProps {
 const OverviewTab: FunctionComponent<IProps> = ({ onDone, ...props }) => {
   // States
   const [assignment, setAssignment] = useState<Assignment>(props.assignment);
+
   // Handlers
   const handleSaveAssignment = async () => {
     onDone(assignment);
@@ -42,12 +43,16 @@ const OverviewTab: FunctionComponent<IProps> = ({ onDone, ...props }) => {
         }
       />
       <p>Description</p>
-      <Editor
-        onChange={(data) =>
-          setAssignment((prev) => ({ ...prev, body: JSON.stringify(data) }))
-        }
-        data={JSON.parse(assignment.body)}
-      />
+      <div className="min-h-[216px]">
+        <Editor
+          height="sm"
+          onChange={(data) =>
+            setAssignment((prev) => ({ ...prev, body: JSON.stringify(data) }))
+          }
+          data={JSON.parse(assignment.body)}
+        />
+      </div>
+
       <div className="flex gap-[14px] items-center mt-[14px]">
         <div className="pr-[12px] border-r-2 border-gray-200">
           <DateInput

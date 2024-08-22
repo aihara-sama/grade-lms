@@ -7,7 +7,7 @@ import BasePopper from "@/components/common/poppers/base-popper";
 import LogoutIcon from "@/components/icons/logout-icon";
 import ProfileIcon from "@/components/icons/profile-icon";
 import type { INavItem } from "@/interfaces/menu.interface";
-import type { ROLES } from "@/interfaces/user.interface";
+import type { Role } from "@/interfaces/user.interface";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -20,7 +20,7 @@ export const menu: INavItem[] = [
   },
 ];
 interface IProps {
-  role: ROLES;
+  role: Role;
   avatar: string;
   userName: string;
 }

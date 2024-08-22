@@ -33,12 +33,7 @@ const Page: FunctionComponent<IProps> = async ({
   return (
     <div>
       <LessonHeader course={course.data} lesson={lesson.data} />
-      <Assignments
-        course={course.data}
-        lesson={lesson.data}
-        lessonId={lessonId}
-        user={user}
-      />
+      <Assignments course={course.data} lesson={lesson.data} user={user} />
     </div>
   );
 };

@@ -3,7 +3,7 @@
 import BaseDrawer from "@/components/common/drawers/base-drawer";
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import type { IUserMetadata } from "@/interfaces/user.interface";
-import { ROLES } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import {
   closeNotificationChannel,
   getNotificationChannel,
@@ -60,7 +60,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
 
   useEffect(() => {
     const room =
-      (user.user_metadata as IUserMetadata).role === ROLES.TEACHER
+      (user.user_metadata as IUserMetadata).role === Role.TEACHER
         ? user.id
         : (user.user_metadata as IUserMetadata).creator_id;
     const channel = getNotificationChannel(room);

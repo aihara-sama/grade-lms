@@ -11,7 +11,7 @@ import Tabs from "@/components/tabs";
 import VideoChat from "@/components/video-chat";
 import Whiteboard from "@/components/whiteboard";
 import { useUserName } from "@/hooks/useUserName";
-import { ROLES, type IUserMetadata } from "@/interfaces/user.interface";
+import { Role, type IUserMetadata } from "@/interfaces/user.interface";
 import { supabaseClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
@@ -48,7 +48,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
   const userNameStore = useUserName();
 
   // Vars
-  const role = (user?.user_metadata as IUserMetadata)?.role || ROLES.GUEST;
+  const role = (user?.user_metadata as IUserMetadata)?.role || Role.GUEST;
   const userName =
     (user?.user_metadata as IUserMetadata)?.name || userNameStore.userName;
 
@@ -128,7 +128,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
                       userName={userName}
                       lessonId={lesson.id}
                       avatar={
-                        role === ROLES.GUEST
+                        role === Role.GUEST
                           ? "default-abatar"
                           : (user.user_metadata as IUserMetadata).avatar
                       }

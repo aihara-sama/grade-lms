@@ -65,7 +65,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
 
   return (
     <div
-      className={`fixed inset-3 z-[999] ${isOpen ? "visible" : "invisible"}`}
+      className={`fixed inset-3 z-[999] ${isOpen ? "visible overflow-visible" : "invisible overflow-hidden"}`}
     >
       {/* Mask ↴ */}
       <div

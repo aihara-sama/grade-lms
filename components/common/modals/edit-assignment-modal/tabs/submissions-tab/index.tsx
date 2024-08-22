@@ -18,8 +18,9 @@ const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
     useState(false);
 
   return (
-    <div>
+    <div className="overflow-hidden">
       <Table
+        compact
         data={submissions.map(({ id, author, title, grade, created_at }) => ({
           Name: (
             <IconTitle

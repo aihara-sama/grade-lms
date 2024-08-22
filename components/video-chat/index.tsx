@@ -4,7 +4,7 @@ import Camera from "@/components/camera";
 import { useEffect, useRef, useState } from "react";
 
 import type { ICamera } from "@/interfaces/camera.interface";
-import type { ROLES } from "@/interfaces/user.interface";
+import type { Role } from "@/interfaces/user.interface";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import type Peer from "peerjs";
 import type { FunctionComponent } from "react";
@@ -14,7 +14,7 @@ interface IProps {
   anonId: string;
   channel: RealtimeChannel;
   userName: string;
-  role: ROLES;
+  role: Role;
 }
 
 const VideoChat: FunctionComponent<IProps> = ({
@@ -36,7 +36,7 @@ const VideoChat: FunctionComponent<IProps> = ({
     stream: MediaStream,
     id: string,
     _userName: string,
-    _role: ROLES
+    _role: Role
   ) => {
     setCameras((prev) => {
       if (!prev.find((camera) => camera.stream.id === stream.id)) {

@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n";
 
-export enum ROLES {
+export enum Role {
   STUDENT = "Student",
   TEACHER = "Teacher",
   GUEST = "Guest",
@@ -8,7 +8,7 @@ export enum ROLES {
 
 export interface IUserMetadata {
   name: string;
-  role: ROLES;
+  role: Role;
   avatar: string;
   email: string;
   preferred_locale: Locale;

@@ -18,7 +18,7 @@ const TotalUsers: FunctionComponent<IProps> = ({
 }) => {
   const router = useRouter();
   return (
-    <div className="flex flex-col items-center p-[24px] w-[250px] rounded-[5px] shadow-md">
+    <div className="flex flex-col items-center p-[24px] w-[280px] rounded-[5px] shadow-md">
       <AvatarIcon size="lg" />
       <hr />
       <p>{title}</p>

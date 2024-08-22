@@ -1,7 +1,7 @@
 "use server";
 
 import type { ReturnType } from "@/actions/delete-user-action/types";
-import { ROLES } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
 
@@ -14,7 +14,7 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
     };
   }
 
-  if (currentUser.data.user.user_metadata.role !== ROLES.TEACHER) {
+  if (currentUser.data.user.user_metadata.role !== Role.TEACHER) {
     return {
       error: "Forbidden",
       data: null,

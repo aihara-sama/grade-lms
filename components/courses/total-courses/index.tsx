@@ -19,7 +19,7 @@ const TotalCourses: FunctionComponent<IProps> = ({
   const router = useRouter();
 
   return (
-    <div className="shadow-sm flex flex-col items-center p-[24px] w-[250px] rounded-[5px]">
+    <div className="shadow-sm flex flex-col items-center p-[24px] w-[280px] rounded-[5px]">
       <CoursesIcon />
       <hr />
       <p>{title}</p>

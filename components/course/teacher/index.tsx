@@ -1,6 +1,6 @@
 import Avatar from "@/components/avatar";
 import IconTitle from "@/components/icon-title";
-import { ROLES } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { User } from "@/types/users";
 import type { FunctionComponent } from "react";
 
@@ -17,7 +17,7 @@ const Teacher: FunctionComponent<IProps> = ({ teacher }) => {
           Icon={<Avatar avatar={teacher.avatar} />}
           href={`/users/${teacher.id}`}
           title={teacher.name}
-          subtitle={ROLES.TEACHER}
+          subtitle={Role.TEACHER}
         />
       </div>
     </div>

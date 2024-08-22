@@ -22,9 +22,15 @@ interface IProps {
   data: OutputData;
   onChange: (data: OutputData) => void;
   readOnly?: boolean;
+  height: "sm" | "md";
 }
 
-const Editor: FunctionComponent<IProps> = ({ data, onChange, readOnly }) => {
+const Editor: FunctionComponent<IProps> = ({
+  data,
+  onChange,
+  readOnly,
+  height,
+}) => {
   const ejInstance = useRef<EditorJS>();
   // const [editorData, setEditorData] = useState<OutputData>(data);
 
@@ -34,7 +40,7 @@ const Editor: FunctionComponent<IProps> = ({ data, onChange, readOnly }) => {
       inlineToolbar: true,
       sanitizer: {},
       placeholder: "Start here...",
-      minHeight: 320,
+      minHeight: 242,
       holder: EDITTOR_HOLDER_ID,
       data,
       onReady: () => {
@@ -84,7 +90,7 @@ const Editor: FunctionComponent<IProps> = ({ data, onChange, readOnly }) => {
 
   return (
     <div
-      className="overflow-auto max-h-80 p-2 border border-gray-200"
+      className={`overflow-auto ${height === "sm" ? "max-h-[198px]" : "max-h-[298px]"} p-2 border border-gray-200`}
       id={EDITTOR_HOLDER_ID}
     ></div>
   );

@@ -5,7 +5,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import ResizeHandler from "@/components/resize-handler";
 import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
-import { ROLES } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -37,7 +37,7 @@ const Excalidraw = dynamic(
 
 interface IProps {
   userName: string;
-  role: ROLES;
+  role: Role;
   channel: RealtimeChannel;
   lesson: Lesson;
 }
@@ -62,7 +62,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
 
   // Effects
   useEffect(() => {
-    if (role === ROLES.STUDENT || role === ROLES.GUEST) {
+    if (role === Role.STUDENT || role === Role.GUEST) {
       channel.on("broadcast", { event: "whiteboard:change" }, (payload) => {
         excalidrawAPIRef.current?.updateScene({
           elements: payload.payload.elements,
@@ -177,7 +177,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
         </div>
       </div>
       <div
-        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(role !== ROLES.TEACHER) && "hide-whiteboard-elements"}`}
+        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(role !== Role.TEACHER) && "hide-whiteboard-elements"}`}
         style={{
           height: `${whiteboardHeight}px`,
         }}
@@ -185,14 +185,14 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
         <Excalidraw
           isCollaborating
           onPointerUpdate={
-            role === ROLES.TEACHER ? handlePointerUpdate : undefined
+            role === Role.TEACHER ? handlePointerUpdate : undefined
           }
-          onChange={role === ROLES.TEACHER ? handleChange : undefined}
+          onChange={role === Role.TEACHER ? handleChange : undefined}
           excalidrawAPI={(api) => {
             excalidrawAPIRef.current = api;
           }}
           initialData={
-            role === ROLES.STUDENT
+            role === Role.STUDENT
               ? (function () {
                   const data = JSON.parse(lesson.whiteboard_data);
                   if (data.appState) {
