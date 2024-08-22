@@ -6,39 +6,34 @@ import NotificationsIcon from "@/components/icons/notifications-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
 import NavTabs from "@/components/nav-tabs";
-
-import type { Database } from "@/types/supabase.type";
-import type { FunctionComponent, PropsWithChildren, ReactNode } from "react";
-
-interface IItem {
-  title: string;
-  href: string;
-  Icon: ReactNode;
-}
+import type { ITabItem } from "@/interfaces/menu.interface";
+import type { Course } from "@/types/courses.type";
+import type { Lesson } from "@/types/lessons.type";
+import type { FunctionComponent, PropsWithChildren } from "react";
 
 interface IProps {
-  course: Database["public"]["Tables"]["courses"]["Row"];
-  lesson: Database["public"]["Tables"]["lessons"]["Row"];
+  course: Course;
+  lesson: Lesson;
 }
 
 const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
   course,
   lesson,
 }) => {
-  const tabs: IItem[] = [
+  const tabs: ITabItem[] = [
     {
       title: "Overview",
-      href: `/dashboard/courses/${course.id}/lessons/${lesson?.id}/overview`,
+      href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
       Icon: <OverviewIcon />,
     },
     {
       title: "Assignments",
-      href: `/dashboard/courses/${course.id}/lessons/${lesson?.id}/assignments`,
+      href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
       Icon: <AssignmentsIcon />,
     },
     {
       title: "Settings",
-      href: `/dashboard/courses/${course.id}/lessons/${lesson?.id}/settings`,
+      href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
       Icon: <SettingsIcon />,
     },
   ];
@@ -54,7 +49,7 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
         items={[
           { title: "Courses", href: "/dashboard/courses" },
           {
-            title: course?.title,
+            title: course.title,
             href: `/dashboard/courses/${course.id}/overview`,
           },
           {
@@ -63,14 +58,14 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
           },
           {
             isCurrentPage: true,
-            title: lesson?.title,
-            href: `/dashboard/courses/${course.id}/lessons/${lesson?.id}/overview`,
+            title: lesson.title,
+            href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
           },
         ]}
       />
       <div className="flex items-center justify-between">
         <p className="text-3xl font-bold text-neutral-600 my-3">
-          {lesson?.title}
+          {lesson.title}
         </p>
         <div className="flex items-center gap-3">
           <div className="text-4 flex items-center gap-1 relative text-sm">

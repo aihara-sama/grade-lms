@@ -14,7 +14,8 @@
   a {
     @apply hover:text-blue-500;
   }
-  button {
+  button,
+  .button {
     @apply font-bold whitespace-nowrap py-[6px] px-3 gap-[6px] shadow-sm [transition:0.2s] cursor-pointer rounded-[5px] flex items-center justify-center;
     @apply disabled:opacity-75 disabled:cursor-default disabled:bg-link !important;
   }

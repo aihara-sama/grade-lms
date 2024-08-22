@@ -16,29 +16,28 @@ import {
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-import type { Database } from "@/types/supabase.type";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types";
-import type { User } from "@supabase/supabase-js";
+import type {
+  ExcalidrawImperativeAPI,
+  ExcalidrawProps,
+} from "@excalidraw/excalidraw/types/types";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 import CalendarIcon from "@/components/icons/calendar-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
+import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
+import type { Lesson } from "@/types/lessons.type";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface IProps {
-  lesson: Database["public"]["Tables"]["lessons"]["Row"];
-  user: User;
+  lesson: Lesson;
 }
 
 const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
   // State
   const [starts, setStarts] = useState(new Date(lesson.starts));
   const [ends, setEnds] = useState(new Date(lesson.ends));
-  const [whiteboardHeight, setWhiteboardHeight] = useState(500);
-  const [whiteboardInitialHeight] = useState(
-    typeof window !== "undefined" ? window.innerHeight - 300 : 500
-  );
+  const [whiteboardHeight, setWhiteboardHeight] = useState(0);
 
   // Refs
   const containerRef = useRef<HTMLDivElement>();
@@ -49,7 +48,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
   const duration = +new Date(ends) - +new Date(starts);
 
   // Handlers
-  const handleSave = async () => {
+  const handleSaveDate = async () => {
     const { error } = await supabaseClient
       .from("lessons")
       .update({
@@ -86,6 +85,21 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
     if (error) toast.error(error.message);
     else toast.success("Saved!");
   };
+  const onWhiteboardChange: ExcalidrawProps["onChange"] = (
+    elements,
+    appState
+  ) => {
+    whiteboardDataRef.current = {
+      elements,
+      appState,
+    };
+  };
+
+  const parseWhiteboardData = () => {
+    const data = JSON.parse(lesson.whiteboard_data);
+    if (data.appState) data.appState.collaborators = new Map();
+    return data;
+  };
 
   return (
     <div className="flex flex-col sm:flex-row gap-6 mt-3" ref={containerRef}>
@@ -115,23 +129,14 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
             excalidrawAPI={(api) => {
               excalidrawAPIRef.current = api;
             }}
-            initialData={(function () {
-              const data = JSON.parse(lesson.whiteboard_data);
-              if (data.appState) data.appState.collaborators = new Map();
-              return data;
-            })()}
-            onChange={(elements, appState) => {
-              whiteboardDataRef.current = {
-                elements,
-                appState,
-              };
-            }}
+            initialData={parseWhiteboardData()}
+            onChange={onWhiteboardChange}
           />
           <ResizeHandler
             containerRef={containerRef}
-            initialHeight={whiteboardInitialHeight}
-            minHeight={170}
-            onResize={(height) => setWhiteboardHeight(height)}
+            initialHeight={window.innerHeight - 300}
+            minHeight={WHITEBOARD_MIN_HEIGHT}
+            onResize={setWhiteboardHeight}
           />
         </div>
       </main>
@@ -153,18 +158,18 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
           value={`${millisecondsToMinutes(duration)}`}
           onChange={handleChangeDuration}
         />
-        <button className="primary-button" onClick={handleSave}>
+        <button className="primary-button" onClick={handleSaveDate}>
           Save
         </button>
         <div className="mt-3 sm:mt-auto flex flex-col gap-1">
           <Link
-            className="warning-button "
-            href={`/dashboard/lessons/${lesson?.id}`}
+            href={`/dashboard/lessons/${lesson.id}`}
+            className=" button warning-button"
           >
             Enter class
           </Link>
           <Link
-            className="link-button flex gap-2 items-center"
+            className="button link-button flex gap-2 items-center"
             href="/dashboard/schedule"
           >
             Find in schedule <CalendarIcon />

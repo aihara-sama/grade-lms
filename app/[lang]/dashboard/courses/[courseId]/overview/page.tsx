@@ -35,12 +35,13 @@ interface IProps {
 }
 
 const Page: FunctionComponent<IProps> = async ({ params }) => {
-  const data = await supabaseClient
+  const courseData = await supabaseClient
     .from("courses")
     .select("*, users(*), lessons(*)")
-    .eq("id", params.courseId);
+    .eq("id", params.courseId)
+    .single();
 
-  const currentCourse = data.data?.[0];
+  const currentCourse = courseData.data;
 
   if (!currentCourse) return redirect("/dashboard/courses");
 
