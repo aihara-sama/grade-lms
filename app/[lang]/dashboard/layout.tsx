@@ -10,7 +10,6 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
 
   return (
     <div className="h-full flex-col">
-      <div className="h-[68px]"></div>
       <Header user={user} />
       <ContentWrapper>{children}</ContentWrapper>
     </div>

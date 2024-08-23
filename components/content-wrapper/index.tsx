@@ -12,9 +12,13 @@ const ContentWrapper: FunctionComponent<IProps> = ({ children }) => {
   const { isExpanded } = useIsLessonHrExpanded();
   return (
     <div
-      className={`overflow-auto h-[calc(100%-68px)] flex flex-1 flex-col p-6 max-w-[1432px] mx-[auto] ${clsx(isExpanded && "[max-width:unset] [margin:unset]")}`}
+      className={`overflow-auto h-[calc(100vh-68px)] fixed inset-0 top-[68px] `}
     >
-      {children}
+      <div
+        className={`max-w-[1432px] mx-[auto] ${clsx(isExpanded && "[max-width:unset] [margin:unset]")} flex flex-1 flex-col p-6`}
+      >
+        {children}
+      </div>
     </div>
   );
 };
