@@ -13,7 +13,10 @@ import BaseModal from "@/components/common/modals/base-modal";
 import { getAssignmentByAssignmentId, updateAssignment } from "@/db/assignment";
 import { getSubmissionsWithAuthorByAssignmentId } from "@/db/submission";
 import type { Assignment } from "@/types/assignments.type";
+import type { Course } from "@/types/courses.type";
+import type { Lesson } from "@/types/lessons.type";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
+import type { User } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 
@@ -22,6 +25,9 @@ interface IProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   assignmentId: string;
   onDone: () => void;
+  user: User;
+  course: Course;
+  lesson: Lesson;
 }
 
 const EditAssignmentModal: FunctionComponent<IProps> = ({
@@ -29,6 +35,9 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
   onDone,
   isOpen,
   setIsOpen,
+  user,
+  course,
+  lesson,
 }) => {
   const [assignment, setAssignment] = useState<Assignment>();
   const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
@@ -67,10 +76,11 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
 
   useEffect(() => {
     if (isOpen) getSubmissions();
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) getAssignment();
+    else setAssignment(undefined);
   }, [isOpen]);
 
   return (
@@ -87,13 +97,24 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
               title: "Overview",
               Icon: <OverviewIcon />,
               content: assignment && (
-                <OverviewTab assignment={assignment} onDone={saveAssignment} />
+                <OverviewTab
+                  course={course}
+                  user={user}
+                  assignment={assignment}
+                  onDone={saveAssignment}
+                  lesson={lesson}
+                />
               ),
             },
             {
               title: "Submissions",
               Icon: <SubmissionsIcon />,
-              content: <SubmissionsTab submissions={submissions} />,
+              content: (
+                <SubmissionsTab
+                  onDone={getSubmissions}
+                  submissions={submissions}
+                />
+              ),
             },
           ]}
         />

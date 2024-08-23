@@ -131,6 +131,7 @@ create table notifications (
   course_id uuid references public.courses on delete SET NULL,
   lesson_id uuid references public.lessons on delete SET NULL,
   assignment_id uuid references public.assignments on delete SET NULL,
+  submission_id uuid references public.submissions on delete SET NULL,
   created_at timestamp not null default now(),
   type text not null,
   is_read boolean not null

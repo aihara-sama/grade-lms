@@ -13,16 +13,16 @@ import List from "@editorjs/list";
 import Paragraph from "@editorjs/paragraph";
 import Quote from "@editorjs/quote";
 import SimpleImage from "@editorjs/simple-image";
+import clsx from "clsx";
 import type { FunctionComponent } from "react";
 import { useEffect, useRef } from "react";
-
-const EDITTOR_HOLDER_ID = "editorjs";
 
 interface IProps {
   data: OutputData;
   onChange: (data: OutputData) => void;
   readOnly?: boolean;
-  height: "sm" | "md";
+  height: "sm" | "md" | "lg";
+  id: string;
 }
 
 const Editor: FunctionComponent<IProps> = ({
@@ -30,6 +30,7 @@ const Editor: FunctionComponent<IProps> = ({
   onChange,
   readOnly,
   height,
+  id,
 }) => {
   const ejInstance = useRef<EditorJS>();
   // const [editorData, setEditorData] = useState<OutputData>(data);
@@ -41,7 +42,7 @@ const Editor: FunctionComponent<IProps> = ({
       sanitizer: {},
       placeholder: "Start here...",
       minHeight: 242,
-      holder: EDITTOR_HOLDER_ID,
+      holder: id,
       data,
       onReady: () => {
         ejInstance.current = editor;
@@ -90,8 +91,8 @@ const Editor: FunctionComponent<IProps> = ({
 
   return (
     <div
-      className={`overflow-auto ${height === "sm" ? "max-h-[198px]" : "max-h-[298px]"} p-2 border border-gray-200`}
-      id={EDITTOR_HOLDER_ID}
+      className={`overflow-auto ${clsx({ "max-h-[198px]": height === "sm", "max-h-[298px]": height === "lg", "max-h-[265px]": height === "md" })} p-2 border border-gray-200`}
+      id={id}
     ></div>
   );
 };

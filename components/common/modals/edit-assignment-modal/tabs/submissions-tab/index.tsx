@@ -10,9 +10,10 @@ import { useState, type FunctionComponent } from "react";
 
 interface IProps {
   submissions: SubmissionWithAuthor[];
+  onDone: () => void;
 }
 
-const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
+const SubmissionsTab: FunctionComponent<IProps> = ({ submissions, onDone }) => {
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string>();
   const [isViewSubmissonModalOpen, setIsViewSubmissonModalOpen] =
     useState(false);
@@ -28,7 +29,10 @@ const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
               key={id}
               title={title}
               subtitle=""
-              onClick={() => setSelectedSubmissionId(id)}
+              onClick={() => {
+                setSelectedSubmissionId(id);
+                setIsViewSubmissonModalOpen(true);
+              }}
             />
           ),
           Author: (
@@ -47,7 +51,7 @@ const SubmissionsTab: FunctionComponent<IProps> = ({ submissions }) => {
       <ViewSubmissionModal
         isOpen={isViewSubmissonModalOpen}
         setIsOpen={setIsViewSubmissonModalOpen}
-        onDone={() => {}}
+        onDone={onDone}
         submissionId={selectedSubmissionId}
       />
     </div>

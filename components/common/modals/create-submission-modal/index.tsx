@@ -1,22 +1,17 @@
 import BaseModal from "@/components/common/modals/base-modal";
-import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import { createAssignment } from "@/db/assignment";
-import { getAllCourseStudentsIds } from "@/db/user";
+import { createNotification } from "@/db/notification";
+import { createSubmission } from "@/db/submission";
 import { NotificationType } from "@/interfaces/notifications.interface";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
-import type { Notification } from "@/types/notifications";
 import type { TablesInsert } from "@/types/supabase.type";
-import { getNextMorning } from "@/utils/get-next-morning";
 import { getNotificationChannel } from "@/utils/get-notification-channel";
-import { supabaseClient } from "@/utils/supabase/client";
 import type { OutputData } from "@editorjs/editorjs";
 import type { User } from "@supabase/supabase-js";
-import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type {
@@ -31,11 +26,14 @@ import toast from "react-hot-toast";
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
-const getInitAssignment = (lessonId: string): TablesInsert<"assignments"> => ({
-  lesson_id: lessonId,
-  title: "",
+const getInitSubmission = (
+  assignmentId: string,
+  userId: string
+): TablesInsert<"submissions"> => ({
+  user_id: userId,
+  title: "My Submission",
   body: "{}",
-  due_date: format(getNextMorning(), "yyyy-MM-dd'T'HH:mm:ss"),
+  assignment_id: assignmentId,
 });
 
 interface IProps {
@@ -45,17 +43,21 @@ interface IProps {
   user: User;
   course: Course;
   lesson: Lesson;
+  assignmentId: string;
 }
-const CreateAssignmentModal: FunctionComponent<IProps> = ({
+const CreateSubmissionModal: FunctionComponent<IProps> = ({
   onDone,
   user,
   course,
   lesson,
   isOpen,
   setIsOpen,
+  assignmentId,
 }) => {
   // States
-  const [assignment, setAssignment] = useState(getInitAssignment(lesson.id));
+  const [submission, setSubmission] = useState(
+    getInitSubmission(assignmentId, user.id)
+  );
 
   // Hooks
   const t = useTranslations();
@@ -63,20 +65,17 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
   // Handlers
   const handleCreateAssignment = async () => {
     try {
-      const createdAssignment = await createAssignment(assignment);
+      const createdSubmission = await createSubmission(submission);
 
-      const students = await getAllCourseStudentsIds(user.id, course.id);
-
-      await supabaseClient.from("notifications").insert(
-        students.map(({ id }) => ({
-          user_id: id,
-          assignment_id: createdAssignment.id,
-          course_id: course.id,
-          lesson_id: lesson.id,
-          is_read: false,
-          type: NotificationType.Assignment,
-        })) as Notification[]
-      );
+      await createNotification({
+        user_id: (user.user_metadata as IUserMetadata).creator_id,
+        submission_id: createdSubmission.id,
+        assignment_id: assignmentId,
+        course_id: course.id,
+        lesson_id: lesson.id,
+        is_read: false,
+        type: NotificationType.Submission,
+      });
 
       const room =
         (user.user_metadata as IUserMetadata).role === Role.TEACHER
@@ -88,7 +87,7 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
         type: "broadcast",
       });
 
-      toast.success(t("assignment_created"));
+      toast.success(t("submission_created"));
       setIsOpen(false);
       onDone();
     } catch (error: any) {
@@ -96,63 +95,49 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
     }
   };
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setAssignment((_) => ({ ..._, [e.target.name]: e.target.value }));
+    setSubmission((_) => ({ ..._, [e.target.name]: e.target.value }));
 
   const handleBodyChange = (data: OutputData) =>
-    setAssignment((_) => ({
+    setSubmission((_) => ({
       ..._,
       body: JSON.stringify(data),
     }));
 
-  const handleDateChange = (date: Date) => {
-    setAssignment((_) => ({
-      ..._,
-      due_date: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
-    }));
-  };
-
   useEffect(() => {
-    if (!isOpen) setAssignment(getInitAssignment(lesson.id));
+    if (!isOpen) setSubmission(getInitSubmission(assignmentId, user.id));
   }, [isOpen]);
 
   return (
     <BaseModal
+      isInsideModal
       width="lg"
       setIsOpen={setIsOpen}
       isOpen={isOpen}
-      title="Assignment"
+      title="Submission"
     >
       <div>
         <Input
           autoFocus
           fullWIdth
           Icon={<LessonsIcon size="xs" />}
-          placeholder="Assignment name"
+          placeholder="Submission name"
           name="title"
           onChange={handleInputChange}
-          value={assignment.title}
+          value={submission.title}
         />
         <p>Description</p>
         <div className="min-h-[298px]">
           <Editor
-            id="create-assignment-editor"
-            height="lg"
+            height="md"
             onChange={handleBodyChange}
-            data={JSON.parse(assignment.body)}
+            data={JSON.parse(submission.body)}
+            id="submission-editor"
           />
         </div>
 
         <div className="flex gap-3 items-center mt-3 justify-end">
-          <div className="pr-3 border-r-2 border-gray-200">
-            <DateInput
-              date={new Date(assignment.due_date)}
-              onChange={handleDateChange}
-              label="Due date"
-              popperPlacement="top-start"
-            />
-          </div>
           <button
-            disabled={!assignment.title}
+            disabled={!submission.title}
             className="primary-button"
             onClick={handleCreateAssignment}
           >
@@ -164,4 +149,4 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
   );
 };
 
-export default CreateAssignmentModal;
+export default CreateSubmissionModal;

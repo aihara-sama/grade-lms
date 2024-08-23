@@ -8,6 +8,7 @@ import type {
   SetStateAction,
 } from "react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface IProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface IProps {
   title: string;
   headerButtons?: ReactNode;
   isExpanded?: boolean;
+  isInsideModal?: boolean;
 }
 
 const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
@@ -24,6 +26,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
   headerButtons,
   isOpen,
   setIsOpen,
+  isInsideModal,
   isExpanded = true,
   width = "md",
 }) => {
@@ -37,10 +40,14 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
     if (!isAnim) {
       setIsVisible(false);
       // Restore scrollbar
-      document.body.style.overflowY = "unset";
-      document.body.style.paddingRight = "0px";
+      if (!isInsideModal) {
+        document.body.style.overflowY = "unset";
+        document.body.style.paddingRight = "0px";
+      }
     }
   };
+
+  const handleMuskClick = () => setIsOpen(false);
 
   // Effects
   useEffect(() => {
@@ -63,14 +70,14 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
     }
   }, [isOpen]);
 
-  return (
+  return createPortal(
     <div
       className={`fixed inset-3 z-[999] ${isOpen ? "visible overflow-visible" : "invisible overflow-hidden"}`}
     >
       {/* Mask ↴ */}
       <div
-        className={`fixed inset-0 backdrop-filter z-[99] transition-all ${isOpen ? "backdrop-blur-[2px] bg-mask visible" : "invisible bg-transparent backdrop-blur-0"}`}
-        onClick={() => setIsOpen(false)}
+        className={` fixed inset-0 backdrop-filter z-[99] transition-all ${isOpen ? "backdrop-blur-[2px] bg-mask visible" : "invisible bg-transparent backdrop-blur-0"}`}
+        onClick={handleMuskClick}
       ></div>
       {/* ^ Mask ^ */}
       <div
@@ -98,7 +105,8 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

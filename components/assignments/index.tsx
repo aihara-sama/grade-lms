@@ -273,9 +273,12 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
         />
       )}
       <EditAssignmentModal
+        lesson={lesson}
+        course={course}
+        user={user}
         assignmentId={selectedAssignmentId}
         onDone={() => {
-          fetchAssignmentsWithCount();
+          fetchAssignmentsBySearch();
           setSelectedAssignmentId(undefined);
         }}
         setIsOpen={setIsEditAssignmentModalOpen}

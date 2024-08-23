@@ -2,7 +2,6 @@
 
 import DeleteButton from "@/components/buttons/delete-button";
 import CardTitle from "@/components/card-title";
-import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import { supabaseClient } from "@/utils/supabase/client";
@@ -18,11 +17,11 @@ interface IProps {
 const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
   // States
   const [, setIsCreateAssignmentModalOpen] = useState(false);
-  const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
-    useState(false);
-  const [currentAssignmentId, setCurrentAssignmentId] = useState<
-    string | undefined
-  >();
+  // const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
+  //   useState(false);
+  // const [currentAssignmentId, setCurrentAssignmentId] = useState<
+  //   string | undefined
+  // >();
   const [assignments, setAssignments] = useState<
     Database["public"]["Tables"]["assignments"]["Row"][]
   >([]);
@@ -65,7 +64,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
               Icon={<AssignmentsIcon size="sm" />}
               title={assignment.title}
               subtitle="Due date: Tomorrow"
-              onClick={() => setCurrentAssignmentId(assignment.id)}
+              // onClick={() => setCurrentAssignmentId(assignment.id)}
             />
             <div className="flex items-center gap-[12px]">
               <button className="icon-button shadow-md">
@@ -90,7 +89,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
           Create assignments
         </button>
       </div>
-      {currentAssignmentId && (
+      {/* {currentAssignmentId && (
         <EditAssignmentModal
           assignmentId={currentAssignmentId}
           onDone={() => {
@@ -100,7 +99,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
           setIsOpen={setIsEditAssignmentModalOpen}
           isOpen={isEditAssignmentModalOpen}
         />
-      )}
+      )} */}
       {/* {isCreateAssignmentModalOpen && (
         <CreateAssignmentModal
           closeModal={() => setIsCreateAssignmentModalOpen(false)}

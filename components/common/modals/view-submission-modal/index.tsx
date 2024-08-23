@@ -62,10 +62,11 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
 
   useEffect(() => {
     if (isOpen) getSubmission();
-  }, []);
+  }, [isOpen]);
 
   return (
     <BaseModal
+      isInsideModal
       width="lg"
       setIsOpen={setIsOpen}
       isOpen={isOpen}
@@ -87,6 +88,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
           <div className="">
             <Editor
               height="md"
+              id="submission-editor"
               readOnly
               onChange={() => {}}
               data={JSON.parse(submission.body)}
