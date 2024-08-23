@@ -53,7 +53,7 @@ const BaseDrawer: FunctionComponent<PropsWithChildren<IProps>> = ({
       {/* Actual Drawer */}
       <div
         className={clsx(
-          "bg-white transition-transform ease-in duration-200 absolute z-[999] inset-y-0",
+          "bg-white transition-transform ease-in duration-200 fixed z-[999] inset-y-0",
           {
             "w-full sm:w-[450px]":
               placement === "left" || placement === "right",

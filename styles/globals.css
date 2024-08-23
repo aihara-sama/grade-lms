@@ -11,6 +11,7 @@
     @apply overflow-x-hidden !important;
     @apply overflow-y-auto;
   }
+
   a {
     @apply hover:text-blue-500;
   }

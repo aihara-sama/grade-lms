@@ -4,7 +4,7 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import type { INavItem } from "@/interfaces/menu.interface";
 
-export const navItems: INavItem[] = [
+export const teacherNavItems: INavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
@@ -19,6 +19,23 @@ export const navItems: INavItem[] = [
     title: "Users",
     href: "/dashboard/users",
     Icon: UsersIcon,
+  },
+  {
+    title: "Schedule",
+    href: "/dashboard/schedule",
+    Icon: CalendarIcon,
+  },
+];
+export const studentNavItems: INavItem[] = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    Icon: OverviewIcon,
+  },
+  {
+    title: "Courses",
+    href: "/dashboard/courses",
+    Icon: CoursesIcon,
   },
   {
     title: "Schedule",

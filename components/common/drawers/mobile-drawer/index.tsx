@@ -2,7 +2,7 @@
 
 import BaseDrawer from "@/components/common/drawers/base-drawer";
 import Hamburger from "@/components/hamburger";
-import { navItems } from "@/components/header/nav-items";
+import { teacherNavItems } from "@/components/header/nav-items";
 import Logo from "@/components/logo";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
@@ -23,7 +23,7 @@ const MobileDrawer: FunctionComponent = () => {
       >
         <div className="pl-7">
           <div className="flex flex-col gap-4 mt-4">
-            {navItems.map(({ title, href, Icon }, idx) => (
+            {teacherNavItems.map(({ title, href, Icon }, idx) => (
               <Link href={href} key={idx} className="flex items-center gap-2">
                 <Icon />
                 <span className="text-md"> {title}</span>

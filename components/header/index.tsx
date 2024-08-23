@@ -32,7 +32,7 @@ const Header: FunctionComponent<IProps> = ({ user }) => {
       {!!user && (
         <>
           <div className="mr-auto">
-            <Nav />
+            <Nav user={user} />
           </div>
           <NotificationsDrawer user={user} />
           <div className="ml-2">
