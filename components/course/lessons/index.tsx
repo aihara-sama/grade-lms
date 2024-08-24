@@ -26,8 +26,11 @@ import {
   getLessonsCountByTitleAndCourseId,
   getOffsetLessonsByTitleAndCourseId,
 } from "@/db/lesson";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
 import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import type { User } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -35,8 +38,9 @@ import toast from "react-hot-toast";
 
 interface IProps {
   courseId: string;
+  user: User;
 }
-const Lessons: FunctionComponent<IProps> = ({ courseId }) => {
+const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
   const [isDeleteLessonsModalOpen, setIsDeleteLessonsModalOpen] =
     useState(false);
   const [selectedLessonsIds, setSelectedLessonsIds] = useState<string[]>([]);
@@ -183,7 +187,9 @@ const Lessons: FunctionComponent<IProps> = ({ courseId }) => {
           total={totalLessonsCount}
           Icon={<LessonsIcon size="lg" />}
         />
-        <CreateLesson onDone={fetchLessonsBySearch} courseId={courseId} />
+        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+          <CreateLesson onDone={fetchLessonsBySearch} courseId={courseId} />
+        )}
       </CardsContainer>
       {selectedLessonsIds.length ? (
         <div className="mb-3 flex gap-3">
@@ -222,11 +228,15 @@ const Lessons: FunctionComponent<IProps> = ({ courseId }) => {
                 Icon={<LessonsIcon size="md" />}
                 title={title}
                 subtitle=""
-                onToggle={(checked) => onLessonToggle(checked, id)}
+                onToggle={
+                  (user.user_metadata as IUserMetadata).role === Role.TEACHER
+                    ? (checked) => onLessonToggle(checked, id)
+                    : undefined
+                }
               />
             ),
             Starts: format(new Date(starts), "EEEE, MMM d"),
-            "": (
+            "": (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
               <LessonOptionsPopper
                 lessonId={id}
                 onDone={fetchLessonsBySearch}

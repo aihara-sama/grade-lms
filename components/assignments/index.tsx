@@ -25,6 +25,8 @@ import {
   getAssignmentsCountByTitleAndLessonId,
   getOffsetAssignmentsByTitleAndLessonId,
 } from "@/db/assignment";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
@@ -208,12 +210,14 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
           total={totalAssignmentsCount}
           title="Total assignments"
         />
-        <CreateAssignment
-          course={course}
-          lesson={lesson}
-          user={user}
-          onDone={fetchAssignmentsBySearch}
-        />
+        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+          <CreateAssignment
+            course={course}
+            lesson={lesson}
+            user={user}
+            onDone={fetchAssignmentsBySearch}
+          />
+        )}
       </CardsContainer>{" "}
       {selectedAssignmentsIds.length ? (
         <div className="mb-3 flex gap-3">
@@ -259,10 +263,14 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
                 Icon={<AssignmentsIcon size="md" />}
                 title={title}
                 subtitle=""
-                onToggle={(checked) => onAssignmentToggle(checked, id)}
+                onToggle={
+                  (user.user_metadata as IUserMetadata).role === Role.TEACHER
+                    ? (checked) => onAssignmentToggle(checked, id)
+                    : undefined
+                }
               />
             ),
-            "": (
+            "": (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
               <AssignmentOptionsPopper
                 assignmentId={id}
                 onDone={fetchAssignmentsBySearch}

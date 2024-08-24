@@ -25,15 +25,20 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import CalendarIcon from "@/components/icons/calendar-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
+import type { User } from "@supabase/supabase-js";
+import clsx from "clsx";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface IProps {
   lesson: Lesson;
+  user: User;
 }
 
-const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
+const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
   // State
   const [starts, setStarts] = useState(new Date(lesson.starts));
   const [ends, setEnds] = useState(new Date(lesson.ends));
@@ -111,15 +116,17 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
               Whiteboard preview
             </p>
           </div>
-          <button
-            className="icon-button shadow-md ml-auto mr-2"
-            onClick={handleSaveWhiteboardData}
-          >
-            <SaveIcon />
-          </button>
+          {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+            <button
+              className="icon-button shadow-md ml-auto mr-2"
+              onClick={handleSaveWhiteboardData}
+            >
+              <SaveIcon />
+            </button>
+          )}
         </div>
         <div
-          className="relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)]"
+          className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx((user.user_metadata as IUserMetadata).role !== Role.TEACHER && "student-whiteboard")}`}
           style={{
             height: `${whiteboardHeight}px`,
           }}
@@ -130,7 +137,11 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
               excalidrawAPIRef.current = api;
             }}
             initialData={parseWhiteboardData()}
-            onChange={onWhiteboardChange}
+            onChange={
+              (user.user_metadata as IUserMetadata).role === Role.TEACHER
+                ? onWhiteboardChange
+                : undefined
+            }
           />
           <ResizeHandler
             containerRef={containerRef}
@@ -148,6 +159,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
           onChange={handleChangeDate}
           label="Starts at"
           popperPlacement="bottom-start"
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
         />
         <Input
           className="mt-3 mb-0"
@@ -157,17 +169,29 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
           Icon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={handleChangeDuration}
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
         />
-        <button className="primary-button" onClick={handleSaveDate}>
-          Save
-        </button>
+        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+          <button className="primary-button" onClick={handleSaveDate}>
+            Save
+          </button>
+        )}
         <div className="mt-3 sm:mt-auto flex flex-col gap-1">
-          <Link
-            href={`/dashboard/lessons/${lesson.id}`}
-            className=" button warning-button"
-          >
-            Enter class
-          </Link>
+          {(user.user_metadata as IUserMetadata).role !== Role.TEACHER ? (
+            <Link
+              href={`/dashboard/lessons/${lesson.id}`}
+              className={`button warning-button ${clsx(new Date() >= starts && "disabled")} `}
+            >
+              Enter class
+            </Link>
+          ) : (
+            <Link
+              href={`/dashboard/lessons/${lesson.id}`}
+              className="button warning-button"
+            >
+              Enter class
+            </Link>
+          )}
           <Link
             className="button link-button flex gap-2 items-center"
             href="/dashboard/schedule"

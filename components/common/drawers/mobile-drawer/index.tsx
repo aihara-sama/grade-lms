@@ -2,14 +2,32 @@
 
 import BaseDrawer from "@/components/common/drawers/base-drawer";
 import Hamburger from "@/components/hamburger";
-import { teacherNavItems } from "@/components/header/nav-items";
+import {
+  studentNavItems,
+  teacherNavItems,
+} from "@/components/header/nav-items";
 import Logo from "@/components/logo";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
+import type { User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
 
-const MobileDrawer: FunctionComponent = () => {
+interface IProps {
+  user: User;
+}
+
+const MobileDrawer: FunctionComponent<IProps> = ({ user }) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
+
+  const getNavItems = () => {
+    if ((user.user_metadata as IUserMetadata).role === Role.TEACHER)
+      return teacherNavItems;
+    if ((user.user_metadata as IUserMetadata).role === Role.STUDENT)
+      return studentNavItems;
+    return [];
+  };
 
   // View
   return (
@@ -23,7 +41,7 @@ const MobileDrawer: FunctionComponent = () => {
       >
         <div className="pl-7">
           <div className="flex flex-col gap-4 mt-4">
-            {teacherNavItems.map(({ title, href, Icon }, idx) => (
+            {getNavItems().map(({ title, href, Icon }, idx) => (
               <Link href={href} key={idx} className="flex items-center gap-2">
                 <Icon />
                 <span className="text-md"> {title}</span>

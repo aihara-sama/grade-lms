@@ -177,7 +177,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
         </div>
       </div>
       <div
-        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(role !== Role.TEACHER) && "hide-whiteboard-elements"}`}
+        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(role !== Role.TEACHER) && "student-whiteboard"}`}
         style={{
           height: `${whiteboardHeight}px`,
         }}

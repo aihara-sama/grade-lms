@@ -10,6 +10,7 @@ const publicPages = [
   "/subscription",
   "/dashboard/lessons/:*",
 ];
+//  "/((?!api/send-notification|[a-zA-Z]{2}/sign-up|[a-zA-Z]{2}/sign-in|[a-zA-Z]{2}/dashboard/lessons/:*|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
 
 const intlMiddleware = createMiddleware({
   locales,

@@ -42,7 +42,7 @@ const Header: FunctionComponent<IProps> = ({ user }) => {
               avatar={(user.user_metadata as IUserMetadata).avatar}
             />
           </div>
-          <MobileDrawer />
+          <MobileDrawer user={user} />
         </>
       )}
     </div>

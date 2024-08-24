@@ -11,7 +11,12 @@ import { useEffect, useState } from "react";
 
 import BaseModal from "@/components/common/modals/base-modal";
 import { getAssignmentByAssignmentId, updateAssignment } from "@/db/assignment";
-import { getSubmissionsWithAuthorByAssignmentId } from "@/db/submission";
+import {
+  getSubmissionsWithAuthorByAssignmentId,
+  getSubmissionsWithAuthorByAssignmentIdAndUserId,
+} from "@/db/submission";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
@@ -59,7 +64,12 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
   const getSubmissions = async () => {
     try {
       setSubmissions(
-        await getSubmissionsWithAuthorByAssignmentId(assignmentId)
+        await ((user.user_metadata as IUserMetadata).role === Role.TEACHER
+          ? getSubmissionsWithAuthorByAssignmentId(assignmentId)
+          : getSubmissionsWithAuthorByAssignmentIdAndUserId(
+              assignmentId,
+              user.id
+            ))
       );
     } catch (error: any) {
       toast.error(error.message);
@@ -98,10 +108,11 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
               Icon: <OverviewIcon />,
               content: assignment && (
                 <OverviewTab
+                  onSubmissionCreated={getSubmissions}
                   course={course}
                   user={user}
                   assignment={assignment}
-                  onDone={saveAssignment}
+                  onAssignmentCreatedDone={saveAssignment}
                   lesson={lesson}
                 />
               ),
@@ -111,6 +122,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
               Icon: <SubmissionsIcon />,
               content: (
                 <SubmissionsTab
+                  user={user}
                   onDone={getSubmissions}
                   submissions={submissions}
                 />

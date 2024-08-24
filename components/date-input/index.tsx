@@ -19,12 +19,13 @@ const CustomInput = forwardRef<
     label: string;
     date: string;
   }
->(({ date, onClick, label }, ref) => (
+>(({ date, onClick, label, disabled }, ref) => (
   <button
     className="outline-button w-full font-bold"
     onClick={onClick}
     ref={ref}
     type="button"
+    disabled={disabled}
   >
     <p className="absolute -top-3 left-2 text-sm">{label}</p>
     <CalendarIcon />
@@ -38,6 +39,7 @@ interface IProps {
   label: string;
   onChange: (date: Date) => void;
   popperPlacement?: Placement;
+  disabled?: boolean;
 }
 
 const DateInput: FunctionComponent<IProps> = ({
@@ -45,6 +47,7 @@ const DateInput: FunctionComponent<IProps> = ({
   label,
   onChange,
   popperPlacement,
+  disabled,
 }) => {
   const [selectedDate, setSelectedDate] = useState(date);
   return (
@@ -63,6 +66,7 @@ const DateInput: FunctionComponent<IProps> = ({
           <CustomInput
             date={format(date, "EEEE, MMM d | h:mm a")}
             label={label}
+            disabled={disabled}
           />
         }
         dateFormat="EEEE, MMM d | h:mm a"
@@ -71,6 +75,7 @@ const DateInput: FunctionComponent<IProps> = ({
         minDate={new Date()}
         showPopperArrow={false}
         onCalendarClose={() => setSelectedDate(date)}
+        disabled={disabled}
       />
     </div>
   );

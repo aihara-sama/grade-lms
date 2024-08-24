@@ -14,24 +14,25 @@ import { useState, type FunctionComponent } from "react";
 
 interface IProps {
   assignment: Assignment;
-  onDone: (assignment: Assignment) => void;
+  onAssignmentCreatedDone: (assignment: Assignment) => void;
+  onSubmissionCreated: () => void;
   user: User;
   course: Course;
   lesson: Lesson;
 }
 
 const OverviewTab: FunctionComponent<IProps> = ({
-  onDone,
+  onAssignmentCreatedDone: onDone,
   user,
   course,
   lesson,
+  onSubmissionCreated,
   ...props
 }) => {
   // States
   const [assignment, setAssignment] = useState<Assignment>(props.assignment);
   const [isCreateSubmissionModalOpen, setIsCreateSubmissionModalOpen] =
     useState(false);
-  console.log({ assignment });
 
   // Handlers
   const handleSaveAssignment = async () => {
@@ -75,13 +76,16 @@ const OverviewTab: FunctionComponent<IProps> = ({
         />
       </div>
 
-      <div className="flex gap-[14px] items-center mt-[14px]">
+      <div className="flex gap-[14px] items-center mt-[14px] justify-end">
         <div className="pr-[12px] border-r-2 border-gray-200">
           <DateInput
             date={new Date(assignment.due_date)}
             onChange={handleChangeDate}
             label="Due date"
             popperPlacement="top-start"
+            disabled={
+              (user.user_metadata as IUserMetadata).role !== Role.TEACHER
+            }
           />
         </div>
         {(user.user_metadata as IUserMetadata).role === Role.TEACHER ? (
@@ -105,7 +109,7 @@ const OverviewTab: FunctionComponent<IProps> = ({
           isOpen={isCreateSubmissionModalOpen}
           setIsOpen={setIsCreateSubmissionModalOpen}
           lesson={lesson}
-          onDone={() => {}}
+          onDone={onSubmissionCreated}
         />
       )}
     </div>

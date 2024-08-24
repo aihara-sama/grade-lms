@@ -27,15 +27,8 @@ const OngoingLessonCard: FunctionComponent<IProps> = async ({ courseId }) => {
       <p className="text-sm mb-[8px] text-light">Ongoing lesson</p>
       <hr className="w-48 mb-2" />
       <p className="mb-1 text-lg font-bold">{lesson?.title || "No lesson"}</p>
-      <Link
-        className="mt-3"
-        href={lesson ? `/dashboard/lessons/${lesson?.id}` : `lessons`}
-      >
-        <button
-          className={`${lesson ? "warning-button" : "primary-button"} w-64`}
-        >
-          {lesson ? "Enter class" : "Create"}
-        </button>
+      <Link className="mt-3" href={`/dashboard/lessons/${lesson?.id}`}>
+        {lesson && <button className="warning-button w-64">Enter class</button>}
       </Link>
     </div>
   );

@@ -30,6 +30,8 @@ import {
   getCoursesCountByUserId,
   getOffsetCoursesByTitleAndUserId,
 } from "@/db/course";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
@@ -183,7 +185,9 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
           total={totalCoursesCount}
           title="Total courses"
         />
-        <CreateCourse onDone={fetchCoursesBySearch} />
+        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+          <CreateCourse onDone={fetchCoursesBySearch} />
+        )}
       </CardsContainer>
       {selectedCoursesIds.length ? (
         <div className="mb-3 flex gap-3">
@@ -223,12 +227,17 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
                   Icon={<CourseIcon />}
                   title={title}
                   subtitle="Active"
-                  onToggle={(checked) => onCourseToggle(checked, id)}
+                  onToggle={
+                    (user.user_metadata as IUserMetadata).role === Role.TEACHER
+                      ? (checked) => onCourseToggle(checked, id)
+                      : undefined
+                  }
                 />
               ),
               Lessons: lessons[0].count,
               Members: members[0].count,
-              "": (
+              "": (user.user_metadata as IUserMetadata).role ===
+                Role.TEACHER && (
                 <CourseOptionsPopper
                   onDone={fetchCoursesBySearch}
                   setSelectedCoursesIds={setSelectedCoursesIds}
