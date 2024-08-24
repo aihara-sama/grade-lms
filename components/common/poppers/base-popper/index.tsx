@@ -12,13 +12,13 @@ import { useEffect, useRef, useState } from "react";
 interface IProps {
   trigger: ReactNode;
   width?: "sm" | "md" | "lg" | "full";
+  popperClassName?: string;
 }
 
 const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
-  // isOpen,
-  // setIsOpen,
   children,
   trigger,
+  popperClassName = "",
   width = "full",
 }) => {
   // State
@@ -80,7 +80,7 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
           isOpen
             ? "opacity-100 translate-y-0 visible"
             : "invisible opacity-0 translate-y-3"
-        }`}
+        } ${popperClassName}`}
         onClick={handleChildrenClick}
         onTransitionEnd={handleTransitionEnd}
       >

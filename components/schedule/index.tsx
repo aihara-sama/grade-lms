@@ -27,6 +27,8 @@ import {
   getWeekLessonsByCourseId,
   upsertLesson,
 } from "@/db/lesson";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { getWeekDays } from "@/utils/get-week-days";
@@ -252,9 +254,13 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       behavior: "smooth",
     });
   }, []);
+
   useEffect(() => {
-    window.addEventListener("mousemove", handlePointerMove);
-    return () => window.removeEventListener("mousemove", handlePointerMove);
+    if ((user.user_metadata as IUserMetadata).role === Role.TEACHER) {
+      window.addEventListener("mousemove", handlePointerMove);
+      return () => window.removeEventListener("mousemove", handlePointerMove);
+    }
+    return () => {};
   }, [
     lessons,
     canDropEvent,
@@ -300,6 +306,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
           onChange={(item) => setSelectedCourse(item)}
           defaultValue={selectedCourse}
           useUnselect
+          popperClassName="max-h-64"
         />
       </div>
 
@@ -345,6 +352,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
                   {[...Array(differenceInHours(addDays(day, 1), day))].map(
                     (__, i) => (
                       <Hour
+                        user={user}
                         hour={+addHours(day, i)}
                         draggingEvent={
                           // Check if user hovered over this hour's quarter
@@ -380,6 +388,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
         </div>
       </div>
       <EditLessonModal
+        user={user}
         isOpen={isEditLessonModalOpen}
         setIsOpen={(isOpen) => {
           setIsEditLessonModalOpen(isOpen);

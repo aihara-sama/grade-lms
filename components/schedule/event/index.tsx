@@ -30,6 +30,9 @@ const Event: FunctionComponent<IProps> = ({
     ? format(startOfDay(event.ends), "yyyy-MM-dd'T'HH:mm:ss")
     : event.starts;
 
+  const isBeforeMidnight = format(new Date(eventStarts), "HH:mm") === "23:45";
+  const isQuarter = millisecondsToMinutes(duration) === 15;
+
   // Hooks
   const draggingEvent = useSchedule((state) => state.draggingEvent);
 
@@ -53,26 +56,30 @@ const Event: FunctionComponent<IProps> = ({
     });
   };
 
+  const eventStyles = {
+    top: `${
+      minToPx(minutesToMilliseconds(new Date(eventStarts).getMinutes())) +
+      (index > 0 ? 1 : 0)
+    }px`,
+    height: `${
+      minToPx(
+        +new Date(event.ends) -
+          +new Date(eventStarts) +
+          +(isSummerDaylight ? hoursToMilliseconds(1) : 0)
+      ) - (index > 0 ? 1 : 0)
+    }px`,
+  };
+
+  const eventClassNames = `event ${draggingEvent?.id === event.id ? "opacity-80" : "opacity-1"} ${clsx(isQuarter || (isBeforeMidnight && "flex gap-1 justify-between"))}`;
+
   return (
     <div
       onClick={() => setSelectedLesson(event)}
       onMouseDown={handlePointerDown}
       data-lesson-id={event.id}
       data-date={new Date(eventStarts)}
-      className={`event ${draggingEvent?.id === event.id ? "opacity-80" : "opacity-1"} ${clsx(millisecondsToMinutes(duration) === 15 || (format(new Date(eventStarts), "HH:mm") === "23:45" && "flex gap-1 justify-between"))}`}
-      style={{
-        top: `${
-          minToPx(minutesToMilliseconds(new Date(eventStarts).getMinutes())) +
-          (index > 0 ? 1 : 0)
-        }px`,
-        height: `${
-          minToPx(
-            +new Date(event.ends) -
-              +new Date(eventStarts) +
-              +(isSummerDaylight ? hoursToMilliseconds(1) : 0)
-          ) - (index > 0 ? 1 : 0)
-        }px`,
-      }}
+      className={eventClassNames}
+      style={eventStyles}
     >
       {event.title}
       <div className="flex gap-1">

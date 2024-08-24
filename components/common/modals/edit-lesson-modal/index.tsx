@@ -17,9 +17,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import PromptModal from "@/components/common/modals/prompt-modal";
 import Select from "@/components/common/select";
+import { deleteLessonsByLessonsIds } from "@/db/lesson";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
+import type { User } from "@supabase/supabase-js";
+import { useTranslations } from "next-intl";
 import type {
   ChangeEvent,
   Dispatch,
@@ -34,6 +40,7 @@ interface IProps {
   courses: Pick<Course, "id" | "title">[];
   onDone: () => void;
   includeCoursesSelect?: boolean;
+  user: User;
 }
 
 const EditLessonModal: FunctionComponent<IProps> = ({
@@ -42,6 +49,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
   courses,
   isOpen,
   setIsOpen,
+  user,
   includeCoursesSelect = false,
 }) => {
   // Hooks
@@ -52,11 +60,19 @@ const EditLessonModal: FunctionComponent<IProps> = ({
   const [ends, setEnds] = useState<Date>(new Date());
   const [lessonTitle, setLessonTitle] = useState<string>("");
   const [course, setCourse] = useState<Pick<Course, "id" | "title">>();
+  const [isDeleteLessonPromptModalOpen, setIsDeleteLessonPromptModalOpen] =
+    useState(false);
 
   // Vars
   const duration = +new Date(ends) - +new Date(starts);
 
+  // Hooks
+  const t = useTranslations();
+
   // Handlers
+  const closeModal = () => setIsOpen(false);
+  const openDeleteLessonPromptModal = () =>
+    setIsDeleteLessonPromptModalOpen(true);
   const handleSaveLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -72,8 +88,8 @@ const EditLessonModal: FunctionComponent<IProps> = ({
       toast(error.message);
     } else {
       toast("Lesson saved");
+      closeModal();
       onDone();
-      setIsOpen(false);
     }
   };
   const handleChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
@@ -86,17 +102,14 @@ const EditLessonModal: FunctionComponent<IProps> = ({
     }
   };
   const deleteLesson = async () => {
-    const { error } = await supabaseClient
-      .from("lessons")
-      .delete()
-      .eq("id", lesson.id);
+    try {
+      await deleteLessonsByLessonsIds([lesson.id]);
 
-    if (error) {
-      toast.error(error.message);
-    } else {
       toast.success("Lesson deleted");
       onDone();
-      setIsOpen(false);
+      closeModal();
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
@@ -113,9 +126,10 @@ const EditLessonModal: FunctionComponent<IProps> = ({
   // View
   return (
     <BaseModal
+      isExpanded={false}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      title="Edit lesson"
+      title="View lesson"
       headerButtons={
         <>
           {lesson?.course_id && (
@@ -130,26 +144,32 @@ const EditLessonModal: FunctionComponent<IProps> = ({
               <LessonsIcon />
             </button>
           )}
-          {lesson?.id && (
-            <button className="icon-button" onClick={deleteLesson}>
-              <DeleteIcon />
-            </button>
-          )}
+          {lesson?.id &&
+            (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+              <button
+                className="icon-button"
+                onClick={openDeleteLessonPromptModal}
+              >
+                <DeleteIcon />
+              </button>
+            )}
         </>
       }
     >
       <div>
         <form onSubmit={handleSaveLesson} id="create-lesson-form">
-          {includeCoursesSelect && (
-            <Select
-              label="Course"
-              defaultValue={course}
-              onChange={(item) => setCourse(item)}
-              options={courses}
-              useUnselect
-              fullWidth
-            />
-          )}
+          {includeCoursesSelect &&
+            (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+              <Select
+                label="Course"
+                defaultValue={course}
+                onChange={(item) => setCourse(item)}
+                options={courses}
+                useUnselect
+                fullWidth
+                popperClassName="max-h-[160px]"
+              />
+            )}
           <Input
             name="title"
             fullWIdth
@@ -158,6 +178,9 @@ const EditLessonModal: FunctionComponent<IProps> = ({
             onChange={(e) => setLessonTitle(e.target.value)}
             value={lessonTitle}
             className="mt-3"
+            disabled={
+              (user.user_metadata as IUserMetadata).role !== Role.TEACHER
+            }
           />
         </form>
         <DateInput
@@ -167,6 +190,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
             setEnds(new Date(+date + duration));
           }}
           label="Starts at"
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
         />
         <Input
           fullWIdth
@@ -175,17 +199,35 @@ const EditLessonModal: FunctionComponent<IProps> = ({
           Icon={<TimeIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={handleChangeDuration}
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
         />
         <hr className="my-3" />
-        <button
-          disabled={!lessonTitle}
-          type="submit"
-          form="create-lesson-form"
-          className="primary-button"
-        >
-          Save
-        </button>
+        <div className="flex justify-end">
+          {(user.user_metadata as IUserMetadata).role === Role.TEACHER ? (
+            <button
+              disabled={!lessonTitle}
+              type="submit"
+              form="create-lesson-form"
+              className="primary-button"
+            >
+              Save
+            </button>
+          ) : (
+            <button className="outline-button" onClick={closeModal}>
+              Close
+            </button>
+          )}
+        </div>
       </div>
+      <PromptModal
+        isInsideModal
+        isOpen={isDeleteLessonPromptModalOpen}
+        setIsOpen={setIsDeleteLessonPromptModalOpen}
+        title="Delete lesson"
+        action="Delete"
+        actionHandler={deleteLesson}
+        body={t("prompts.delete_lesson")}
+      />
     </BaseModal>
   );
 };

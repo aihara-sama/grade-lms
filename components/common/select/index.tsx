@@ -11,6 +11,7 @@ interface IProps {
   useUnselect?: boolean;
   defaultValue: ISelectItem;
   onChange: (option: ISelectItem) => void;
+  popperClassName?: string;
   fullWidth?: boolean;
 }
 
@@ -20,6 +21,7 @@ const Select: FunctionComponent<IProps> = ({
   defaultValue,
   useUnselect,
   onChange,
+  popperClassName = "",
   fullWidth,
 }) => {
   // State
@@ -28,6 +30,7 @@ const Select: FunctionComponent<IProps> = ({
   return (
     <div>
       <BasePopper
+        popperClassName={popperClassName}
         trigger={
           <div
             className={`relative border-[1px] border-solid flex items-center justify-between px-3 py-2 rounded-[5px] cursor-pointer bg-white hover:bg-gray-100 active:bg-gray-200 gap-3 ${clsx(fullWidth ? "w-full" : "w-40")}`}

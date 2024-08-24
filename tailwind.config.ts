@@ -72,7 +72,7 @@ const config: Config = {
       },
     },
   },
-  // eslint-disable-next-line global-require
+  // eslint-disable-next-line
   plugins: [require("./styles/globals.css")],
 };
 export default config;

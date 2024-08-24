@@ -8,6 +8,7 @@ interface IProps {
   body: string;
   action: "Delete" | "Dispel";
   actionHandler: () => void;
+  isInsideModal?: boolean;
 }
 
 const PromptModal: FunctionComponent<IProps> = ({
@@ -15,11 +16,13 @@ const PromptModal: FunctionComponent<IProps> = ({
   body,
   isOpen,
   action,
+  isInsideModal,
   setIsOpen,
   actionHandler,
 }) => {
   return (
     <BaseModal
+      isInsideModal={isInsideModal}
       isExpanded={false}
       isOpen={isOpen}
       setIsOpen={setIsOpen}

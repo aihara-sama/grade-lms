@@ -1,9 +1,13 @@
 import Event from "@/components/schedule/event";
 import { useSchedule } from "@/hooks/useSchedule";
+import type { IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
 import { isFirstDateFromYesterdayOrMore } from "@/utils/is-first-date-from-yesterday-or-more";
 import { isSummerDaylight } from "@/utils/is-summer-daylight";
 import { minToPx } from "@/utils/min-to-px";
+import type { User } from "@supabase/supabase-js";
+import clsx from "clsx";
 import {
   addHours,
   addMilliseconds,
@@ -23,6 +27,7 @@ interface IProps {
   events: Lesson[];
   draggingEvent?: Lesson;
   hour: number;
+  user: User;
 }
 
 const Hour: FunctionComponent<IProps> = ({
@@ -32,6 +37,7 @@ const Hour: FunctionComponent<IProps> = ({
   draggingEvent,
   quarter,
   hour,
+  user,
 }) => {
   const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
   const hourEvents = events.filter(
@@ -70,7 +76,7 @@ const Hour: FunctionComponent<IProps> = ({
         )}
       <div
         id="a"
-        className="hour h-[81px] border border-r-neutral-100 border-t-neutral-100 relative"
+        className={`hour h-[81px] border border-r-neutral-100 border-t-neutral-100 relative `}
         data-date={new Date(hour)}
       >
         {[...Array(4)].map((_, idx) => {
@@ -100,7 +106,7 @@ const Hour: FunctionComponent<IProps> = ({
                   )
                 )
               }
-              className={`placeholder absolute w-full text-center border-[2px] border-dashed border-[#c3c3c3] rounded-[3px] opacity-0 [transition:0.1s] bg-[white] h-[20px] flex justify-center items-center bg-transparent ${!draggingEvent ? "hover:cursor-pointer hover:opacity-100" : ""} active:bg-gray-100 ${quarter === idx * 15 ? "opacity-100" : "opacity-0"}`}
+              className={`placeholder absolute w-full text-center border-[2px] border-dashed border-[#c3c3c3] rounded-[3px] opacity-0 [transition:0.1s] bg-[white] h-[20px] flex justify-center items-center bg-transparent ${!draggingEvent ? "hover:cursor-pointer hover:opacity-100" : ""} active:bg-gray-100 ${quarter === idx * 15 ? "opacity-100" : "opacity-0"} ${clsx((user.user_metadata as IUserMetadata).role !== Role.TEACHER && "pointer-events-none")}`}
               style={{
                 top: `${idx * 20}px`,
                 height: `${
