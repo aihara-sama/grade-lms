@@ -57,7 +57,7 @@ export const getCoursesByTitleAndUserId = async (
   return result.data.courses;
 };
 
-export const getCoursesByUserId = async (userId: string) => {
+export const getCoursesWithRefsCountByUserId = async (userId: string) => {
   const t = await loadMessages();
   const result = await supabaseClient
     .from("users")
@@ -66,6 +66,18 @@ export const getCoursesByUserId = async (userId: string) => {
     .limit(COURSES_GET_LIMIT, { foreignTable: "courses" })
     .order("title", { foreignTable: "courses", ascending: true })
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
+    .single();
+
+  if (result.error) throw new Error(t("failed_to_load_courses"));
+
+  return result.data.courses;
+};
+export const getCoursesByUserId = async (userId: string) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("users")
+    .select("id, courses(*)")
+    .eq("id", userId)
     .single();
 
   if (result.error) throw new Error(t("failed_to_load_courses"));

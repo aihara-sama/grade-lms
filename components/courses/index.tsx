@@ -25,9 +25,9 @@ import {
   deleteCoursesByCoursesIds,
   deleteCoursesByTitleAndUserId,
   getCoursesByTitleAndUserId,
-  getCoursesByUserId,
   getCoursesCountByTitleAndUserId,
   getCoursesCountByUserId,
+  getCoursesWithRefsCountByUserId,
   getOffsetCoursesByTitleAndUserId,
 } from "@/db/course";
 import type { IUserMetadata } from "@/interfaces/user.interface";
@@ -65,7 +65,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
 
     try {
       const [coursesByUserId, coursesCountByUserId] = await Promise.all([
-        getCoursesByUserId(user.id),
+        getCoursesWithRefsCountByUserId(user.id),
         getCoursesCountByUserId(user.id),
       ]);
 

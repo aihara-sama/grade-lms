@@ -1,7 +1,9 @@
 import { LESSONS_GET_LIMIT } from "@/constants";
+import type { Lesson } from "@/types/lessons.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
 import { supabaseClient } from "@/utils/supabase/client";
+import { format } from "date-fns";
 
 export const deleteLessonsByLessonsIds = async (lessonsIds: string[]) => {
   const t = await loadMessages();
@@ -40,6 +42,41 @@ export const getLessonsCountByCourseId = async (courseId: string) => {
   if (result.error) throw new Error(t("failed_to_load_lessons_count"));
 
   return result.data.lessons[0].count;
+};
+export const getWeekLessons = async (days: string[]) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("lessons")
+    .select("*")
+    .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
+    .lte(
+      "starts",
+      format(`${days[days.length - 1]} 23:45:00`, "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .order("starts", { ascending: true });
+
+  if (result.error) throw new Error(t("failed_to_load_lessons"));
+
+  return result.data;
+};
+export const getWeekLessonsByCourseId = async (
+  days: string[],
+  courseId: string
+) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("lessons")
+    .select("*")
+    .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
+    .lte(
+      "starts",
+      format(`${days[days.length - 1]} 23:45:00`, "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .eq("course_id", courseId);
+
+  if (result.error) throw new Error(t("failed_to_load_lessons"));
+
+  return result.data;
 };
 
 export const getLessonsCountByTitleAndCourseId = async (
@@ -113,6 +150,16 @@ export const getOffsetLessonsByTitleAndCourseId = async (
   if (result.error) throw new Error(t("failed_to_load_lessons"));
 
   return result.data.lessons;
+};
+
+export const upsertLesson = async (lesson: Lesson) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("lessons")
+    .upsert(lesson)
+    .eq("id", lesson.id);
+
+  if (result.error) throw new Error(t("failed_to_save_lesson"));
 };
 
 export const deleteLessonsByTitleAndCourseId = async (

@@ -6,11 +6,7 @@ const Page = async () => {
     data: { user },
   } = await createClient().auth.getUser();
 
-  return (
-    <div>
-      <Schedule user={user} />
-    </div>
-  );
+  return <Schedule user={user} />;
 };
 
 export default Page;

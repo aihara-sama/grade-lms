@@ -14,6 +14,7 @@
   "failed_to_create_submission": "Failed to create submission",
   "failed_to_create_assignment": "Failed to create assignment",
   "failed_to_load_courses": "Failed to load course",
+  "failed_to_save_lesson": "Failed to save lesson",
   "failed_to_load_lessons": "Failed to load lessons",
   "failed_to_load_submissions": "Failed to load submissions",
   "failed_to_update_submission_grade": "Failed to update submission grade",
@@ -37,6 +38,7 @@
   "lesson_created": "Lesson successfully created",
   "users_dispelled": "Users successfully dispelled",
   "users_deleted": "Users successfully deleted",
+  "lesson_saved": "Lesson successfully saved",
   "user_deleted": "User successfully deleted",
   "auth": {
     "an_email_address_is_too_long": "An email address is too long",

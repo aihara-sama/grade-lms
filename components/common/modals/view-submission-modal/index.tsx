@@ -105,7 +105,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
               />
             </div>
             <div className="flex gap-2 items-center text-neutral-500">
-              {new Array(5).fill(0).map((_, idx) => (
+              {[...new Array(5)].map((_, idx) => (
                 <div
                   key={idx}
                   className="flex"

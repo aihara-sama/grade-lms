@@ -2,7 +2,10 @@ import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
 import CourseIcon from "@/components/icons/course-icon";
 import Table from "@/components/table";
-import { getCoursesByUserId, getUnenrolledCoursesByUserId } from "@/db/course";
+import {
+  getCoursesWithRefsCountByUserId,
+  getUnenrolledCoursesByUserId,
+} from "@/db/course";
 import { enrollUsersInCourses } from "@/db/user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { User } from "@supabase/supabase-js";
@@ -41,7 +44,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
       setCourses(
         await (isSingleUser
           ? getUnenrolledCoursesByUserId(usersIds[0])
-          : getCoursesByUserId(currentUser.id))
+          : getCoursesWithRefsCountByUserId(currentUser.id))
       );
     } catch (error: any) {
       toast.error(error.message);

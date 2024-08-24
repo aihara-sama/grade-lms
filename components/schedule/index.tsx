@@ -7,7 +7,6 @@ import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
 import { useSchedule } from "@/hooks/useSchedule";
 import { getEventWidth } from "@/utils/get-event-width";
-import { supabaseClient } from "@/utils/supabase/client";
 import {
   addDays,
   addHours,
@@ -22,11 +21,17 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import Select from "@/components/common/select";
+import { getCoursesByUserId } from "@/db/course";
+import {
+  getWeekLessons,
+  getWeekLessonsByCourseId,
+  upsertLesson,
+} from "@/db/lesson";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
-import type { Database } from "@/types/supabase.type";
 import { getWeekDays } from "@/utils/get-week-days";
 import type { User } from "@supabase/supabase-js";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 interface IProps {
@@ -73,63 +78,51 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   const draggingEventRef = useRef<HTMLDivElement>();
   const hoursLabelsDaysWrapperRef = useRef<HTMLDivElement>();
 
-  // Handlers
-  const getLessons = async () => {
-    const { data, error } = await supabaseClient
-      .from("lessons")
-      .select("*")
-      .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
-      .lte(
-        "starts",
-        format(`${days[days.length - 1]} 23:45:00`, "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .order("starts", { ascending: true });
-    if (error) toast.error(error.message);
-    else setLessons(data);
-  };
-  const getLessonsByCourseId = async (courseId: string) => {
-    const { data, error } = await supabaseClient
-      .from("lessons")
-      .select("*")
-      .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
-      .lte(
-        "starts",
-        format(`${days[days.length - 1]} 23:45:00`, "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .eq("course_id", courseId);
-    if (error) toast.error(error.message);
-    else setLessons(data);
-  };
-  const getCourses = async () => {
-    const { error, data } = await supabaseClient
-      .from("users")
-      .select("id, courses(*)")
-      .eq("id", user.id)
-      .single();
-    if (error) toast.error(error.message);
-    else setCourses(data.courses);
-  };
-  const handleSaveLesson = async (
-    newStart: string,
-    event: Database["public"]["Tables"]["lessons"]["Row"]
-  ) => {
-    const { error } = await supabaseClient.from("lessons").upsert({
-      ...event,
-      starts: format(newStart, "yyyy-MM-dd'T'HH:mm:ss"),
-      ends: format(
-        addMinutes(
-          new Date(newStart),
-          millisecondsToMinutes(+new Date(event.ends) - +new Date(event.starts))
-        ),
-        "yyyy-MM-dd'T'HH:mm:ss"
-      ),
-    });
+  // Hooks
+  const t = useTranslations();
 
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Lesson saved");
-      await getLessons();
+  // Handlers
+  const fetchWeekLessons = async () => {
+    try {
+      setLessons(await getWeekLessons(days));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const fetchLessonsByCourseId = async (courseId: string) => {
+    try {
+      setLessons(await getWeekLessonsByCourseId(days, courseId));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const fetchCourses = async () => {
+    try {
+      setCourses(await getCoursesByUserId(user.id));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const handleSaveLesson = async (newStart: string, event: Lesson) => {
+    try {
+      await upsertLesson({
+        ...event,
+        starts: format(newStart, "yyyy-MM-dd'T'HH:mm:ss"),
+        ends: format(
+          addMinutes(
+            new Date(newStart),
+            millisecondsToMinutes(
+              +new Date(event.ends) - +new Date(event.starts)
+            )
+          ),
+          "yyyy-MM-dd'T'HH:mm:ss"
+        ),
+      });
+
+      toast.success(t("lesson_saved"));
+      await fetchWeekLessons();
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
   const scroll = (direction: "top" | "bottom") => {
@@ -245,13 +238,13 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     isDraggingEventRef.current = !!draggingEvent;
   }, [draggingEvent]);
   useEffect(() => {
-    getCourses();
+    fetchCourses();
   }, []);
   useEffect(() => {
     if (selectedCourse) {
-      getLessonsByCourseId(selectedCourse.id);
+      fetchLessonsByCourseId(selectedCourse.id);
     } else {
-      getLessons();
+      fetchWeekLessons();
     }
   }, [selectedCourse, days]);
   useEffect(() => {
@@ -397,9 +390,9 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
         lesson={selectedLesson}
         onDone={() => {
           if (selectedCourse) {
-            getLessonsByCourseId(selectedCourse.id);
+            fetchLessonsByCourseId(selectedCourse.id);
           } else {
-            getLessons();
+            fetchWeekLessons();
           }
           setSelectedLesson(undefined);
         }}
