@@ -63,7 +63,7 @@ const VideoChat: FunctionComponent<IProps> = ({
       .on("presence", { event: "join" }, (payload) => {
         console.log("presence - join", { payload });
 
-        if (payload.key !== anonId) {
+        if (payload.key === anonId) {
           Object.keys(channel.presenceState())
             .filter((id) => id !== anonId)
             .forEach((id) => {

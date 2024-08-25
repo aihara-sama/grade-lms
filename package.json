@@ -15,6 +15,7 @@
     "prepare": "husky install",
     "supabase:start": "npx supabase start",
     "supabase:db:reset": "npx supabase db reset",
+    "supabase:db:reset:remote": "npx supabase db reset --linked",
     "supabase:gen-types": "npx supabase gen types typescript --local --schema public > types/supabase.type.ts",
     "supabase:migrate": "yarn supabase:db:reset && yarn supabase:gen-types",
     "supabase:status": "npx supabase status"
