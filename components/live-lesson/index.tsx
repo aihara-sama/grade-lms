@@ -102,7 +102,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
             <ArrowRightIcon />
           </button>
           <aside
-            className={`${isAsideOpen ? "flex" : "hidden"} flex-col gap-3`}
+            className={`${isAsideOpen ? "flex" : "hidden"} flex-col gap-3 w-[350px]`}
           >
             <Tabs
               tabs={[
@@ -136,7 +136,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
                   ),
                   Icon: <ChatIcon />,
                 },
-                {
+                role === Role.TEACHER && {
                   title: "Assignments",
                   content: <AssignmentsTab lessonId={lesson.id} />,
                   Icon: <AssignmentsIcon />,

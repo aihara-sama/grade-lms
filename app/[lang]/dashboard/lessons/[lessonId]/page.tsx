@@ -15,17 +15,17 @@ const Page: FunctionComponent<IProps> = async ({ params: { lessonId } }) => {
     data: { user },
   } = await createClient().auth.getUser();
 
-  const lesson = await supabaseClient
+  const lessonResult = await supabaseClient
     .from("lessons")
     .select("*, course:courses(*)")
     .eq("id", lessonId)
     .single();
 
-  if (!lesson.data) {
+  if (!lessonResult.data) {
     return redirect("/dashboard");
   }
 
-  return <LiveLesson lesson={lesson.data} user={user} />;
+  return <LiveLesson lesson={lessonResult.data} user={user} />;
 };
 
 export default Page;

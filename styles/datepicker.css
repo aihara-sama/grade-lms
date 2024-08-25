@@ -1,6 +1,6 @@
 /* Datepicker ↴ */
 .react-datepicker-popper {
-  @apply shadow-md z-[4] !important;
+  @apply shadow-md z-[999] !important;
 }
 
 .react-datepicker {

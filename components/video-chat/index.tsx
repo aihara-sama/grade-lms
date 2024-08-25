@@ -26,6 +26,7 @@ const VideoChat: FunctionComponent<IProps> = ({
   // State
   const [peer, setPeer] = useState<Peer>();
   const [cameras, setCameras] = useState<ICamera[]>([]);
+  console.log({ cameras });
 
   // Refs
   const localStreamRef = useRef<MediaStream>();
@@ -38,6 +39,8 @@ const VideoChat: FunctionComponent<IProps> = ({
     _userName: string,
     _role: Role
   ) => {
+    console.log({ stream, id, _userName, _role });
+
     setCameras((prev) => {
       if (!prev.find((camera) => camera.stream.id === stream.id)) {
         return [
@@ -58,6 +61,8 @@ const VideoChat: FunctionComponent<IProps> = ({
   const join = async () => {
     channel
       .on("presence", { event: "join" }, (payload) => {
+        console.log("presence - join", { payload });
+
         if (payload.key !== anonId) {
           Object.keys(channel.presenceState())
             .filter((id) => id !== anonId)
@@ -71,7 +76,14 @@ const VideoChat: FunctionComponent<IProps> = ({
               });
 
               outgoingCall.on("stream", (remoteStream) => {
-                addCamera(remoteStream, id, userName, role);
+                addCamera(
+                  remoteStream,
+                  id,
+                  // @ts-ignore
+                  channel.presenceState()[id][0].userName,
+                  // @ts-ignore
+                  channel.presenceState()[id][0].role
+                );
               });
             });
         }
@@ -85,6 +97,8 @@ const VideoChat: FunctionComponent<IProps> = ({
         if (status === "SUBSCRIBED") {
           await channel.track({
             user_id: anonId,
+            role,
+            userName,
           });
         }
       });
@@ -162,6 +176,8 @@ const VideoChat: FunctionComponent<IProps> = ({
         navigator.mediaDevices
           .getUserMedia({ audio: true, video: true })
           .then((stream) => {
+            console.log("on peer open");
+
             localStreamRef.current = stream;
             setCameras((prev) => [
               ...prev,
@@ -181,17 +197,20 @@ const VideoChat: FunctionComponent<IProps> = ({
           });
       });
 
+      // When smdb joins
       peer.on("call", (incomingCall) => {
         navigator.mediaDevices
           .getUserMedia({ audio: true, video: true })
           .then((stream) => {
             incomingCall.answer(stream);
             incomingCall.on("stream", (remoteStream) => {
+              console.log("smbd joined", { remoteStream, incomingCall });
+
               addCamera(
                 remoteStream,
                 incomingCall.metadata.anonId,
-                incomingCall.metadata.role,
-                incomingCall.metadata.userName
+                incomingCall.metadata.userName,
+                incomingCall.metadata.role
               );
             });
           })
@@ -226,11 +245,11 @@ const VideoChat: FunctionComponent<IProps> = ({
             localStream={localStreamRef.current}
             camera={camera}
             key={idx}
+            role={role}
           />
         ))}
       </div>
     </div>
   );
 };
-
 export default VideoChat;

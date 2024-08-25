@@ -180,7 +180,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
           {(user.user_metadata as IUserMetadata).role !== Role.TEACHER ? (
             <Link
               href={`/dashboard/lessons/${lesson.id}`}
-              className={`button warning-button ${clsx(new Date() >= starts && "disabled")} `}
+              className={`button warning-button ${clsx(new Date() <= starts && "disabled")} `}
             >
               Enter class
             </Link>

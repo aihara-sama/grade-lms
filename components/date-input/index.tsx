@@ -2,13 +2,16 @@
 
 import CalendarIcon from "@/components/icons/calendar-icon";
 import { format } from "date-fns";
-import { forwardRef, useState, type FunctionComponent } from "react";
+
 import ReactDatePicker from "react-datepicker";
 
 import "@/styles/datepicker.css";
 import "react-datepicker/dist/react-datepicker.css";
 
 import type { Placement } from "@floating-ui/utils/dist/floating-ui.utils";
+import type { FunctionComponent } from "react";
+import { forwardRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const CustomInput = forwardRef<
   HTMLButtonElement,
@@ -53,6 +56,11 @@ const DateInput: FunctionComponent<IProps> = ({
   return (
     <div>
       <ReactDatePicker
+        popperProps={{ strategy: "fixed" }}
+        popperClassName="z-[10]"
+        popperContainer={({ children }) =>
+          createPortal(children, document.body)
+        }
         popperPlacement={popperPlacement}
         selected={selectedDate}
         onChange={(d, e) => {

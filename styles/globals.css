@@ -131,15 +131,18 @@
   }
   .student-whiteboard {
     position: relative;
-    &::after {
-      position: absolute;
-      inset: 0;
-      content: "";
-      background-color: transparent;
-      cursor: not-allowed !important;
-    }
-    & * {
-      pointer-events: none !important;
+
+    & > .excalidraw.excalidraw-container {
+      &::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background-color: transparent;
+        cursor: not-allowed !important;
+      }
+      & * {
+        pointer-events: none !important;
+      }
     }
     & > .excalidraw {
       & > .App-menu_top,

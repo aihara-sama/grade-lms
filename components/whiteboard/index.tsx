@@ -145,6 +145,29 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
     }
   };
 
+  const parseWhiteboardData = () => {
+    if (role === Role.STUDENT) {
+      const data = JSON.parse(lesson.whiteboard_data);
+
+      if (data.appState) {
+        data.appState.collaborators = new Map();
+        data.appState.activeTool = {
+          type: "hand",
+          locked: false,
+          lastActiveTool: {
+            type: "hand",
+            customType: null,
+          },
+          customType: null,
+        };
+      }
+      return data;
+    }
+    const data = JSON.parse(lesson.whiteboard_data);
+    if (data.appState) data.appState.collaborators = new Map();
+    return data;
+  };
+
   return (
     <div className="flex-[4]" ref={containerRef}>
       <div className="flex justify-between items-center mb-3">
@@ -158,12 +181,14 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
             <p className="text-neutral-600 font-bold">
               <LiveTime date={new Date(lesson.ends)} /> left
             </p>
-            <button
-              className="text-link"
-              onClick={() => setIsExtendLessonModalOpen(true)}
-            >
-              Extend?
-            </button>
+            {role === Role.TEACHER && (
+              <button
+                className="text-link"
+                onClick={() => setIsExtendLessonModalOpen(true)}
+              >
+                Extend?
+              </button>
+            )}
           </div>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -171,13 +196,15 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
           >
             {isExpanded ? <ShrinkHorizontalIcon /> : <ExpandHorizontalIcon />}
           </button>
-          <button className="icon-button" onClick={handleInvite}>
-            <InviteIcon size="sm" />
-          </button>
+          {role === Role.TEACHER && (
+            <button className="icon-button" onClick={handleInvite}>
+              <InviteIcon size="sm" />
+            </button>
+          )}
         </div>
       </div>
       <div
-        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(role !== Role.TEACHER) && "student-whiteboard"}`}
+        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(role !== Role.TEACHER && "student-whiteboard")}`}
         style={{
           height: `${whiteboardHeight}px`,
         }}
@@ -191,30 +218,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
           excalidrawAPI={(api) => {
             excalidrawAPIRef.current = api;
           }}
-          initialData={
-            role === Role.STUDENT
-              ? (function () {
-                  const data = JSON.parse(lesson.whiteboard_data);
-                  if (data.appState) {
-                    data.appState.collaborators = new Map();
-                    data.appState.activeTool = {
-                      type: "hand",
-                      locked: false,
-                      lastActiveTool: {
-                        type: "hand",
-                        customType: null,
-                      },
-                      customType: null,
-                    };
-                  }
-                  return data;
-                })()
-              : (function () {
-                  const data = JSON.parse(lesson.whiteboard_data);
-                  if (data.appState) data.appState.collaborators = new Map();
-                  return data;
-                })()
-          }
+          initialData={parseWhiteboardData()}
         />
         <ResizeHandler
           containerRef={containerRef}
