@@ -11,3 +11,9 @@ export type TBasicEvent =
 
 export type TPointerEvent = "pointer:move";
 export type TWhiteboardEvent = "whiteboard:change";
+export enum Event {
+  ChatMessage = "chat:message",
+  NewNotification = "notification:new",
+  ToggleCamera = "camera:toggle",
+  ToggleAudio = "audio:toggle",
+}

@@ -1,9 +1,10 @@
 import type { Locale } from "@/i18n";
+import type { User } from "@supabase/supabase-js";
 
 export enum Role {
-  STUDENT = "Student",
-  TEACHER = "Teacher",
-  GUEST = "Guest",
+  Teacher = "Teacher",
+  Student = "Student",
+  Guest = "Guest",
 }
 
 export interface IUserMetadata {
@@ -17,4 +18,8 @@ export interface IUserMetadata {
    */
   fcm_token?: string;
   creator_id?: string;
+}
+
+export interface AuthUser extends User {
+  user_metadata: IUserMetadata;
 }

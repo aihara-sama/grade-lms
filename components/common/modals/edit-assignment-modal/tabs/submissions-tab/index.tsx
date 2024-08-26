@@ -57,7 +57,7 @@ const SubmissionsTab: FunctionComponent<IProps> = ({
           ),
         }))}
       />
-      {(user.user_metadata as IUserMetadata).role === Role.TEACHER ? (
+      {(user.user_metadata as IUserMetadata).role === Role.Teacher ? (
         <ViewSubmissionModal
           isOpen={isViewSubmissonModalOpen}
           setIsOpen={setIsViewSubmissonModalOpen}

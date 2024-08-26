@@ -1,5 +1,6 @@
 import ContentWrapper from "@/components/content-wrapper";
 import Header from "@/components/header";
+import UserProvider from "@/components/user-provider";
 import { createClient } from "@/utils/supabase/server";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
@@ -10,8 +11,10 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
 
   return (
     <div className="h-full flex-col">
-      <Header user={user} />
-      <ContentWrapper>{children}</ContentWrapper>
+      <UserProvider user={user}>
+        <Header />
+        <ContentWrapper>{children}</ContentWrapper>
+      </UserProvider>
     </div>
   );
 };

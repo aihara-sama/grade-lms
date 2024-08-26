@@ -44,6 +44,51 @@ export type Database = {
           },
         ];
       };
+      chat_messages: {
+        Row: {
+          author: string;
+          author_avatar: string;
+          author_role: Database["public"]["Enums"]["role"];
+          id: string;
+          lesson_id: string;
+          reply_id: string | null;
+          text: string | null;
+        };
+        Insert: {
+          author: string;
+          author_avatar: string;
+          author_role: Database["public"]["Enums"]["role"];
+          id?: string;
+          lesson_id: string;
+          reply_id?: string | null;
+          text?: string | null;
+        };
+        Update: {
+          author?: string;
+          author_avatar?: string;
+          author_role?: Database["public"]["Enums"]["role"];
+          id?: string;
+          lesson_id?: string;
+          reply_id?: string | null;
+          text?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_lesson_id_fkey";
+            columns: ["lesson_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_messages_reply_id_fkey";
+            columns: ["reply_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_messages";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       courses: {
         Row: {
           created_at: string;
@@ -96,51 +141,6 @@ export type Database = {
             columns: ["course_id"];
             isOneToOne: false;
             referencedRelation: "courses";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      messages: {
-        Row: {
-          author: string;
-          author_avatar: string;
-          author_role: string;
-          id: string;
-          lesson_id: string;
-          reply_id: string | null;
-          text: string | null;
-        };
-        Insert: {
-          author: string;
-          author_avatar: string;
-          author_role: string;
-          id?: string;
-          lesson_id: string;
-          reply_id?: string | null;
-          text?: string | null;
-        };
-        Update: {
-          author?: string;
-          author_avatar?: string;
-          author_role?: string;
-          id?: string;
-          lesson_id?: string;
-          reply_id?: string | null;
-          text?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "messages_lesson_id_fkey";
-            columns: ["lesson_id"];
-            isOneToOne: false;
-            referencedRelation: "lessons";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "messages_reply_id_fkey";
-            columns: ["reply_id"];
-            isOneToOne: false;
-            referencedRelation: "messages";
             referencedColumns: ["id"];
           },
         ];
@@ -338,7 +338,7 @@ export type Database = {
           id: string;
           name: string;
           preferred_locale: string;
-          role: string;
+          role: Database["public"]["Enums"]["role"];
         };
         Insert: {
           avatar: string;
@@ -349,7 +349,7 @@ export type Database = {
           id: string;
           name: string;
           preferred_locale: string;
-          role: string;
+          role: Database["public"]["Enums"]["role"];
         };
         Update: {
           avatar?: string;
@@ -360,7 +360,7 @@ export type Database = {
           id?: string;
           name?: string;
           preferred_locale?: string;
-          role?: string;
+          role?: Database["public"]["Enums"]["role"];
         };
         Relationships: [
           {
@@ -423,12 +423,12 @@ export type Database = {
           id: string;
           name: string;
           preferred_locale: string;
-          role: string;
+          role: Database["public"]["Enums"]["role"];
         }[];
       };
     };
     Enums: {
-      [_ in never]: never;
+      role: "Teacher" | "Student" | "Guest";
     };
     CompositeTypes: {
       [_ in never]: never;

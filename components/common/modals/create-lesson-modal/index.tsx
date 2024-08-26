@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import { createLesson } from "@/db/lesson";
+import { insertLesson } from "@/db/lesson";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
 import { useTranslations } from "next-intl";
@@ -65,7 +65,7 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
     e.preventDefault();
 
     try {
-      await createLesson(lesson);
+      await insertLesson(lesson);
 
       toast(t("lesson_created"));
       setIsOpen(false);

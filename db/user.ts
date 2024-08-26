@@ -282,7 +282,7 @@ export const dispelAllStudentsByNameFromCourse = async (
     .from("users")
     .select("id")
     .ilike("name", `%${name}%`)
-    .eq("role", Role.STUDENT);
+    .eq("role", Role.Student);
 
   if (studentsData.error) throw new Error(t("failed_to_dispel_users"));
 

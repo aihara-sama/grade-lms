@@ -1,3 +1,4 @@
+import Mask from "@/components/common/mask";
 import CloseIcon from "@/components/icons/close-icon";
 import { hasVerticalScrollbar } from "@/utils/has-vertical-scrollbar";
 import type {
@@ -47,7 +48,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
     }
   };
 
-  const handleMuskClick = () => setIsOpen(false);
+  const handleMaskClick = () => setIsOpen(false);
 
   // Effects
   useEffect(() => {
@@ -74,12 +75,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<IProps>> = ({
     <div
       className={`fixed inset-3 z-[999] ${isOpen ? "visible overflow-visible" : "invisible overflow-hidden"}`}
     >
-      {/* Mask ↴ */}
-      <div
-        className={` fixed inset-0 backdrop-filter z-[99] transition-all ${isOpen ? "backdrop-blur-[2px] bg-mask visible" : "invisible bg-transparent backdrop-blur-0"}`}
-        onClick={handleMuskClick}
-      ></div>
-      {/* ^ Mask ^ */}
+      <Mask isOpen={isOpen} onClick={handleMaskClick} />
       <div
         className={`${isExpanded ? "h-[min(500px,100%)]" : "max-h-[90vh]"} flex flex-col relative top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 z-[999] w-full ${width === "md" ? "sm:w-[400px]" : "sm:w-[680px]"}`}
       >

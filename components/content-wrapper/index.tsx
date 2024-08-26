@@ -2,14 +2,11 @@
 
 import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
 import clsx from "clsx";
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, PropsWithChildren } from "react";
 
-interface IProps {
-  children: React.ReactNode;
-}
-
-const ContentWrapper: FunctionComponent<IProps> = ({ children }) => {
+const ContentWrapper: FunctionComponent<PropsWithChildren> = ({ children }) => {
   const { isExpanded } = useIsLessonHrExpanded();
+
   return (
     <div
       className={`overflow-auto h-[calc(100vh-68px)] fixed inset-0 top-[68px] `}

@@ -187,7 +187,7 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
           total={totalLessonsCount}
           Icon={<LessonsIcon size="lg" />}
         />
-        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
           <CreateLesson onDone={fetchLessonsBySearch} courseId={courseId} />
         )}
       </CardsContainer>
@@ -229,14 +229,14 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
                 title={title}
                 subtitle=""
                 onToggle={
-                  (user.user_metadata as IUserMetadata).role === Role.TEACHER
+                  (user.user_metadata as IUserMetadata).role === Role.Teacher
                     ? (checked) => onLessonToggle(checked, id)
                     : undefined
                 }
               />
             ),
             Starts: format(new Date(starts), "EEEE, MMM d"),
-            "": (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+            "": (user.user_metadata as IUserMetadata).role === Role.Teacher && (
               <LessonOptionsPopper
                 lessonId={id}
                 onDone={fetchLessonsBySearch}

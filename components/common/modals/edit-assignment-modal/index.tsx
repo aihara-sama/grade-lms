@@ -64,7 +64,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
   const getSubmissions = async () => {
     try {
       setSubmissions(
-        await ((user.user_metadata as IUserMetadata).role === Role.TEACHER
+        await ((user.user_metadata as IUserMetadata).role === Role.Teacher
           ? getSubmissionsWithAuthorByAssignmentId(assignmentId)
           : getSubmissionsWithAuthorByAssignmentIdAndUserId(
               assignmentId,
@@ -116,6 +116,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
                   lesson={lesson}
                 />
               ),
+              tier: [Role.Teacher, Role.Student],
             },
             {
               title: "Submissions",
@@ -127,6 +128,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
                   submissions={submissions}
                 />
               ),
+              tier: [Role.Teacher, Role.Student],
             },
           ]}
         />

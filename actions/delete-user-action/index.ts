@@ -14,7 +14,7 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
     };
   }
 
-  if (currentUser.data.user.user_metadata.role !== Role.TEACHER) {
+  if (currentUser.data.user.user_metadata.role !== Role.Teacher) {
     return {
       error: "Forbidden",
       data: null,

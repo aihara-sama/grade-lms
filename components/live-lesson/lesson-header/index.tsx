@@ -7,6 +7,7 @@ import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
 import NavTabs from "@/components/nav-tabs";
 import type { ITabItem } from "@/interfaces/menu.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
@@ -25,16 +26,19 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
       title: "Overview",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
       Icon: <OverviewIcon />,
+      tier: [Role.Teacher, Role.Student],
     },
     {
       title: "Assignments",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
       Icon: <AssignmentsIcon />,
+      tier: [Role.Teacher, Role.Student],
     },
     {
       title: "Settings",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
       Icon: <SettingsIcon />,
+      tier: [Role.Teacher, Role.Student],
     },
   ];
 
@@ -57,7 +61,6 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
             href: `/dashboard/courses/${course.id}/lessons`,
           },
           {
-            isCurrentPage: true,
             title: lesson.title,
             href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
           },

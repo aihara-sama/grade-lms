@@ -1,13 +1,15 @@
+
 /** 
 * USERS
 * Note: This table contains user data. Users should only be able to view and update their own data.
 */
+CREATE TYPE public.Role AS ENUM ('Teacher', 'Student', 'Guest');
 create table users (
   -- UUID from auth.users
   id uuid references auth.users on delete cascade not null primary key,
   creator_id text,
   name text not null,
-  role text not null,
+  role Role not null,
   email text not null,
   avatar text not null,
   preferred_locale text not null,
@@ -25,7 +27,7 @@ create function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'role', new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id');
+  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id');
   return new;
 end;
 $$ language plpgsql security definer;
@@ -158,13 +160,13 @@ $$ language plpgsql;
 -- Example usage:
 -- SELECT create_lesson_with_assignments('<course_id>', 'Lesson Title', '2024-03-03 12:00:00', '2024-03-03 14:00:00', '[{"dueDate": "2024-03-05 12:00:00", "title": "Assignment 1", "body": "Assignment 1 description"}, {"dueDate": "2024-03-08 12:00:00", "title": "Assignment 2", "body": "Assignment 2 description"}]');
 
-create table messages (
+create table chat_messages (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   lesson_id uuid references public.lessons on delete cascade not null,
-  reply_id uuid references public.messages on delete cascade,
+  reply_id uuid references public.chat_messages on delete cascade,
   author text not null,
   author_avatar text not null,
-  author_role text not null,
+  author_role Role not null,
   text text
 );
 

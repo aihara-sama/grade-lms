@@ -1,26 +1,10 @@
+import type { getNotifications } from "@/db/notification";
 import { NotificationType } from "@/interfaces/notifications.interface";
+import type { ResultOf } from "@/types";
 
-export const parseNotification = (notification: {
-  is_read: boolean;
-  type: string;
-  course: {
-    title: string;
-    id: string;
-  };
-  lesson: {
-    title: string;
-    id: string;
-  };
-  assignment: {
-    title: string;
-  };
-  submission?: {
-    title: string;
-  };
-  user: {
-    name: string;
-  };
-}) => {
+export const parseNotification = (
+  notification: ResultOf<typeof getNotifications>[number]
+) => {
   if (notification.type === NotificationType.Assignment) {
     return {
       title: `New assignment in ${notification?.course?.title || "Deleted"}`,

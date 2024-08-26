@@ -2,95 +2,86 @@
 
 import AttachIcon from "@/components/icons/attach-icon";
 import Input from "@/components/input";
-import Message from "@/components/live-lesson/chat/message";
-import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
-import toast from "react-hot-toast";
 
 import MessagesIcon from "@/components/icons/messages-icon";
-import type { Role } from "@/interfaces/user.interface";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import Message from "@/components/live-lesson/chat/message";
+import { createChatMessage, getChatMessages } from "@/db/message";
+import { useLessonChannel } from "@/hooks/use-lesson-channel";
+import { useUser } from "@/hooks/use-user";
+import type { ResultOf } from "@/types";
+import type { ChatMessage } from "@/types/chat-messages";
+import { Event } from "@/types/events.type";
+import clsx from "clsx";
+import toast from "react-hot-toast";
 
 interface IProps {
   lessonId: string;
-  userName: string;
-  avatar: string;
-  userRole: Role;
-  channel: RealtimeChannel;
 }
 
-const Chat: FunctionComponent<IProps> = ({
-  lessonId,
-  userName,
-  channel,
-  avatar,
-  userRole,
-}) => {
+const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
   // State
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<
-    {
-      author: string;
-      author_avatar: string;
-      author_role: string;
-      id: string;
-      lesson_id: string;
-      reply_id: string;
-      text: string;
-    }[]
+  const [chatMessageText, setChatMessageText] = useState("");
+  const [chatMessages, setChatMessages] = useState<
+    ResultOf<typeof getChatMessages>
   >([]);
 
   // Refs
-  const messagesRef = useRef<HTMLDivElement>();
+  const messagesWrapperRef = useRef<HTMLDivElement>();
+
+  // Hooks
+  const { user } = useUser();
+  const channel = useLessonChannel();
 
   // Handlers
-  const handleCreateMesssage = async (replyId?: string) => {
-    const { error, data } = await supabaseClient
-      .from("messages")
-      .insert({
-        text: message,
-        author: userName,
+  const handleCreateChatMesssage = async (replyId?: string) => {
+    try {
+      const createdChatMessage = await createChatMessage({
+        text: chatMessageText,
+        author: user.name,
         lesson_id: lessonId,
         reply_id: replyId,
-        author_avatar: avatar,
-        author_role: userRole,
-      })
-      .select("*")
-      .single();
-
-    if (error) {
-      toast(error.message);
-    } else {
-      setMessages((prev) => [...prev, data]);
-      setMessage("");
-      channel.send({
-        event: "message",
-        type: "broadcast",
-        payload: {
-          message: data,
-        },
+        author_avatar: user.avatar,
+        author_role: user.role,
       });
+
+      setChatMessages((prev) => [...prev, createdChatMessage]);
+      setChatMessageText("");
+      channel.send({
+        event: Event.ChatMessage,
+        type: "broadcast",
+        payload: createdChatMessage,
+      });
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
-  const getMessages = async () => {
-    const data = await supabaseClient
-      .from("messages")
-      .select("*")
-      .eq("lesson_id", lessonId);
-    setMessages(data.data);
+  const handleGetMessages = async () => {
+    try {
+      setChatMessages(await getChatMessages(lessonId));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
+  const onNewChatMessage = (payload: { payload: ChatMessage }) =>
+    setChatMessages((prev) => [...prev, payload.payload]);
 
   // Effects
   useEffect(() => {
-    getMessages();
+    handleGetMessages();
   }, []);
   useEffect(() => {
-    messagesRef.current.scrollTo(0, messagesRef.current.scrollHeight);
-  }, [messages]);
+    messagesWrapperRef.current.scrollTo(
+      0,
+      messagesWrapperRef.current.scrollHeight
+    );
+  }, [chatMessages]);
   useEffect(() => {
-    channel.on("broadcast", { event: "message" }, (payload) => {
-      setMessages((prev) => [...prev, payload.payload.message]);
-    });
+    channel.on<ChatMessage>(
+      "broadcast",
+      { event: Event.ChatMessage },
+      onNewChatMessage
+    );
   }, []);
 
   return (
@@ -106,13 +97,13 @@ const Chat: FunctionComponent<IProps> = ({
         style={{
           maxHeight: `${typeof window !== "undefined" ? window.innerHeight - 380 : 0}px`,
         }}
-        ref={messagesRef}
+        ref={messagesWrapperRef}
         className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1"
       >
         <div className="flex flex-1 flex-col gap-2">
-          {messages.map((msg, idx) => (
-            <div key={msg.id} className={`${idx === 0 ? "mt-auto" : ""}`}>
-              <Message message={msg} />
+          {chatMessages.map((msg, idx) => (
+            <div key={msg.id} className={`${clsx(idx === 0 && "mt-auto")}`}>
+              <Message chatMessage={msg} />
             </div>
           ))}
         </div>
@@ -120,12 +111,12 @@ const Chat: FunctionComponent<IProps> = ({
       <Input
         className="mt-auto"
         fullWIdth
-        onChange={(e) => setMessage(e.target.value)}
-        value={message}
+        onChange={(e) => setChatMessageText(e.target.value)}
+        value={chatMessageText}
         Icon={<AttachIcon />}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            handleCreateMesssage();
+            handleCreateChatMesssage();
           }
         }}
       />

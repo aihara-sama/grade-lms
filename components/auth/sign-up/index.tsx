@@ -34,7 +34,7 @@ const SignUp: FunctionComponent = () => {
       options: {
         data: {
           name,
-          role: Role.TEACHER,
+          role: Role.Teacher,
           avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
           preferred_locale: "en",
         } as IUserMetadata,

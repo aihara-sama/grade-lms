@@ -185,7 +185,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
           total={totalCoursesCount}
           title="Total courses"
         />
-        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
           <CreateCourse onDone={fetchCoursesBySearch} />
         )}
       </CardsContainer>
@@ -228,7 +228,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
                   title={title}
                   subtitle="Active"
                   onToggle={
-                    (user.user_metadata as IUserMetadata).role === Role.TEACHER
+                    (user.user_metadata as IUserMetadata).role === Role.Teacher
                       ? (checked) => onCourseToggle(checked, id)
                       : undefined
                   }
@@ -237,7 +237,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
               Lessons: lessons[0].count,
               Members: members[0].count,
               "": (user.user_metadata as IUserMetadata).role ===
-                Role.TEACHER && (
+                Role.Teacher && (
                 <CourseOptionsPopper
                   onDone={fetchCoursesBySearch}
                   setSelectedCoursesIds={setSelectedCoursesIds}

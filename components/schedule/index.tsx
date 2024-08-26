@@ -256,7 +256,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   }, []);
 
   useEffect(() => {
-    if ((user.user_metadata as IUserMetadata).role === Role.TEACHER) {
+    if ((user.user_metadata as IUserMetadata).role === Role.Teacher) {
       window.addEventListener("mousemove", handlePointerMove);
       return () => window.removeEventListener("mousemove", handlePointerMove);
     }

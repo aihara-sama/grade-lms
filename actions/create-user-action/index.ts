@@ -20,7 +20,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
-  if (user.user_metadata.role !== Role.TEACHER) {
+  if (user.user_metadata.role !== Role.Teacher) {
     return {
       error: "Forbidden",
       data: null,
@@ -33,7 +33,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     user_metadata: {
       name: payload.name,
       creator_id: user.id,
-      role: Role.STUDENT,
+      role: Role.Student,
       avatar: payload.avatar,
       preferred_locale: (user.user_metadata as IUserMetadata).preferred_locale,
     } as IUserMetadata,

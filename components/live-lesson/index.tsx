@@ -6,60 +6,27 @@ import CameraIcon from "@/components/icons/camera-icon";
 import ChatIcon from "@/components/icons/chat-icon";
 import Chat from "@/components/live-lesson/chat";
 import AssignmentsTab from "@/components/live-lesson/tabs/assignments-tab";
-import UserNamePrompt from "@/components/live-lesson/user-name-prompt";
 import Tabs from "@/components/tabs";
-import VideoChat from "@/components/video-chat";
 import Whiteboard from "@/components/whiteboard";
-import { useUserName } from "@/hooks/useUserName";
-import { Role, type IUserMetadata } from "@/interfaces/user.interface";
-import { supabaseClient } from "@/utils/supabase/client";
+import { Role } from "@/interfaces/user.interface";
 import clsx from "clsx";
-import { useEffect, useRef, useState, type FunctionComponent } from "react";
-import { v4 as uuid } from "uuid";
+import { useState, type FunctionComponent } from "react";
 
 import Breadcrumbs from "@/components/breadcrumbs";
+import Camera from "@/components/camera";
 import CoursesIcon from "@/components/icons/courses-icon";
+import { useVideoChat } from "@/hooks/use-video-chat";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
-import type { RealtimeChannel, User } from "@supabase/supabase-js";
 
 interface IProps {
-  user?: User;
   lesson: Lesson & { course: Course };
 }
 
-const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
+const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
   // State
   const [isAsideOpen, setIsAsideOpen] = useState(true);
-
-  // Refs
-  const anonIdRef = useRef<string>(uuid());
-  const channelRef = useRef<RealtimeChannel>(
-    supabaseClient.channel(lesson.id, {
-      config: {
-        presence: {
-          key: anonIdRef.current,
-        },
-      },
-    })
-  );
-
-  // Hooks
-  const userNameStore = useUserName();
-
-  // Vars
-  const role = (user?.user_metadata as IUserMetadata)?.role || Role.GUEST;
-  const userName =
-    (user?.user_metadata as IUserMetadata)?.name || userNameStore.userName;
-
-  // Effects
-  useEffect(() => {
-    userNameStore.setUserName(localStorage.getItem("userName") || "");
-  }, []);
-
-  // View
-  if (userName === null) return null;
-  if (userName === "") return <UserNamePrompt />;
+  const { cameras, toggleAudio, toggleCamera } = useVideoChat();
 
   return (
     <div>
@@ -69,7 +36,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
           items={[
             { title: "Courses", href: "/dashboard/courses" },
             {
-              title: lesson.course?.title,
+              title: lesson.course.title,
               href: `/dashboard/courses/${lesson.course.id}/overview`,
             },
             {
@@ -77,20 +44,14 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
               href: `/dashboard/courses/${lesson.course.id}/lessons`,
             },
             {
-              isCurrentPage: true,
-              title: lesson?.title,
-              href: `/dashboard/courses/${lesson.course.id}/lessons/${lesson?.id}/overview`,
+              title: lesson.title,
+              href: `/dashboard/courses/${lesson.course.id}/lessons/${lesson.id}/overview`,
             },
           ]}
         />
       )}
       <main className="flex gap-6 mt-4">
-        <Whiteboard
-          lesson={lesson}
-          role={role}
-          userName={userName}
-          channel={channelRef.current}
-        />
+        <Whiteboard lesson={lesson} />
 
         <div
           className={`pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
@@ -109,37 +70,33 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson, user }) => {
                 {
                   title: "Cameras",
                   content: (
-                    <VideoChat
-                      channel={channelRef.current}
-                      anonId={anonIdRef.current}
-                      lessonId={lesson.id}
-                      role={role}
-                      userName={userName}
-                    />
+                    <div className="flex flex-col flex-1">
+                      <div className="flex flex-col gap-3">
+                        {cameras.map((camera, idx) => (
+                          <Camera
+                            toggleCamera={toggleCamera}
+                            toggleAudio={toggleAudio}
+                            camera={camera}
+                            key={idx}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ),
                   Icon: <CameraIcon />,
+                  tier: [Role.Teacher, Role.Student, Role.Guest],
                 },
                 {
                   title: "Messages",
-                  content: (
-                    <Chat
-                      userRole={role}
-                      channel={channelRef.current}
-                      userName={userName}
-                      lessonId={lesson.id}
-                      avatar={
-                        role === Role.GUEST
-                          ? "default-abatar"
-                          : (user.user_metadata as IUserMetadata).avatar
-                      }
-                    />
-                  ),
+                  content: <Chat lessonId={lesson.id} />,
                   Icon: <ChatIcon />,
+                  tier: [Role.Teacher, Role.Student, Role.Guest],
                 },
-                role === Role.TEACHER && {
+                {
                   title: "Assignments",
                   content: <AssignmentsTab lessonId={lesson.id} />,
                   Icon: <AssignmentsIcon />,
+                  tier: [Role.Teacher],
                 },
               ]}
             />

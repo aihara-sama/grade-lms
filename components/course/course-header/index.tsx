@@ -6,6 +6,7 @@ import MembersIcon from "@/components/icons/members-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import NavTabs from "@/components/nav-tabs";
 import type { ITabItem } from "@/interfaces/menu.interface";
+import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
@@ -21,21 +22,25 @@ const CourseHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
       title: "Overview",
       href: `/dashboard/courses/${course.id}/overview`,
       Icon: <OverviewIcon />,
+      tier: [Role.Teacher, Role.Student],
     },
     {
       title: "Lessons",
       href: `/dashboard/courses/${course.id}/lessons`,
       Icon: <LessonsIcon />,
+      tier: [Role.Teacher, Role.Student],
     },
     {
       title: "Members",
       href: `/dashboard/courses/${course.id}/members`,
       Icon: <MembersIcon />,
+      tier: [Role.Teacher, Role.Student],
     },
     {
       title: "Settings",
       href: `/dashboard/courses/${course.id}/settings`,
       Icon: <SettingsIcon />,
+      tier: [Role.Teacher, Role.Student],
     },
   ];
 
@@ -46,7 +51,6 @@ const CourseHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
         items={[
           { title: "Courses", href: "/dashboard/courses" },
           {
-            isCurrentPage: true,
             title: course.title,
             href: `/dashboard/courses/${course.id}`,
           },

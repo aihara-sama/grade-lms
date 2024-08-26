@@ -23,7 +23,7 @@ export const deleteLessonsByLessonsIds = async (lessonsIds: string[]) => {
 
   return result;
 };
-export const createLesson = async (lesson: TablesInsert<"lessons">) => {
+export const insertLesson = async (lesson: TablesInsert<"lessons">) => {
   const t = await loadMessages();
   const result = await supabaseClient.from("lessons").insert(lesson);
 

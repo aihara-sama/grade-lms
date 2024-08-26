@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import type { InputType as UserInputType } from "@/actions/create-user-action/types";
 import BaseModal from "@/components/common/modals/base-modal";
 import { createUser } from "@/db/user";
+import { Role } from "@/interfaces/user.interface";
 import { useTranslations } from "next-intl";
 import type {
   ChangeEvent,
@@ -113,6 +114,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
                   />
                 </>
               ),
+              tier: [Role.Teacher],
             },
             {
               title: "Avatar",
@@ -125,6 +127,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
                   />
                 </div>
               ),
+              tier: [Role.Teacher],
             },
           ]}
         />

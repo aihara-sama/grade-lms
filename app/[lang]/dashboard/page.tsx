@@ -12,7 +12,7 @@ const Page = async () => {
 
   let Dashborad: ReactNode;
 
-  if ((user.user_metadata as IUserMetadata).role === Role.TEACHER) {
+  if ((user.user_metadata as IUserMetadata).role === Role.Teacher) {
     const [
       {
         data: { courses },
@@ -44,7 +44,7 @@ const Page = async () => {
     );
   }
 
-  if ((user.user_metadata as IUserMetadata).role === Role.STUDENT) {
+  if ((user.user_metadata as IUserMetadata).role === Role.Student) {
     const [{ data: meWithAssignmentsCount }, { data: submissions }] =
       await Promise.all([
         createClient()

@@ -5,17 +5,17 @@ import NotificationsDrawer from "@/components/common/drawers/notifications-drawe
 import UserPopper from "@/components/common/poppers/user-popper";
 import Nav from "@/components/header/nav";
 import Logo from "@/components/logo";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { useUser } from "@/hooks/use-user";
+import { Role } from "@/interfaces/user.interface";
 import { messaging } from "@/utils/firebase";
-import type { User } from "@supabase/supabase-js";
 import { onMessage } from "firebase/messaging";
 import { useEffect, type FunctionComponent } from "react";
 
-interface IProps {
-  user: User;
-}
+interface IProps {}
 
-const Header: FunctionComponent<IProps> = ({ user }) => {
+const Header: FunctionComponent<IProps> = () => {
+  const { user } = useUser();
+
   useEffect(() => {
     onMessage(
       messaging,
@@ -29,22 +29,14 @@ const Header: FunctionComponent<IProps> = ({ user }) => {
   return (
     <div className="flex p-4 items-center shadow-lg fixed inset-x-0 top-0 bg-white z-[99]">
       <Logo />
-      {!!user && (
+      {[Role.Teacher, Role.Student].includes(user.role as Role) && (
         <>
-          <div className="mr-auto">
-            <Nav user={user} />
-          </div>
-          <NotificationsDrawer user={user} />
-          <div className="ml-2">
-            <UserPopper
-              userName={(user.user_metadata as IUserMetadata).name}
-              role={(user.user_metadata as IUserMetadata).role}
-              avatar={(user.user_metadata as IUserMetadata).avatar}
-            />
-          </div>
-          <MobileDrawer user={user} />
+          <Nav className="mr-auto" />
+          <NotificationsDrawer />
+          <UserPopper className="ml-2" />
         </>
       )}
+      <MobileDrawer />
     </div>
   );
 };

@@ -145,7 +145,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
             </button>
           )}
           {lesson?.id &&
-            (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+            (user.user_metadata as IUserMetadata).role === Role.Teacher && (
               <button
                 className="icon-button"
                 onClick={openDeleteLessonPromptModal}
@@ -159,7 +159,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
       <div>
         <form onSubmit={handleSaveLesson} id="create-lesson-form">
           {includeCoursesSelect &&
-            (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+            (user.user_metadata as IUserMetadata).role === Role.Teacher && (
               <Select
                 label="Course"
                 defaultValue={course}
@@ -179,7 +179,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
             value={lessonTitle}
             className="mt-3"
             disabled={
-              (user.user_metadata as IUserMetadata).role !== Role.TEACHER
+              (user.user_metadata as IUserMetadata).role !== Role.Teacher
             }
           />
         </form>
@@ -190,7 +190,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
             setEnds(new Date(+date + duration));
           }}
           label="Starts at"
-          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.Teacher}
         />
         <Input
           fullWIdth
@@ -199,11 +199,11 @@ const EditLessonModal: FunctionComponent<IProps> = ({
           Icon={<TimeIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={handleChangeDuration}
-          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.Teacher}
         />
         <hr className="my-3" />
         <div className="flex justify-end">
-          {(user.user_metadata as IUserMetadata).role === Role.TEACHER ? (
+          {(user.user_metadata as IUserMetadata).role === Role.Teacher ? (
             <button
               disabled={!lessonTitle}
               type="submit"

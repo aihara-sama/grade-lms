@@ -210,7 +210,7 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
           total={totalAssignmentsCount}
           title="Total assignments"
         />
-        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
           <CreateAssignment
             course={course}
             lesson={lesson}
@@ -264,13 +264,13 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
                 title={title}
                 subtitle=""
                 onToggle={
-                  (user.user_metadata as IUserMetadata).role === Role.TEACHER
+                  (user.user_metadata as IUserMetadata).role === Role.Teacher
                     ? (checked) => onAssignmentToggle(checked, id)
                     : undefined
                 }
               />
             ),
-            "": (user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+            "": (user.user_metadata as IUserMetadata).role === Role.Teacher && (
               <AssignmentOptionsPopper
                 assignmentId={id}
                 onDone={fetchAssignmentsBySearch}

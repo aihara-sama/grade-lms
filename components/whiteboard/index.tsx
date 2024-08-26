@@ -15,6 +15,8 @@ import InviteIcon from "@/components/icons/invite-icon";
 import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
 import Input from "@/components/input";
 import LiveTime from "@/components/live-time";
+import { useLessonChannel } from "@/hooks/use-lesson-channel";
+import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lessons.type";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
@@ -23,7 +25,6 @@ import type {
   ExcalidrawImperativeAPI,
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types/types";
-import type { RealtimeChannel } from "@supabase/supabase-js";
 import clsx from "clsx";
 import { format, minutesToMilliseconds } from "date-fns";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -36,13 +37,10 @@ const Excalidraw = dynamic(
 );
 
 interface IProps {
-  userName: string;
-  role: Role;
-  channel: RealtimeChannel;
   lesson: Lesson;
 }
 
-const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
+const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
   // State
   const [isExtendLessonModalOpen, setIsExtendLessonModalOpen] = useState(false);
   const [whiteboardHeight, setWhiteboardHeight] = useState(500);
@@ -59,10 +57,12 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
 
   // Hooks
   const { isExpanded, setIsExpanded } = useIsLessonHrExpanded();
+  const { user } = useUser();
+  const channel = useLessonChannel();
 
   // Effects
   useEffect(() => {
-    if (role === Role.STUDENT || role === Role.GUEST) {
+    if ([Role.Student, Role.Guest].includes(user.role as Role)) {
       channel.on("broadcast", { event: "whiteboard:change" }, (payload) => {
         excalidrawAPIRef.current?.updateScene({
           elements: payload.payload.elements,
@@ -71,9 +71,9 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
             // Teacher's cursor
             collaborators: new Map([
               [
-                "Teacher",
+                Role.Teacher,
                 {
-                  username: "Teacher",
+                  username: Role.Teacher,
                   pointer: payload.payload.pointerEvent?.pointer,
                   button: payload.payload.pointerEvent?.button,
                 },
@@ -146,7 +146,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
   };
 
   const parseWhiteboardData = () => {
-    if (role === Role.STUDENT) {
+    if (user.role === Role.Student) {
       const data = JSON.parse(lesson.whiteboard_data);
 
       if (data.appState) {
@@ -181,7 +181,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
             <p className="text-neutral-600 font-bold">
               <LiveTime date={new Date(lesson.ends)} /> left
             </p>
-            {role === Role.TEACHER && (
+            {user.role === Role.Teacher && (
               <button
                 className="text-link"
                 onClick={() => setIsExtendLessonModalOpen(true)}
@@ -196,7 +196,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
           >
             {isExpanded ? <ShrinkHorizontalIcon /> : <ExpandHorizontalIcon />}
           </button>
-          {role === Role.TEACHER && (
+          {user.role === Role.Teacher && (
             <button className="icon-button" onClick={handleInvite}>
               <InviteIcon size="sm" />
             </button>
@@ -204,7 +204,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
         </div>
       </div>
       <div
-        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(role !== Role.TEACHER && "student-whiteboard")}`}
+        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
         style={{
           height: `${whiteboardHeight}px`,
         }}
@@ -212,9 +212,9 @@ const Whiteboard: FunctionComponent<IProps> = ({ role, channel, lesson }) => {
         <Excalidraw
           isCollaborating
           onPointerUpdate={
-            role === Role.TEACHER ? handlePointerUpdate : undefined
+            user.role === Role.Teacher ? handlePointerUpdate : undefined
           }
-          onChange={role === Role.TEACHER ? handleChange : undefined}
+          onChange={user.role === Role.Teacher ? handleChange : undefined}
           excalidrawAPI={(api) => {
             excalidrawAPIRef.current = api;
           }}

@@ -1,39 +1,57 @@
 import AvatarIcon from "@/components/icons/avatar-icon";
 import Input from "@/components/input";
-import { useUserName } from "@/hooks/useUserName";
+import { useUser } from "@/hooks/use-user";
 import { useState } from "react";
+import { v4 as uuid } from "uuid";
 
-import type { FunctionComponent } from "react";
+import { Role } from "@/interfaces/user.interface";
+import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {}
 
-const UserNamePrompt: FunctionComponent<IProps> = () => {
+const GuestPrompt: FunctionComponent<IProps> = () => {
   // State
   const [userName, setUserName] = useState("");
 
   // Hooks
-  const userNameStore = useUserName();
+  const userStore = useUser();
 
   // Handlers
-  const handleJoin = () => {
-    userNameStore.setUserName(userName);
-  };
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setUserName(e.target.value);
+
+  const createGuestUser = () =>
+    userStore.setUser({
+      id: uuid(),
+      avatar: process.env.DEFAULT_AVATAR,
+      created_at: new Date().toISOString(),
+      creator_id: null,
+      email: "",
+      name: userName,
+      role: Role.Guest,
+      preferred_locale: "en",
+      fcm_token: null,
+    });
 
   // View
   return (
     <div className="flex flex-col justify-center items-center h-screen max-w-[400px] mx-auto my-0">
       <Input
         value={userName}
-        onChange={(e) => setUserName(e.target.value)}
+        onChange={handleInputChange}
         Icon={<AvatarIcon size="xs" />}
         label="Enter your name"
         autoFocus
       />
-      <button className="primary-button" onClick={handleJoin}>
+      <button
+        disabled={!userName}
+        className="primary-button"
+        onClick={createGuestUser}
+      >
         Join
       </button>
     </div>
   );
 };
 
-export default UserNamePrompt;
+export default GuestPrompt;

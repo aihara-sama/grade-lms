@@ -79,7 +79,7 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
       );
 
       const room =
-        (user.user_metadata as IUserMetadata).role === Role.TEACHER
+        (user.user_metadata as IUserMetadata).role === Role.Teacher
           ? user.id
           : (user.user_metadata as IUserMetadata).creator_id;
 

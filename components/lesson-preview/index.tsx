@@ -116,7 +116,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
               Whiteboard preview
             </p>
           </div>
-          {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+          {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
             <button
               className="icon-button shadow-md ml-auto mr-2"
               onClick={handleSaveWhiteboardData}
@@ -126,7 +126,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
           )}
         </div>
         <div
-          className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx((user.user_metadata as IUserMetadata).role !== Role.TEACHER && "student-whiteboard")}`}
+          className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx((user.user_metadata as IUserMetadata).role !== Role.Teacher && "student-whiteboard")}`}
           style={{
             height: `${whiteboardHeight}px`,
           }}
@@ -138,7 +138,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
             }}
             initialData={parseWhiteboardData()}
             onChange={
-              (user.user_metadata as IUserMetadata).role === Role.TEACHER
+              (user.user_metadata as IUserMetadata).role === Role.Teacher
                 ? onWhiteboardChange
                 : undefined
             }
@@ -159,7 +159,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
           onChange={handleChangeDate}
           label="Starts at"
           popperPlacement="bottom-start"
-          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.Teacher}
         />
         <Input
           className="mt-3 mb-0"
@@ -169,15 +169,15 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
           Icon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={handleChangeDuration}
-          disabled={(user.user_metadata as IUserMetadata).role !== Role.TEACHER}
+          disabled={(user.user_metadata as IUserMetadata).role !== Role.Teacher}
         />
-        {(user.user_metadata as IUserMetadata).role === Role.TEACHER && (
+        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
           <button className="primary-button" onClick={handleSaveDate}>
             Save
           </button>
         )}
         <div className="mt-3 sm:mt-auto flex flex-col gap-1">
-          {(user.user_metadata as IUserMetadata).role !== Role.TEACHER ? (
+          {(user.user_metadata as IUserMetadata).role !== Role.Teacher ? (
             <Link
               href={`/dashboard/lessons/${lesson.id}`}
               className={`button warning-button ${clsx(new Date() <= starts && "disabled")} `}

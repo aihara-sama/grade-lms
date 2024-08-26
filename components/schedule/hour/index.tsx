@@ -106,7 +106,7 @@ const Hour: FunctionComponent<IProps> = ({
                   )
                 )
               }
-              className={`placeholder absolute w-full text-center border-[2px] border-dashed border-[#c3c3c3] rounded-[3px] opacity-0 [transition:0.1s] bg-[white] h-[20px] flex justify-center items-center bg-transparent ${!draggingEvent ? "hover:cursor-pointer hover:opacity-100" : ""} active:bg-gray-100 ${quarter === idx * 15 ? "opacity-100" : "opacity-0"} ${clsx((user.user_metadata as IUserMetadata).role !== Role.TEACHER && "pointer-events-none")}`}
+              className={`placeholder absolute w-full text-center border-[2px] border-dashed border-[#c3c3c3] rounded-[3px] opacity-0 [transition:0.1s] bg-[white] h-[20px] flex justify-center items-center bg-transparent ${!draggingEvent ? "hover:cursor-pointer hover:opacity-100" : ""} active:bg-gray-100 ${quarter === idx * 15 ? "opacity-100" : "opacity-0"} ${clsx((user.user_metadata as IUserMetadata).role !== Role.Teacher && "pointer-events-none")}`}
               style={{
                 top: `${idx * 20}px`,
                 height: `${

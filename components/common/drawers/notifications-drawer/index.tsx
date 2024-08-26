@@ -1,99 +1,64 @@
 "use client";
 
 import BaseDrawer from "@/components/common/drawers/base-drawer";
+import Notification from "@/components/common/drawers/notifications-drawer/notification";
 import NotificationsIcon from "@/components/icons/notifications-icon";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { getNotifications } from "@/db/notification";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
+import type { ResultOf } from "@/types";
+import { Event } from "@/types/events.type";
 import {
   closeNotificationChannel,
   getNotificationChannel,
 } from "@/utils/get-notification-channel";
-import { parseNotification } from "@/utils/parse-notification";
-import { supabaseClient } from "@/utils/supabase/client";
-import type { User } from "@supabase/supabase-js";
-import { formatDistanceToNowStrict } from "date-fns";
-import Link from "next/link";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface Props {
-  user: User;
-}
-
-const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
+const NotificationsDrawer: FunctionComponent = () => {
+  // State
+  const [isOpen, setIsOpen] = useState(false);
+  const [isNewNotification, setIsNewNotification] = useState(false);
   const [notifications, setNotifications] = useState<
-    {
-      is_read: boolean;
-      id: string;
-      created_at: string;
-      type: string;
-      course: {
-        title: string;
-        id: string;
-      };
-      lesson: {
-        title: string;
-        id: string;
-      };
-      assignment: {
-        title: string;
-      };
-      user: {
-        name: string;
-      };
-    }[]
+    ResultOf<typeof getNotifications>
   >([]);
 
-  const [isNewNotification, setIsNewNotification] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  // Hooks
+  const { user } = useUser();
 
-  const getNotifications = async () => {
-    const data = await supabaseClient
-      .from("notifications")
-      .select(
-        "id, is_read, type, created_at, course:courses(title, id), lesson:lessons(title, id), assignment:assignments(title), user:users!inner(name)"
+  // Handlers
+  const onNewNotification = () => setIsNewNotification(true);
+  const onReadNotification = (notificationId: string) =>
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === notificationId
+          ? { ...notification, is_read: true }
+          : notification
       )
-      .eq("users.id", user.id);
-
-    setNotifications(data.data);
-  };
-
-  useEffect(() => {
-    const room =
-      (user.user_metadata as IUserMetadata).role === Role.TEACHER
-        ? user.id
-        : (user.user_metadata as IUserMetadata).creator_id;
-    const channel = getNotificationChannel(room);
-
-    channel
-      .on("broadcast", { event: "notification" }, () => {
-        setIsNewNotification(true);
-      })
-      .subscribe();
-
-    return closeNotificationChannel();
-  }, []);
-
-  const readNotification = async (notificationId: string) => {
-    const { error } = await supabaseClient
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("id", notificationId);
-
-    if (error) {
-      toast.error("Something went wrong");
-    } else {
-      setNotifications((prev) =>
-        prev.map((_) => {
-          if (_.id === notificationId) _.is_read = true;
-          return _;
-        })
-      );
+    );
+  const handleGetNotifications = async () => {
+    try {
+      setNotifications(await getNotifications(user.id));
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
+  // Effects
   useEffect(() => {
-    getNotifications();
+    const room = user.role === Role.Teacher ? user.id : user.creator_id;
+
+    getNotificationChannel(room)
+      .on("broadcast", { event: Event.NewNotification }, onNewNotification)
+      .subscribe();
+
+    return () => {
+      closeNotificationChannel();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) handleGetNotifications();
   }, [isOpen]);
 
   useEffect(() => {
@@ -123,47 +88,14 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ user }) => {
         }
       >
         <div className="max-h-[calc(100vh-88px)] overflow-auto py-4">
-          {notifications.map((notification) => {
-            const { href, body, textHref, title } =
-              parseNotification(notification);
-            return (
-              <div
-                onMouseEnter={() => {
-                  if (!notification.is_read) readNotification(notification.id);
-                }}
-                key={notification.id}
-                className="flex flex-col pb-4 px-7 "
-              >
-                <div className="flex items-start gap-2">
-                  <button className="relative icon-button border border-neutral-300">
-                    <NotificationsIcon className="" size="xs" />
-                    <div
-                      className={`absolute bottom-[-18px] w-[10px] h-[10px]  rounded-[50%] border border-white ${!notification.is_read ? "bg-red-500" : "bg-transparent"} transition-all`}
-                    ></div>
-                  </button>
-                  <div>
-                    <p className="text-neutral-700 text-[15px] font-bold">
-                      {title}
-                    </p>
-                    <p className="">{body}</p>
-                    <p className="text-sm text-neutral-500 mb-2">
-                      {formatDistanceToNowStrict(
-                        new Date(notification.created_at)
-                      )}
-                    </p>
-                    <Link
-                      href={href}
-                      className="text-sm"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {textHref}
-                    </Link>
-                  </div>
-                </div>
-                <hr className="mt-4" />
-              </div>
-            );
-          })}
+          {notifications.map((notification) => (
+            <Notification
+              notification={notification}
+              onNavigateAway={() => setIsOpen(false)}
+              onReadNotification={() => onReadNotification(notification.id)}
+              key={notification.id}
+            />
+          ))}
         </div>
       </BaseDrawer>
     </>

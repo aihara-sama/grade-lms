@@ -1,5 +1,6 @@
 "use client";
 
+import type { PropsWithClassName } from "@/types";
 import clsx from "clsx";
 import type {
   FunctionComponent,
@@ -15,9 +16,12 @@ interface IProps {
   popperClassName?: string;
 }
 
-const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
+const BasePopper: FunctionComponent<
+  PropsWithChildren<PropsWithClassName<IProps>>
+> = ({
   children,
   trigger,
+  className = "",
   popperClassName = "",
   width = "full",
 }) => {
@@ -69,18 +73,19 @@ const BasePopper: FunctionComponent<PropsWithChildren<IProps>> = ({
   };
 
   return (
-    <div className="relative" ref={rootRef}>
+    <div className={`relative ${className}`} ref={rootRef}>
       <div onClick={() => setIsOpen((prev) => !prev)}>{trigger}</div>
       <div
-        className={`mt-2 ${clsx({
-          "w-44": width === "sm",
-          "w-60": width === "md",
-          "w-full": width === "full",
-        })} overflow-auto bg-white max-h-[calc(100vh-70px)] shadow-md absolute right-0 ${isVisible ? "py-[14px]" : ""} rounded-[3px] z-[999] transition-fade duration-300 ease-in-out ${
-          isOpen
-            ? "opacity-100 translate-y-0 visible"
-            : "invisible opacity-0 translate-y-3"
-        } ${popperClassName}`}
+        className={`mt-2 overflow-auto bg-white max-h-[calc(100vh-70px)] shadow-md absolute right-0 rounded-[3px] z-[999] transition-fade duration-300 ease-in-out ${clsx(
+          {
+            "opacity-100 translate-y-0 visible": isOpen,
+            "invisible opacity-0 translate-y-3": !isOpen,
+            "py-[14px]": isVisible,
+            "w-44": width === "sm",
+            "w-60": width === "md",
+            "w-full": width === "full",
+          }
+        )} ${popperClassName}`}
         onClick={handleChildrenClick}
         onTransitionEnd={handleTransitionEnd}
       >

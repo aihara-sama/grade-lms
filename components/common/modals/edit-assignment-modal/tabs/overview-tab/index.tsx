@@ -50,7 +50,7 @@ const OverviewTab: FunctionComponent<IProps> = ({
   return (
     <div>
       <Input
-        disabled={(user.user_metadata as IUserMetadata).role === Role.STUDENT}
+        disabled={(user.user_metadata as IUserMetadata).role === Role.Student}
         fullWIdth
         Icon={<LessonsIcon size="xs" />}
         placeholder="Assignment name"
@@ -72,7 +72,7 @@ const OverviewTab: FunctionComponent<IProps> = ({
             setAssignment((prev) => ({ ...prev, body: JSON.stringify(data) }))
           }
           data={JSON.parse(assignment.body)}
-          readOnly={(user.user_metadata as IUserMetadata).role === Role.STUDENT}
+          readOnly={(user.user_metadata as IUserMetadata).role === Role.Student}
         />
       </div>
 
@@ -84,11 +84,11 @@ const OverviewTab: FunctionComponent<IProps> = ({
             label="Due date"
             popperPlacement="top-start"
             disabled={
-              (user.user_metadata as IUserMetadata).role !== Role.TEACHER
+              (user.user_metadata as IUserMetadata).role !== Role.Teacher
             }
           />
         </div>
-        {(user.user_metadata as IUserMetadata).role === Role.TEACHER ? (
+        {(user.user_metadata as IUserMetadata).role === Role.Teacher ? (
           <button className="primary-button" onClick={handleSaveAssignment}>
             Save
           </button>
@@ -101,7 +101,7 @@ const OverviewTab: FunctionComponent<IProps> = ({
           </button>
         )}
       </div>
-      {(user.user_metadata as IUserMetadata).role === Role.STUDENT && (
+      {(user.user_metadata as IUserMetadata).role === Role.Student && (
         <CreateSubmissionModal
           user={user}
           assignmentId={assignment.id}

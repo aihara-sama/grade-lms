@@ -1,5 +1,6 @@
 "use client";
 
+import Mask from "@/components/common/mask";
 import CloseIcon from "@/components/icons/close-icon";
 import { hasVerticalScrollbar } from "@/utils/has-vertical-scrollbar";
 import clsx from "clsx";
@@ -43,13 +44,7 @@ const BaseDrawer: FunctionComponent<PropsWithChildren<IProps>> = ({
   // View
   return (
     <>
-      {/* Mask ↴ */}
-      <div
-        className={`fixed top-0 bottom-0 left-0 right-0 backdrop-filter z-[99]  transition-all ${isOpen ? "backdrop-blur-[2px] bg-mask visible" : "invisible bg-transparent backdrop-blur-0"}`}
-        onClick={() => setIsOpen(false)}
-      ></div>
-      {/* ^ Mask ^ */}
-
+      <Mask isOpen={isOpen} onClick={() => setIsOpen(false)} />
       {/* Actual Drawer */}
       <div
         className={clsx(

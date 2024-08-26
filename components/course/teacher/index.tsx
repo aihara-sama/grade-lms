@@ -17,7 +17,7 @@ const Teacher: FunctionComponent<IProps> = ({ teacher }) => {
           Icon={<Avatar avatar={teacher.avatar} />}
           href={`/users/${teacher.id}`}
           title={teacher.name}
-          subtitle={Role.TEACHER}
+          subtitle={Role.Teacher}
         />
       </div>
     </div>
