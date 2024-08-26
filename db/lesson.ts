@@ -48,6 +48,7 @@ export const getWeekLessons = async (days: string[]) => {
   const result = await supabaseClient
     .from("lessons")
     .select("*")
+    .filter("course_id", "not.is", null)
     .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
     .lte(
       "starts",

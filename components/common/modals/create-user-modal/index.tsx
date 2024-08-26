@@ -45,7 +45,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
 
   const t = useTranslations();
 
-  const handleCreateUser = async (createAnother?: boolean) => {
+  const submitCreateUser = async (createAnother?: boolean) => {
     try {
       await createUser(userDetails);
       setUserDetails(initUserDetails);
@@ -59,10 +59,10 @@ const CreateUserModal: FunctionComponent<IProps> = ({
     }
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
 
-  const handleAvatarChange = (avatar: string) =>
+  const onAvatarChange = (avatar: string) =>
     setUserDetails((_) => ({ ..._, avatar }));
 
   useEffect(() => {
@@ -85,7 +85,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
               content: (
                 <>
                   <Input
-                    onChange={handleInputChange}
+                    onChange={onInputChange}
                     value={userDetails.name}
                     fullWIdth
                     name="name"
@@ -94,7 +94,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
                     autoFocus
                   />
                   <Input
-                    onChange={handleInputChange}
+                    onChange={onInputChange}
                     value={userDetails.email}
                     Icon={<EmailIcon size="xs" />}
                     label="Email"
@@ -103,7 +103,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
                     fullWIdth
                   />
                   <Input
-                    onChange={handleInputChange}
+                    onChange={onInputChange}
                     value={userDetails.password}
                     name="password"
                     Icon={<SecurityIcon size="xs" />}
@@ -122,7 +122,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
               content: (
                 <div className="flex justify-center mx-[0] my-[23.5px]">
                   <AvatarUpload
-                    onChange={handleAvatarChange}
+                    onChange={onAvatarChange}
                     avatar={userDetails.avatar}
                   />
                 </div>
@@ -134,7 +134,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
         <hr className="mb-4" />
         <div className="flex justify-end gap-3">
           <button
-            onClick={() => handleCreateUser(true)}
+            onClick={() => submitCreateUser(true)}
             className="outline-button"
             type="button"
           >
@@ -143,7 +143,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
           <button
             className="primary-button"
             type="button"
-            onClick={() => handleCreateUser()}
+            onClick={() => submitCreateUser()}
           >
             Create
           </button>

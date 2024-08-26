@@ -160,6 +160,10 @@ $$ language plpgsql;
 -- Example usage:
 -- SELECT create_lesson_with_assignments('<course_id>', 'Lesson Title', '2024-03-03 12:00:00', '2024-03-03 14:00:00', '[{"dueDate": "2024-03-05 12:00:00", "title": "Assignment 1", "body": "Assignment 1 description"}, {"dueDate": "2024-03-08 12:00:00", "title": "Assignment 2", "body": "Assignment 2 description"}]');
 
+
+
+
+
 create table chat_messages (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   lesson_id uuid references public.lessons on delete cascade not null,
@@ -168,6 +172,15 @@ create table chat_messages (
   author_avatar text not null,
   author_role Role not null,
   text text
+);
+
+create table chat_files (
+  id uuid not null primary key DEFAULT gen_random_uuid(),
+  message_id uuid references public.chat_messages on delete cascade not null,
+  name text not null,
+  ext text not null,
+  path text not null,
+  size int not null
 );
 
 create or replace function public.get_users_not_in_course(p_course_id uuid)

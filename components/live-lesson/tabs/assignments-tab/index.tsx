@@ -69,7 +69,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId, courseId }) => {
       <div className="mb-[12px] flex flex-col gap-[6px]">
         {assignments.map((assignment) => (
           <div
-            className="flex items-center justify-between cursor-pointer p-[8px] hover:bg-slate-100"
+            className="flex items-center justify-between cursor-pointer p-[8px] hover:bg-neutral-50"
             key={assignment.id}
           >
             <CardTitle
@@ -82,7 +82,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId, courseId }) => {
               className="flex items-center gap-[12px]"
               onClick={() => openDeleteAssignmentModal(assignment.id)}
             >
-              <button className="icon-button shadow-md">
+              <button className="icon-button">
                 <DeleteIcon />
               </button>
             </div>

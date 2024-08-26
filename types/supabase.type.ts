@@ -44,6 +44,41 @@ export type Database = {
           },
         ];
       };
+      chat_files: {
+        Row: {
+          ext: string;
+          id: string;
+          message_id: string;
+          name: string;
+          path: string;
+          size: number;
+        };
+        Insert: {
+          ext: string;
+          id?: string;
+          message_id: string;
+          name: string;
+          path: string;
+          size: number;
+        };
+        Update: {
+          ext?: string;
+          id?: string;
+          message_id?: string;
+          name?: string;
+          path?: string;
+          size?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_files_message_id_fkey";
+            columns: ["message_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_messages";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       chat_messages: {
         Row: {
           author: string;

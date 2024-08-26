@@ -18,6 +18,9 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import { useVideoChat } from "@/hooks/use-video-chat";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
+import { supabaseClient } from "@/utils/supabase/client";
+import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
 
 interface IProps {
   lesson: Lesson & { course: Course };
@@ -26,7 +29,26 @@ interface IProps {
 const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
   // State
   const [isAsideOpen, setIsAsideOpen] = useState(true);
+  const [currentLesson, setCurrentLesson] = useState(lesson);
   const { cameras, fireToggleAudio, fireToggleCamera } = useVideoChat();
+
+  const t = useTranslations();
+
+  const fetchLesson = async () => {
+    try {
+      const { data, error } = await supabaseClient
+        .from("lessons")
+        .select("*, course:courses(*)")
+        .eq("id", lesson.id)
+        .single();
+
+      if (error) throw new Error(t("something_went_wrong"));
+
+      setCurrentLesson(data);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
 
   const tabs = [
     {
@@ -60,7 +82,10 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
     tabs.push({
       title: "Assignments",
       content: (
-        <AssignmentsTab lessonId={lesson.id} courseId={lesson.course_id} />
+        <AssignmentsTab
+          lessonId={currentLesson.id}
+          courseId={currentLesson.course_id}
+        />
       ),
       Icon: <AssignmentsIcon />,
       tier: [Role.Teacher],
@@ -69,28 +94,28 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
 
   return (
     <div>
-      {lesson.course && (
+      {currentLesson.course && (
         <Breadcrumbs
           Icon={<CoursesIcon />}
           items={[
             { title: "Courses", href: "/dashboard/courses" },
             {
-              title: lesson.course.title,
-              href: `/dashboard/courses/${lesson.course.id}/overview`,
+              title: currentLesson.course.title,
+              href: `/dashboard/courses/${currentLesson.course.id}/overview`,
             },
             {
               title: "Lessons",
-              href: `/dashboard/courses/${lesson.course.id}/lessons`,
+              href: `/dashboard/courses/${currentLesson.course.id}/lessons`,
             },
             {
-              title: lesson.title,
-              href: `/dashboard/courses/${lesson.course.id}/lessons/${lesson.id}/overview`,
+              title: currentLesson.title,
+              href: `/dashboard/courses/${currentLesson.course.id}/lessons/${currentLesson.id}/overview`,
             },
           ]}
         />
       )}
       <main className="flex gap-6 mt-4">
-        <Whiteboard lesson={lesson} />
+        <Whiteboard onLessonExtended={fetchLesson} lesson={currentLesson} />
         <div
           className={`pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >

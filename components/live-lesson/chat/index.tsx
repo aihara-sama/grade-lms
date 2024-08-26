@@ -2,8 +2,8 @@
 
 import AttachIcon from "@/components/icons/attach-icon";
 import Input from "@/components/input";
-import { useEffect, useRef, useState, type FunctionComponent } from "react";
 
+import CreateFileMessageModal from "@/components/common/modals/create-file-message-modal";
 import MessagesIcon from "@/components/icons/messages-icon";
 import Message from "@/components/live-lesson/chat/message";
 import { createChatMessage, getChatMessages } from "@/db/message";
@@ -13,6 +13,8 @@ import type { ResultOf } from "@/types";
 import type { ChatMessage } from "@/types/chat-messages";
 import { Event } from "@/types/events.type";
 import clsx from "clsx";
+import type { ChangeEvent, FunctionComponent } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 interface IProps {
@@ -25,6 +27,9 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
   const [chatMessages, setChatMessages] = useState<
     ResultOf<typeof getChatMessages>
   >([]);
+  const [file, setFile] = useState<File>();
+  const [isCreateFileMessageModalOpen, setIsCreateFileMessageModalOpen] =
+    useState(false);
 
   // Refs
   const messagesWrapperRef = useRef<HTMLDivElement>();
@@ -34,7 +39,14 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
   const channel = useLessonChannel();
 
   // Handlers
-  const handleCreateChatMesssage = async (replyId?: string) => {
+  const fireChatMessageCreate = (chatMessage: ChatMessage) => {
+    channel.send({
+      event: Event.ChatMessageCreated,
+      type: "broadcast",
+      payload: chatMessage,
+    });
+  };
+  const submitCreateChatMesssage = async (replyId?: string) => {
     try {
       const createdChatMessage = await createChatMessage({
         text: chatMessageText,
@@ -45,30 +57,33 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
         author_role: user.role,
       });
 
-      setChatMessages((prev) => [...prev, createdChatMessage]);
       setChatMessageText("");
-      channel.send({
-        event: Event.ChatMessageCreated,
-        type: "broadcast",
-        payload: createdChatMessage,
-      });
+      fireChatMessageCreate(createdChatMessage);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-  const handleGetMessages = async () => {
+
+  const fetchChatMessages = async () => {
     try {
       setChatMessages(await getChatMessages(lessonId));
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-  const onNewChatMessage = (payload: { payload: ChatMessage }) =>
-    setChatMessages((prev) => [...prev, payload.payload]);
+  const onNewChatMessage = (payload: {
+    payload: ResultOf<typeof getChatMessages>[number];
+  }) => setChatMessages((prev) => [...prev, payload.payload]);
 
+  const onFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files.length) {
+      setFile(e.target.files[0]);
+      setIsCreateFileMessageModalOpen(true);
+    }
+  };
   // Effects
   useEffect(() => {
-    handleGetMessages();
+    fetchChatMessages();
   }, []);
 
   useEffect(() => {
@@ -79,7 +94,7 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
   }, [chatMessages]);
 
   useEffect(() => {
-    channel.on<ChatMessage>(
+    channel.on<ResultOf<typeof getChatMessages>[number]>(
       "broadcast",
       { event: Event.ChatMessageCreated },
       onNewChatMessage
@@ -115,12 +130,24 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
         fullWIdth
         onChange={(e) => setChatMessageText(e.target.value)}
         value={chatMessageText}
-        Icon={<AttachIcon />}
+        Icon={
+          <label>
+            <AttachIcon className="interactive" />
+            <input onChange={onFileChange} type="file" className="hidden" />
+          </label>
+        }
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            handleCreateChatMesssage();
+            submitCreateChatMesssage();
           }
         }}
+      />
+      <CreateFileMessageModal
+        file={file}
+        isOpen={isCreateFileMessageModalOpen}
+        lessonId={lessonId}
+        onDone={fetchChatMessages}
+        setIsOpen={setIsCreateFileMessageModalOpen}
       />
     </div>
   );

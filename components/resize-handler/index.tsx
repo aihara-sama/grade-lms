@@ -72,8 +72,8 @@ const ResizeHandler: FunctionComponent<IProps> = ({
 
   // View
   return (
-    <div className="absolute bottom-6 right-6" onMouseDown={handleMouseDown}>
-      <ResizeIcon className="cursor-nw-resize" />
+    <div className="absolute bottom-3 right-6" onMouseDown={handleMouseDown}>
+      <ResizeIcon className="cursor-nw-resize" size="xs" />
     </div>
   );
 };

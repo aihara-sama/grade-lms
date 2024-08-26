@@ -9,7 +9,7 @@ export const createChatMessage = async (
   const result = await supabaseClient
     .from("chat_messages")
     .insert(chatMessage)
-    .select("*")
+    .select("*, chat_files(*)")
     .single();
 
   if (result.error) throw new Error(t("failed_to_send_message"));
@@ -21,7 +21,7 @@ export const getChatMessages = async (lessonId: string) => {
   const t = await loadMessages();
   const result = await supabaseClient
     .from("chat_messages")
-    .select("*")
+    .select("*, chat_files(*)")
     .eq("lesson_id", lessonId);
 
   if (result.error) throw new Error(t("failed_to_load_messages"));

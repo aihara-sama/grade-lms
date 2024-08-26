@@ -116,7 +116,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
               Whiteboard preview
             </p>
           </div>
-          {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
+          {user.role === Role.Teacher && (
             <div
               className="interactive p-2 border rounded-md ml-auto mr-2"
               onClick={handleSaveWhiteboardData}

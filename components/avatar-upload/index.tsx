@@ -2,6 +2,7 @@
 
 import CameraIcon from "@/components/icons/camera-icon";
 import { supabaseClient } from "@/utils/supabase/client";
+import { useTranslations } from "next-intl";
 import { type ChangeEvent, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 import { v4 as uuid } from "uuid";
@@ -12,17 +13,20 @@ interface IProps {
 }
 
 const AvatarUpload: FunctionComponent<IProps> = ({ onChange, avatar }) => {
+  const t = useTranslations();
+
   const handleChangeAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
-    const avatarFile = e.target.files[0];
+    try {
+      const avatarFile = e.target.files[0];
 
-    const { data, error } = await supabaseClient.storage
-      .from("avatars")
-      .upload(`${uuid()}.png`, avatarFile);
+      const { data, error } = await supabaseClient.storage
+        .from("avatars")
+        .upload(uuid(), avatarFile);
 
-    if (error) {
-      toast.error("Something went wrong");
-    } else {
+      if (error) throw new Error(t("something_went_wrong"));
       onChange(data.path);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
@@ -36,12 +40,7 @@ const AvatarUpload: FunctionComponent<IProps> = ({ onChange, avatar }) => {
       <label>
         <div className="flex cursor-pointer absolute bottom-[2px] right-[12px] p-[10px] rounded-[50%] border border-3 border-white bg-gray-100 shadow-md hover:bg-gray-200 active:bg-gray-500">
           <CameraIcon size="sm" />
-          <input
-            onChange={handleChangeAvatar}
-            type="file"
-            id="avatar-file"
-            className="hidden"
-          />
+          <input onChange={handleChangeAvatar} type="file" className="hidden" />
         </div>
       </label>
     </div>

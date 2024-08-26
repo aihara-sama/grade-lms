@@ -111,7 +111,6 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
   useEffect(() => {
     if (!isOpen) setAssignment(getInitAssignment(lessonId));
   }, [isOpen]);
-  console.log({ assignment });
 
   if (!assignment) return null;
 

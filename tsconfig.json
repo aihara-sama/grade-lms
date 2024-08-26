@@ -45,6 +45,7 @@
     "**/*.tsx",
     "**/*.ts",
     "**/*.css",
+    "file-extension",
     "global.d.ts"
   ],
   "exclude": ["node_modules", "supabase"]

@@ -73,23 +73,24 @@ const EditLessonModal: FunctionComponent<IProps> = ({
   const closeModal = () => setIsOpen(false);
   const openDeleteLessonPromptModal = () =>
     setIsDeleteLessonPromptModalOpen(true);
-  const handleSaveLesson = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  const submitUpdateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { error } = await supabaseClient.from("lessons").upsert({
-      title: lessonTitle,
-      starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
-      ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-      course_id: course?.id || null,
-      id: lesson.id,
-    });
+    try {
+      await supabaseClient.from("lessons").upsert({
+        title: lessonTitle,
+        starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
+        ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
+        course_id: course?.id || null,
+        id: lesson.id,
+      });
 
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Lesson saved");
+      toast(t("lesson_updated"));
       closeModal();
       onDone();
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
   const handleChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
@@ -108,6 +109,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
       toast.success("Lesson deleted");
       onDone();
       closeModal();
+      setIsDeleteLessonPromptModalOpen(false);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -157,7 +159,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
       }
     >
       <div>
-        <form onSubmit={handleSaveLesson} id="create-lesson-form">
+        <form onSubmit={submitUpdateLesson} id="create-lesson-form">
           {includeCoursesSelect &&
             (user.user_metadata as IUserMetadata).role === Role.Teacher && (
               <Select

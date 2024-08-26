@@ -41,9 +41,13 @@ const Excalidraw = dynamic(
 
 interface IProps {
   lesson: Lesson;
+  onLessonExtended: () => void;
 }
 
-const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
+const Whiteboard: FunctionComponent<IProps> = ({
+  lesson,
+  onLessonExtended,
+}) => {
   // Hooks
   const t = useTranslations();
   const channel = useLessonChannel();
@@ -110,6 +114,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
 
       setIsExtendLessonModalOpen(false);
       toast(t("lesson_extended"));
+      onLessonExtended();
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -184,15 +189,17 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
 
   return (
     <div className="flex-[4]" ref={rootRef}>
-      <div className="flex justify-between items-center mb-3">
+      <div className="border flex items-center px-3 py-2 justify-between">
         <div className="flex items-center gap-2 font-bold">
-          <WhiteboardIcon size="sm" />
-          <span className="text">{lesson.title}</span>
+          <WhiteboardIcon size="xs" />
+          <span className="text-center text-neutral-600 font-bold text-sm">
+            {lesson.title}
+          </span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center text-sm gap-2">
+          <div className="flex items-center text-sm">
             <TimeIcon />
-            <p className="text-neutral-600 font-bold">
+            <p className="text-neutral-600 font-bold ml-1">
               <LiveTime date={new Date(lesson.ends)} /> left
             </p>
             {user.role === Role.Teacher && (
@@ -206,7 +213,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
           </div>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="icon-button shadow-md"
+            className="icon-button "
           >
             {isExpanded ? <ShrinkHorizontalIcon /> : <ExpandHorizontalIcon />}
           </button>
@@ -218,7 +225,7 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
         </div>
       </div>
       <div
-        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
+        className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-25px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
         style={{
           height: `${whiteboardHeight}px`,
         }}

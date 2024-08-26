@@ -16,7 +16,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
   const router = useRouter();
   const { user } = useUser();
 
-  const handleCreateLesson = async () => {
+  const submitCreateLesson = async () => {
     try {
       const { error, data } = await supabaseClient
         .from("lessons")
@@ -46,7 +46,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
         ))}
 
       {user.role === Role.Teacher && (
-        <button className="primary-button" onClick={handleCreateLesson}>
+        <button className="primary-button" onClick={submitCreateLesson}>
           Quick lesson
         </button>
       )}
