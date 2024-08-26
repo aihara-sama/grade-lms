@@ -48,7 +48,7 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
       setChatMessages((prev) => [...prev, createdChatMessage]);
       setChatMessageText("");
       channel.send({
-        event: Event.ChatMessage,
+        event: Event.ChatMessageCreated,
         type: "broadcast",
         payload: createdChatMessage,
       });
@@ -70,16 +70,18 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
   useEffect(() => {
     handleGetMessages();
   }, []);
+
   useEffect(() => {
     messagesWrapperRef.current.scrollTo(
       0,
       messagesWrapperRef.current.scrollHeight
     );
   }, [chatMessages]);
+
   useEffect(() => {
     channel.on<ChatMessage>(
       "broadcast",
-      { event: Event.ChatMessage },
+      { event: Event.ChatMessageCreated },
       onNewChatMessage
     );
   }, []);

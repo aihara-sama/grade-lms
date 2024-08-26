@@ -109,20 +109,20 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
   return (
     <div className="flex flex-col sm:flex-row gap-6 mt-3" ref={containerRef}>
       <main className="flex-1">
-        <div className="flex items-center mb-3">
+        <div className="border flex items-center px-3 py-2">
           <div className="flex items-center gap-2">
-            <WhiteboardIcon size="sm" />
-            <p className="text-center text-neutral-600 font-bold">
+            <WhiteboardIcon size="xs" />
+            <p className="text-center text-neutral-600 font-bold text-sm">
               Whiteboard preview
             </p>
           </div>
           {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
-            <button
-              className="icon-button shadow-md ml-auto mr-2"
+            <div
+              className="interactive p-2 border rounded-md ml-auto mr-2"
               onClick={handleSaveWhiteboardData}
             >
               <SaveIcon />
-            </button>
+            </div>
           )}
         </div>
         <div

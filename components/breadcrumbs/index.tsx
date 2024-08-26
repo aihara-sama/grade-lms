@@ -21,16 +21,19 @@ const Breadcrumbs: FunctionComponent<IProps> = ({ Icon, items }) => {
     <ul className="flex items-center text-sm gap-2 [&>*]:max-w-24 whitespace-nowrap overflow-ellipsis overflow-hidden">
       {items.map(({ href, title }, idx) =>
         isCurrentPage(href) ? (
-          <li key={idx} className="flex items-center gap-2">
-            <Link href={href} className="flex items-center gap-2 text-link">
-              {idx === 0 && Icon}
-              {title}
-            </Link>
-            <ArrowRightIcon />
+          <li className="text-neutral-600" key={idx}>
+            {title}
           </li>
         ) : (
-          <li className="text-light" key={idx}>
-            {title}
+          <li key={idx} className="flex items-center gap-2">
+            <Link
+              href={href}
+              className="flex items-center gap-2 text-neutral-600 font-bold"
+            >
+              {idx === 0 && Icon}
+              {title}
+              {idx !== items.length - 1 && <ArrowRightIcon />}
+            </Link>
           </li>
         )
       )}

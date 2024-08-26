@@ -15,6 +15,7 @@ import PromptModal from "@/components/common/modals/prompt-modal";
 import LessonOptionsPopper from "@/components/common/poppers/lesson-options-popper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
+import LessonIcon from "@/components/icons/lesson-icon";
 import Skeleton from "@/components/skeleton";
 import { LESSONS_GET_LIMIT } from "@/constants";
 import {
@@ -225,7 +226,7 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
               <CardTitle
                 href={`/dashboard/courses/${courseId}/lessons/${id}/overview`}
                 checked={selectedLessonsIds.includes(id)}
-                Icon={<LessonsIcon size="md" />}
+                Icon={<LessonIcon size="md" />}
                 title={title}
                 subtitle=""
                 onToggle={

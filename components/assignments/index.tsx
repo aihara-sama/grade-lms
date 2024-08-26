@@ -25,13 +25,12 @@ import {
   getAssignmentsCountByTitleAndLessonId,
   getOffsetAssignmentsByTitleAndLessonId,
 } from "@/db/assignment";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import type { User } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -41,9 +40,8 @@ import toast from "react-hot-toast";
 interface IProps {
   course: Course;
   lesson: Lesson;
-  user: User;
 }
-const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
+const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
   // States
   const [isDeleteAssignmentsModalOpen, setIsDeleteAssignmentsModalOpen] =
     useState(false);
@@ -66,6 +64,8 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
+
   const openDeleteAssignmentsModal = () =>
     setIsDeleteAssignmentsModalOpen(true);
   const onAssignmentToggle = (checked: boolean, lessonId: string) => {
@@ -114,7 +114,7 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
       toast.error(error.message);
     }
   };
-  const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAssignmentsSearchText(
       (assignmentsSearchTextRef.current = e.target.value)
     );
@@ -139,7 +139,7 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
       setIsAssignmentsLoading(false);
     }
   };
-  const deleteSelectedAssignments = async () => {
+  const submitDeleteSelectedAssignments = async () => {
     try {
       await (isSelectedAllRef.current
         ? deleteAssignmentsByTitleAndLessonId(assignmentsSearchText, lesson.id)
@@ -153,7 +153,7 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
     }
   };
 
-  const handleAssignmentsScroll = async () => {
+  const onAssignmentsScroll = async () => {
     if (isDocCloseToBottom()) {
       try {
         const offsetAssignmentsByUserId =
@@ -181,7 +181,7 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
   };
 
   useEffect(() => {
-    const throttled = throttle(handleAssignmentsScroll, 300);
+    const throttled = throttle(onAssignmentsScroll, 300);
     document.addEventListener("scroll", throttled);
 
     return () => {
@@ -210,11 +210,10 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
           total={totalAssignmentsCount}
           title="Total assignments"
         />
-        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
+        {user.role === Role.Teacher && (
           <CreateAssignment
-            course={course}
-            lesson={lesson}
-            user={user}
+            courseId={course.id}
+            lessonId={lesson.id}
             onDone={fetchAssignmentsBySearch}
           />
         )}
@@ -244,7 +243,7 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
           Icon={<SearchIcon size="xs" />}
           placeholder="Search"
           className="w-auto"
-          onChange={handleSearchInputChange}
+          onChange={onSearchInputChange}
           value={assignmentsSearchText}
         />
       )}
@@ -264,13 +263,13 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
                 title={title}
                 subtitle=""
                 onToggle={
-                  (user.user_metadata as IUserMetadata).role === Role.Teacher
+                  user.role === Role.Teacher
                     ? (checked) => onAssignmentToggle(checked, id)
                     : undefined
                 }
               />
             ),
-            "": (user.user_metadata as IUserMetadata).role === Role.Teacher && (
+            "": user.role === Role.Teacher && (
               <AssignmentOptionsPopper
                 assignmentId={id}
                 onDone={fetchAssignmentsBySearch}
@@ -281,24 +280,21 @@ const Assignments: FunctionComponent<IProps> = ({ user, course, lesson }) => {
         />
       )}
       <EditAssignmentModal
-        lesson={lesson}
-        course={course}
-        user={user}
+        isOpen={isEditAssignmentModalOpen}
+        setIsOpen={setIsEditAssignmentModalOpen}
         assignmentId={selectedAssignmentId}
         onDone={() => {
           fetchAssignmentsBySearch();
           setSelectedAssignmentId(undefined);
         }}
-        setIsOpen={setIsEditAssignmentModalOpen}
-        isOpen={isEditAssignmentModalOpen}
       />
       <PromptModal
-        setIsOpen={setIsDeleteAssignmentsModalOpen}
         isOpen={isDeleteAssignmentsModalOpen}
+        setIsOpen={setIsDeleteAssignmentsModalOpen}
         title="Delete assignments"
         action="Delete"
         body={t("prompts.delete_assignments")}
-        actionHandler={deleteSelectedAssignments}
+        actionHandler={submitDeleteSelectedAssignments}
       />
     </>
   );

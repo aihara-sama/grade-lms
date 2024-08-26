@@ -1,30 +1,21 @@
 "use client";
 
 import { useUser } from "@/hooks/use-user";
+import { Role } from "@/interfaces/user.interface";
 import { supabaseClient } from "@/utils/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { useParams } from "next/navigation";
 import { useEffect } from "react";
-import { v4 as uuid } from "uuid";
 
 let channel: RealtimeChannel;
 
-export const useLessonChannel = () => {
-  const params = useParams<{ lessonId?: string }>();
+export const useNotificationChannel = () => {
   const { user } = useUser();
 
   channel =
     channel ||
-    supabaseClient.channel(params.lessonId || uuid(), {
-      config: {
-        presence: {
-          key: user.id,
-        },
-        broadcast: {
-          self: true,
-        },
-      },
-    });
+    supabaseClient.channel(
+      user.role === Role.Teacher ? user.id : user.creator_id
+    );
 
   useEffect(() => {
     return () => {
@@ -33,5 +24,6 @@ export const useLessonChannel = () => {
       });
     };
   }, []);
+
   return channel;
 };

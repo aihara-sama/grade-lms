@@ -26,18 +26,18 @@ interface IProps {
   submissionId: string;
 }
 const ViewSubmissionModal: FunctionComponent<IProps> = ({
-  onDone,
-  submissionId,
   isOpen,
   setIsOpen,
+  submissionId,
+  onDone,
 }) => {
-  const [submission, setSubmission] = useState<SubmissionWithAuthor>();
   const [grade, setGrade] = useState<number>();
+  const [submission, setSubmission] = useState<SubmissionWithAuthor>();
   const [hoveredGrade, setHoveredGrade] = useState<number>();
 
   const t = useTranslations();
 
-  const handleUpdateGrade = async () => {
+  const submitUpdateGrade = async () => {
     try {
       await updateSubmissionGrade(submissionId, grade);
 
@@ -49,7 +49,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
     }
   };
 
-  const getSubmission = async () => {
+  const fetchSubmission = async () => {
     try {
       const submissionData =
         await getSubmissionWithAuthorBySubmissionId(submissionId);
@@ -61,7 +61,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
   };
 
   useEffect(() => {
-    if (isOpen) getSubmission();
+    if (isOpen) fetchSubmission();
   }, [isOpen]);
 
   return (
@@ -121,7 +121,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
               ))}
             </div>
             <button
-              onClick={handleUpdateGrade}
+              onClick={submitUpdateGrade}
               disabled={submission.grade === grade}
               className="primary-button w-[100px]"
             >

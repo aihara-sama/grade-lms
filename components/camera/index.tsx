@@ -42,18 +42,18 @@ const Camera: FunctionComponent<IProps> = ({
         <p className="text-xs text-slate-200">{camera.user.role}</p>
       </div>
       <div className="group-hover:h-[70px] absolute left-[0] right-[0] h-[0] bottom-[0] flex gap-[12px] items-center justify-center [transition:0.2s_height] overflow-hidden bg-black bg-opacity-50">
-        <button
-          className="icon-button bg-transparent border-2 border-divider"
+        <div
+          className="size-8 flex justify-center items-center rounded-md bg-transparent border-2 border-divider interactive"
           onClick={() => toggleCamera(camera.user.id)}
         >
           {camera.isCameraEnabled ? <VideoIcon /> : <VideoDisabledIcon />}
-        </button>
-        <button
-          className="icon-button bg-transparent border-2 border-divider"
+        </div>
+        <div
+          className="size-8 flex justify-center items-center rounded-md interactive bg-transparent border-2 border-divider"
           onClick={() => toggleAudio(camera.user.id)}
         >
           {camera.isMicEnabled ? <MicroIcon /> : <MicroDisabledIcon />}
-        </button>
+        </div>
         {user.role === Role.Teacher && camera.user.role !== Role.Teacher && (
           <button className="icon-button bg-transparent border-2 border-divider">
             <RemoveUserIcon />

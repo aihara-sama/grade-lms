@@ -25,20 +25,20 @@ const Editor = dynamic(() => import("@/components/editor"), {
 interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onDone: () => void;
   submissionId: string;
+  onDone: () => void;
 }
 const EditSubmissionModal: FunctionComponent<IProps> = ({
-  onDone,
-  submissionId,
   isOpen,
   setIsOpen,
+  submissionId,
+  onDone,
 }) => {
   const [submission, setSubmission] = useState<SubmissionWithAuthor>();
 
   const t = useTranslations();
 
-  const handleUpdateSubmission = async () => {
+  const submitUpdateSubmission = async () => {
     try {
       await updateSubmission(submission);
 
@@ -49,8 +49,7 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
       toast.error(error.message);
     }
   };
-
-  const getSubmission = async () => {
+  const fetchSubmission = async () => {
     try {
       const submissionData =
         await getSubmissionWithAuthorBySubmissionId(submissionId);
@@ -59,16 +58,16 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
       toast.error(error.message);
     }
   };
-  const handleBodyChange = (data: OutputData) =>
+  const onBodyChange = (data: OutputData) =>
     setSubmission((_) => ({
       ..._,
       body: JSON.stringify(data),
     }));
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setSubmission((_) => ({ ..._, [e.target.name]: e.target.value }));
 
   useEffect(() => {
-    if (isOpen) getSubmission();
+    if (isOpen) fetchSubmission();
   }, [isOpen]);
 
   return (
@@ -79,9 +78,7 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
       isOpen={isOpen}
       title="Submission"
     >
-      {!submission ? (
-        <Skeleton className="" />
-      ) : (
+      {submission ? (
         <div>
           <Input
             fullWIdth
@@ -89,20 +86,20 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
             placeholder="Submission name"
             name="title"
             value={submission.title}
-            onChange={handleInputChange}
+            onChange={onInputChange}
           />
           <p>Description</p>
           <div className="">
             <Editor
               height="lg"
               id="submission-editor"
-              onChange={handleBodyChange}
+              onChange={onBodyChange}
               data={JSON.parse(submission.body)}
             />
           </div>
           <div className="flex gap-3 items-center mt-3 justify-end">
             <button
-              onClick={handleUpdateSubmission}
+              onClick={submitUpdateSubmission}
               disabled={
                 !submission.title ||
                 !(JSON.parse(submission.body) as OutputData)?.blocks?.length
@@ -113,6 +110,8 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
             </button>
           </div>
         </div>
+      ) : (
+        <Skeleton />
       )}
     </BaseModal>
   );

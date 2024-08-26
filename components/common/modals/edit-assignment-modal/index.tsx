@@ -7,32 +7,26 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Tabs from "@/components/tabs";
 import toast from "react-hot-toast";
 
-import { useEffect, useState } from "react";
-
 import BaseModal from "@/components/common/modals/base-modal";
 import { getAssignmentByAssignmentId, updateAssignment } from "@/db/assignment";
 import {
   getSubmissionsWithAuthorByAssignmentId,
   getSubmissionsWithAuthorByAssignmentIdAndUserId,
 } from "@/db/submission";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { Assignment } from "@/types/assignments.type";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
+import type { ResultOf } from "@/types";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
-import type { User } from "@supabase/supabase-js";
+import type { TablesUpdate } from "@/types/supabase.type";
 import { useTranslations } from "next-intl";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
+import { useEffect, useState } from "react";
 
 interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   assignmentId: string;
   onDone: () => void;
-  user: User;
-  course: Course;
-  lesson: Lesson;
 }
 
 const EditAssignmentModal: FunctionComponent<IProps> = ({
@@ -40,18 +34,19 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
   onDone,
   isOpen,
   setIsOpen,
-  user,
-  course,
-  lesson,
 }) => {
-  const [assignment, setAssignment] = useState<Assignment>();
+  const [assignment, setAssignment] =
+    useState<ResultOf<typeof getAssignmentByAssignmentId>>();
   const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
 
   const t = useTranslations();
+  const { user } = useUser();
 
-  const saveAssignment = async (_assignment: Assignment) => {
+  const submitUpdateAssignment = async (
+    assignmentUpdate: TablesUpdate<"assignments">
+  ) => {
     try {
-      await updateAssignment(_assignment);
+      await updateAssignment(assignmentUpdate);
 
       toast(t("assignment_updated"));
       setIsOpen(false);
@@ -61,10 +56,10 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
     }
   };
 
-  const getSubmissions = async () => {
+  const fetchSubmissions = async () => {
     try {
       setSubmissions(
-        await ((user.user_metadata as IUserMetadata).role === Role.Teacher
+        await (user.role === Role.Teacher
           ? getSubmissionsWithAuthorByAssignmentId(assignmentId)
           : getSubmissionsWithAuthorByAssignmentIdAndUserId(
               assignmentId,
@@ -76,7 +71,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
     }
   };
 
-  const getAssignment = async () => {
+  const fetchAssignment = async () => {
     try {
       setAssignment(await getAssignmentByAssignmentId(assignmentId));
     } catch (error: any) {
@@ -85,11 +80,11 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
   };
 
   useEffect(() => {
-    if (isOpen) getSubmissions();
+    if (isOpen) fetchSubmissions();
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen) getAssignment();
+    if (isOpen) fetchAssignment();
     else setAssignment(undefined);
   }, [isOpen]);
 
@@ -108,12 +103,9 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
               Icon: <OverviewIcon />,
               content: assignment && (
                 <OverviewTab
-                  onSubmissionCreated={getSubmissions}
-                  course={course}
-                  user={user}
                   assignment={assignment}
-                  onAssignmentCreatedDone={saveAssignment}
-                  lesson={lesson}
+                  onSubmissionCreated={fetchSubmissions}
+                  submitUpdateAssignment={submitUpdateAssignment}
                 />
               ),
               tier: [Role.Teacher, Role.Student],
@@ -123,8 +115,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
               Icon: <SubmissionsIcon />,
               content: (
                 <SubmissionsTab
-                  user={user}
-                  onDone={getSubmissions}
+                  onDone={fetchSubmissions}
                   submissions={submissions}
                 />
               ),

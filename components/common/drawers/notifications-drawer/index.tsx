@@ -49,7 +49,7 @@ const NotificationsDrawer: FunctionComponent = () => {
     const room = user.role === Role.Teacher ? user.id : user.creator_id;
 
     getNotificationChannel(room)
-      .on("broadcast", { event: Event.NewNotification }, onNewNotification)
+      .on("broadcast", { event: Event.NotificationCreated }, onNewNotification)
       .subscribe();
 
     return () => {

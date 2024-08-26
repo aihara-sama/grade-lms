@@ -1,7 +1,6 @@
 "use client";
 
 import ExpandHorizontalIcon from "@/components/icons/expand-horizontal-icon";
-import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import ResizeHandler from "@/components/resize-handler";
 import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
@@ -13,20 +12,24 @@ import toast from "react-hot-toast";
 import BaseModal from "@/components/common/modals/base-modal";
 import InviteIcon from "@/components/icons/invite-icon";
 import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
+import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import Input from "@/components/input";
 import LiveTime from "@/components/live-time";
+import { extendLesson } from "@/db/lesson";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
+import { Event } from "@/types/events.type";
 import type { Lesson } from "@/types/lessons.type";
-import { supabaseClient } from "@/utils/supabase/client";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
   AppState,
   ExcalidrawImperativeAPI,
+  ExcalidrawInitialDataState,
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types/types";
 import clsx from "clsx";
-import { format, minutesToMilliseconds } from "date-fns";
+import { minutesToMilliseconds } from "date-fns";
+import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 const Excalidraw = dynamic(
@@ -41,49 +44,25 @@ interface IProps {
 }
 
 const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
+  // Hooks
+  const t = useTranslations();
+  const channel = useLessonChannel();
+  const { user } = useUser();
+  const { isExpanded, setIsExpanded } = useIsLessonHrExpanded();
+
   // State
   const [isExtendLessonModalOpen, setIsExtendLessonModalOpen] = useState(false);
   const [whiteboardHeight, setWhiteboardHeight] = useState(500);
-  const [whiteboardInitialHeight] = useState(
-    typeof window !== "undefined" ? window.innerHeight - 200 : 500
-  );
+  const [whiteboardInitialHeight] = useState(window.innerHeight - 200);
   const [extendLessonByMin, setExtendLessonByMin] = useState(15);
+  const [whiteboardInitialData, setWhiteboardInitialData] =
+    useState<ExcalidrawInitialDataState>();
 
   // Refs
   const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI>(null);
-  const containerRef = useRef<HTMLDivElement>();
+  const rootRef = useRef<HTMLDivElement>();
   const pointerEventRef =
     useRef<Parameters<ExcalidrawProps["onPointerUpdate"]>[0]>();
-
-  // Hooks
-  const { isExpanded, setIsExpanded } = useIsLessonHrExpanded();
-  const { user } = useUser();
-  const channel = useLessonChannel();
-
-  // Effects
-  useEffect(() => {
-    if ([Role.Student, Role.Guest].includes(user.role as Role)) {
-      channel.on("broadcast", { event: "whiteboard:change" }, (payload) => {
-        excalidrawAPIRef.current?.updateScene({
-          elements: payload.payload.elements,
-          appState: {
-            ...payload.payload.appState,
-            // Teacher's cursor
-            collaborators: new Map([
-              [
-                Role.Teacher,
-                {
-                  username: Role.Teacher,
-                  pointer: payload.payload.pointerEvent?.pointer,
-                  button: payload.payload.pointerEvent?.button,
-                },
-              ],
-            ]),
-          },
-        });
-      });
-    }
-  }, []);
 
   // Handlers
   const handleInvite = async () => {
@@ -92,17 +71,15 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
       .then(() => toast.success("Link copied to clipboard"))
       .catch(() => toast.error("Something went wrong"));
   };
-  const handlePointerUpdate = (
-    ev: Parameters<ExcalidrawProps["onPointerUpdate"]>[0]
-  ) => {
-    pointerEventRef.current = ev;
+  const onPointerUpdate: ExcalidrawProps["onPointerUpdate"] = (event) => {
+    pointerEventRef.current = event;
   };
-  const handleChange = (
+  const fireWhiteboardChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState
   ) => {
     channel.send({
-      event: "whiteboard:change",
+      event: Event.WhiteboardChange,
       type: "broadcast",
       payload: {
         elements,
@@ -116,7 +93,8 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
       },
     });
   };
-  const handleChangeExtendLesson = (e: ChangeEvent<HTMLInputElement>) => {
+
+  const onExtendLessonInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const extendBy = +e.target.value;
 
     if (extendBy > extendLessonByMin) {
@@ -127,24 +105,47 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
   };
 
   const handleExtendLesson = async () => {
-    const { error } = await supabaseClient
-      .from("lessons")
-      .update({
-        ends: format(
-          +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin),
-          "yyyy-MM-dd'T'HH:mm:ss"
-        ),
-      })
-      .eq("id", lesson.id);
+    try {
+      await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin));
 
-    if (error) {
-      toast(error.message);
-    } else {
-      toast("Lesson extended");
       setIsExtendLessonModalOpen(false);
+      toast(t("lesson_extended"));
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
+  const onWhiteboardChange = (payload: {
+    payload: {
+      elements: readonly ExcalidrawElement[];
+      appState: Pick<
+        AppState,
+        | "selectionElement"
+        | "selectedElementIds"
+        | "viewBackgroundColor"
+        | "theme"
+      >;
+      pointerEvent: Parameters<ExcalidrawProps["onPointerUpdate"]>[0];
+    };
+  }) => {
+    excalidrawAPIRef.current?.updateScene({
+      elements: payload.payload.elements,
+      appState: {
+        ...payload.payload.appState,
+        // Teacher's cursor
+        collaborators: new Map([
+          [
+            Role.Teacher,
+            {
+              username: Role.Teacher,
+              pointer: payload.payload.pointerEvent?.pointer,
+              button: payload.payload.pointerEvent?.button,
+            },
+          ],
+        ]),
+      },
+    });
+  };
   const parseWhiteboardData = () => {
     if (user.role === Role.Student) {
       const data = JSON.parse(lesson.whiteboard_data);
@@ -165,14 +166,27 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
     }
     const data = JSON.parse(lesson.whiteboard_data);
     if (data.appState) data.appState.collaborators = new Map();
+
     return data;
   };
 
+  // Effects
+  useEffect(() => {
+    if ([Role.Student, Role.Guest].includes(user.role as Role)) {
+      channel.on(
+        "broadcast",
+        { event: Event.WhiteboardChange },
+        onWhiteboardChange
+      );
+    }
+  }, []);
+  useEffect(() => setWhiteboardInitialData(parseWhiteboardData()), []);
+
   return (
-    <div className="flex-[4]" ref={containerRef}>
+    <div className="flex-[4]" ref={rootRef}>
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-2 font-bold">
-          <LessonsIcon size="sm" />
+          <WhiteboardIcon size="sm" />
           <span className="text">{lesson.title}</span>
         </div>
         <div className="flex items-center gap-3">
@@ -212,58 +226,58 @@ const Whiteboard: FunctionComponent<IProps> = ({ lesson }) => {
         <Excalidraw
           isCollaborating
           onPointerUpdate={
-            user.role === Role.Teacher ? handlePointerUpdate : undefined
+            user.role === Role.Teacher ? onPointerUpdate : undefined
           }
-          onChange={user.role === Role.Teacher ? handleChange : undefined}
+          onChange={
+            user.role === Role.Teacher ? fireWhiteboardChange : undefined
+          }
           excalidrawAPI={(api) => {
             excalidrawAPIRef.current = api;
           }}
-          initialData={parseWhiteboardData()}
+          initialData={whiteboardInitialData}
         />
         <ResizeHandler
-          containerRef={containerRef}
+          containerRef={rootRef}
           initialHeight={whiteboardInitialHeight}
           minHeight={170}
           onResize={(height) => setWhiteboardHeight(height)}
         />
       </div>
-      {isExtendLessonModalOpen && (
-        <BaseModal
-          title="Extend lesson"
-          setIsOpen={() => setIsExtendLessonModalOpen(false)}
-          isOpen={isExtendLessonModalOpen}
-        >
+      <BaseModal
+        isExpanded={false}
+        title="Extend lesson"
+        setIsOpen={() => setIsExtendLessonModalOpen(false)}
+        isOpen={isExtendLessonModalOpen}
+      >
+        <div>
           <div>
-            <div>
-              <Input
-                value={`${extendLessonByMin}`}
-                onChange={handleChangeExtendLesson}
-                autoFocus
-                fullWIdth
-                Icon={<TimeIcon />}
-                type="number"
-                label="Add minutes"
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                className="outline-button ml-auto w-auto"
-                onClick={() => setIsExtendLessonModalOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="primary-button w-auto"
-                onClick={handleExtendLesson}
-              >
-                Save
-              </button>
-            </div>
+            <Input
+              value={`${extendLessonByMin}`}
+              onChange={onExtendLessonInputChange}
+              autoFocus
+              fullWIdth
+              Icon={<TimeIcon />}
+              type="number"
+              label="Add minutes"
+            />
           </div>
-        </BaseModal>
-      )}
+          <div className="flex gap-3">
+            <button
+              className="outline-button ml-auto w-auto"
+              onClick={() => setIsExtendLessonModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="primary-button w-auto"
+              onClick={handleExtendLesson}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </BaseModal>
     </div>
   );
 };
-
 export default Whiteboard;

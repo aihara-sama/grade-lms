@@ -34,5 +34,4 @@ const Tabs: FunctionComponent<IProps> = ({ tabs }) => {
     </div>
   );
 };
-
 export default Tabs;

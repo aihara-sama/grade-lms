@@ -61,13 +61,13 @@ const Page: FunctionComponent<IProps> = async ({ params }) => {
                 <Total
                   title="Total members"
                   total={users.length}
-                  href={`/dashboard/courses/${courseRest.id}/members`}
+                  link={`/dashboard/courses/${courseRest.id}/members`}
                   Icon={<AvatarIcon size="lg" />}
                 />
                 <Total
                   title="Total lessons"
                   total={lessons.length}
-                  href={`/dashboard/courses/${courseRest.id}/lessons`}
+                  link={`/dashboard/courses/${courseRest.id}/lessons`}
                   Icon={<LessonsIcon size="lg" />}
                 />
               </div>

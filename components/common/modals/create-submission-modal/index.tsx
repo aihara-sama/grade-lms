@@ -3,15 +3,12 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import { createNotification } from "@/db/notification";
 import { createSubmission } from "@/db/submission";
+import { useNotificationChannel } from "@/hooks/use-notification-channel";
+import { useUser } from "@/hooks/use-user";
 import { NotificationType } from "@/interfaces/notifications.interface";
-import type { IUserMetadata } from "@/interfaces/user.interface";
-import { Role } from "@/interfaces/user.interface";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
+import { Event } from "@/types/events.type";
 import type { TablesInsert } from "@/types/supabase.type";
-import { getNotificationChannel } from "@/utils/get-notification-channel";
 import type { OutputData } from "@editorjs/editorjs";
-import type { User } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type {
@@ -21,6 +18,7 @@ import type {
   SetStateAction,
 } from "react";
 import { useEffect, useState } from "react";
+
 import toast from "react-hot-toast";
 
 const Editor = dynamic(() => import("@/components/editor"), {
@@ -40,53 +38,48 @@ interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   onDone: () => void;
-  user: User;
-  course: Course;
-  lesson: Lesson;
+  courseId: string;
+  lessonId: string;
   assignmentId: string;
 }
 const CreateSubmissionModal: FunctionComponent<IProps> = ({
   onDone,
-  user,
-  course,
-  lesson,
+  courseId,
+  lessonId,
   isOpen,
   setIsOpen,
   assignmentId,
 }) => {
   // States
-  const [submission, setSubmission] = useState(
-    getInitSubmission(assignmentId, user.id)
-  );
+  const [submission, setSubmission] = useState<TablesInsert<"submissions">>();
 
   // Hooks
   const t = useTranslations();
+  const notificationChannel = useNotificationChannel();
+  const { user } = useUser();
 
   // Handlers
-  const handleCreateAssignment = async () => {
+  const fireNotificationCreated = () => {
+    notificationChannel.send({
+      event: Event.NotificationCreated,
+      type: "broadcast",
+    });
+  };
+  const submitCreateAssignment = async () => {
     try {
       const createdSubmission = await createSubmission(submission);
 
       await createNotification({
-        user_id: (user.user_metadata as IUserMetadata).creator_id,
+        user_id: user.creator_id,
         submission_id: createdSubmission.id,
         assignment_id: assignmentId,
-        course_id: course.id,
-        lesson_id: lesson.id,
+        course_id: courseId,
+        lesson_id: lessonId,
         is_read: false,
         type: NotificationType.Submission,
       });
 
-      const room =
-        (user.user_metadata as IUserMetadata).role === Role.Teacher
-          ? user.id
-          : (user.user_metadata as IUserMetadata).creator_id;
-
-      getNotificationChannel(room).send({
-        event: "notification",
-        type: "broadcast",
-      });
-
+      fireNotificationCreated();
       toast.success(t("submission_created"));
       setIsOpen(false);
       onDone();
@@ -94,10 +87,11 @@ const CreateSubmissionModal: FunctionComponent<IProps> = ({
       toast.error(error.message);
     }
   };
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setSubmission((_) => ({ ..._, [e.target.name]: e.target.value }));
 
-  const handleBodyChange = (data: OutputData) =>
+  const onBodyChange = (data: OutputData) =>
     setSubmission((_) => ({
       ..._,
       body: JSON.stringify(data),
@@ -106,6 +100,8 @@ const CreateSubmissionModal: FunctionComponent<IProps> = ({
   useEffect(() => {
     if (!isOpen) setSubmission(getInitSubmission(assignmentId, user.id));
   }, [isOpen]);
+
+  if (!submission) return null;
 
   return (
     <BaseModal
@@ -122,14 +118,14 @@ const CreateSubmissionModal: FunctionComponent<IProps> = ({
           Icon={<LessonsIcon size="xs" />}
           placeholder="Submission name"
           name="title"
-          onChange={handleInputChange}
+          onChange={onInputChange}
           value={submission.title}
         />
         <p>Description</p>
         <div className="min-h-[298px]">
           <Editor
             height="md"
-            onChange={handleBodyChange}
+            onChange={onBodyChange}
             data={JSON.parse(submission.body)}
             id="submission-editor"
           />
@@ -139,7 +135,7 @@ const CreateSubmissionModal: FunctionComponent<IProps> = ({
           <button
             disabled={!submission.title}
             className="primary-button"
-            onClick={handleCreateAssignment}
+            onClick={submitCreateAssignment}
           >
             Create
           </button>

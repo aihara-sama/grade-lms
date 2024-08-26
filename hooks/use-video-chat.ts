@@ -71,7 +71,6 @@ export const useVideoChat = () => {
         return cam;
       });
     });
-    fireToggleCamera(userId);
   };
   const toggleAudio = (userId: string) => {
     setCameras((prev) => {
@@ -85,7 +84,6 @@ export const useVideoChat = () => {
         return cam;
       });
     });
-    fireToggleAudio(userId);
   };
 
   const onPresenceJoin = (
@@ -184,13 +182,13 @@ export const useVideoChat = () => {
   }, [peer]);
 
   useEffect(() => {
-    channel.on("broadcast", { event: Event.ToggleCamera }, (payload) => {
-      toggleCamera(payload.payload.userId);
-    });
-    channel.on("broadcast", { event: Event.ToggleAudio }, (payload) => {
-      toggleAudio(payload.payload.userId);
-    });
+    channel.on("broadcast", { event: Event.ToggleCamera }, (payload) =>
+      toggleCamera(payload.payload.userId)
+    );
+    channel.on("broadcast", { event: Event.ToggleAudio }, (payload) =>
+      toggleAudio(payload.payload.userId)
+    );
   }, []);
 
-  return { cameras, toggleAudio, toggleCamera };
+  return { cameras, fireToggleAudio, fireToggleCamera };
 };

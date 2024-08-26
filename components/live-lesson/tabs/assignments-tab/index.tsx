@@ -1,32 +1,48 @@
 "use client";
 
-import DeleteButton from "@/components/buttons/delete-button";
 import CardTitle from "@/components/card-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import { supabaseClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 
-import type { Database } from "@/types/supabase.type";
+import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
+import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
+import PromptModal from "@/components/common/modals/prompt-modal";
+import { deleteAssignment } from "@/db/assignment";
+import type { Assignment } from "@/types/assignments.type";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
+import toast from "react-hot-toast";
 
 interface IProps {
   lessonId: string;
+  courseId: string;
 }
 
-const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
+const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId, courseId }) => {
   // States
-  const [, setIsCreateAssignmentModalOpen] = useState(false);
-  // const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
-  //   useState(false);
-  // const [currentAssignmentId, setCurrentAssignmentId] = useState<
-  //   string | undefined
-  // >();
-  const [assignments, setAssignments] = useState<
-    Database["public"]["Tables"]["assignments"]["Row"][]
-  >([]);
+  const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
+    useState(false);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string>();
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [isCreateAssignmentModalOpen, setIsCreateAssignmentModalOpen] =
+    useState(false);
+  const [isDeleteAssignmentModalOpen, setIsDeleteAssignmentModalOpen] =
+    useState(false);
 
-  const getAssignments = async () => {
+  const t = useTranslations();
+
+  const openEditAssignmentModal = (assignmentId: string) => {
+    setSelectedAssignmentId(assignmentId);
+    setIsEditAssignmentModalOpen(true);
+  };
+  const openDeleteAssignmentModal = (assignmentId: string) => {
+    setSelectedAssignmentId(assignmentId);
+    setIsDeleteAssignmentModalOpen(true);
+  };
+
+  const fetchAssignments = async () => {
     const data = await supabaseClient
       .from("assignments")
       .select("*")
@@ -35,22 +51,18 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
     setAssignments(data.data);
   };
 
-  const deleteAssignment = async (
-    assignmentId: string
-  ): Promise<{ error: string | null; data: null }> => {
-    const { error } = await supabaseClient
-      .from("assignments")
-      .delete()
-      .eq("id", assignmentId);
-
-    return {
-      data: null,
-      error: error ? error.message : null,
-    };
+  const submitDeleteAssignment = async () => {
+    try {
+      await deleteAssignment(selectedAssignmentId);
+      setIsDeleteAssignmentModalOpen(false);
+      fetchAssignments();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
-    getAssignments();
+    fetchAssignments();
   }, []);
   return (
     <div className="flex flex-1 flex-col">
@@ -64,18 +76,14 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
               Icon={<AssignmentsIcon size="sm" />}
               title={assignment.title}
               subtitle="Due date: Tomorrow"
-              // onClick={() => setCurrentAssignmentId(assignment.id)}
+              onClick={() => openEditAssignmentModal(assignment.id)}
             />
-            <div className="flex items-center gap-[12px]">
+            <div
+              className="flex items-center gap-[12px]"
+              onClick={() => openDeleteAssignmentModal(assignment.id)}
+            >
               <button className="icon-button shadow-md">
                 <DeleteIcon />
-                <DeleteButton
-                  onDone={getAssignments}
-                  action={deleteAssignment}
-                  record="assignment"
-                  id={assignment.id}
-                  key={assignment.id}
-                />
               </button>
             </div>
           </div>
@@ -89,26 +97,27 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId }) => {
           Create assignments
         </button>
       </div>
-      {/* {currentAssignmentId && (
-        <EditAssignmentModal
-          assignmentId={currentAssignmentId}
-          onDone={() => {
-            getAssignments();
-            setCurrentAssignmentId(undefined);
-          }}
-          setIsOpen={setIsEditAssignmentModalOpen}
-          isOpen={isEditAssignmentModalOpen}
-        />
-      )} */}
-      {/* {isCreateAssignmentModalOpen && (
-        <CreateAssignmentModal
-          closeModal={() => setIsCreateAssignmentModalOpen(false)}
-          onDone={() => {
-            setIsCreateAssignmentModalOpen(false);
-            getAssignments();
-          }}
-        />
-      )} */}
+      <EditAssignmentModal
+        assignmentId={selectedAssignmentId}
+        onDone={fetchAssignments}
+        setIsOpen={setIsEditAssignmentModalOpen}
+        isOpen={isEditAssignmentModalOpen}
+      />
+      <CreateAssignmentModal
+        isOpen={isCreateAssignmentModalOpen}
+        setIsOpen={setIsCreateAssignmentModalOpen}
+        lessonId={lessonId}
+        courseId={courseId}
+        onDone={fetchAssignments}
+      />
+      <PromptModal
+        isOpen={isDeleteAssignmentModalOpen}
+        setIsOpen={setIsDeleteAssignmentModalOpen}
+        title="Delete assignments"
+        action="Delete"
+        body={t("prompts.delete_assignment")}
+        actionHandler={submitDeleteAssignment}
+      />
     </div>
   );
 };

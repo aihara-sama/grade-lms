@@ -3,44 +3,37 @@ import DateInput from "@/components/date-input";
 import Editor from "@/components/editor";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import type { getAssignmentByAssignmentId } from "@/db/assignment";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { Assignment } from "@/types/assignments.type";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
-import type { User } from "@supabase/supabase-js";
+import type { ResultOf } from "@/types";
+import type { TablesUpdate } from "@/types/supabase.type";
 import { format } from "date-fns";
-import { useState, type FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
+import { useState } from "react";
 
 interface IProps {
-  assignment: Assignment;
-  onAssignmentCreatedDone: (assignment: Assignment) => void;
+  assignment: ResultOf<typeof getAssignmentByAssignmentId>;
+  submitUpdateAssignment: (assignment: TablesUpdate<"assignments">) => void;
   onSubmissionCreated: () => void;
-  user: User;
-  course: Course;
-  lesson: Lesson;
 }
 
 const OverviewTab: FunctionComponent<IProps> = ({
-  onAssignmentCreatedDone: onDone,
-  user,
-  course,
-  lesson,
+  submitUpdateAssignment,
   onSubmissionCreated,
   ...props
 }) => {
   // States
-  const [assignment, setAssignment] = useState<Assignment>(props.assignment);
+  const [assignment, setAssignment] = useState(props.assignment);
   const [isCreateSubmissionModalOpen, setIsCreateSubmissionModalOpen] =
     useState(false);
 
+  const { user } = useUser();
+
   // Handlers
-  const handleSaveAssignment = async () => {
-    onDone(assignment);
-  };
   const openCreateSubmissoinModal = () => setIsCreateSubmissionModalOpen(true);
 
-  const handleChangeDate = (date: Date) => {
+  const onChangeDate = (date: Date) => {
     setAssignment((_assignment) => ({
       ..._assignment,
       due_date: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
@@ -50,7 +43,7 @@ const OverviewTab: FunctionComponent<IProps> = ({
   return (
     <div>
       <Input
-        disabled={(user.user_metadata as IUserMetadata).role === Role.Student}
+        disabled={user.role === Role.Student}
         fullWIdth
         Icon={<LessonsIcon size="xs" />}
         placeholder="Assignment name"
@@ -72,7 +65,7 @@ const OverviewTab: FunctionComponent<IProps> = ({
             setAssignment((prev) => ({ ...prev, body: JSON.stringify(data) }))
           }
           data={JSON.parse(assignment.body)}
-          readOnly={(user.user_metadata as IUserMetadata).role === Role.Student}
+          readOnly={user.role === Role.Student}
         />
       </div>
 
@@ -80,16 +73,17 @@ const OverviewTab: FunctionComponent<IProps> = ({
         <div className="pr-[12px] border-r-2 border-gray-200">
           <DateInput
             date={new Date(assignment.due_date)}
-            onChange={handleChangeDate}
+            onChange={onChangeDate}
             label="Due date"
             popperPlacement="top-start"
-            disabled={
-              (user.user_metadata as IUserMetadata).role !== Role.Teacher
-            }
+            disabled={user.role !== Role.Teacher}
           />
         </div>
-        {(user.user_metadata as IUserMetadata).role === Role.Teacher ? (
-          <button className="primary-button" onClick={handleSaveAssignment}>
+        {user.role === Role.Teacher ? (
+          <button
+            className="primary-button"
+            onClick={() => submitUpdateAssignment(assignment)}
+          >
             Save
           </button>
         ) : (
@@ -101,19 +95,17 @@ const OverviewTab: FunctionComponent<IProps> = ({
           </button>
         )}
       </div>
-      {(user.user_metadata as IUserMetadata).role === Role.Student && (
+      {user.role === Role.Student && (
         <CreateSubmissionModal
-          user={user}
-          assignmentId={assignment.id}
-          course={course}
           isOpen={isCreateSubmissionModalOpen}
           setIsOpen={setIsCreateSubmissionModalOpen}
-          lesson={lesson}
+          assignmentId={assignment.id}
+          lessonId={assignment.lesson_id}
+          courseId={assignment.lesson.course_id}
           onDone={onSubmissionCreated}
         />
       )}
     </div>
   );
 };
-
 export default OverviewTab;

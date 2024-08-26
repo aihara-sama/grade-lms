@@ -177,3 +177,18 @@ export const deleteLessonsByTitleAndCourseId = async (
 
   return result;
 };
+
+export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("lessons")
+    .update({
+      ends: format(
+        +new Date(lesson.ends) + miliseconds,
+        "yyyy-MM-dd'T'HH:mm:ss"
+      ),
+    })
+    .eq("id", lesson.id);
+
+  if (result.error) throw new Error(t("failed_to_extend_lesson"));
+};

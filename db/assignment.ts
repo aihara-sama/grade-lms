@@ -33,7 +33,7 @@ export const getAssignmentByAssignmentId = async (assignmentId: string) => {
   const t = await loadMessages();
   const result = await supabaseClient
     .from("assignments")
-    .select("*")
+    .select("*, lesson:lessons(course_id)")
     .eq("id", assignmentId)
     .single();
 
@@ -156,4 +156,16 @@ export const deleteAssignmentsByAssignmentsIds = async (
     );
 
   return result;
+};
+
+export const deleteAssignment = async (assignmentId: string) => {
+  const t = await loadMessages();
+  const result = await supabaseClient
+    .from("assignments")
+    .delete()
+    .eq("id", assignmentId);
+
+  if (result.error) throw new Error(t("failed_to_delete_assignment"));
+
+  return result.data;
 };

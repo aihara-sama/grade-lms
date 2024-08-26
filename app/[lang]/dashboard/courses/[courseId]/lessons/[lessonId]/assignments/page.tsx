@@ -1,7 +1,6 @@
 import Assignments from "@/components/assignments";
 import LessonHeader from "@/components/live-lesson/lesson-header";
 import { supabaseClient } from "@/utils/supabase/client";
-import { createClient } from "@/utils/supabase/server";
 
 import { type FunctionComponent } from "react";
 
@@ -26,15 +25,11 @@ const Page: FunctionComponent<IProps> = async ({
     .eq("id", courseId)
     .single();
 
-  const {
-    data: { user },
-  } = await createClient().auth.getUser();
-
   return (
-    <div>
+    <>
       <LessonHeader course={course.data} lesson={lesson.data} />
-      <Assignments course={course.data} lesson={lesson.data} user={user} />
-    </div>
+      <Assignments course={course.data} lesson={lesson.data} />
+    </>
   );
 };
 

@@ -26,7 +26,46 @@ interface IProps {
 const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
   // State
   const [isAsideOpen, setIsAsideOpen] = useState(true);
-  const { cameras, toggleAudio, toggleCamera } = useVideoChat();
+  const { cameras, fireToggleAudio, fireToggleCamera } = useVideoChat();
+
+  const tabs = [
+    {
+      title: "Cameras",
+      content: (
+        <div className="flex flex-col flex-1">
+          <div className="flex flex-col gap-3">
+            {cameras.map((camera, idx) => (
+              <Camera
+                toggleCamera={fireToggleCamera}
+                toggleAudio={fireToggleAudio}
+                camera={camera}
+                key={idx}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+      Icon: <CameraIcon />,
+      tier: [Role.Teacher, Role.Student, Role.Guest],
+    },
+    {
+      title: "Messages",
+      content: <Chat lessonId={lesson.id} />,
+      Icon: <ChatIcon />,
+      tier: [Role.Teacher, Role.Student, Role.Guest],
+    },
+  ];
+
+  if (lesson.course_id) {
+    tabs.push({
+      title: "Assignments",
+      content: (
+        <AssignmentsTab lessonId={lesson.id} courseId={lesson.course_id} />
+      ),
+      Icon: <AssignmentsIcon />,
+      tier: [Role.Teacher],
+    });
+  }
 
   return (
     <div>
@@ -52,7 +91,6 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
       )}
       <main className="flex gap-6 mt-4">
         <Whiteboard lesson={lesson} />
-
         <div
           className={`pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >
@@ -65,41 +103,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
           <aside
             className={`${isAsideOpen ? "flex" : "hidden"} flex-col gap-3 w-[350px]`}
           >
-            <Tabs
-              tabs={[
-                {
-                  title: "Cameras",
-                  content: (
-                    <div className="flex flex-col flex-1">
-                      <div className="flex flex-col gap-3">
-                        {cameras.map((camera, idx) => (
-                          <Camera
-                            toggleCamera={toggleCamera}
-                            toggleAudio={toggleAudio}
-                            camera={camera}
-                            key={idx}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ),
-                  Icon: <CameraIcon />,
-                  tier: [Role.Teacher, Role.Student, Role.Guest],
-                },
-                {
-                  title: "Messages",
-                  content: <Chat lessonId={lesson.id} />,
-                  Icon: <ChatIcon />,
-                  tier: [Role.Teacher, Role.Student, Role.Guest],
-                },
-                {
-                  title: "Assignments",
-                  content: <AssignmentsTab lessonId={lesson.id} />,
-                  Icon: <AssignmentsIcon />,
-                  tier: [Role.Teacher],
-                },
-              ]}
-            />
+            <Tabs tabs={tabs} />
           </aside>
         </div>
       </main>
