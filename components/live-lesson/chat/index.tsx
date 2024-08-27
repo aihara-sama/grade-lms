@@ -11,17 +11,20 @@ import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types";
 import type { ChatMessage } from "@/types/chat-messages";
+import type { Course } from "@/types/courses.type";
 import { Event } from "@/types/events.type";
+import type { Lesson } from "@/types/lessons.type";
+import { isLessonEnded } from "@/utils/is-lesson-ended";
 import clsx from "clsx";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 interface IProps {
-  lessonId: string;
+  lesson: Lesson & { course: Course };
 }
 
-const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
+const Chat: FunctionComponent<IProps> = ({ lesson }) => {
   // State
   const [chatMessageText, setChatMessageText] = useState("");
   const [chatMessages, setChatMessages] = useState<
@@ -38,6 +41,8 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
   const { user } = useUser();
   const channel = useLessonChannel();
 
+  const disabled = isLessonEnded(new Date(lesson.ends));
+
   // Handlers
   const fireChatMessageCreate = (chatMessage: ChatMessage) => {
     channel.send({
@@ -51,7 +56,7 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
       const createdChatMessage = await createChatMessage({
         text: chatMessageText,
         author: user.name,
-        lesson_id: lessonId,
+        lesson_id: lesson.id,
         reply_id: replyId,
         author_avatar: user.avatar,
         author_role: user.role,
@@ -66,7 +71,7 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
 
   const fetchChatMessages = async () => {
     try {
-      setChatMessages(await getChatMessages(lessonId));
+      setChatMessages(await getChatMessages(lesson.id));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -126,14 +131,17 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
         </div>
       </div>
       <Input
+        disabled={disabled}
         className="mt-auto"
         fullWIdth
         onChange={(e) => setChatMessageText(e.target.value)}
         value={chatMessageText}
         Icon={
           <label>
-            <AttachIcon className="interactive" />
-            <input onChange={onFileChange} type="file" className="hidden" />
+            <AttachIcon className={`${clsx(disabled || "interactive")}`} />
+            {!disabled && (
+              <input onChange={onFileChange} type="file" className="hidden" />
+            )}
           </label>
         }
         onKeyDown={(e) => {
@@ -145,7 +153,7 @@ const Chat: FunctionComponent<IProps> = ({ lessonId }) => {
       <CreateFileMessageModal
         file={file}
         isOpen={isCreateFileMessageModalOpen}
-        lessonId={lessonId}
+        lessonId={lesson.id}
         onDone={fetchChatMessages}
         setIsOpen={setIsCreateFileMessageModalOpen}
       />

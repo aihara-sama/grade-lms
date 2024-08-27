@@ -104,7 +104,7 @@ const CreateFileMessageModal: FunctionComponent<IProps> = ({
         lesson_id: lessonId,
         text: "",
       });
-  }, []);
+  }, [isOpen]);
 
   return (
     <BaseModal
@@ -155,5 +155,4 @@ const CreateFileMessageModal: FunctionComponent<IProps> = ({
     </BaseModal>
   );
 };
-
 export default CreateFileMessageModal;

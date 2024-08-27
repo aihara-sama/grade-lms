@@ -7,8 +7,7 @@ import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
 import { Role } from "@/interfaces/user.interface";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-
+// import toast from "react-hot-toast";
 import BaseModal from "@/components/common/modals/base-modal";
 import InviteIcon from "@/components/icons/invite-icon";
 import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
@@ -20,6 +19,7 @@ import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { Event } from "@/types/events.type";
 import type { Lesson } from "@/types/lessons.type";
+import { isLessonEnded } from "@/utils/is-lesson-ended";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
   AppState,
@@ -31,6 +31,7 @@ import clsx from "clsx";
 import { minutesToMilliseconds } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
+import { toast } from "react-toastify";
 
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
@@ -69,10 +70,12 @@ const Whiteboard: FunctionComponent<IProps> = ({
     useRef<Parameters<ExcalidrawProps["onPointerUpdate"]>[0]>();
 
   // Handlers
-  const handleInvite = async () => {
+  const invite = async () => {
     navigator.clipboard
       .writeText(window.location.href)
-      .then(() => toast.success("Link copied to clipboard"))
+      .then(() =>
+        toast.success(<div className="text-red-600">{t("invite_copied")}</div>)
+      )
       .catch(() => toast.error("Something went wrong"));
   };
   const onPointerUpdate: ExcalidrawProps["onPointerUpdate"] = (event) => {
@@ -97,7 +100,6 @@ const Whiteboard: FunctionComponent<IProps> = ({
       },
     });
   };
-
   const onExtendLessonInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const extendBy = +e.target.value;
 
@@ -107,8 +109,7 @@ const Whiteboard: FunctionComponent<IProps> = ({
       setExtendLessonByMin(extendBy - 14);
     }
   };
-
-  const handleExtendLesson = async () => {
+  const submitExtendLesson = async () => {
     try {
       await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin));
 
@@ -119,7 +120,6 @@ const Whiteboard: FunctionComponent<IProps> = ({
       toast.error(error.message);
     }
   };
-
   const onWhiteboardChange = (payload: {
     payload: {
       elements: readonly ExcalidrawElement[];
@@ -186,6 +186,7 @@ const Whiteboard: FunctionComponent<IProps> = ({
     }
   }, []);
   useEffect(() => setWhiteboardInitialData(parseWhiteboardData()), []);
+  useEffect(() => setIsExpanded(true), []);
 
   return (
     <div className="flex-[4]" ref={rootRef}>
@@ -197,20 +198,25 @@ const Whiteboard: FunctionComponent<IProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center text-sm">
-            <TimeIcon />
-            <p className="text-neutral-600 font-bold ml-1">
-              <LiveTime date={new Date(lesson.ends)} /> left
-            </p>
-            {user.role === Role.Teacher && (
-              <button
-                className="text-link"
-                onClick={() => setIsExtendLessonModalOpen(true)}
-              >
-                Extend?
-              </button>
-            )}
-          </div>
+          {isLessonEnded(new Date(lesson.ends)) ? (
+            <p className="text-yellow-600 ml-1">This lesson has ended</p>
+          ) : (
+            <div className="flex items-center text-sm">
+              <TimeIcon />
+              <p className="text-neutral-600 font-bold ml-1">
+                <LiveTime date={new Date(lesson.ends)} /> left
+              </p>
+              {user.role === Role.Teacher && (
+                <button
+                  className="text-link"
+                  onClick={() => setIsExtendLessonModalOpen(true)}
+                >
+                  Extend?
+                </button>
+              )}
+            </div>
+          )}
+
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="icon-button "
@@ -218,7 +224,7 @@ const Whiteboard: FunctionComponent<IProps> = ({
             {isExpanded ? <ShrinkHorizontalIcon /> : <ExpandHorizontalIcon />}
           </button>
           {user.role === Role.Teacher && (
-            <button className="icon-button" onClick={handleInvite}>
+            <button className="icon-button" onClick={invite}>
               <InviteIcon size="sm" />
             </button>
           )}
@@ -277,7 +283,7 @@ const Whiteboard: FunctionComponent<IProps> = ({
             </button>
             <button
               className="primary-button w-auto"
-              onClick={handleExtendLesson}
+              onClick={submitExtendLesson}
             >
               Save
             </button>

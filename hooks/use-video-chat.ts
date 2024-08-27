@@ -23,7 +23,17 @@ export const useVideoChat = () => {
   // Refs
   const localStreamRef = useRef<MediaStream>();
 
-  const handleAddCamera = (stream: MediaStream, _user: User) => {
+  const endSession = () => {
+    if (peer) {
+      peer.disconnect();
+      peer.destroy();
+      setPeer(undefined);
+    }
+    localStreamRef.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
+  };
+  const addCamera = (stream: MediaStream, _user: User) => {
     setCameras((_) => {
       if (!_.find((camera) => camera.stream.id === stream.id)) {
         return [
@@ -100,7 +110,7 @@ export const useVideoChat = () => {
           });
 
           outgoingCall.on("stream", (remoteStream) => {
-            handleAddCamera(
+            addCamera(
               remoteStream,
               channel.presenceState<{ user: User }>()[id][0].user
             );
@@ -134,7 +144,7 @@ export const useVideoChat = () => {
           .on("presence", { event: "leave" }, onPresenceLeave)
           .subscribe(onPresenceSubscribe);
 
-        handleAddCamera(stream, user);
+        addCamera(stream, user);
         localStreamRef.current = stream;
       })
       .catch((error) => {
@@ -147,13 +157,21 @@ export const useVideoChat = () => {
       .then((stream) => {
         incomingCall.answer(stream);
         incomingCall.on("stream", (remoteStream) => {
-          handleAddCamera(remoteStream, incomingCall.metadata.user);
+          addCamera(remoteStream, incomingCall.metadata.user);
         });
       })
       .catch((error) => {
         console.error("Error accessing media devices: ", error);
       });
   };
+
+  const startSession = () => {
+    // Handle SSR for navigator
+    import("peerjs").then(({ default: Peer }) => {
+      setPeer(new Peer(user.id));
+    });
+  };
+
   useEffect(() => {
     return () => {
       localStreamRef.current?.getTracks().forEach((track) => {
@@ -162,22 +180,13 @@ export const useVideoChat = () => {
     };
   }, []);
   useEffect(() => {
-    // Handle SSR for navigator
-    import("peerjs").then(({ default: Peer }) => {
-      setPeer(new Peer(user.id));
-    });
-  }, []);
-
-  useEffect(() => {
     if (peer) {
       peer.on("open", onPeerOpen);
       peer.on("call", onPeerCall);
     }
+
     return () => {
-      if (peer) {
-        peer.disconnect();
-        peer.destroy();
-      }
+      endSession();
     };
   }, [peer]);
 
@@ -190,5 +199,11 @@ export const useVideoChat = () => {
     );
   }, []);
 
-  return { cameras, fireToggleAudio, fireToggleCamera };
+  return {
+    cameras,
+    fireToggleAudio,
+    fireToggleCamera,
+    endSession,
+    startSession,
+  };
 };

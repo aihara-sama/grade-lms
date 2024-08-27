@@ -1,13 +1,14 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 
-import "@/styles/globals.css";
-
 import ProgressBar from "@/components/pregress-bar";
 import PaypalProvider from "@/components/providers/paypal-provider";
+import "@/styles/globals.css";
 import { Lato } from "next/font/google";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const latoFont = Lato({
   weight: ["100", "300", "400", "700", "900"],
@@ -32,7 +33,8 @@ const Layout: FunctionComponent<PropsWithChildren<IProps>> = async ({
         <NextIntlClientProvider messages={messages}>
           <PaypalProvider>
             {children}
-            <Toaster />
+            <Toaster position="bottom-right" />
+            <ToastContainer />
             <ProgressBar />
           </PaypalProvider>
         </NextIntlClientProvider>

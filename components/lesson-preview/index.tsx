@@ -25,20 +25,19 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import CalendarIcon from "@/components/icons/calendar-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
-import type { User } from "@supabase/supabase-js";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface IProps {
   lesson: Lesson;
-  user: User;
 }
 
-const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
+const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
   // State
   const [starts, setStarts] = useState(new Date(lesson.starts));
   const [ends, setEnds] = useState(new Date(lesson.ends));
@@ -46,31 +45,23 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
 
   // Refs
   const containerRef = useRef<HTMLDivElement>();
-  const whiteboardDataRef = useRef(JSON.parse(lesson.whiteboard_data));
   const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI>(null);
+  const whiteboardDataRef = useRef(JSON.parse(lesson.whiteboard_data));
 
   // Vars
   const duration = +new Date(ends) - +new Date(starts);
 
-  // Handlers
-  const handleSaveDate = async () => {
-    const { error } = await supabaseClient
-      .from("lessons")
-      .update({
-        starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
-        ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-        whiteboard_data: JSON.stringify(whiteboardDataRef.current),
-      })
-      .eq("id", lesson.id);
+  // Hooks
+  const t = useTranslations();
+  const { user } = useUser();
 
-    if (error) toast.error(error.message);
-    else toast.success("Saved!");
+  // Handlers
+  const parseWhiteboardData = () => {
+    const data = JSON.parse(lesson.whiteboard_data);
+    if (data.appState) data.appState.collaborators = new Map();
+    return data;
   };
-  const handleChangeDate = (date: Date) => {
-    setStarts(date);
-    setEnds(addMinutes(date, millisecondsToMinutes(duration)));
-  };
-  const handleChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
+  const changeDateDuration = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
     if (+value > millisecondsToMinutes(duration)) {
@@ -79,16 +70,9 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
       setEnds(subMinutes(ends, 15));
     }
   };
-  const handleSaveWhiteboardData = async () => {
-    const { error } = await supabaseClient
-      .from("lessons")
-      .update({
-        whiteboard_data: JSON.stringify(whiteboardDataRef.current),
-      })
-      .eq("id", lesson.id);
-
-    if (error) toast.error(error.message);
-    else toast.success("Saved!");
+  const onDateChange = (date: Date) => {
+    setStarts(date);
+    setEnds(addMinutes(date, millisecondsToMinutes(duration)));
   };
   const onWhiteboardChange: ExcalidrawProps["onChange"] = (
     elements,
@@ -99,11 +83,34 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
       appState,
     };
   };
+  const submitUpdateLessonDate = async () => {
+    try {
+      const { error } = await supabaseClient
+        .from("lessons")
+        .update({
+          starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
+          ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
+          whiteboard_data: JSON.stringify(whiteboardDataRef.current),
+        })
+        .eq("id", lesson.id);
 
-  const parseWhiteboardData = () => {
-    const data = JSON.parse(lesson.whiteboard_data);
-    if (data.appState) data.appState.collaborators = new Map();
-    return data;
+      if (error) throw new Error(t("failed_to_update_lesson_date"));
+
+      toast.success(t("lesson_date_updated"));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const submitUpdateWhiteboardData = async () => {
+    const { error } = await supabaseClient
+      .from("lessons")
+      .update({
+        whiteboard_data: JSON.stringify(whiteboardDataRef.current),
+      })
+      .eq("id", lesson.id);
+
+    if (error) toast.error(error.message);
+    else toast.success("Saved!");
   };
 
   return (
@@ -119,14 +126,14 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
           {user.role === Role.Teacher && (
             <div
               className="interactive p-2 border rounded-md ml-auto mr-2"
-              onClick={handleSaveWhiteboardData}
+              onClick={submitUpdateWhiteboardData}
             >
               <SaveIcon />
             </div>
           )}
         </div>
         <div
-          className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-100px)] ${clsx((user.user_metadata as IUserMetadata).role !== Role.Teacher && "student-whiteboard")}`}
+          className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-25px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
           style={{
             height: `${whiteboardHeight}px`,
           }}
@@ -138,9 +145,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
             }}
             initialData={parseWhiteboardData()}
             onChange={
-              (user.user_metadata as IUserMetadata).role === Role.Teacher
-                ? onWhiteboardChange
-                : undefined
+              user.role === Role.Teacher ? onWhiteboardChange : undefined
             }
           />
           <ResizeHandler
@@ -156,10 +161,10 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
         <hr className="mb-6" />
         <DateInput
           date={starts}
-          onChange={handleChangeDate}
+          onChange={onDateChange}
           label="Starts at"
           popperPlacement="bottom-start"
-          disabled={(user.user_metadata as IUserMetadata).role !== Role.Teacher}
+          disabled={user.role !== Role.Teacher}
         />
         <Input
           className="mt-3 mb-0"
@@ -168,16 +173,16 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
           type="number"
           Icon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
-          onChange={handleChangeDuration}
-          disabled={(user.user_metadata as IUserMetadata).role !== Role.Teacher}
+          onChange={changeDateDuration}
+          disabled={user.role !== Role.Teacher}
         />
-        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
-          <button className="primary-button" onClick={handleSaveDate}>
+        {user.role === Role.Teacher && (
+          <button className="primary-button" onClick={submitUpdateLessonDate}>
             Save
           </button>
         )}
         <div className="mt-3 sm:mt-auto flex flex-col gap-1">
-          {(user.user_metadata as IUserMetadata).role !== Role.Teacher ? (
+          {user.role !== Role.Teacher ? (
             <Link
               href={`/dashboard/lessons/${lesson.id}`}
               className={`button warning-button ${clsx(new Date() <= starts && "disabled")} `}
@@ -203,5 +208,4 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson, user }) => {
     </div>
   );
 };
-
 export default LessonPreview;

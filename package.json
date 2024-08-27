@@ -59,6 +59,7 @@
     "react-datepicker": "^6.1.0",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
+    "react-toastify": "^10.0.5",
     "uuid": "^9.0.1",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"
