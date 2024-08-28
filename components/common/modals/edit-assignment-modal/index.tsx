@@ -18,6 +18,7 @@ import { Role } from "@/interfaces/user.interface";
 import type { ResultOf } from "@/types";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import type { TablesUpdate } from "@/types/supabase.type";
+import { isAfter } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -38,6 +39,10 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
   const [assignment, setAssignment] =
     useState<ResultOf<typeof getAssignmentByAssignmentId>>();
   const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
+
+  // Vars
+  const isAssignmentPastDue =
+    assignment && isAfter(new Date(), new Date(assignment.due_date));
 
   const t = useTranslations();
   const { user } = useUser();
@@ -106,6 +111,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
                   assignment={assignment}
                   onSubmissionCreated={fetchSubmissions}
                   submitUpdateAssignment={submitUpdateAssignment}
+                  isAssignmentPastDue={isAssignmentPastDue}
                 />
               ),
               tier: [Role.Teacher, Role.Student],
@@ -117,6 +123,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
                 <SubmissionsTab
                   onDone={fetchSubmissions}
                   submissions={submissions}
+                  isAssignmentPastDue={isAssignmentPastDue}
                 />
               ),
               tier: [Role.Teacher, Role.Student],

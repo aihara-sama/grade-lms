@@ -14,6 +14,7 @@ import { useState } from "react";
 
 interface IProps {
   assignment: ResultOf<typeof getAssignmentByAssignmentId>;
+  isAssignmentPastDue: boolean;
   submitUpdateAssignment: (assignment: TablesUpdate<"assignments">) => void;
   onSubmissionCreated: () => void;
 }
@@ -21,6 +22,7 @@ interface IProps {
 const OverviewTab: FunctionComponent<IProps> = ({
   submitUpdateAssignment,
   onSubmissionCreated,
+  isAssignmentPastDue,
   ...props
 }) => {
   // States
@@ -28,6 +30,7 @@ const OverviewTab: FunctionComponent<IProps> = ({
   const [isCreateSubmissionModalOpen, setIsCreateSubmissionModalOpen] =
     useState(false);
 
+  // hooks
   const { user } = useUser();
 
   // Handlers
@@ -69,7 +72,12 @@ const OverviewTab: FunctionComponent<IProps> = ({
         />
       </div>
 
-      <div className="flex gap-[14px] items-center mt-[14px] justify-end">
+      <div
+        className={`flex gap-[14px] items-center mt-[14px] ${isAssignmentPastDue ? "justify-between" : "justify-end"}`}
+      >
+        <p className="text-sm font-bold text-red-600">
+          {isAssignmentPastDue && "This assignment is past due"}
+        </p>
         <div className="pr-[12px] border-r-2 border-gray-200">
           <DateInput
             date={new Date(assignment.due_date)}
@@ -82,12 +90,20 @@ const OverviewTab: FunctionComponent<IProps> = ({
         {user.role === Role.Teacher ? (
           <button
             className="primary-button"
-            onClick={() => submitUpdateAssignment(assignment)}
+            onClick={() =>
+              submitUpdateAssignment({
+                body: assignment.body,
+                title: assignment.title,
+                due_date: assignment.due_date,
+                id: assignment.id,
+              })
+            }
           >
             Save
           </button>
         ) : (
           <button
+            disabled={isAssignmentPastDue}
             className="primary-button"
             onClick={openCreateSubmissoinModal}
           >

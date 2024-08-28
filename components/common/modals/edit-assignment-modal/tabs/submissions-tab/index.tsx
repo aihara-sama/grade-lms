@@ -14,9 +14,14 @@ import { useState, type FunctionComponent } from "react";
 interface IProps {
   submissions: SubmissionWithAuthor[];
   onDone: () => void;
+  isAssignmentPastDue: boolean;
 }
 
-const SubmissionsTab: FunctionComponent<IProps> = ({ submissions, onDone }) => {
+const SubmissionsTab: FunctionComponent<IProps> = ({
+  submissions,
+  isAssignmentPastDue,
+  onDone,
+}) => {
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string>();
   const [isViewSubmissonModalOpen, setIsViewSubmissonModalOpen] =
     useState(false);
@@ -66,6 +71,7 @@ const SubmissionsTab: FunctionComponent<IProps> = ({ submissions, onDone }) => {
           setIsOpen={setIsViewSubmissonModalOpen}
           onDone={onDone}
           submissionId={selectedSubmissionId}
+          isAssignmentPastDue={isAssignmentPastDue}
         />
       )}
     </div>

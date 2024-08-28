@@ -27,11 +27,13 @@ interface IProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   submissionId: string;
   onDone: () => void;
+  isAssignmentPastDue: boolean;
 }
 const EditSubmissionModal: FunctionComponent<IProps> = ({
   isOpen,
   setIsOpen,
   submissionId,
+  isAssignmentPastDue,
   onDone,
 }) => {
   const [submission, setSubmission] = useState<SubmissionWithAuthor>();
@@ -87,6 +89,7 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
             name="title"
             value={submission.title}
             onChange={onInputChange}
+            disabled={isAssignmentPastDue}
           />
           <p>Description</p>
           <div className="">
@@ -95,9 +98,13 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
               id="submission-editor"
               onChange={onBodyChange}
               data={JSON.parse(submission.body)}
+              readOnly={isAssignmentPastDue}
             />
           </div>
-          <div className="flex gap-3 items-center mt-3 justify-end">
+          <div className="flex gap-3 items-center mt-3 justify-between">
+            <p className="text-sm font-bold text-red-600">
+              {isAssignmentPastDue && "This assignment is past due"}
+            </p>
             <button
               onClick={submitUpdateSubmission}
               disabled={
