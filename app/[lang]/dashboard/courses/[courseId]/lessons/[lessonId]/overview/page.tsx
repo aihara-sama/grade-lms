@@ -1,6 +1,6 @@
 import LessonPreview from "@/components/lesson-preview";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
@@ -15,7 +15,7 @@ interface IProps {
 const Page: FunctionComponent<IProps> = async ({
   params: { lessonId, courseId },
 }) => {
-  const courseData = await supabaseClient
+  const courseData = await db
     .from("courses")
     .select("*")
     .eq("id", courseId)
@@ -23,7 +23,7 @@ const Page: FunctionComponent<IProps> = async ({
 
   if (!courseData.data) return redirect("/dashboard/courses");
 
-  const lessonData = await supabaseClient
+  const lessonData = await db
     .from("lessons")
     .select("*")
     .eq("id", lessonId)

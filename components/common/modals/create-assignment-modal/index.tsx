@@ -12,7 +12,7 @@ import type { Notification } from "@/types/notifications";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
 import { getNotificationChannel } from "@/utils/get-notification-channel";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import type { OutputData } from "@editorjs/editorjs";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -65,7 +65,7 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
         getAllCourseStudentsIds(user.id, courseId),
       ]);
 
-      const { error } = await supabaseClient.from("notifications").insert(
+      const { error } = await db.from("notifications").insert(
         students.map(({ id }) => ({
           user_id: id,
           assignment_id: createdAssignment.id,

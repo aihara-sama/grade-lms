@@ -6,7 +6,7 @@ import DeleteIcon from "@/components/icons/delete-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import {
   addMinutes,
   format,
@@ -78,7 +78,7 @@ const EditLessonModal: FunctionComponent<IProps> = ({
     e.preventDefault();
 
     try {
-      await supabaseClient.from("lessons").upsert({
+      await db.from("lessons").upsert({
         title: lessonTitle,
         starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
         ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),

@@ -2,7 +2,7 @@
 
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useEffect } from "react";
 
@@ -13,9 +13,7 @@ export const useNotificationChannel = () => {
 
   channel =
     channel ||
-    supabaseClient.channel(
-      user.role === Role.Teacher ? user.id : user.creator_id
-    );
+    db.channel(user.role === Role.Teacher ? user.id : user.creator_id);
 
   useEffect(() => {
     return () => {

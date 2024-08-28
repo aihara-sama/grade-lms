@@ -1,11 +1,11 @@
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 let channel: RealtimeChannel;
 
 export const getNotificationChannel = (name: string) => {
   if (!channel) {
-    channel = supabaseClient.channel(name);
+    channel = db.channel(name);
   }
 
   return channel;

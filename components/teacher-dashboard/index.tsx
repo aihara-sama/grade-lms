@@ -8,7 +8,7 @@ import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
@@ -45,7 +45,7 @@ const TeacherDashboard: FunctionComponent<IProps> = ({
   //     .single();
 
   const fetchCoursesCount = () =>
-    supabaseClient
+    db
       .from("users")
       .select("courses(count)")
       .eq("id", user.id)
@@ -53,7 +53,7 @@ const TeacherDashboard: FunctionComponent<IProps> = ({
       .single();
 
   const fetchLatestCourses = () =>
-    supabaseClient
+    db
       .from("users")
       .select("courses(*, users(count), lessons(count))")
       .eq("id", user.id)

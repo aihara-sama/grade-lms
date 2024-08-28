@@ -1,7 +1,7 @@
 "use client";
 
 import CameraIcon from "@/components/icons/camera-icon";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import { type ChangeEvent, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -19,7 +19,7 @@ const AvatarUpload: FunctionComponent<IProps> = ({ onChange, avatar }) => {
     try {
       const avatarFile = e.target.files[0];
 
-      const { data, error } = await supabaseClient.storage
+      const { data, error } = await db.storage
         .from("avatars")
         .upload(uuid(), avatarFile);
 

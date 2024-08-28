@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/hooks/use-user";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
@@ -15,22 +15,20 @@ export const useLessonChannel = () => {
 
   channel =
     channel ||
-    supabaseClient.channel(params.lessonId || uuid(), {
+    db.channel(params.lessonId || uuid(), {
       config: {
         presence: {
           key: user.id,
-        },
-        broadcast: {
-          self: true,
         },
       },
     });
 
   useEffect(() => {
     return () => {
-      channel.unsubscribe().then(() => {
-        channel = undefined;
-      });
+      if (channel)
+        channel.unsubscribe().then(() => {
+          channel = undefined;
+        });
     };
   }, []);
   return channel;

@@ -3,7 +3,7 @@
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
@@ -24,7 +24,7 @@ const SignIn: FunctionComponent<IProps> = () => {
     const email = String(payload.get("email")).trim();
     const password = String(payload.get("password"));
 
-    const { error } = await supabaseClient.auth.signInWithPassword({
+    const { error } = await db.auth.signInWithPassword({
       email,
       password,
     });

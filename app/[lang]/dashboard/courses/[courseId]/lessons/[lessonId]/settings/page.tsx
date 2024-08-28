@@ -2,7 +2,7 @@
 
 import LessonSettings from "@/components/lesson-settings";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
@@ -24,12 +24,12 @@ const Page: FunctionComponent<IProps> = ({ params }) => {
 
   useEffect(() => {
     (async () => {
-      const { data: courseData, error: courseError } = await supabaseClient
+      const { data: courseData, error: courseError } = await db
         .from("courses")
         .select("*")
         .eq("id", params.courseId)
         .single();
-      const { data: lessonData, error: lessonError } = await supabaseClient
+      const { data: lessonData, error: lessonError } = await db
         .from("lessons")
         .select("*")
         .eq("id", params.lessonId)

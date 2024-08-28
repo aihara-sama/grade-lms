@@ -6,12 +6,12 @@ import { Role } from "@/interfaces/user.interface";
 import { loadMessages } from "@/utils/load-messages";
 import { parseUsersCoursesIds } from "@/utils/parse-users-courses-ids";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 
 // Get
 export const getUsersByCourseId = async (courseId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("users(*)")
     .eq("id", courseId)
@@ -26,7 +26,7 @@ export const getUsersByCourseId = async (courseId: string) => {
 
 export const getUsersCountByCourseId = async (courseId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("users(count)")
     .eq("id", courseId)
@@ -39,7 +39,7 @@ export const getUsersCountByCourseId = async (courseId: string) => {
 };
 export const getUsersByCreatorId = async (creatorId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("*")
     .limit(COURSES_GET_LIMIT)
@@ -52,7 +52,7 @@ export const getUsersByCreatorId = async (creatorId: string) => {
 
 export const getUsersCountByCreatorId = async (creatorId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("count")
     .eq("creator_id", creatorId)
@@ -67,7 +67,7 @@ export const getUsersCountByTitleAndUserId = async (
   creatorId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("count")
     .ilike("name", `%${name}%`)
@@ -83,7 +83,7 @@ export const getUsersCountByTitleAndCourseId = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("users(count)")
     .ilike("users.name", `%${name}%`)
@@ -101,7 +101,7 @@ export const getUsersByNameAndCreatorId = async (
   userId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("*")
     .ilike("name", `%${name}%`)
@@ -118,7 +118,7 @@ export const getUsersByNameAndCourseId = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("users(*)")
     .ilike("users.name", `%${name}%`)
@@ -139,7 +139,7 @@ export const getOffsetUsersByNameAndCreatorId = async (
   to: number
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("*")
     .eq("creator_id", creatorId)
@@ -158,7 +158,7 @@ export const getOffsetUsersByNameAndCourseId = async (
   to: number
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("users(*)")
     .eq("id", courseId)
@@ -174,7 +174,7 @@ export const getOffsetUsersByNameAndCourseId = async (
 
 export const getUsersNotInCourse = async (userId: string, courseId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .rpc("get_users_not_in_course", {
       p_course_id: courseId,
     })
@@ -190,7 +190,7 @@ export const getAllCourseStudentsIds = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("users(id)")
     .eq("id", courseId)
@@ -214,7 +214,7 @@ export const deleteUsersByNameAndCreatorId = async (
 ) => {
   const t = await loadMessages();
 
-  const usersIds = await supabaseClient
+  const usersIds = await db
     .from("users")
     .select("id")
     .ilike("name", `%${name}%`)
@@ -232,7 +232,7 @@ export const enrollUsersInCourses = async (
   coursesIds: string[]
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("user_courses")
     .upsert(parseUsersCoursesIds(usersIds, coursesIds));
 
@@ -257,7 +257,7 @@ export const dispelUsersFromCourse = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("user_courses")
     .delete()
     .in("user_id", usersIds)
@@ -278,7 +278,7 @@ export const dispelAllStudentsByNameFromCourse = async (
 ) => {
   const t = await loadMessages();
 
-  const studentsData = await supabaseClient
+  const studentsData = await db
     .from("users")
     .select("id")
     .ilike("name", `%${name}%`)
@@ -286,7 +286,7 @@ export const dispelAllStudentsByNameFromCourse = async (
 
   if (studentsData.error) throw new Error(t("failed_to_dispel_users"));
 
-  const result = await supabaseClient
+  const result = await db
     .from("user_courses")
     .delete()
     .in(

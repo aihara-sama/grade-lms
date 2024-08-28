@@ -3,7 +3,7 @@ import type { getChatMessages } from "@/db/message";
 import type { ResultOf } from "@/types";
 import type { ChatFile } from "@/types/chat-files.type";
 import { shortenFileName } from "@/utils/short-file-name";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import imgExtentions from "image-extensions";
 import { useTranslations } from "next-intl";
 import prettyBytes from "pretty-bytes";
@@ -19,7 +19,7 @@ const Message: FunctionComponent<IProps> = ({ chatMessage }) => {
 
   const submitDownloadFile = async (file: ChatFile) => {
     try {
-      const { data, error } = await supabaseClient.storage
+      const { data, error } = await db.storage
         .from("public")
         .download(`chat-files/${file.path}`);
 

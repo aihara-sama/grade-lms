@@ -22,7 +22,7 @@ import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { execAtStartOfMin } from "@/utils/interval-at-start-of-min";
 import { isLessonEnded } from "@/utils/is-lesson-ended";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 
 interface IProps {
@@ -35,8 +35,8 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
   const [currentLesson, setCurrentLesson] = useState(lesson);
   const {
     cameras,
-    fireToggleAudio,
-    fireToggleCamera,
+    fireAndToggleAudio,
+    fireAndToggleCamera,
     endSession,
     startSession,
   } = useVideoChat();
@@ -45,7 +45,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
 
   const fetchLesson = async () => {
     try {
-      const { data, error } = await supabaseClient
+      const { data, error } = await db
         .from("lessons")
         .select("*, course:courses(*)")
         .eq("id", lesson.id)
@@ -73,8 +73,8 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
             ) : (
               cameras.map((camera, idx) => (
                 <Camera
-                  toggleCamera={fireToggleCamera}
-                  toggleAudio={fireToggleAudio}
+                  toggleCamera={fireAndToggleCamera}
+                  toggleAudio={fireAndToggleAudio}
                   camera={camera}
                   key={idx}
                 />
@@ -117,7 +117,7 @@ const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
     if (!isLessonEnded(new Date(lesson.ends)))
       execAtStartOfMin(async (stop) => {
         try {
-          const { data, error } = await supabaseClient
+          const { data, error } = await db
             .from("lessons")
             .select("ends")
             .eq("id", lesson.id)

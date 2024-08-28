@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import { insertLesson } from "@/db/lesson";
+import { createLesson } from "@/db/lesson";
+import { useUser } from "@/hooks/use-user";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
 import { useTranslations } from "next-intl";
@@ -49,8 +50,9 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
-  const handleChangeDate = (date: Date) => {
+  const onDateChange = (date: Date) => {
     setLesson((_) => ({
       ..._,
       starts: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
@@ -61,11 +63,11 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
     }));
   };
 
-  const handleCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submitCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      await insertLesson(lesson);
+      await createLesson(lesson, user.id);
 
       toast(t("lesson_created"));
       setIsOpen(false);
@@ -76,9 +78,9 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
     }
   };
 
-  const handleChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
+  const changeDuration = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let ends: string;
+    let { ends } = lesson;
 
     if (+value > millisecondsToMinutes(duration)) {
       ends = format(addMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
@@ -89,7 +91,7 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
     setLesson((_) => ({ ..._, ends }));
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setLesson((_) => ({ ..._, [e.target.name]: e.target.value }));
 
   useEffect(() => {
@@ -103,12 +105,12 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
       isOpen={isOpen}
       title="Create lesson"
     >
-      <form onSubmit={handleCreateLesson}>
+      <form onSubmit={submitCreateLesson}>
         <Input
           autoFocus
           fullWIdth
           value={lesson.title}
-          onChange={handleInputChange}
+          onChange={onInputChange}
           name="title"
           Icon={<LessonsIcon size="xs" />}
           placeholder="Lesson name"
@@ -116,7 +118,7 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
         />
         <DateInput
           date={new Date(lesson.starts)}
-          onChange={handleChangeDate}
+          onChange={onDateChange}
           label="Starts at"
         />
         <Input
@@ -125,7 +127,7 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
           type="number"
           Icon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
-          onChange={handleChangeDuration}
+          onChange={changeDuration}
           className="mt-2"
         />
         <hr className="my-3" />

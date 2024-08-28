@@ -31,6 +31,7 @@
   "failed_to_load_assignments_count": "Failed to load assignments count",
   "failed_to_update_lesson_date": "Failed to load update lesson date",
   "user_enrolled": "User successfully enrolled",
+  "lesson_overlaps": "The lesson you are trying to schedule overlaps with another lesson",
   "users_enrolled": "Users successfully enrolled",
   "submission_created": "Submission successfully created",
   "lesson_date_updated": "Lesson date successfully updated",

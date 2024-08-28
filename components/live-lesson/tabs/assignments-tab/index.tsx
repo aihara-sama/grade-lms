@@ -3,7 +3,7 @@
 import CardTitle from "@/components/card-title";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 
 import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
@@ -43,7 +43,7 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId, courseId }) => {
   };
 
   const fetchAssignments = async () => {
-    const data = await supabaseClient
+    const data = await db
       .from("assignments")
       .select("*")
       .eq("lesson_id", lessonId);

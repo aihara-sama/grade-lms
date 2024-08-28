@@ -5,7 +5,7 @@ import ChartSkeleton from "@/components/skeletons/chart-skeleton";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { getWeekNames } from "@/utils/get-week-names";
 import { parseInsights } from "@/utils/parse-insights";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
@@ -25,7 +25,7 @@ const DashboardInsights: FunctionComponent<IProps> = ({ user, courses }) => {
 
   // Handlers
   const fetchCoursesInsights = () => {
-    return supabaseClient
+    return db
       .from("users")
       .select("courses(timestamp:created_at)")
       .eq("id", user.id)
@@ -37,7 +37,7 @@ const DashboardInsights: FunctionComponent<IProps> = ({ user, courses }) => {
       .single();
   };
   const fetchUsersInsights = () => {
-    return supabaseClient
+    return db
       .from("users")
       .select("timestamp:created_at")
       .eq("creator_id", user.id)

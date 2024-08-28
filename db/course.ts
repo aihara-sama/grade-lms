@@ -2,12 +2,12 @@ import { COURSES_GET_LIMIT } from "@/constants";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 
 // Get
 export const getCoursesCountByUserId = async (userId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("courses(count)")
     .eq("id", userId)
@@ -24,7 +24,7 @@ export const getCoursesCountByTitleAndUserId = async (
   userId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("courses(count)")
     .ilike("courses.title", `%${title}%`)
@@ -42,7 +42,7 @@ export const getCoursesByTitleAndUserId = async (
   userId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("courses(*, lessons(count), users(count))")
     .ilike("courses.title", `%${title}%`)
@@ -59,7 +59,7 @@ export const getCoursesByTitleAndUserId = async (
 
 export const getCoursesWithRefsCountByUserId = async (userId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("courses(*, lessons(count), users(count))")
     .eq("id", userId)
@@ -74,7 +74,7 @@ export const getCoursesWithRefsCountByUserId = async (userId: string) => {
 };
 export const getCoursesByUserId = async (userId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("id, courses(*)")
     .eq("id", userId)
@@ -86,7 +86,7 @@ export const getCoursesByUserId = async (userId: string) => {
 };
 export const getCourseByCourseId = async (courseId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("*, users (*), lessons (*)")
     .eq("id", courseId)
@@ -98,7 +98,7 @@ export const getCourseByCourseId = async (courseId: string) => {
 };
 export const getUnenrolledCoursesByUserId = async (userId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .rpc("get_courses_not_assigned_to_user", {
       p_user_id: userId,
     })
@@ -116,7 +116,7 @@ export const getOffsetCoursesByTitleAndUserId = async (
   to: number
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("users")
     .select("courses(*, lessons(count), users(count))")
     .eq("id", userId)
@@ -133,7 +133,7 @@ export const getOffsetCoursesByTitleAndUserId = async (
 
 export const createCourse = async (course: TablesInsert<"courses">) => {
   const t = await loadMessages();
-  const result = await supabaseClient.from("courses").insert(course);
+  const result = await db.from("courses").insert(course);
 
   if (result.error) throw new Error(t("failed_to_create_course"));
 };
@@ -141,10 +141,7 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
 // Delete
 export const deleteCourseByCourseId = async (courseId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
-    .from("courses")
-    .delete()
-    .eq("id", courseId);
+  const result = await db.from("courses").delete().eq("id", courseId);
 
   if (result.error) throw new Error(t("failed_to_delete_course"));
 
@@ -152,10 +149,7 @@ export const deleteCourseByCourseId = async (courseId: string) => {
 };
 export const deleteCoursesByCoursesIds = async (coursesIds: string[]) => {
   const t = await loadMessages();
-  const result = await supabaseClient
-    .from("courses")
-    .delete()
-    .in("id", coursesIds);
+  const result = await db.from("courses").delete().in("id", coursesIds);
 
   if (result.error) throw new Error(t("failed_to_delete_courses"));
 
@@ -167,13 +161,10 @@ export const deleteCoursesByTitleAndUserId = async (
   userId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient.rpc(
-    "delete_courses_by_title_and_user_id",
-    {
-      p_user_id: userId,
-      p_title: title,
-    }
-  );
+  const result = await db.rpc("delete_courses_by_title_and_user_id", {
+    p_user_id: userId,
+    p_title: title,
+  });
 
   if (result.error) throw new Error(t("failed_to_delete_courses"));
 

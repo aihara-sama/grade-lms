@@ -1,4 +1,4 @@
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { format } from "date-fns";
 import Link from "next/link";
 import { type FunctionComponent } from "react";
@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const OngoingLessonCard: FunctionComponent<IProps> = async ({ courseId }) => {
-  const data = await supabaseClient
+  const data = await db
     .from("courses")
     .select("lessons(*)")
     .eq("id", courseId)

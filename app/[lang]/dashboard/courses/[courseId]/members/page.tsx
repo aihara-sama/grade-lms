@@ -1,6 +1,6 @@
 import CourseHeader from "@/components/course/course-header";
 import Members from "@/components/course/members";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -19,7 +19,7 @@ const Page: FunctionComponent<IProps> = async ({ params: { courseId } }) => {
     currentCourseData,
   ] = await Promise.all([
     createClient().auth.getUser(),
-    supabaseClient
+    db
       .from("courses")
       .select("*, users(*), lessons(*)")
       .eq("id", courseId)

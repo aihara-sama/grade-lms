@@ -5,7 +5,7 @@ import AssignmentsIcon from "@/components/icons/assignments-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import type { Lesson } from "@/types/lessons.type";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { toCapitalCase } from "@/utils/to-capital-case";
 import type { User } from "@supabase/supabase-js";
 import { addDays, format, formatDistanceToNow, startOfDay } from "date-fns";
@@ -28,7 +28,7 @@ const DashboardSchedule: FunctionComponent<IProps> = ({ user }) => {
   };
 
   const fetchLessonsByStartDate = (date: Date) =>
-    supabaseClient
+    db
       .from("users")
       .select("id, courses(id, lessons(*, course:courses(title)))")
       .eq("id", user.id)

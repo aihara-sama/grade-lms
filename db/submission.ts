@@ -1,13 +1,13 @@
 import { SUBMISSIONS_GET_LIMIT } from "@/constants";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 
 export const createSubmission = async (
   submission: TablesInsert<"submissions">
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("submissions")
     .insert(submission)
     .select("id")
@@ -22,7 +22,7 @@ export const updateSubmission = async (
   submission: TablesUpdate<"submissions">
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("submissions")
     .update(submission)
     .eq("id", submission.id);
@@ -34,7 +34,7 @@ export const getSubmissionsWithAuthorByAssignmentId = async (
   assignmentId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("submissions")
     .select("*, author:users(*)")
     .eq("assignment_id", assignmentId)
@@ -49,7 +49,7 @@ export const getSubmissionsWithAuthorByAssignmentIdAndUserId = async (
   userId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("submissions")
     .select("*, author:users(*)")
     .eq("assignment_id", assignmentId)
@@ -64,7 +64,7 @@ export const getSubmissionWithAuthorBySubmissionId = async (
   submissionId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("submissions")
     .select("*, author:users(*)")
     .eq("id", submissionId)
@@ -79,7 +79,7 @@ export const updateSubmissionGrade = async (
   grade: number
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("submissions")
     .update({ grade })
     .eq("id", submissionId);

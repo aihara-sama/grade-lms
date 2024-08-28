@@ -5,7 +5,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import SaveIcon from "@/components/icons/save-icon";
 import Input from "@/components/input";
 import ResizeHandler from "@/components/resize-handler";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import {
   addMinutes,
@@ -85,7 +85,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
   };
   const submitUpdateLessonDate = async () => {
     try {
-      const { error } = await supabaseClient
+      const { error } = await db
         .from("lessons")
         .update({
           starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
@@ -102,7 +102,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
     }
   };
   const submitUpdateWhiteboardData = async () => {
-    const { error } = await supabaseClient
+    const { error } = await db
       .from("lessons")
       .update({
         whiteboard_data: JSON.stringify(whiteboardDataRef.current),

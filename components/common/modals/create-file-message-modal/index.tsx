@@ -6,7 +6,7 @@ import { useUser } from "@/hooks/use-user";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getFileExt } from "@/utils/get-file-ext";
 import { shortenFileName } from "@/utils/short-file-name";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import imgExtentions from "image-extensions";
 import { useTranslations } from "next-intl";
 import prettyBytes from "pretty-bytes";
@@ -51,7 +51,7 @@ const CreateFileMessageModal: FunctionComponent<IProps> = ({
     try {
       const ext = await getFileExt(file);
 
-      const { data, error } = await supabaseClient.storage
+      const { data, error } = await db.storage
         .from("chat-files")
         .upload(`${uuid()}.${ext}`, file);
 
@@ -66,7 +66,7 @@ const CreateFileMessageModal: FunctionComponent<IProps> = ({
 
   const submitCreateMessage = async () => {
     try {
-      const createdChatMessage = await supabaseClient
+      const createdChatMessage = await db
         .from("chat_messages")
         .insert(chatMessage)
         .select("id")
@@ -74,7 +74,7 @@ const CreateFileMessageModal: FunctionComponent<IProps> = ({
 
       if (createdChatMessage.error) throw new Error(t("something_went_wrong"));
 
-      const createdChatFile = await supabaseClient.from("chat_files").insert({
+      const createdChatFile = await db.from("chat_files").insert({
         ext: fileExt,
         name: file.name,
         size: file.size,

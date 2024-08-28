@@ -3,7 +3,7 @@
 import CourseHeader from "@/components/course/course-header";
 import CourseSettings from "@/components/course/course-settings";
 import type { Database } from "@/types/supabase.type";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
@@ -19,7 +19,7 @@ const Page: FunctionComponent<IProps> = ({ params }) => {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabaseClient
+      const { data, error } = await db
         .from("courses")
         .select("*")
         .eq("id", params.courseId)

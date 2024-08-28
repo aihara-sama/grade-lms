@@ -4,7 +4,7 @@ import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CrownIcon from "@/components/icons/crown-icon";
 import Input from "@/components/input";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { toCapitalCase } from "@/utils/to-capital-case";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -45,14 +45,14 @@ const Profile: FunctionComponent<IProps> = ({ user }) => {
   };
 
   const handleRenameUser = async () => {
-    const { error: usersError } = await supabaseClient
+    const { error: usersError } = await db
       .from("users")
       .update({
         name: userName,
       })
       .eq("id", user.id);
 
-    const { error: profileError } = await supabaseClient.auth.updateUser({
+    const { error: profileError } = await db.auth.updateUser({
       data: {
         name: userName,
       } as IUserMetadata,
@@ -65,14 +65,14 @@ const Profile: FunctionComponent<IProps> = ({ user }) => {
   useEffect(() => {
     (async () => {
       if (avatar !== (user.user_metadata as IUserMetadata).avatar) {
-        const { error: usersError } = await supabaseClient
+        const { error: usersError } = await db
           .from("users")
           .update({
             avatar,
           })
           .eq("id", user.id);
 
-        const { error: profileError } = await supabaseClient.auth.updateUser({
+        const { error: profileError } = await db.auth.updateUser({
           data: {
             avatar,
           } as IUserMetadata,

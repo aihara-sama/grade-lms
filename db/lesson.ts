@@ -2,15 +2,12 @@ import { LESSONS_GET_LIMIT } from "@/constants";
 import type { Lesson } from "@/types/lessons.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { format } from "date-fns";
 
 export const deleteLessonsByLessonsIds = async (lessonsIds: string[]) => {
   const t = await loadMessages();
-  const result = await supabaseClient
-    .from("lessons")
-    .delete()
-    .in("id", lessonsIds);
+  const result = await db.from("lessons").delete().in("id", lessonsIds);
 
   if (result.error)
     throw new Error(
@@ -23,16 +20,28 @@ export const deleteLessonsByLessonsIds = async (lessonsIds: string[]) => {
 
   return result;
 };
-export const insertLesson = async (lesson: TablesInsert<"lessons">) => {
+export const createLesson = async (
+  lesson: TablesInsert<"lessons">,
+  userId: string
+) => {
   const t = await loadMessages();
-  const result = await supabaseClient.from("lessons").insert(lesson);
+
+  const overlappingLesson = await db.rpc("get_overlapping_lesson", {
+    p_user_id: userId,
+    p_ends: lesson.ends,
+    p_starts: lesson.starts,
+  });
+
+  if (overlappingLesson.data.length) throw new Error(t("lesson_overlaps"));
+
+  const result = await db.from("lessons").insert(lesson);
 
   if (result.error) throw new Error(t("failed_to_create_lesson"));
 };
 
 export const getLessonsCountByCourseId = async (courseId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("lessons(count)")
     .eq("id", courseId)
@@ -45,7 +54,7 @@ export const getLessonsCountByCourseId = async (courseId: string) => {
 };
 export const getWeekLessons = async (days: string[]) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("lessons")
     .select("*")
     .filter("course_id", "not.is", null)
@@ -65,7 +74,7 @@ export const getWeekLessonsByCourseId = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("lessons")
     .select("*")
     .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
@@ -85,7 +94,7 @@ export const getLessonsCountByTitleAndCourseId = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("lessons(count)")
     .ilike("lessons.title", `%${title}%`)
@@ -103,7 +112,7 @@ export const getLessonsByTitleAndCourseId = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("lessons(*)")
     .ilike("lessons.title", `%${title}%`)
@@ -119,7 +128,7 @@ export const getLessonsByTitleAndCourseId = async (
 
 export const getLessonsByCourseId = async (courseId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("lessons(*)")
     .eq("id", courseId)
@@ -139,7 +148,7 @@ export const getOffsetLessonsByTitleAndCourseId = async (
   to: number
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("courses")
     .select("lessons(*)")
     .eq("id", courseId)
@@ -155,10 +164,7 @@ export const getOffsetLessonsByTitleAndCourseId = async (
 
 export const upsertLesson = async (lesson: Lesson) => {
   const t = await loadMessages();
-  const result = await supabaseClient
-    .from("lessons")
-    .upsert(lesson)
-    .eq("id", lesson.id);
+  const result = await db.from("lessons").upsert(lesson).eq("id", lesson.id);
 
   if (result.error) throw new Error(t("failed_to_save_lesson"));
 };
@@ -168,7 +174,7 @@ export const deleteLessonsByTitleAndCourseId = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("lessons")
     .delete()
     .eq("course_id", courseId)
@@ -181,7 +187,7 @@ export const deleteLessonsByTitleAndCourseId = async (
 
 export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("lessons")
     .update({
       ends: format(

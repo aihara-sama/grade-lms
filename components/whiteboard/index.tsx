@@ -73,10 +73,8 @@ const Whiteboard: FunctionComponent<IProps> = ({
   const invite = async () => {
     navigator.clipboard
       .writeText(window.location.href)
-      .then(() =>
-        toast.success(<div className="text-red-600">{t("invite_copied")}</div>)
-      )
-      .catch(() => toast.error("Something went wrong"));
+      .then(() => toast.success(t("invite_copied")))
+      .catch(() => toast.error(t("something_went_wrong")));
   };
   const onPointerUpdate: ExcalidrawProps["onPointerUpdate"] = (event) => {
     pointerEventRef.current = event;

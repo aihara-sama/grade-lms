@@ -9,7 +9,7 @@ import { menu } from "@/components/common/poppers/user-popper/menu";
 import LogoutIcon from "@/components/icons/logout-icon";
 import { useUser } from "@/hooks/use-user";
 import type { PropsWithClassName } from "@/types";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -25,7 +25,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
   // Handlers
   const handleSignOut = async () => {
     try {
-      const { error } = await supabaseClient.auth.signOut();
+      const { error } = await db.auth.signOut();
 
       if (error) throw new Error(t("something_went_wrong"));
       router.push("/sign-in");

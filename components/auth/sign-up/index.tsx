@@ -6,7 +6,7 @@ import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
 import { Role, type IUserMetadata } from "@/interfaces/user.interface";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,7 @@ const SignUp: FunctionComponent = () => {
     const email = String(payload.get("email")).trim();
     const password = String(payload.get("password"));
 
-    const { error } = await supabaseClient.auth.signUp({
+    const { error } = await db.auth.signUp({
       email,
       password,
       options: {

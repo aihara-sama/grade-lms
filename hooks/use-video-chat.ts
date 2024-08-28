@@ -96,6 +96,15 @@ export const useVideoChat = () => {
     });
   };
 
+  const fireAndToggleCamera = (userId: string) => {
+    toggleCamera(userId);
+    fireToggleCamera(userId);
+  };
+  const fireAndToggleAudio = (userId: string) => {
+    toggleAudio(userId);
+    fireToggleAudio(userId);
+  };
+
   const onPresenceJoin = (
     payload: RealtimePresenceJoinPayload<{ user: User }>
   ) => {
@@ -201,8 +210,8 @@ export const useVideoChat = () => {
 
   return {
     cameras,
-    fireToggleAudio,
-    fireToggleCamera,
+    fireAndToggleAudio,
+    fireAndToggleCamera,
     endSession,
     startSession,
   };

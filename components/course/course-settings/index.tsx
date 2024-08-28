@@ -3,7 +3,7 @@
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import type { Database } from "@/types/supabase.type";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 // import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
@@ -21,7 +21,7 @@ const CourseSettings: FunctionComponent<IProps> = ({
   const router = useRouter();
   const [courseTitle, setCourseTitle] = useState(course.title);
   const handleRenameCourse = async () => {
-    const { error } = await supabaseClient
+    const { error } = await db
       .from("courses")
       .update({
         title: courseTitle,

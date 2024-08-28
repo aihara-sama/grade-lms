@@ -445,6 +445,22 @@ export type Database = {
           title: string;
         }[];
       };
+      get_overlapping_lesson: {
+        Args: {
+          p_user_id: string;
+          p_starts: string;
+          p_ends: string;
+        };
+        Returns: {
+          course_id: string | null;
+          created_at: string;
+          ends: string;
+          id: string;
+          starts: string;
+          title: string;
+          whiteboard_data: string;
+        }[];
+      };
       get_users_not_in_course: {
         Args: {
           p_course_id: string;

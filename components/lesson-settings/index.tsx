@@ -3,7 +3,7 @@
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import type { Database } from "@/types/supabase.type";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -20,7 +20,7 @@ const LessonSettings: FunctionComponent<IProps> = ({
   const router = useRouter();
   const [lessonTitle, setLessonTitle] = useState(lesson.title);
   const handleRenameLesson = async () => {
-    const { error } = await supabaseClient
+    const { error } = await db
       .from("lessons")
       .update({
         title: lessonTitle,

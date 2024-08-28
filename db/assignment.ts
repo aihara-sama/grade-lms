@@ -1,13 +1,13 @@
 import { ASSIGNMENTS_GET_LIMIT } from "@/constants";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
-import { supabaseClient } from "@/utils/supabase/client";
+import { db } from "@/utils/supabase/client";
 
 export const createAssignment = async (
   assignment: TablesInsert<"assignments">
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .insert(assignment)
     .select("id")
@@ -21,7 +21,7 @@ export const updateAssignment = async (
   assignment: TablesUpdate<"assignments">
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .update(assignment)
     .eq("id", assignment.id);
@@ -31,7 +31,7 @@ export const updateAssignment = async (
 
 export const getAssignmentByAssignmentId = async (assignmentId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .select("*, lesson:lessons(course_id)")
     .eq("id", assignmentId)
@@ -43,7 +43,7 @@ export const getAssignmentByAssignmentId = async (assignmentId: string) => {
 };
 export const getAssignmentsByLessonId = async (lessonId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .select("*")
     .eq("lesson_id", lessonId)
@@ -60,7 +60,7 @@ export const getAssignmentsByTitleAndLessonId = async (
   lessonId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .select("*")
     .ilike("title", `%${title}%`)
@@ -78,7 +78,7 @@ export const getAssignmentsCountByTitleAndLessonId = async (
   lessonId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .select("count")
     .ilike("title", `%${title}%`)
@@ -92,7 +92,7 @@ export const getAssignmentsCountByTitleAndLessonId = async (
 
 export const getAssignmentsCountByLessonId = async (lessonId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .select("count")
     .eq("lesson_id", lessonId)
@@ -110,7 +110,7 @@ export const getOffsetAssignmentsByTitleAndLessonId = async (
   to: number
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .select("*")
     .eq("lesson_id", lessonId)
@@ -128,7 +128,7 @@ export const deleteAssignmentsByTitleAndLessonId = async (
   lessonId: string
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
+  const result = await db
     .from("assignments")
     .delete()
     .eq("lesson_id", lessonId)
@@ -141,10 +141,7 @@ export const deleteAssignmentsByAssignmentsIds = async (
   assignmentsIds: string[]
 ) => {
   const t = await loadMessages();
-  const result = await supabaseClient
-    .from("assignments")
-    .delete()
-    .in("id", assignmentsIds);
+  const result = await db.from("assignments").delete().in("id", assignmentsIds);
 
   if (result.error)
     throw new Error(
@@ -160,10 +157,7 @@ export const deleteAssignmentsByAssignmentsIds = async (
 
 export const deleteAssignment = async (assignmentId: string) => {
   const t = await loadMessages();
-  const result = await supabaseClient
-    .from("assignments")
-    .delete()
-    .eq("id", assignmentId);
+  const result = await db.from("assignments").delete().eq("id", assignmentId);
 
   if (result.error) throw new Error(t("failed_to_delete_assignment"));
 
