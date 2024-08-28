@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         from: "onboarding@resend.dev",
-        to: "aihara-sama@mail.ru",
+        to: JSON.parse(req.body).email,
         subject: "hello world",
         html: "<strong>it works!</strong>",
       }),
