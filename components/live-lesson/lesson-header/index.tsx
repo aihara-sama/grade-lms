@@ -10,6 +10,7 @@ import type { ITabItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
+import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 interface IProps {
@@ -42,9 +43,7 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
     },
   ];
 
-  const isLessonOngoing =
-    Date.now() > +new Date(lesson.starts) &&
-    Date.now() < +new Date(lesson.ends);
+  const isThisLessonOngoing = isLessonOngoing(lesson);
 
   return (
     <div>
@@ -74,10 +73,10 @@ const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
           <div className="text-4 flex items-center gap-1 relative text-sm">
             <div
               className={`absolute block w-2 h-2 rounded-[50%] -left-4 top-[12px] ${
-                isLessonOngoing ? "bg-green-500" : "bg-yellow-200"
+                isThisLessonOngoing ? "bg-green-500" : "bg-yellow-200"
               }`}
             ></div>
-            {isLessonOngoing ? (
+            {isThisLessonOngoing ? (
               "Ongoing"
             ) : (
               <>

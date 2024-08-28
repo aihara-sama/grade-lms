@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import { createLesson } from "@/db/lesson";
+import { createLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
@@ -67,7 +67,15 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
     e.preventDefault();
 
     try {
-      await createLesson(lesson, user.id);
+      const overlappingLesson = await getOverlappingLessons(
+        lesson.starts,
+        lesson.ends,
+        user.id
+      );
+
+      if (overlappingLesson.length) throw new Error(t("lesson_overlaps"));
+
+      await createLesson(lesson);
 
       toast(t("lesson_created"));
       setIsOpen(false);

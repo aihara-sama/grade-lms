@@ -14,7 +14,7 @@ import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import Input from "@/components/input";
 import LiveTime from "@/components/live-time";
-import { extendLesson } from "@/db/lesson";
+import { extendLesson, getOverlappingLessons } from "@/db/lesson";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { Event } from "@/types/events.type";
@@ -28,7 +28,7 @@ import type {
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types/types";
 import clsx from "clsx";
-import { minutesToMilliseconds } from "date-fns";
+import { format, minutesToMilliseconds } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { toast } from "react-toastify";
@@ -109,6 +109,17 @@ const Whiteboard: FunctionComponent<IProps> = ({
   };
   const submitExtendLesson = async () => {
     try {
+      const overlappingLessons = await getOverlappingLessons(
+        lesson.starts,
+        format(
+          +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin),
+          "yyyy-MM-dd'T'HH:mm:ss"
+        ),
+        user.id
+      );
+
+      if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
+
       await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin));
 
       setIsExtendLessonModalOpen(false);

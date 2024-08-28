@@ -13,11 +13,12 @@ import {
   millisecondsToMinutes,
   subMinutes,
 } from "date-fns";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import type {
   ExcalidrawImperativeAPI,
+  ExcalidrawInitialDataState,
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types/types";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -25,9 +26,11 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import CalendarIcon from "@/components/icons/calendar-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
+import { getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
+import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -42,6 +45,8 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
   const [starts, setStarts] = useState(new Date(lesson.starts));
   const [ends, setEnds] = useState(new Date(lesson.ends));
   const [whiteboardHeight, setWhiteboardHeight] = useState(0);
+  const [whiteboardInitialData, setWhiteboardInitialData] =
+    useState<ExcalidrawInitialDataState>();
 
   // Refs
   const containerRef = useRef<HTMLDivElement>();
@@ -50,6 +55,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
 
   // Vars
   const duration = +new Date(ends) - +new Date(starts);
+  const isThisLessonOngoing = isLessonOngoing(lesson);
 
   // Hooks
   const t = useTranslations();
@@ -70,21 +76,16 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
       setEnds(subMinutes(ends, 15));
     }
   };
-  const onDateChange = (date: Date) => {
-    setStarts(date);
-    setEnds(addMinutes(date, millisecondsToMinutes(duration)));
-  };
-  const onWhiteboardChange: ExcalidrawProps["onChange"] = (
-    elements,
-    appState
-  ) => {
-    whiteboardDataRef.current = {
-      elements,
-      appState,
-    };
-  };
   const submitUpdateLessonDate = async () => {
     try {
+      const overlappingLessons = await getOverlappingLessons(
+        format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
+        format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
+        user.id
+      );
+
+      if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
+
       const { error } = await db
         .from("lessons")
         .update({
@@ -112,7 +113,22 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
     if (error) toast.error(error.message);
     else toast.success("Saved!");
   };
+  const onDateChange = (date: Date) => {
+    setStarts(date);
+    setEnds(addMinutes(date, millisecondsToMinutes(duration)));
+  };
+  const onWhiteboardChange: ExcalidrawProps["onChange"] = (
+    elements,
+    appState
+  ) => {
+    whiteboardDataRef.current = {
+      elements,
+      appState,
+    };
+  };
 
+  // Effects
+  useEffect(() => setWhiteboardInitialData(parseWhiteboardData()), []);
   return (
     <div className="flex flex-col sm:flex-row gap-6 mt-3" ref={containerRef}>
       <main className="flex-1">
@@ -143,7 +159,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
             excalidrawAPI={(api) => {
               excalidrawAPIRef.current = api;
             }}
-            initialData={parseWhiteboardData()}
+            initialData={whiteboardInitialData}
             onChange={
               user.role === Role.Teacher ? onWhiteboardChange : undefined
             }
@@ -164,7 +180,7 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
           onChange={onDateChange}
           label="Starts at"
           popperPlacement="bottom-start"
-          disabled={user.role !== Role.Teacher}
+          disabled={user.role !== Role.Teacher || isThisLessonOngoing}
         />
         <Input
           className="mt-3 mb-0"
@@ -174,10 +190,18 @@ const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
           Icon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={changeDateDuration}
-          disabled={user.role !== Role.Teacher}
+          disabled={user.role !== Role.Teacher || isThisLessonOngoing}
         />
         {user.role === Role.Teacher && (
-          <button className="primary-button" onClick={submitUpdateLessonDate}>
+          <button
+            disabled={
+              (lesson.starts === format(starts, "yyyy-MM-dd'T'HH:mm:ss") &&
+                lesson.ends === format(ends, "yyyy-MM-dd'T'HH:mm:ss")) ||
+              isThisLessonOngoing
+            }
+            className="primary-button"
+            onClick={submitUpdateLessonDate}
+          >
             Save
           </button>
         )}

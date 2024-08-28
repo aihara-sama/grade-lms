@@ -20,19 +20,26 @@ export const deleteLessonsByLessonsIds = async (lessonsIds: string[]) => {
 
   return result;
 };
-export const createLesson = async (
-  lesson: TablesInsert<"lessons">,
+
+export const getOverlappingLessons = async (
+  starts: string,
+  ends: string,
   userId: string
 ) => {
   const t = await loadMessages();
 
-  const overlappingLesson = await db.rpc("get_overlapping_lesson", {
+  const result = await db.rpc("get_overlapping_lesson", {
     p_user_id: userId,
-    p_ends: lesson.ends,
-    p_starts: lesson.starts,
+    p_ends: ends,
+    p_starts: starts,
   });
+  if (result.error) throw new Error(t("something_went_wrong"));
 
-  if (overlappingLesson.data.length) throw new Error(t("lesson_overlaps"));
+  return result.data;
+};
+
+export const createLesson = async (lesson: TablesInsert<"lessons">) => {
+  const t = await loadMessages();
 
   const result = await db.from("lessons").insert(lesson);
 
@@ -187,6 +194,7 @@ export const deleteLessonsByTitleAndCourseId = async (
 
 export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
   const t = await loadMessages();
+
   const result = await db
     .from("lessons")
     .update({
