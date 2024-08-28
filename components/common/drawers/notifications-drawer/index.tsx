@@ -4,14 +4,11 @@ import BaseDrawer from "@/components/common/drawers/base-drawer";
 import Notification from "@/components/common/drawers/notifications-drawer/notification";
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import { getNotifications } from "@/db/notification";
+import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import { useUser } from "@/hooks/use-user";
-import { Role } from "@/interfaces/user.interface";
 import type { ResultOf } from "@/types";
 import { Event } from "@/types/events.type";
-import {
-  closeNotificationChannel,
-  getNotificationChannel,
-} from "@/utils/get-notification-channel";
+import { closeNotificationChannel } from "@/utils/get-notification-channel";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
@@ -24,6 +21,7 @@ const NotificationsDrawer: FunctionComponent = () => {
   >([]);
 
   // Hooks
+  const notificationChannel = useNotificationChannel();
   const { user } = useUser();
 
   // Handlers
@@ -46,9 +44,7 @@ const NotificationsDrawer: FunctionComponent = () => {
 
   // Effects
   useEffect(() => {
-    const room = user.role === Role.Teacher ? user.id : user.creator_id;
-
-    getNotificationChannel(room)
+    notificationChannel
       .on("broadcast", { event: Event.NotificationCreated }, onNewNotification)
       .subscribe();
 
