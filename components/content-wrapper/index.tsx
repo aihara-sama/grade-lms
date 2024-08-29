@@ -9,6 +9,7 @@ const ContentWrapper: FunctionComponent<PropsWithChildren> = ({ children }) => {
 
   return (
     <div
+      id="content-wrapper"
       className={`overflow-auto h-[calc(100vh-68px)] fixed inset-0 top-[68px] `}
     >
       <div

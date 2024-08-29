@@ -160,10 +160,14 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
   // Effects
   useEffect(() => {
     const throttled = throttle(handleLessonsScroll, 300);
-    document.addEventListener("scroll", throttled);
+    document
+      .getElementById("content-wrapper")
+      .addEventListener("scroll", throttled);
 
     return () => {
-      document.removeEventListener("scroll", throttled);
+      document
+        .getElementById("content-wrapper")
+        .removeEventListener("scroll", throttled);
     };
   }, []);
   useEffect(() => {
