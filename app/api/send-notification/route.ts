@@ -35,7 +35,8 @@ export async function POST(req: NextRequest) {
         }),
       })
         .then((r) => r.json())
-        .then(console.log);
+        .then(console.log)
+        .catch(console.error);
     });
   } catch (error) {
     console.log(error);
