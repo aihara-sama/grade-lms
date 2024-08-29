@@ -374,6 +374,7 @@ export type Database = {
           name: string;
           preferred_locale: string;
           role: Database["public"]["Enums"]["role"];
+          timezone: string;
         };
         Insert: {
           avatar: string;
@@ -385,6 +386,7 @@ export type Database = {
           name: string;
           preferred_locale: string;
           role: Database["public"]["Enums"]["role"];
+          timezone: string;
         };
         Update: {
           avatar?: string;
@@ -396,6 +398,7 @@ export type Database = {
           name?: string;
           preferred_locale?: string;
           role?: Database["public"]["Enums"]["role"];
+          timezone?: string;
         };
         Relationships: [
           {
@@ -475,6 +478,7 @@ export type Database = {
           name: string;
           preferred_locale: string;
           role: Database["public"]["Enums"]["role"];
+          timezone: string;
         }[];
       };
     };

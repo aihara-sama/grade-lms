@@ -306,7 +306,9 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
           onChange={(item) => setSelectedCourse(item)}
           defaultValue={selectedCourse}
           useUnselect
-          popperClassName="max-h-64"
+          popperProps={{
+            popperClassName: "max-h-64",
+          }}
         />
       </div>
 

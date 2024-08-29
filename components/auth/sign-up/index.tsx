@@ -5,6 +5,7 @@ import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
 import { Role, type IUserMetadata } from "@/interfaces/user.interface";
+import { getTimeZone } from "@/utils/get-time-zone";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
@@ -37,6 +38,7 @@ const SignUp: FunctionComponent = () => {
           role: Role.Teacher,
           avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
           preferred_locale: "en",
+          timezone: getTimeZone(),
         } as IUserMetadata,
       },
     });

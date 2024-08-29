@@ -1,5 +1,7 @@
 "use client";
 
+import tz from "timezones-list";
+
 import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CameraIcon from "@/components/icons/camera-icon";
@@ -13,8 +15,11 @@ import toast from "react-hot-toast";
 
 import type { InputType as UserInputType } from "@/actions/create-user-action/types";
 import BaseModal from "@/components/common/modals/base-modal";
+import Select from "@/components/common/select";
 import { createUser } from "@/db/user";
+import type { ISelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
+import { getTimeZone } from "@/utils/get-time-zone";
 import { useTranslations } from "next-intl";
 import type {
   ChangeEvent,
@@ -34,6 +39,7 @@ const initUserDetails: UserInputType = {
   email: "",
   password: "",
   avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
+  timezone: getTimeZone(),
 };
 
 const CreateUserModal: FunctionComponent<IProps> = ({
@@ -42,6 +48,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
   setIsOpen,
 }) => {
   const [userDetails, setUserDetails] = useState(initUserDetails);
+  const [timezones, setTimezones] = useState<ISelectItem[]>([]);
 
   const t = useTranslations();
 
@@ -59,6 +66,9 @@ const CreateUserModal: FunctionComponent<IProps> = ({
     }
   };
 
+  const onTimezoneChange = (timezone: ISelectItem) =>
+    setUserDetails((_) => ({ ..._, timezone: timezone.title }));
+
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
 
@@ -69,6 +79,9 @@ const CreateUserModal: FunctionComponent<IProps> = ({
     if (!isOpen) setUserDetails(initUserDetails);
   }, [isOpen]);
 
+  useEffect(() => {
+    setTimezones(tz.map(({ label }) => ({ id: label, title: label })));
+  }, []);
   return (
     <BaseModal
       isExpanded={false}
@@ -109,9 +122,27 @@ const CreateUserModal: FunctionComponent<IProps> = ({
                     Icon={<SecurityIcon size="xs" />}
                     label="Password"
                     type="password"
-                    className="mb-auto"
                     fullWIdth
                   />
+                  <div>
+                    <p className="mb-1 text-sm font-bold text-neutral-500">
+                      Timezone
+                    </p>
+                    <Select
+                      popperProps={{
+                        placement: "top",
+                        popperClassName: "h-[251px]",
+                      }}
+                      label=""
+                      options={timezones}
+                      fullWidth
+                      defaultValue={{
+                        id: userDetails.timezone,
+                        title: userDetails.timezone,
+                      }}
+                      onChange={onTimezoneChange}
+                    />
+                  </div>
                 </>
               ),
               tier: [Role.Teacher],

@@ -18,6 +18,7 @@ export interface IUserMetadata {
    */
   fcm_token?: string;
   creator_id?: string;
+  timezone: string;
 }
 
 export interface AuthUser extends User {

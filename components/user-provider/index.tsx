@@ -33,6 +33,7 @@ const UserProvider: FunctionComponent<PropsWithChildren<IProps>> = ({
         preferred_locale: (user.user_metadata as IUserMetadata)
           .preferred_locale,
         fcm_token: null,
+        timezone: (user.user_metadata as IUserMetadata).timezone,
       });
   }, []);
 

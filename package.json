@@ -17,7 +17,7 @@
     "supabase:db:reset": "npx supabase db reset",
     "supabase:db:reset:remote": "npx supabase db reset --linked",
     "supabase:gen-types": "npx supabase gen types typescript --local --schema public > types/supabase.type.ts",
-    "supabase:migrate": "yarn supabase:db:reset && yarn supabase:gen-types",
+    "supabase:migrate": "yarn supabase:db:reset && yarn supabase:db:reset:remote && yarn supabase:gen-types",
     "supabase:status": "npx supabase status"
   },
   "dependencies": {
@@ -60,6 +60,7 @@
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
     "react-toastify": "^10.0.5",
+    "timezones-list": "^3.0.3",
     "uuid": "^9.0.1",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"

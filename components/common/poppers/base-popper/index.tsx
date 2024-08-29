@@ -3,28 +3,34 @@
 import type { PropsWithClassName } from "@/types";
 import clsx from "clsx";
 import type {
-  FunctionComponent,
+  ForwardRefRenderFunction,
   MouseEvent,
   PropsWithChildren,
   ReactNode,
 } from "react";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 
 interface IProps {
   trigger: ReactNode;
   width?: "sm" | "md" | "lg" | "full";
   popperClassName?: string;
+  placement?: "bottom" | "top";
 }
 
-const BasePopper: FunctionComponent<
+const BasePopper: ForwardRefRenderFunction<
+  HTMLDivElement,
   PropsWithChildren<PropsWithClassName<IProps>>
-> = ({
-  children,
-  trigger,
-  className = "",
-  popperClassName = "",
-  width = "full",
-}) => {
+> = (
+  {
+    children,
+    trigger,
+    placement = "bottom",
+    className = "",
+    popperClassName = "",
+    width = "full",
+  },
+  ref
+) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -32,6 +38,7 @@ const BasePopper: FunctionComponent<
 
   // Refs
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   // Handlers
   const handleClickOutside = (event: Event) => {
@@ -74,9 +81,12 @@ const BasePopper: FunctionComponent<
 
   return (
     <div className={`relative ${className}`} ref={rootRef}>
-      <div onClick={() => setIsOpen((prev) => !prev)}>{trigger}</div>
+      <div ref={triggerRef} onClick={() => setIsOpen((prev) => !prev)}>
+        {trigger}
+      </div>
       <div
-        className={`mt-2 overflow-auto bg-white max-h-[calc(100vh-70px)] shadow-md absolute right-0 rounded-[3px] z-[999] transition-fade duration-300 ease-in-out ${clsx(
+        id="actual-popper"
+        className={`border overflow-auto bg-white max-h-[calc(100vh-70px)] shadow-md absolute right-0 rounded-[3px] z-[999] transition-fade duration-300 ease-in-out ${clsx(
           {
             "opacity-100 translate-y-0 visible": isOpen,
             "invisible opacity-0 translate-y-3": !isOpen,
@@ -84,10 +94,19 @@ const BasePopper: FunctionComponent<
             "w-44": width === "sm",
             "w-60": width === "md",
             "w-full": width === "full",
+            "mt-2": placement === "bottom",
+            "mb-2": placement === "top",
           }
         )} ${popperClassName}`}
+        style={{
+          bottom:
+            placement === "top"
+              ? `${triggerRef.current?.getBoundingClientRect?.()?.height}px`
+              : "auto",
+        }}
         onClick={handleChildrenClick}
         onTransitionEnd={handleTransitionEnd}
+        ref={ref} // Pass the ref here
       >
         {isVisible && children}
       </div>
@@ -95,4 +114,4 @@ const BasePopper: FunctionComponent<
   );
 };
 
-export default BasePopper;
+export default forwardRef(BasePopper);

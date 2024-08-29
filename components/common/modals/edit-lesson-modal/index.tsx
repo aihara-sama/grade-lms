@@ -169,7 +169,9 @@ const EditLessonModal: FunctionComponent<IProps> = ({
                 options={courses}
                 useUnselect
                 fullWidth
-                popperClassName="max-h-[160px]"
+                popperProps={{
+                  popperClassName: "max-h-[160px]",
+                }}
               />
             )}
           <Input

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { v4 as uuid } from "uuid";
 
 import { Role } from "@/interfaces/user.interface";
+import { getTimeZone } from "@/utils/get-time-zone";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 interface IProps {}
@@ -31,6 +32,7 @@ const GuestPrompt: FunctionComponent<IProps> = () => {
       role: Role.Guest,
       preferred_locale: "en",
       fcm_token: null,
+      timezone: getTimeZone(),
     });
 
   // View

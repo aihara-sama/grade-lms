@@ -36,6 +36,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       role: Role.Student,
       avatar: payload.avatar,
       preferred_locale: (user.user_metadata as IUserMetadata).preferred_locale,
+      timezone: payload.timezone,
     } as IUserMetadata,
     email_confirm: true,
   });

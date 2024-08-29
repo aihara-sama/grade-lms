@@ -14,6 +14,7 @@ create table users (
   avatar text not null,
   preferred_locale text not null,
   fcm_token text,
+  timezone text not null,
   created_at timestamp not null default now()
 );
 alter table users enable row level security;
@@ -26,8 +27,8 @@ create policy "Can update own's data." on users for update using (auth.uid() = i
 create function public.handle_new_user() 
 returns trigger as $$
 begin
-  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id');
+  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone)
+  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone');
   return new;
 end;
 $$ language plpgsql security definer;
