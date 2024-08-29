@@ -93,8 +93,8 @@ create table lessons (
   created_at timestamp not null default now(),
   title text DEFAULT 'Quick lesson' not null,
   whiteboard_data text default '{}' not null,
-  starts timestamp not null,
-  ends timestamp not null
+  starts timestamp with time zone not null,
+  ends timestamp with time zone not null
 );
 /** 
 * Notifications

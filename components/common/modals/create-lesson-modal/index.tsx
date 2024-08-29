@@ -1,20 +1,17 @@
+import BaseModal from "@/components/common/modals/base-modal";
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
+import { createLesson, getOverlappingLessons } from "@/db/lesson";
+import { useUser } from "@/hooks/use-user";
+import type { TablesInsert } from "@/types/supabase.type";
+import { getNextMorning } from "@/utils/get-next-morning";
 import {
   addMinutes,
   format,
   millisecondsToMinutes,
   subMinutes,
 } from "date-fns";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-
-import BaseModal from "@/components/common/modals/base-modal";
-import { createLesson, getOverlappingLessons } from "@/db/lesson";
-import { useUser } from "@/hooks/use-user";
-import type { TablesInsert } from "@/types/supabase.type";
-import { getNextMorning } from "@/utils/get-next-morning";
 import { useTranslations } from "next-intl";
 import type {
   ChangeEvent,
@@ -22,11 +19,13 @@ import type {
   FunctionComponent,
   SetStateAction,
 } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const initLesson: TablesInsert<"lessons"> = {
   title: "",
-  starts: format(getNextMorning(), "yyyy-MM-dd'T'HH:mm:ss"),
-  ends: format(addMinutes(getNextMorning(), 30), "yyyy-MM-dd'T'HH:mm:ss"),
+  starts: getNextMorning().toISOString(),
+  ends: new Date(addMinutes(getNextMorning(), 30)).toISOString(),
 };
 
 interface IProps {
@@ -46,6 +45,8 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
     ...initLesson,
     course_id: courseId,
   });
+  console.log({ lesson });
+
   const duration = +new Date(lesson.ends) - +new Date(lesson.starts);
 
   // Hooks
@@ -55,11 +56,10 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
   const onDateChange = (date: Date) => {
     setLesson((_) => ({
       ..._,
-      starts: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
-      ends: format(
-        addMinutes(date, millisecondsToMinutes(duration)),
-        "yyyy-MM-dd'T'HH:mm:ss"
-      ),
+      starts: date.toISOString(),
+      ends: new Date(
+        addMinutes(date, millisecondsToMinutes(duration))
+      ).toISOString(),
     }));
   };
 
