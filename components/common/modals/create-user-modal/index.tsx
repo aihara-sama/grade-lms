@@ -80,7 +80,7 @@ const CreateUserModal: FunctionComponent<IProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
-    setTimezones(tz.map(({ label }) => ({ id: label, title: label })));
+    setTimezones(tz.map(({ tzCode }) => ({ id: tzCode, title: tzCode })));
   }, []);
   return (
     <BaseModal

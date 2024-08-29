@@ -1,10 +1,10 @@
 "use client";
 
-import { format } from "date-fns";
 import type { NextPage } from "next";
+import timezones from "timezones-list";
 
 const Page: NextPage = () => {
-  console.log(format(new Date(), "yyyy-MM-dd'T'HH:mm:ss'Z'"));
+  console.log(timezones);
 
   return <button>Click</button>;
 };
