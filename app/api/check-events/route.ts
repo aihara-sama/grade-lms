@@ -1,5 +1,19 @@
 import { db } from "@/utils/supabase/client";
+import * as admin from "firebase-admin";
 import { NextResponse } from "next/server";
+
+const app = admin.initializeApp(
+  {
+    credential: admin.credential.cert(
+      JSON.parse(
+        Buffer.from(process.env.FIREBASE_CREDENTIALS_BASE64, "base64").toString(
+          "utf8"
+        )
+      )
+    ),
+  },
+  process.env.FIREBASE_APP_NAME
+);
 
 export async function GET() {
   const { data: users, error: usersError } = await db.rpc(
@@ -34,6 +48,18 @@ export async function GET() {
           lesson_id: user.lesson_id,
         });
         if (error) throw new Error(error.message);
+      })
+      .then(() => {
+        admin
+          .messaging(app)
+          .send({
+            token: user.fcm_token,
+            notification: {
+              title: "Your lessons starts soon",
+              body: "Your lesson starts soon",
+            },
+          })
+          .catch(console.error);
       })
       .catch(console.error);
   }

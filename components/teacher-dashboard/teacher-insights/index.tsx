@@ -2,11 +2,11 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
+import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { getWeekNames } from "@/utils/get-week-names";
 import { parseInsights } from "@/utils/parse-insights";
 import { db } from "@/utils/supabase/client";
-import type { User } from "@supabase/supabase-js";
 import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 
@@ -14,14 +14,16 @@ import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface IProps {
-  user: User;
   courses: CourseWithRefsCount[];
 }
 
-const TeacherInsights: FunctionComponent<IProps> = ({ user, courses }) => {
+const TeacherInsights: FunctionComponent<IProps> = ({ courses }) => {
   // State
   const [usersInsights, setUsersInsights] = useState<number[]>([]);
   const [coursesInsights, setCoursesInsights] = useState<number[]>([]);
+
+  // Hooks
+  const { user } = useUser();
 
   // Handlers
   const fetchCoursesInsights = () => {

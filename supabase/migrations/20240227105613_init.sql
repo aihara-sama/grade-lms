@@ -281,6 +281,7 @@ CREATE OR REPLACE FUNCTION get_upcoming_lessons_users()
 RETURNS TABLE (
   id text,
   email text,
+  fcm_token text,
   lesson_id text
 )
 LANGUAGE sql
@@ -288,6 +289,7 @@ AS $$
   SELECT
     u.id,
     u.email,
+    u.fcm_token,
     l.id AS lesson_id
   FROM lessons l
   INNER JOIN user_courses uc ON l.course_id = uc.course_id

@@ -7,13 +7,14 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
+import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
+import { messaging, vapidKey } from "@/utils/firebase";
 import { db } from "@/utils/supabase/client";
-import type { User } from "@supabase/supabase-js";
+import { getToken } from "firebase/messaging";
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
 // const handleRequest = async (builder: ?, success: string, error: string) => {
 //   const result = await builder;
 
@@ -22,13 +23,11 @@ import toast from "react-hot-toast";
 // };
 
 interface IProps {
-  user: User;
   totalCoursesCount: number;
   totalUsersCount: number;
 }
 
 const TeacherDashboard: FunctionComponent<IProps> = ({
-  user,
   totalUsersCount,
   totalCoursesCount,
 }) => {
@@ -36,13 +35,7 @@ const TeacherDashboard: FunctionComponent<IProps> = ({
   const [coursesCount, setCoursesCount] = useState(totalCoursesCount);
   const [latestCourses, setLatestCourses] = useState<CourseWithRefsCount[]>([]);
 
-  // const fetchUsersCount = () =>
-  //   supabaseClient
-  //     .from("users")
-  //     .select("courses(count)")
-  //     .eq("id", user.id)
-  //     .returns<Record<"courses", { count: number }[]>[]>()
-  //     .single();
+  const { user } = useUser();
 
   const fetchCoursesCount = () =>
     db
@@ -94,6 +87,45 @@ const TeacherDashboard: FunctionComponent<IProps> = ({
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      if (
+        Notification.permission !== "granted" ||
+        (Notification.permission === "granted" && !user.fcm_token)
+      ) {
+        console.log("should ask permission");
+
+        Notification.requestPermission()
+          .then((permission) => {
+            console.log({ permission });
+
+            if (permission === "granted") {
+              getToken(messaging, {
+                vapidKey,
+              }).then((token) => {
+                Promise.all([
+                  db
+                    .from("users")
+                    .update({
+                      fcm_token: token,
+                    })
+                    .eq("id", user.id),
+                  db.auth.updateUser({
+                    data: {
+                      fcm_token: token,
+                    },
+                  }),
+                ])
+                  .then(() => toast.success("Notifications enabled!"))
+                  .catch(console.error);
+              });
+            }
+          })
+          .catch(console.error);
+      }
+    })();
+  }, []);
+
   return (
     <div className="flex gap-8">
       <div className="flex-1 overflow-hidden">
@@ -114,10 +146,10 @@ const TeacherDashboard: FunctionComponent<IProps> = ({
           courses={latestCourses}
           onCourseCreated={handleGetCourses}
         />
-        <TeacherInsights user={user} courses={latestCourses} />
+        <TeacherInsights courses={latestCourses} />
       </div>
       <div className="w-[278px]">
-        <DashboardSchedule user={user} />
+        <DashboardSchedule />
       </div>
     </div>
   );

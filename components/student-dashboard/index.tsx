@@ -71,7 +71,7 @@ const StudentrDashboard: FunctionComponent<IProps> = ({
         <StudentInsights user={user} />
       </div>
       <div className="w-[278px]">
-        <DashboardSchedule user={user} />
+        <DashboardSchedule />
       </div>
     </div>
   );

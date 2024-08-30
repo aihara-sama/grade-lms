@@ -1,46 +1,31 @@
-import type { Database } from "@/types/supabase.type";
-import type { NextRequest } from "next/server";
+import console from "console";
+import * as admin from "firebase-admin";
 import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
-  const body = (await req.json()) as {
-    users: Database["public"]["Tables"]["users"]["Row"][];
-  };
-  console.log(body.users);
+const app = admin.initializeApp(
+  {
+    credential: admin.credential.cert(
+      JSON.parse(
+        Buffer.from(process.env.FIREBASE_CREDENTIALS_BASE64, "base64").toString(
+          "utf8"
+        )
+      )
+    ),
+  },
+  "grade-lms"
+);
 
-  // const app = admin.initializeApp({
-  //   credential: applicationDefault(),
-  // });
+export async function GET() {
+  console.log({ app });
 
-  // admin.messaging(app).send({
-  //   token: body.users[0].fcm_token,
-  //   notification: {
-  //     title: "New course",
-  //     body: "You have been assigned to a new course",
-  //   },
-  // });
-  try {
-    body.users.forEach(({ email }) => {
-      fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer re_M45Tzn9t_3U1p7qpA11qRbXqAJwrkcfjs`,
-        },
-        body: JSON.stringify({
-          from: "onboarding@resend.dev",
-          to: email,
-          subject: "hello world",
-          html: "<strong>it works!</strong>",
-        }),
-      })
-        .then((r) => r.json())
-        .then(console.log)
-        .catch(console.error);
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  admin.messaging(app).send({
+    token:
+      "fsm9j2MqHcnntdIzgWBu60:APA91bFvs6dD-Yw8yQJu6VRsRLZiZB09HGqrNv8cymqFc3yPPAHQ_XRSprG0dvaTKR06YdbeMuMTf_I7xaZ9HNQeGofAhZL-PSZRb3PAcL1XjeH2TnwQem9Y5sxGMXLIsqATeTG4F2UI",
+    notification: {
+      title: "New course",
+      body: "You have been assigned to a new course",
+    },
+  });
 
   return NextResponse.json({});
 }

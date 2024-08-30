@@ -469,6 +469,7 @@ export type Database = {
         Returns: {
           id: string;
           email: string;
+          fcm_token: string;
           lesson_id: string;
         }[];
       };

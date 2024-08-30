@@ -4,24 +4,22 @@ import CalendarWidget from "@/components/calendar-widget";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
+import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lessons.type";
 import { db } from "@/utils/supabase/client";
 import { toCapitalCase } from "@/utils/to-capital-case";
-import type { User } from "@supabase/supabase-js";
 import { addDays, format, formatDistanceToNow, startOfDay } from "date-fns";
 import Link from "next/link";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
-  user: User;
-}
-
-const DashboardSchedule: FunctionComponent<IProps> = ({ user }) => {
+const DashboardSchedule: FunctionComponent = () => {
   const [schedule, setSchedule] = useState<
     (Lesson & { course: { title: string } })[]
   >([]);
   const [scheduleDate, setScheduleDate] = useState(startOfDay(new Date()));
+
+  const { user } = useUser();
 
   const handleDayChange = (date: Date) => {
     setScheduleDate(startOfDay(date));

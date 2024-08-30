@@ -37,7 +37,6 @@ const Page = async () => {
 
     Dashborad = (
       <TeacherDashboard
-        user={user}
         totalUsersCount={usersCount}
         totalCoursesCount={courses[0].count}
       />
