@@ -1,5 +1,19 @@
 import { db } from "@/utils/supabase/client";
+import * as admin from "firebase-admin";
 import { NextResponse } from "next/server";
+
+const app = admin.initializeApp(
+  {
+    credential: admin.credential.cert(
+      JSON.parse(
+        Buffer.from(process.env.FIREBASE_CREDENTIALS_BASE64, "base64").toString(
+          "utf8"
+        )
+      )
+    ),
+  },
+  process.env.FIREBASE_APP_NAME
+);
 
 export async function GET() {
   const { data: users, error: usersError } = await db.rpc(
@@ -8,15 +22,17 @@ export async function GET() {
 
   if (usersError) throw new Error("Failed to get lessons' users");
 
-  fetch(process.env.SUPABASE_SEND_EMAIL_LAMBDA_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-    },
-    body: JSON.stringify({ users }),
-  });
+  console.log(users);
 
+  await admin.messaging(app).sendEach(
+    users.map((user) => ({
+      token: user.fcm_token,
+      notification: {
+        title: "New course",
+        body: "You have been assigned to a new course",
+      },
+    }))
+  );
   return NextResponse.json({
     status: "OK",
     users,
