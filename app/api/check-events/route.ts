@@ -27,7 +27,7 @@ export async function POST() {
       .send({
         token: user.fcm_token,
         notification: {
-          title: "Your lessons starts soon",
+          title: "Your lessons starts soon ",
           body: "Your lesson starts soon",
         },
       })
