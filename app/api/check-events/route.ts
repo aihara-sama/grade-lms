@@ -15,13 +15,13 @@ import { NextResponse } from "next/server";
 // );
 
 export async function GET() {
-  // const { data: users, error: usersError } = await db.rpc(
-  //   "get_upcoming_lessons_users"
-  // );
+  const { data: users, error: usersError } = await db.rpc(
+    "get_upcoming_lessons_users"
+  );
 
-  const users = await db.from("users").select("*");
+  // const users = await db.from("users").select("*");
 
-  // if (usersError) throw new Error("Failed to get lessons' users");
+  if (usersError) throw new Error("Failed to get lessons' users");
 
   console.log(users);
 
