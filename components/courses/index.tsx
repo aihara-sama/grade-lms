@@ -13,7 +13,6 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
-import type { User as AuthenticatedUser } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -30,17 +29,15 @@ import {
   getCoursesWithRefsCountByUserId,
   getOffsetCoursesByTitleAndUserId,
 } from "@/db/course";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
-interface IProps {
-  user: AuthenticatedUser;
-}
+interface IProps {}
 
-const Courses: FunctionComponent<IProps> = ({ user }) => {
+const Courses: FunctionComponent<IProps> = () => {
   // State
   const [isDeleteCoursesModalOpen, setIsDeleteCoursesModalOpen] =
     useState(false);
@@ -58,6 +55,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
   // Handdlers
   const fetchCoursesWithCount = async () => {
@@ -189,7 +187,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
           total={totalCoursesCount}
           title="Total courses"
         />
-        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
+        {user.role === Role.Teacher && (
           <CreateCourse onDone={fetchCoursesBySearch} />
         )}
       </CardsContainer>
@@ -232,7 +230,7 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
                   title={title}
                   subtitle="Active"
                   onToggle={
-                    (user.user_metadata as IUserMetadata).role === Role.Teacher
+                    user.role === Role.Teacher
                       ? (checked) => onCourseToggle(checked, id)
                       : undefined
                   }
@@ -240,13 +238,11 @@ const Courses: FunctionComponent<IProps> = ({ user }) => {
               ),
               Lessons: lessons[0].count,
               Members: members[0].count,
-              "": (user.user_metadata as IUserMetadata).role ===
-                Role.Teacher && (
+              "": user.role === Role.Teacher && (
                 <CourseOptionsPopper
                   onDone={fetchCoursesBySearch}
                   setSelectedCoursesIds={setSelectedCoursesIds}
                   courseId={id}
-                  user={user}
                 />
               ),
             }))}

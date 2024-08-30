@@ -6,9 +6,10 @@ import {
   getCoursesWithRefsCountByUserId,
   getUnenrolledCoursesByUserId,
 } from "@/db/course";
+import { checkEvents } from "@/db/lesson";
 import { enrollUsersInCourses } from "@/db/user";
+import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
-import type { User } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -19,7 +20,6 @@ interface IProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   usersIds: string[];
   onDone: () => void;
-  currentUser: User;
 }
 
 const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
@@ -27,7 +27,6 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
   setIsOpen,
   usersIds,
   onDone,
-  currentUser,
 }) => {
   // State
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
@@ -37,6 +36,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
   // Handlers
   const getCourses = async () => {
@@ -44,7 +44,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
       setCourses(
         await (isSingleUser
           ? getUnenrolledCoursesByUserId(usersIds[0])
-          : getCoursesWithRefsCountByUserId(currentUser.id))
+          : getCoursesWithRefsCountByUserId(user.id))
       );
     } catch (error: any) {
       toast.error(error.message);
@@ -61,6 +61,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
       setSelectedCoursesIds([]);
       toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
       onDone();
+      checkEvents();
     }
   };
   const closeModal = () => setIsOpen(false);

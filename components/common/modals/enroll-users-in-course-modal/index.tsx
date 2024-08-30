@@ -5,9 +5,10 @@ import Table from "@/components/table";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
+import { checkEvents } from "@/db/lesson";
 import { enrollUsersInCourses, getUsersNotInCourse } from "@/db/user";
+import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
-import type { User as AuthUser } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
@@ -15,7 +16,6 @@ interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   courseId: string;
-  currentUser: AuthUser;
   onDone: () => void;
 }
 
@@ -23,7 +23,6 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   isOpen,
   setIsOpen,
   courseId,
-  currentUser,
   onDone,
 }) => {
   // State
@@ -33,12 +32,15 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   // Refs
   const t = useTranslations();
 
+  // Hooks
+  const { user } = useUser();
+
   // Handlers
   const closeModal = () => setIsOpen(false);
 
   const fetchUsersNotInCourse = async () => {
     try {
-      setUsers(await getUsersNotInCourse(currentUser.id, courseId));
+      setUsers(await getUsersNotInCourse(user.id, courseId));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -50,6 +52,7 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
       setSelectedUsersIds([]);
       setIsOpen(false);
       onDone();
+      checkEvents();
     } catch (error: any) {
       toast.error(error.message);
     }

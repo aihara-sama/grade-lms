@@ -5,7 +5,6 @@ import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import { deleteCourseByCourseId } from "@/db/course";
-import type { User } from "@supabase/supabase-js";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useState } from "react";
 
@@ -15,14 +14,12 @@ interface IProps {
   setSelectedCoursesIds: Dispatch<SetStateAction<string[]>>;
   courseId: string;
   onDone: () => void;
-  user: User;
 }
 
 const CourseOptionsPopper: FunctionComponent<IProps> = ({
   courseId,
   setSelectedCoursesIds,
   onDone,
-  user,
 }) => {
   // State
   const [isDeleteCourseModalOpen, setIsDeleteCourseModalOpen] = useState(false);
@@ -73,7 +70,6 @@ const CourseOptionsPopper: FunctionComponent<IProps> = ({
         actionHandler={handleDeleteCourse}
       />
       <EnrollUsersInCourseModal
-        currentUser={user}
         courseId={courseId}
         isOpen={isEnrollUsersModalOpen}
         setIsOpen={setIsEnrollUsersModalOpen}

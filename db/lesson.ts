@@ -207,3 +207,9 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
 
   if (result.error) throw new Error(t("failed_to_extend_lesson"));
 };
+
+export const checkEvents = () =>
+  fetch("/api/check-events")
+    .then((r) => r.json())
+    .then(console.log)
+    .catch(console.error);

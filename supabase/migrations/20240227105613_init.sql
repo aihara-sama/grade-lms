@@ -275,3 +275,27 @@ begin
       );
 end;
 $$ language plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_upcoming_lessons_users()
+RETURNS TABLE (
+  id text,
+  email text,
+  lesson_id text
+)
+LANGUAGE sql
+AS $$
+  SELECT
+    u.id,
+    u.email,
+    l.id AS lesson_id
+  FROM lessons l
+  INNER JOIN user_courses uc ON l.course_id = uc.course_id
+  INNER JOIN users u ON uc.user_id = u.id
+  WHERE l.starts BETWEEN NOW() AND NOW() + INTERVAL '5 minutes'
+    AND l.id NOT IN (
+      SELECT sn.lesson_id
+      FROM sent_notifications sn
+      WHERE sn.user_id = u.id
+    );
+$$;

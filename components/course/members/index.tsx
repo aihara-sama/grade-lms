@@ -190,11 +190,7 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
           total={totalMembersCount}
           title="Total members"
         />
-        <EnrollUsers
-          onDone={fetchMembersBySearch}
-          courseId={courseId}
-          user={currentUser}
-        />
+        <EnrollUsers onDone={fetchMembersBySearch} courseId={courseId} />
       </CardsContainer>
       {selectedMembersIds.length ? (
         <div className="mb-3 gap-2 flex">

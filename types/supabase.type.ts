@@ -464,6 +464,14 @@ export type Database = {
           whiteboard_data: string;
         }[];
       };
+      get_upcoming_lessons_users: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          id: string;
+          email: string;
+          lesson_id: string;
+        }[];
+      };
       get_users_not_in_course: {
         Args: {
           p_course_id: string;

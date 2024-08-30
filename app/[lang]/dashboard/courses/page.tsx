@@ -1,6 +1,5 @@
 import Courses from "@/components/courses";
 import type { Locale } from "@/i18n";
-import { createClient } from "@/utils/supabase/server";
 import type { Metadata, NextPage } from "next";
 import { getTranslations } from "next-intl/server";
 
@@ -13,10 +12,6 @@ interface IProps {
 }
 
 const Page: NextPage<IProps> = async ({ params: { locale } }) => {
-  const {
-    data: { user },
-  } = await createClient().auth.getUser();
-
   const t = await getTranslations({ locale });
 
   return (
@@ -26,7 +21,7 @@ const Page: NextPage<IProps> = async ({ params: { locale } }) => {
       </div>
       <p className="text-neutral-500">View and manage courses</p>
       <hr className="my-2 mb-4" />
-      <Courses user={user} />
+      <Courses />
     </div>
   );
 };

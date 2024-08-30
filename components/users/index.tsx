@@ -29,18 +29,14 @@ import {
   getUsersCountByCreatorId,
   getUsersCountByTitleAndUserId,
 } from "@/db/user";
+import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
 import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import type { User as AuthUser } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 
-interface IProps {
-  currentUser: AuthUser;
-}
-
-const Users: FunctionComponent<IProps> = ({ currentUser }) => {
+const Users: FunctionComponent = () => {
   // State
   const [users, setUsers] = useState<User[]>([]);
   const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
@@ -59,6 +55,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
   // Handlers
   const fetchUsersWithCount = async () => {
@@ -66,8 +63,8 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
 
     try {
       const [usersByCreatorId, usersCountByCreatorId] = await Promise.all([
-        getUsersByCreatorId(currentUser.id),
-        getUsersCountByCreatorId(currentUser.id),
+        getUsersByCreatorId(user.id),
+        getUsersCountByCreatorId(user.id),
       ]);
       setUsers(usersByCreatorId);
       setTotalUsersCount(usersCountByCreatorId);
@@ -81,14 +78,8 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
     try {
       const [usersByTitleAndUserId, usersCountByTitleAndUserId] =
         await Promise.all([
-          getUsersByNameAndCreatorId(
-            usersSearchTextRef.current,
-            currentUser.id
-          ),
-          getUsersCountByTitleAndUserId(
-            usersSearchTextRef.current,
-            currentUser.id
-          ),
+          getUsersByNameAndCreatorId(usersSearchTextRef.current, user.id),
+          getUsersCountByTitleAndUserId(usersSearchTextRef.current, user.id),
         ]);
 
       setUsers(usersByTitleAndUserId);
@@ -100,10 +91,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
   const handleDeleteUsers = async () => {
     try {
       await (isSelectedAllRef.current
-        ? deleteUsersByNameAndCreatorId(
-            usersSearchTextRef.current,
-            currentUser.id
-          )
+        ? deleteUsersByNameAndCreatorId(usersSearchTextRef.current, user.id)
         : deleteUsersByUsersIds(selectedUsersIds));
       setSelectedUsersIds([]);
       setIsDeleteUsersModalOpen(false);
@@ -140,7 +128,7 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
       try {
         const offsetUsersByUserId = await getOffsetUsersByNameAndCreatorId(
           usersSearchTextRef.current,
-          currentUser.id,
+          user.id,
           usersOffsetRef.current,
           usersOffsetRef.current + USERS_GET_LIMIT - 1
         );
@@ -249,7 +237,6 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
                   onDone={fetchUsersBySearch}
                   setSelectedUsersIds={setSelectedUsersIds}
                   userId={id}
-                  currentUser={currentUser}
                 />
               ),
             }))}
@@ -267,7 +254,6 @@ const Users: FunctionComponent<IProps> = ({ currentUser }) => {
       />
       <EnrollUsersInCoursesModal
         onDone={() => setSelectedUsersIds([])}
-        currentUser={currentUser}
         usersIds={selectedUsersIds}
         isOpen={isEnrollUsersInCoursesModalOpen}
         setIsOpen={setIsEnrollUsersInCoursesModalOpen}
