@@ -22,6 +22,8 @@ export async function GET() {
 
   if (usersError) throw new Error("Failed to get lessons' users");
 
+  console.log(users);
+
   for (const user of users) {
     fetch(process.env.EMAILJS_SEND_ENDPOINT, {
       method: "POST",
