@@ -6,10 +6,10 @@ import {
   getCoursesWithRefsCountByUserId,
   getUnenrolledCoursesByUserId,
 } from "@/db/course";
-import { checkEvents } from "@/db/lesson";
 import { enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
+import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -61,7 +61,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
       setSelectedCoursesIds([]);
       toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
       onDone();
-      checkEvents();
+      db.functions.invoke("check-events");
     }
   };
   const closeModal = () => setIsOpen(false);

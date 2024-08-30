@@ -5,10 +5,10 @@ import Table from "@/components/table";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
-import { checkEvents } from "@/db/lesson";
 import { enrollUsersInCourses, getUsersNotInCourse } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
+import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
@@ -52,7 +52,7 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
       setSelectedUsersIds([]);
       setIsOpen(false);
       onDone();
-      checkEvents();
+      db.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
     }
