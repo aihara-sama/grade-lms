@@ -24,7 +24,7 @@ export async function GET() {
 
   console.log(users);
 
-  if (users)
+  if (users.length)
     await admin.messaging(app).sendEach(
       users.map((user) => ({
         token: user.fcm_token,
