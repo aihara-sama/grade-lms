@@ -24,15 +24,16 @@ export async function GET() {
 
   console.log(users);
 
-  await admin.messaging(app).sendEach(
-    users.map((user) => ({
-      token: user.fcm_token,
-      notification: {
-        title: "New course",
-        body: "You have been assigned to a new course",
-      },
-    }))
-  );
+  if (users)
+    await admin.messaging(app).sendEach(
+      users.map((user) => ({
+        token: user.fcm_token,
+        notification: {
+          title: "New course",
+          body: "You have been assigned to a new course",
+        },
+      }))
+    );
   return NextResponse.json({
     status: "OK",
     users,
