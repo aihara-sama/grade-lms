@@ -2,7 +2,7 @@ import { db } from "@/utils/supabase/client";
 import * as admin from "firebase-admin";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST() {
   const app =
     admin.apps.find((item) => item.name === process.env.FIREBASE_APP_NAME) ||
     admin.initializeApp(
