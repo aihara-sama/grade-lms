@@ -8,35 +8,14 @@ export async function GET() {
 
   if (usersError) throw new Error("Failed to get lessons' users");
 
-  for (const user of users) {
-    fetch(process.env.EMAILJS_SEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        service_id: process.env.EMAILJS_SERVICE_ID,
-        template_id: process.env.EMAILJS_TEMPLATE_ID,
-        user_id: process.env.EMAILJS_USER_ID,
-        accessToken: process.env.EMAILJS_PRIVATE_KEY,
-        template_params: {
-          to_email: user.email,
-        },
-      }),
-    })
-      .then((r) => r.text())
-      .then((message) => {
-        if (message !== "OK") throw new Error(message);
-      })
-      .then(async () => {
-        const { error } = await db.from("sent_notifications").insert({
-          user_id: user.id,
-          lesson_id: user.lesson_id,
-        });
-        if (error) throw new Error(error.message);
-      })
-      .catch(console.error);
-  }
+  fetch(process.env.SUPABASE_SEND_EMAIL_LAMBDA_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify({ users }),
+  });
 
   return NextResponse.json({
     status: "OK",
