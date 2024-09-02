@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
 import { type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   params: {
     lessonId: string;
     courseId: string;
   };
 }
-const Page: FunctionComponent<IProps> = async ({
+const Page: FunctionComponent<Props> = async ({
   params: { lessonId, courseId },
 }) => {
   return redirect(

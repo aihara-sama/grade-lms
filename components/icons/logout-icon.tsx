@@ -1,10 +1,10 @@
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   className?: string;
 }
 
-const LogoutIcon: FunctionComponent<IProps> = ({ className }) => {
+const LogoutIcon: FunctionComponent<Props> = ({ className }) => {
   return (
     <svg
       width="14"

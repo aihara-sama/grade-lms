@@ -1,10 +1,10 @@
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   className?: string;
 }
 
-const Skeleton: FunctionComponent<IProps> = ({ className }) => {
+const Skeleton: FunctionComponent<Props> = ({ className }) => {
   return (
     <div>
       <div className={`animate-pulse ${className}`}>

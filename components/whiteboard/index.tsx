@@ -8,13 +8,11 @@ import { Role } from "@/interfaces/user.interface";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 // import toast from "react-hot-toast";
-import BaseModal from "@/components/common/modals/base-modal";
+import ExtendLessonModal from "@/components/common/modals/extend-lesson-modal";
 import InviteIcon from "@/components/icons/invite-icon";
 import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
-import Input from "@/components/input";
 import LiveTime from "@/components/live-time";
-import { extendLesson, getOverlappingLessons } from "@/db/lesson";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { Event } from "@/types/events.type";
@@ -28,9 +26,8 @@ import type {
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types/types";
 import clsx from "clsx";
-import { format, minutesToMilliseconds } from "date-fns";
 import { useTranslations } from "next-intl";
-import type { ChangeEvent, FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { toast } from "react-toastify";
 
 const Excalidraw = dynamic(
@@ -40,15 +37,12 @@ const Excalidraw = dynamic(
   }
 );
 
-interface IProps {
+interface Props {
   lesson: Lesson;
   onLessonExtended: () => void;
 }
 
-const Whiteboard: FunctionComponent<IProps> = ({
-  lesson,
-  onLessonExtended,
-}) => {
+const Whiteboard: FunctionComponent<Props> = ({ lesson, onLessonExtended }) => {
   // Hooks
   const t = useTranslations();
   const channel = useLessonChannel();
@@ -59,7 +53,6 @@ const Whiteboard: FunctionComponent<IProps> = ({
   const [isExtendLessonModalOpen, setIsExtendLessonModalOpen] = useState(false);
   const [whiteboardHeight, setWhiteboardHeight] = useState(500);
   const [whiteboardInitialHeight] = useState(window.innerHeight - 200);
-  const [extendLessonByMin, setExtendLessonByMin] = useState(15);
   const [whiteboardInitialData, setWhiteboardInitialData] =
     useState<ExcalidrawInitialDataState>();
 
@@ -98,37 +91,7 @@ const Whiteboard: FunctionComponent<IProps> = ({
       },
     });
   };
-  const onExtendLessonInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const extendBy = +e.target.value;
 
-    if (extendBy > extendLessonByMin) {
-      setExtendLessonByMin(extendBy + 14);
-    } else if (extendBy < extendLessonByMin && extendBy > 15) {
-      setExtendLessonByMin(extendBy - 14);
-    }
-  };
-  const submitExtendLesson = async () => {
-    try {
-      const overlappingLessons = await getOverlappingLessons(
-        lesson.starts,
-        format(
-          +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin),
-          "yyyy-MM-dd'T'HH:mm:ss"
-        ),
-        user.id
-      );
-
-      if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
-
-      await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin));
-
-      setIsExtendLessonModalOpen(false);
-      toast(t("lesson_extended"));
-      onLessonExtended();
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
   const onWhiteboardChange = (payload: {
     payload: {
       elements: readonly ExcalidrawElement[];
@@ -182,6 +145,11 @@ const Whiteboard: FunctionComponent<IProps> = ({
     if (data.appState) data.appState.collaborators = new Map();
 
     return data;
+  };
+  const onExtendLessonModalClose = (mutated?: boolean) => {
+    setIsExtendLessonModalOpen(false);
+
+    if (mutated) onLessonExtended();
   };
 
   // Effects
@@ -265,40 +233,9 @@ const Whiteboard: FunctionComponent<IProps> = ({
           onResize={(height) => setWhiteboardHeight(height)}
         />
       </div>
-      <BaseModal
-        isExpanded={false}
-        title="Extend lesson"
-        setIsOpen={() => setIsExtendLessonModalOpen(false)}
-        isOpen={isExtendLessonModalOpen}
-      >
-        <div>
-          <div>
-            <Input
-              value={`${extendLessonByMin}`}
-              onChange={onExtendLessonInputChange}
-              autoFocus
-              fullWIdth
-              Icon={<TimeIcon />}
-              type="number"
-              label="Add minutes"
-            />
-          </div>
-          <div className="flex gap-3">
-            <button
-              className="outline-button ml-auto w-auto"
-              onClick={() => setIsExtendLessonModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              className="primary-button w-auto"
-              onClick={submitExtendLesson}
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      </BaseModal>
+      {isExtendLessonModalOpen && (
+        <ExtendLessonModal lesson={lesson} onClose={onExtendLessonModalClose} />
+      )}
     </div>
   );
 };

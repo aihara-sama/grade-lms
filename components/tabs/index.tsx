@@ -6,11 +6,11 @@ import type { ITab } from "@/interfaces/tabs.interface";
 import type { FunctionComponent } from "react";
 import { useState } from "react";
 
-interface IProps {
+interface Props {
   tabs: ITab[];
 }
 
-const Tabs: FunctionComponent<IProps> = ({ tabs }) => {
+const Tabs: FunctionComponent<Props> = ({ tabs }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const { user } = useUser();

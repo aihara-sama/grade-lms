@@ -1,12 +1,12 @@
 import { IconSize } from "@/components/icons";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   className?: string;
   size?: keyof typeof IconSize;
 }
 
-const InviteIcon: FunctionComponent<IProps> = ({ className, size }) => {
+const InviteIcon: FunctionComponent<Props> = ({ className, size }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

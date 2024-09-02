@@ -37,7 +37,7 @@ const CustomInput = forwardRef<
 ));
 CustomInput.displayName = "CustomInput";
 
-interface IProps {
+interface Props {
   date: Date;
   label: string;
   onChange: (date: Date) => void;
@@ -45,7 +45,7 @@ interface IProps {
   disabled?: boolean;
 }
 
-const DateInput: FunctionComponent<IProps> = ({
+const DateInput: FunctionComponent<Props> = ({
   date,
   label,
   onChange,
@@ -53,6 +53,7 @@ const DateInput: FunctionComponent<IProps> = ({
   disabled,
 }) => {
   const [selectedDate, setSelectedDate] = useState(date);
+
   return (
     <div>
       <ReactDatePicker
@@ -88,5 +89,4 @@ const DateInput: FunctionComponent<IProps> = ({
     </div>
   );
 };
-
 export default DateInput;

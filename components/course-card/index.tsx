@@ -5,11 +5,11 @@ import type { CourseWithRefsCount } from "@/types/courses.type";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   course: CourseWithRefsCount;
 }
 
-const CourseCard: FunctionComponent<IProps> = ({ course }) => {
+const CourseCard: FunctionComponent<Props> = ({ course }) => {
   return (
     <Link
       href={`/dashboard/courses/${course.id}/overview`}

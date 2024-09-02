@@ -1,8 +1,8 @@
 import type { FunctionComponent } from "react";
 
-interface IProps {}
+interface Props {}
 
-const ArrowLeftIcon: FunctionComponent<IProps> = () => {
+const ArrowLeftIcon: FunctionComponent<Props> = () => {
   return (
     <svg
       width="6"

@@ -1,10 +1,10 @@
 import type { FunctionComponent, PropsWithChildren } from "react";
 
-interface IProps {
+interface Props {
   title?: string;
 }
 
-const CardsContainer: FunctionComponent<PropsWithChildren<IProps>> = ({
+const CardsContainer: FunctionComponent<PropsWithChildren<Props>> = ({
   children,
   title,
 }) => {

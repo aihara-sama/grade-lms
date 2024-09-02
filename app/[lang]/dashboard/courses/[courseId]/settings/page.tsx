@@ -7,12 +7,12 @@ import { db } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   params: {
     courseId: string;
   };
 }
-const Page: FunctionComponent<IProps> = ({ params }) => {
+const Page: FunctionComponent<Props> = ({ params }) => {
   const router = useRouter();
   const [course, setCourse] =
     useState<Database["public"]["Tables"]["courses"]["Row"]>();

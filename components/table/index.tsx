@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import { type FunctionComponent, type ReactNode } from "react";
 
-interface IProps {
+interface Props {
   data: { [key: string]: ReactNode }[];
   compact?: boolean;
 }
 
-const Table: FunctionComponent<IProps> = ({ data, compact }) => {
+const Table: FunctionComponent<Props> = ({ data, compact }) => {
   if (!data.length) return null;
 
   const keys = Object.keys(data[0] || {});

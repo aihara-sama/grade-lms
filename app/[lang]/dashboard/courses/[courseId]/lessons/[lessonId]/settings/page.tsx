@@ -8,13 +8,13 @@ import { useEffect, useState, type FunctionComponent } from "react";
 
 import type { Database } from "@/types/supabase.type";
 
-interface IProps {
+interface Props {
   params: {
     courseId: string;
     lessonId: string;
   };
 }
-const Page: FunctionComponent<IProps> = ({ params }) => {
+const Page: FunctionComponent<Props> = ({ params }) => {
   const router = useRouter();
 
   const [course, setCourse] =

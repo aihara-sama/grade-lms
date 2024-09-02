@@ -6,23 +6,23 @@ import NotificationsIcon from "@/components/icons/notifications-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
 import NavTabs from "@/components/nav-tabs";
-import type { ITabItem } from "@/interfaces/menu.interface";
+import type { TabItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
-interface IProps {
+interface Props {
   course: Course;
   lesson: Lesson;
 }
 
-const LessonHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
+const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = ({
   course,
   lesson,
 }) => {
-  const tabs: ITabItem[] = [
+  const tabs: TabItem[] = [
     {
       title: "Overview",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,

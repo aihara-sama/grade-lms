@@ -8,14 +8,14 @@ import type {
 } from "react";
 import { useEffect, useRef, useState } from "react";
 
-interface IProps {
+interface Props {
   onResize: (height: number) => void;
   containerRef: MutableRefObject<HTMLElement>;
   minHeight: number;
   initialHeight: number;
 }
 
-const ResizeHandler: FunctionComponent<IProps> = ({
+const ResizeHandler: FunctionComponent<Props> = ({
   onResize,
   containerRef,
   minHeight,

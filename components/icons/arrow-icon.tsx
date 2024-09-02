@@ -1,6 +1,6 @@
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   direction: "top" | "right" | "bottom" | "left";
   className?: string;
 }
@@ -12,7 +12,7 @@ const directions = {
   left: 180,
 };
 
-const ArrowIcon: FunctionComponent<IProps> = ({
+const ArrowIcon: FunctionComponent<Props> = ({
   className,
   direction = "right",
 }) => {

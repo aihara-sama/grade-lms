@@ -4,12 +4,12 @@ import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   params: {
     lessonId: string;
   };
 }
-const Page: FunctionComponent<IProps> = async ({ params: { lessonId } }) => {
+const Page: FunctionComponent<Props> = async ({ params: { lessonId } }) => {
   const lessonResult = await db
     .from("lessons")
     .select("*, course:courses(*)")

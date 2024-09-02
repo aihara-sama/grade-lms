@@ -10,11 +10,11 @@ import prettyBytes from "pretty-bytes";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   chatMessage: ResultOf<typeof getChatMessages>[number];
 }
 
-const Message: FunctionComponent<IProps> = ({ chatMessage }) => {
+const Message: FunctionComponent<Props> = ({ chatMessage }) => {
   const t = useTranslations();
 
   const submitDownloadFile = async (file: ChatFile) => {

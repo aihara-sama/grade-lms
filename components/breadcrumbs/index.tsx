@@ -7,12 +7,12 @@ import type { IBreadcrumb } from "@/interfaces/breadcrumbs.interface";
 import { usePathname } from "next/navigation";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   Icon: JSX.Element;
   items: IBreadcrumb[];
 }
 
-const Breadcrumbs: FunctionComponent<IProps> = ({ Icon, items }) => {
+const Breadcrumbs: FunctionComponent<Props> = ({ Icon, items }) => {
   const pathname = usePathname();
 
   const isCurrentPage = (href: string) => href === pathname;

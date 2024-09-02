@@ -12,9 +12,10 @@ import { useEffect, useRef, useState } from "react";
 
 import CardTitle from "@/components/card-title";
 import PromptModal from "@/components/common/modals/prompt-modal";
-import LessonOptionsPopper from "@/components/common/poppers/lesson-options-popper";
+import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
+import DotsIcon from "@/components/icons/dots-icon";
 import LessonIcon from "@/components/icons/lesson-icon";
 import Skeleton from "@/components/skeleton";
 import { LESSONS_GET_LIMIT } from "@/constants";
@@ -27,24 +28,24 @@ import {
   getLessonsCountByTitleAndCourseId,
   getOffsetLessonsByTitleAndCourseId,
 } from "@/db/lesson";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
 import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import type { User } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   courseId: string;
-  user: User;
 }
-const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
+const Lessons: FunctionComponent<Props> = ({ courseId }) => {
   const [isDeleteLessonsModalOpen, setIsDeleteLessonsModalOpen] =
     useState(false);
+  const [isDeleteLessonModalOpen, setIsDeleteLessonModalOpen] = useState(false);
   const [selectedLessonsIds, setSelectedLessonsIds] = useState<string[]>([]);
+  const [selectedLessonId, setSelectedLessonId] = useState<string>();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLessonsLoading, setIsLessonsLoading] = useState(true);
   const [totalLessonsCount, setTotalLessonsCount] = useState(0);
@@ -58,6 +59,7 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
   const openDeleteLessonsModal = () => setIsDeleteLessonsModalOpen(true);
   const onLessonToggle = (checked: boolean, lessonId: string) => {
@@ -67,6 +69,23 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
     } else {
       setSelectedLessonsIds((prev) => prev.filter((_id) => _id !== lessonId));
       setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length - 1);
+    }
+  };
+  const fetchLessonsBySearch = async () => {
+    try {
+      const [lessonsByTitleAndCourseId, lessonsCountByTitCoursedUserId] =
+        await Promise.all([
+          getLessonsByTitleAndCourseId(lessonsSearchTextRef.current, courseId),
+          getLessonsCountByTitleAndCourseId(
+            lessonsSearchTextRef.current,
+            courseId
+          ),
+        ]);
+
+      setLessons(lessonsByTitleAndCourseId);
+      setTotalLessonsCount(lessonsCountByTitCoursedUserId);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
   const fetchLessonsWithCount = async () => {
@@ -86,7 +105,19 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
       setIsLessonsLoading(false);
     }
   };
-
+  const submitDeleteLesson = async () => {
+    try {
+      await deleteLessonsByLessonsIds([selectedLessonId]);
+      setIsDeleteLessonModalOpen(false);
+      setSelectedLessonsIds((prev) =>
+        prev.filter((id) => id !== selectedLessonId)
+      );
+      fetchLessonsBySearch();
+      toast.success(t("lesson_deleted"));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
   const selectAllLessons = () => {
     setSelectedLessonsIds(lessons.map(({ id }) => id));
     setIsSelectedAll(true);
@@ -96,23 +127,6 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
     setIsSelectedAll(false);
   };
 
-  const fetchLessonsBySearch = async () => {
-    try {
-      const [lessonsByTitleAndCourseId, lessonsCountByTitCoursedUserId] =
-        await Promise.all([
-          getLessonsByTitleAndCourseId(lessonsSearchTextRef.current, courseId),
-          getLessonsCountByTitleAndCourseId(
-            lessonsSearchTextRef.current,
-            courseId
-          ),
-        ]);
-
-      setLessons(lessonsByTitleAndCourseId);
-      setTotalLessonsCount(lessonsCountByTitCoursedUserId);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
   const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLessonsSearchText((lessonsSearchTextRef.current = e.target.value));
     fetchLessonsBySearch();
@@ -192,8 +206,8 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
           total={totalLessonsCount}
           Icon={<LessonsIcon size="lg" />}
         />
-        {(user.user_metadata as IUserMetadata).role === Role.Teacher && (
-          <CreateLesson onDone={fetchLessonsBySearch} courseId={courseId} />
+        {user.role === Role.Teacher && (
+          <CreateLesson onCreated={fetchLessonsBySearch} courseId={courseId} />
         )}
       </CardsContainer>
       {selectedLessonsIds.length ? (
@@ -234,31 +248,56 @@ const Lessons: FunctionComponent<IProps> = ({ courseId, user }) => {
                 title={title}
                 subtitle=""
                 onToggle={
-                  (user.user_metadata as IUserMetadata).role === Role.Teacher
+                  user.role === Role.Teacher
                     ? (checked) => onLessonToggle(checked, id)
                     : undefined
                 }
               />
             ),
             Starts: format(new Date(starts), "EEEE, MMM d"),
-            "": (user.user_metadata as IUserMetadata).role === Role.Teacher && (
-              <LessonOptionsPopper
-                lessonId={id}
-                onDone={fetchLessonsBySearch}
-                setSelectedLessonsIds={setSelectedLessonsIds}
-              />
+            "": user.role === Role.Teacher && (
+              <BasePopper
+                width="sm"
+                trigger={
+                  <button
+                    className="icon-button text-neutral-500"
+                    onClick={() => setSelectedLessonId(id)}
+                  >
+                    <DotsIcon />
+                  </button>
+                }
+              >
+                <ul className="flex flex-col">
+                  <li
+                    className="popper-list-item"
+                    onClick={() => setIsDeleteLessonModalOpen(true)}
+                  >
+                    <DeleteIcon /> Delete
+                  </li>
+                </ul>
+              </BasePopper>
             ),
           }))}
         />
       )}
-      <PromptModal
-        setIsOpen={setIsDeleteLessonsModalOpen}
-        isOpen={isDeleteLessonsModalOpen}
-        title="Delete lessons"
-        action="Delete"
-        body={t("prompts.delete_lessons")}
-        actionHandler={deleteSelectedLessons}
-      />
+      {isDeleteLessonsModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteLessonsModalOpen(false)}
+          title="Delete lessons"
+          action="Delete"
+          body={t("prompts.delete_lessons")}
+          actionHandler={deleteSelectedLessons}
+        />
+      )}
+      {isDeleteLessonModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteLessonModalOpen(false)}
+          title="Delete lesson"
+          action="Delete"
+          body={t("prompts.delete_lesson")}
+          actionHandler={submitDeleteLesson}
+        />
+      )}
     </>
   );
 };

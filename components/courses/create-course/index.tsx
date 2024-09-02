@@ -5,15 +5,21 @@ import AddCourseIcon from "@/components/icons/add-course-icon";
 import type { FunctionComponent } from "react";
 import { useState } from "react";
 
-interface IProps {
-  onDone: () => void;
+interface Props {
+  onCreated: () => void;
 }
 
-const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
+const CreateCourse: FunctionComponent<Props> = ({ onCreated }) => {
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
 
   const openCreateCourseModal = () => setIsCreateCourseModalOpen(true);
+  const closeCreateCourseModal = (mutated?: boolean) => {
+    setIsCreateCourseModalOpen(false);
 
+    if (mutated) {
+      onCreated();
+    }
+  };
   return (
     <div className="border border-dashed border-light bg-white px-6 py-8 flex flex-col items-center justify-between sm:w-64 w-full rounded-md">
       <AddCourseIcon />
@@ -21,11 +27,9 @@ const CreateCourse: FunctionComponent<IProps> = ({ onDone }) => {
       <button className="primary-button w-full" onClick={openCreateCourseModal}>
         Create
       </button>
-      <CreateCourseModal
-        isOpen={isCreateCourseModalOpen}
-        setIsOpen={setIsCreateCourseModalOpen}
-        onDone={onDone}
-      />
+      {isCreateCourseModalOpen && (
+        <CreateCourseModal onClose={closeCreateCourseModal} />
+      )}
     </div>
   );
 };

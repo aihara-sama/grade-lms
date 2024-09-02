@@ -4,14 +4,14 @@ import CreateAssignmentModal from "@/components/common/modals/create-assignment-
 import AddAssignmentIcon from "@/components/icons/add-assignment-icon";
 import { useState, type FunctionComponent } from "react";
 
-interface IProps {
-  onDone: () => void;
+interface Props {
+  onCreated: () => void;
   courseId: string;
   lessonId: string;
 }
 
-const CreateAssignment: FunctionComponent<IProps> = ({
-  onDone,
+const CreateAssignment: FunctionComponent<Props> = ({
+  onCreated,
   courseId,
   lessonId,
 }) => {
@@ -21,7 +21,13 @@ const CreateAssignment: FunctionComponent<IProps> = ({
 
   // Handlers
   const openCreateAssignmentModal = () => setIsCreateAssignmentModalOpen(true);
+  const closeCreatessignmentModal = (mutated?: boolean) => {
+    setIsCreateAssignmentModalOpen(false);
 
+    if (mutated) {
+      onCreated();
+    }
+  };
   // View
   return (
     <div className="px-6 py-8 border-dashed flex flex-col items-center justify-between w-64 rounded-md border border-light bg-white">
@@ -30,13 +36,13 @@ const CreateAssignment: FunctionComponent<IProps> = ({
       <button className="primary-button" onClick={openCreateAssignmentModal}>
         Create
       </button>
-      <CreateAssignmentModal
-        courseId={courseId}
-        lessonId={lessonId}
-        setIsOpen={setIsCreateAssignmentModalOpen}
-        isOpen={isCreateAssignmentModalOpen}
-        onDone={onDone}
-      />
+      {isCreateAssignmentModalOpen && (
+        <CreateAssignmentModal
+          courseId={courseId}
+          lessonId={lessonId}
+          onClose={closeCreatessignmentModal}
+        />
+      )}
     </div>
   );
 };

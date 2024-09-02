@@ -15,12 +15,12 @@ import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   lessonId: string;
   courseId: string;
 }
 
-const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId, courseId }) => {
+const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
   // States
   const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
     useState(false);
@@ -61,6 +61,22 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId, courseId }) => {
     }
   };
 
+  const onCreateAssignmentModalClose = (mutated?: boolean) => {
+    setIsCreateAssignmentModalOpen(false);
+
+    if (mutated) {
+      fetchAssignments();
+    }
+  };
+
+  const onEditAssignmentModalClose = (mutated?: boolean) => {
+    setIsEditAssignmentModalOpen(false);
+
+    if (mutated) {
+      fetchAssignments();
+    }
+  };
+
   useEffect(() => {
     fetchAssignments();
   }, []);
@@ -97,27 +113,29 @@ const AssignmentsTab: FunctionComponent<IProps> = ({ lessonId, courseId }) => {
           Create assignments
         </button>
       </div>
-      <EditAssignmentModal
-        assignmentId={selectedAssignmentId}
-        onDone={fetchAssignments}
-        setIsOpen={setIsEditAssignmentModalOpen}
-        isOpen={isEditAssignmentModalOpen}
-      />
-      <CreateAssignmentModal
-        isOpen={isCreateAssignmentModalOpen}
-        setIsOpen={setIsCreateAssignmentModalOpen}
-        lessonId={lessonId}
-        courseId={courseId}
-        onDone={fetchAssignments}
-      />
-      <PromptModal
-        isOpen={isDeleteAssignmentModalOpen}
-        setIsOpen={setIsDeleteAssignmentModalOpen}
-        title="Delete assignments"
-        action="Delete"
-        body={t("prompts.delete_assignment")}
-        actionHandler={submitDeleteAssignment}
-      />
+      {isCreateAssignmentModalOpen && (
+        <CreateAssignmentModal
+          onClose={onCreateAssignmentModalClose}
+          lessonId={lessonId}
+          courseId={courseId}
+        />
+      )}
+      {isEditAssignmentModalOpen && (
+        <EditAssignmentModal
+          assignmentId={selectedAssignmentId}
+          onSubmissionCreated={fetchAssignments}
+          onClose={onEditAssignmentModalClose}
+        />
+      )}
+      {isDeleteAssignmentModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteAssignmentModalOpen(false)}
+          title="Delete assignments"
+          action="Delete"
+          body={t("prompts.delete_assignment")}
+          actionHandler={submitDeleteAssignment}
+        />
+      )}
     </div>
   );
 };

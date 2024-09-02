@@ -5,7 +5,7 @@ import EyeIcon from "@/components/icons/eye-icon";
 import type { FunctionComponent, InputHTMLAttributes } from "react";
 import { useEffect, useRef, useState } from "react";
 
-interface IProps extends InputHTMLAttributes<HTMLInputElement> {
+interface Props extends InputHTMLAttributes<HTMLInputElement> {
   Icon: JSX.Element;
   label?: string;
   value?: string;
@@ -15,7 +15,7 @@ interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   fullWIdth?: boolean;
 }
 
-const Input: FunctionComponent<IProps> = ({
+const Input: FunctionComponent<Props> = ({
   Icon,
   type,
   label,

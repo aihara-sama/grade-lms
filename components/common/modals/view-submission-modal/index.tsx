@@ -6,30 +6,26 @@ import StarIcon from "@/components/icons/star-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import {
-  getSubmissionWithAuthorBySubmissionId,
+  getSubmissionWithAuthorById,
   updateSubmissionGrade,
 } from "@/db/submission";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import type { Dispatch, FunctionComponent, SetStateAction } from "react";
+import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onDone: () => void;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   submissionId: string;
 }
-const ViewSubmissionModal: FunctionComponent<IProps> = ({
-  isOpen,
-  setIsOpen,
+const ViewSubmissionModal: FunctionComponent<Props> = ({
   submissionId,
-  onDone,
+  onClose,
 }) => {
   const [grade, setGrade] = useState<number>();
   const [submission, setSubmission] = useState<SubmissionWithAuthor>();
@@ -41,9 +37,8 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
     try {
       await updateSubmissionGrade(submissionId, grade);
 
+      onClose(true);
       toast.success(t("grade_updated"));
-      setIsOpen(false);
-      onDone();
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -51,8 +46,7 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
 
   const fetchSubmission = async () => {
     try {
-      const submissionData =
-        await getSubmissionWithAuthorBySubmissionId(submissionId);
+      const submissionData = await getSubmissionWithAuthorById(submissionId);
       setSubmission(submissionData);
       setGrade(submissionData.grade);
     } catch (error: any) {
@@ -61,17 +55,11 @@ const ViewSubmissionModal: FunctionComponent<IProps> = ({
   };
 
   useEffect(() => {
-    if (isOpen) fetchSubmission();
-  }, [isOpen]);
+    fetchSubmission();
+  }, []);
 
   return (
-    <BaseModal
-      isInsideModal
-      width="lg"
-      setIsOpen={setIsOpen}
-      isOpen={isOpen}
-      title="Submission"
-    >
+    <BaseModal isInsideModal width="lg" onClose={onClose} title="Submission">
       {!submission ? (
         <Skeleton className="" />
       ) : (

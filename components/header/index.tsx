@@ -11,9 +11,9 @@ import { messaging } from "@/utils/firebase";
 import { onMessage } from "firebase/messaging";
 import { useEffect, type FunctionComponent } from "react";
 
-interface IProps {}
+interface Props {}
 
-const Header: FunctionComponent<IProps> = () => {
+const Header: FunctionComponent<Props> = () => {
   const { user } = useUser();
 
   useEffect(() => {

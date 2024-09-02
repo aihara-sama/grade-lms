@@ -1,6 +1,6 @@
 "use client";
 
-import type { Database } from "@/types/supabase.type";
+import type { Lesson } from "@/types/lessons.type";
 import { create } from "zustand";
 
 export interface IPointerPosition {
@@ -9,15 +9,11 @@ export interface IPointerPosition {
 }
 
 export interface ISchedueState {
-  selectedLesson?: Database["public"]["Tables"]["lessons"]["Row"];
-  setSelectedLesson: (
-    lesson: Database["public"]["Tables"]["lessons"]["Row"]
-  ) => void;
+  selectedLesson?: Lesson;
+  setSelectedLesson: (lesson: Lesson) => void;
   canDropEvent: boolean;
-  draggingEvent?: Database["public"]["Tables"]["lessons"]["Row"];
-  setDraggingEvent: (
-    lesson: Database["public"]["Tables"]["lessons"]["Row"]
-  ) => void;
+  draggingEvent?: Lesson;
+  setDraggingEvent: (lesson: Lesson) => void;
   pointerOffsetPositionOnEvent?: IPointerPosition;
   initPointerPosition?: IPointerPosition;
   initEventPosition?: { x: number; y: number };

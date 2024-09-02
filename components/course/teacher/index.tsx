@@ -4,11 +4,11 @@ import { Role } from "@/interfaces/user.interface";
 import type { User } from "@/types/users";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   teacher: User;
 }
 
-const Teacher: FunctionComponent<IProps> = ({ teacher }) => {
+const Teacher: FunctionComponent<Props> = ({ teacher }) => {
   return (
     <div className="mt-10">
       <p className="mb-2 font-bold">Teacher</p>

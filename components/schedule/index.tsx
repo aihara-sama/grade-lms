@@ -17,61 +17,30 @@ import {
   millisecondsToMinutes,
   subDays,
 } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
 import Select from "@/components/common/select";
 import { getCoursesByUserId } from "@/db/course";
-import {
-  getWeekLessons,
-  getWeekLessonsByCourseId,
-  upsertLesson,
-} from "@/db/lesson";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { getWeekLessons, upsertLesson } from "@/db/lesson";
+import { useUser } from "@/hooks/use-user";
+import type { SelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
-import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
+import { getEventElFromPoints } from "@/utils/get-event-el-from-points";
+import { getEventPlaceholderElFromPoints } from "@/utils/get-event-placeholder-el-from-points";
 import { getWeekDays } from "@/utils/get-week-days";
-import type { User } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
-interface IProps {
-  user: User;
-}
-
-const Schedule: FunctionComponent<IProps> = ({ user }) => {
-  // Zustand
-  const canDropEvent = useSchedule((state) => state.canDropEvent);
-  const draggingEvent = useSchedule((state) => state.draggingEvent);
-  const selectedLesson = useSchedule((state) => state.selectedLesson);
-  const initPointerPosition = useSchedule((state) => state.initPointerPosition);
-  const pointerOffsetPositionOnEvent = useSchedule(
-    (state) => state.pointerOffsetPositionOnEvent
-  );
-
-  const setCanDropEvent = useSchedule((state) => state.setCanDropEvent);
-  const setDraggingEvent = useSchedule((state) => state.setDraggingEvent);
-  const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
-  const setInitEventPosition = useSchedule(
-    (state) => state.setInitEventPosition
-  );
-  const setInitPointerPosition = useSchedule(
-    (state) => state.setInitPointerPosition
-  );
-  const setPointerOffsetPositionOnEvent = useSchedule(
-    (state) => state.setPointerOffsetPositionOnEvent
-  );
-
+const Schedule: FunctionComponent = () => {
   // State
-  const [days, setDays] = useState(getWeekDays());
+  const [days, setDays] = useState<string[]>(getWeekDays());
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [hoveredDate, setHoveredDate] = useState<string>();
-  const [courses, setCourses] = useState<Pick<Course, "id" | "title">[]>([]);
-  const [selectedCourse, setSelectedCourse] =
-    useState<Pick<Course, "id" | "title">>(null);
-  const [isEditLessonModalOpen, setIsEditLessonModalOpen] =
-    useState(!!selectedLesson);
+  const [hoveredDate, setHoveredDate] = useState<Date>();
+  const [courses, setCourses] = useState<SelectItem[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
 
   // Refs
   const isDraggingEventRef = useRef(false);
@@ -82,18 +51,48 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
+  const {
+    canDropEvent,
+    draggingEvent,
+    selectedLesson,
+    initEventPosition,
+    initPointerPosition,
+    pointerOffsetPositionOnEvent,
+    setCanDropEvent,
+    setDraggingEvent,
+    setSelectedLesson,
+    setInitEventPosition,
+    setInitPointerPosition,
+    setPointerOffsetPositionOnEvent,
+  } = useSchedule();
 
   // Handlers
+
+  const getMaybeDraggingEvent = (day: string, hour: number) => {
+    //  return the dragging event if user hovered over the hour's quarter
+    return new Array(4)
+      .fill(draggingEvent)
+      .find((_, i) =>
+        isEqual(hoveredDate, addMinutes(addHours(day, hour), i * 15))
+      );
+  };
+  const getHourQuarter = (day: string, hour: number) => {
+    return [0, 15, 30, 45].find((quarter) =>
+      isEqual(hoveredDate, addMinutes(addHours(day, hour), quarter))
+    );
+  };
+  const scroll = (direction: "top" | "bottom") => {
+    intervalIDRef.current = setInterval(() => {
+      hoursLabelsDaysWrapperRef.current.scrollBy(
+        0,
+        { top: -2, bottom: 2 }[direction]
+      );
+    }, 2);
+  };
   const fetchWeekLessons = async () => {
     try {
-      setLessons(await getWeekLessons(days));
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-  const fetchLessonsByCourseId = async (courseId: string) => {
-    try {
-      setLessons(await getWeekLessonsByCourseId(days, courseId));
+      setLessons(await getWeekLessons(days, selectedCourse?.id));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -105,20 +104,19 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       toast.error(error.message);
     }
   };
-  const handleSaveLesson = async (newStart: string, event: Lesson) => {
+  const submitUpsertLesson = async (newStart: Date, event: Lesson) => {
     try {
       await upsertLesson({
         ...event,
-        starts: format(newStart, "yyyy-MM-dd'T'HH:mm:ss"),
-        ends: format(
+        starts: newStart.toISOString(),
+        ends: new Date(
           addMinutes(
-            new Date(newStart),
+            newStart,
             millisecondsToMinutes(
               +new Date(event.ends) - +new Date(event.starts)
             )
-          ),
-          "yyyy-MM-dd'T'HH:mm:ss"
-        ),
+          )
+        ).toISOString(),
       });
 
       toast.success(t("lesson_saved"));
@@ -127,25 +125,13 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       toast.error(error.message);
     }
   };
-  const scroll = (direction: "top" | "bottom") => {
-    intervalIDRef.current = setInterval(() => {
-      hoursLabelsDaysWrapperRef.current.scrollBy(
-        0,
-        { top: -2, bottom: 2 }[direction]
-      );
-    }, 2);
-  };
-  const handlePointerMove = (e: MouseEvent) => {
-    // if (isScrolling()) return;
+  const onPointerMove = (e: MouseEvent) => {
     if (initPointerPosition && !draggingEvent) {
-      const hoveredLessonId = (
-        document
-          .elementsFromPoint(e.clientX, e.clientY)
-          .find((el) => el.classList.contains("event")) as HTMLElement
-      )?.dataset.lessonId;
+      const maybeEventEl = getEventElFromPoints(e.clientX, e.clientY);
 
-      const targetLesson = lessons.find(({ id }) => id === hoveredLessonId);
-      setDraggingEvent(targetLesson);
+      setDraggingEvent(
+        lessons.find(({ id }) => id === maybeEventEl?.dataset.lessonId)
+      );
       setInitEventPosition({
         x:
           e.clientX -
@@ -161,54 +147,51 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     }
 
     if (draggingEvent) {
-      const hoveredDateSlot = (
-        document.elementsFromPoint(
-          e.clientX -
-            pointerOffsetPositionOnEvent.pointerX +
-            getEventWidth() / 2,
-          e.clientY - pointerOffsetPositionOnEvent.pointerY + 10
-        ) as HTMLElement[]
-      ).find((el) => el.classList.contains("placeholder"))?.dataset.date;
+      const maybeEventPlaceholderEl = getEventPlaceholderElFromPoints(
+        e.clientX - pointerOffsetPositionOnEvent.pointerX + getEventWidth() / 2,
+        e.clientY - pointerOffsetPositionOnEvent.pointerY + 10
+      );
+      if (maybeEventPlaceholderEl) {
+        const eventPlaceholderDate = maybeEventPlaceholderEl.dataset.date;
 
-      const hoveredDateSlotEnds =
-        hoveredDateSlot &&
-        new Date(
-          +new Date(hoveredDateSlot) +
+        const eventPlaceholderEnds = new Date(
+          +new Date(eventPlaceholderDate) +
             +new Date(draggingEvent.ends) -
             +new Date(draggingEvent.starts)
         );
 
-      const translateX =
-        e.clientX -
-        pointerOffsetPositionOnEvent.pointerX -
-        daysRef.current.getBoundingClientRect().left;
-      const translateY =
-        e.clientY -
-        pointerOffsetPositionOnEvent.pointerY +
-        hoursLabelsDaysWrapperRef.current.scrollTop -
-        hoursLabelsDaysWrapperRef.current.getBoundingClientRect().top -
-        6;
+        const translateX =
+          e.clientX -
+          pointerOffsetPositionOnEvent.pointerX -
+          daysRef.current.getBoundingClientRect().left;
+        const translateY =
+          e.clientY -
+          pointerOffsetPositionOnEvent.pointerY +
+          hoursLabelsDaysWrapperRef.current.scrollTop -
+          hoursLabelsDaysWrapperRef.current.getBoundingClientRect().top -
+          6;
 
-      draggingEventRef.current.style.transform = `translate(${translateX}px, ${translateY}px)`;
-      if (hoveredDateSlot) {
+        draggingEventRef.current.style.transform = `translate(${translateX}px, ${translateY}px)`;
+
         const canDrop = !lessons
           .filter(({ id }) => id !== draggingEvent.id)
           .find(
             (event) =>
-              (+new Date(hoveredDateSlot) >= +new Date(event.starts) &&
-                +new Date(hoveredDateSlot) < +new Date(event.ends)) ||
-              (+new Date(hoveredDateSlotEnds) > +new Date(event.starts) &&
-                +new Date(hoveredDateSlotEnds) <= +new Date(event.ends)) ||
-              (+new Date(event.starts) > +new Date(hoveredDateSlot) &&
-                +new Date(event.ends) < +new Date(hoveredDateSlotEnds))
+              (+new Date(eventPlaceholderDate) >= +new Date(event.starts) &&
+                +new Date(eventPlaceholderDate) < +new Date(event.ends)) ||
+              (+new Date(eventPlaceholderEnds) > +new Date(event.starts) &&
+                +new Date(eventPlaceholderEnds) <= +new Date(event.ends)) ||
+              (+new Date(event.starts) > +new Date(eventPlaceholderDate) &&
+                +new Date(event.ends) < +new Date(eventPlaceholderEnds))
           );
 
         if (canDrop !== canDropEvent) {
           setCanDropEvent(canDrop);
         }
 
-        setHoveredDate(hoveredDateSlot);
+        setHoveredDate(new Date(eventPlaceholderDate));
       }
+
       const hoursLabelsDaysWrapperPosition =
         hoursLabelsDaysWrapperRef.current.getBoundingClientRect();
 
@@ -222,10 +205,10 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
       }
     }
   };
-  const handleMouseUp = async () => {
+  const onMouseUp = async () => {
     if (draggingEvent) {
       if (canDropEvent) {
-        await handleSaveLesson(hoveredDate, draggingEvent);
+        await submitUpsertLesson(hoveredDate, draggingEvent);
       }
       draggingEventRef.current = undefined;
       setDraggingEvent(undefined);
@@ -235,6 +218,14 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     setInitPointerPosition(undefined);
   };
 
+  const onLessonModalClose = useCallback((mutated?: boolean) => {
+    setSelectedLesson(undefined);
+
+    if (mutated) {
+      fetchWeekLessons();
+    }
+  }, []);
+
   // Effects
   useEffect(() => {
     isDraggingEventRef.current = !!draggingEvent;
@@ -243,11 +234,7 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     fetchCourses();
   }, []);
   useEffect(() => {
-    if (selectedCourse) {
-      fetchLessonsByCourseId(selectedCourse.id);
-    } else {
-      fetchWeekLessons();
-    }
+    fetchWeekLessons();
   }, [selectedCourse, days]);
   useEffect(() => {
     document.querySelector(`[data-hour-label="8:00 AM"]`).scrollIntoView({
@@ -256,9 +243,9 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
   }, []);
 
   useEffect(() => {
-    if ((user.user_metadata as IUserMetadata).role === Role.Teacher) {
-      window.addEventListener("mousemove", handlePointerMove);
-      return () => window.removeEventListener("mousemove", handlePointerMove);
+    if (user.role === Role.Teacher) {
+      window.addEventListener("mousemove", onPointerMove);
+      return () => window.removeEventListener("mousemove", onPointerMove);
     }
     return () => {};
   }, [
@@ -268,13 +255,13 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
     initPointerPosition,
     pointerOffsetPositionOnEvent,
   ]);
-
   useEffect(() => {
-    setIsEditLessonModalOpen(!!selectedLesson);
-  }, [selectedLesson]);
+    setDays(getWeekDays());
+  }, []);
 
+  // View
   return (
-    <div onMouseUp={handleMouseUp}>
+    <div onMouseUp={onMouseUp}>
       <h1 className="page-title">Schedule</h1>
       <p className="text-neutral-500">View and manage your schedule</p>
       <hr className="my-2 mb-8" />
@@ -314,16 +301,13 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
 
       <hr />
 
-      <div className="flex ml-[75px] mt-[4px]">
+      <div className="flex ml-[75px] mt-1">
         {days.map((day, idx) => (
           <div
-            className="flex-[1] text-center text-sm font-bold px-[0] py-[16px]"
             key={idx}
+            className="flex-[1] text-center text-sm font-bold py-4"
           >
-            {new Date(day).toLocaleString("en-US", {
-              weekday: "short",
-              day: "2-digit",
-            })}
+            {format(new Date(day), "EE")}
           </div>
         ))}
       </div>
@@ -354,29 +338,13 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
                   {[...Array(differenceInHours(addDays(day, 1), day))].map(
                     (__, i) => (
                       <Hour
-                        user={user}
-                        hour={+addHours(day, i)}
-                        draggingEvent={
-                          // Check if user hovered over this hour's quarter
-                          new Array(4)
-                            .fill(draggingEvent)
-                            .find((___, index) =>
-                              isEqual(
-                                hoveredDate,
-                                addMinutes(addHours(day, i), index * 15)
-                              )
-                            )
-                        }
                         key={i}
                         day={day}
                         index={i}
                         events={lessons}
-                        quarter={[0, 15, 30, 45].find((quarter) =>
-                          isEqual(
-                            hoveredDate,
-                            addMinutes(addHours(day, i), quarter)
-                          )
-                        )}
+                        hour={+addHours(day, i)}
+                        quarter={getHourQuarter(day, i)}
+                        draggingEvent={getMaybeDraggingEvent(day, i)}
                       />
                     )
                   )}
@@ -384,30 +352,29 @@ const Schedule: FunctionComponent<IProps> = ({ user }) => {
               );
             })}
             {draggingEvent && (
-              <DraggingEvent ref={draggingEventRef} event={draggingEvent} />
+              <DraggingEvent
+                ref={draggingEventRef}
+                event={draggingEvent}
+                canDropEvent={canDropEvent}
+                initEventPosition={initEventPosition}
+              />
             )}
           </div>
         </div>
       </div>
-      <EditLessonModal
-        user={user}
-        isOpen={isEditLessonModalOpen}
-        setIsOpen={(isOpen) => {
-          setIsEditLessonModalOpen(isOpen);
-          setSelectedLesson(undefined);
-        }}
-        includeCoursesSelect
-        courses={courses}
-        lesson={selectedLesson}
-        onDone={() => {
-          if (selectedCourse) {
-            fetchLessonsByCourseId(selectedCourse.id);
-          } else {
-            fetchWeekLessons();
-          }
-          setSelectedLesson(undefined);
-        }}
-      />
+      {!!selectedLesson && selectedLesson.id && (
+        <EditLessonModal
+          onClose={onLessonModalClose}
+          lessonId={selectedLesson.id}
+        />
+      )}
+      {!!selectedLesson && !selectedLesson.id && (
+        <CreateLessonModal
+          onClose={onLessonModalClose}
+          courseId={selectedCourse?.id}
+          maybeLesson={selectedLesson}
+        />
+      )}
     </div>
   );
 };

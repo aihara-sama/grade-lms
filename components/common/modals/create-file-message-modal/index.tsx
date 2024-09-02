@@ -10,38 +10,38 @@ import { db } from "@/utils/supabase/client";
 import imgExtentions from "image-extensions";
 import { useTranslations } from "next-intl";
 import prettyBytes from "pretty-bytes";
-import type {
-  ChangeEvent,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-} from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { v4 as uuid } from "uuid";
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onDone: () => void;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   lessonId: string;
   file: File | undefined;
 }
 
-const CreateFileMessageModal: FunctionComponent<IProps> = ({
+const CreateFileMessageModal: FunctionComponent<Props> = ({
   lessonId,
-  onDone,
   file,
-  isOpen,
-  setIsOpen,
+  onClose,
 }) => {
-  const [chatMessage, setChatMessage] =
-    useState<TablesInsert<"chat_messages">>();
-  const [filePath, setFilePath] = useState("");
-  const [fileExt, setFileExt] = useState("");
-
+  // Hooks
   const t = useTranslations();
   const { user } = useUser();
+
+  // State
+  const [chatMessage, setChatMessage] = useState<TablesInsert<"chat_messages">>(
+    {
+      author: user.name,
+      author_avatar: user.avatar,
+      author_role: user.role,
+      lesson_id: lessonId,
+      text: "",
+    }
+  );
+  const [filePath, setFilePath] = useState("");
+  const [fileExt, setFileExt] = useState("");
 
   const onTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     setChatMessage((_) => ({ ..._, text: e.target.value }));
@@ -84,35 +84,18 @@ const CreateFileMessageModal: FunctionComponent<IProps> = ({
 
       if (createdChatFile.error) throw new Error(t("something_went_wrong"));
 
-      onDone();
-      setIsOpen(false);
+      onClose(true);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
   useEffect(() => {
-    if (isOpen && file) submitUploadChatFile();
-  }, [isOpen, file]);
-
-  useEffect(() => {
-    if (!isOpen)
-      setChatMessage({
-        author: user.name,
-        author_avatar: user.avatar,
-        author_role: user.role,
-        lesson_id: lessonId,
-        text: "",
-      });
-  }, [isOpen]);
+    if (file) submitUploadChatFile();
+  }, [file]);
 
   return (
-    <BaseModal
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
-      title="Send File"
-      isExpanded={false}
-    >
+    <BaseModal onClose={onClose} title="Send File" isExpanded={false}>
       {filePath ? (
         <>
           <div className="flex gap-2 mb-2">

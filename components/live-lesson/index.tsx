@@ -25,11 +25,11 @@ import { isLessonEnded } from "@/utils/is-lesson-ended";
 import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 
-interface IProps {
+interface Props {
   lesson: Lesson & { course: Course };
 }
 
-const LiveLesson: FunctionComponent<IProps> = ({ lesson }) => {
+const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   // State
   const [isAsideOpen, setIsAsideOpen] = useState(true);
   const [currentLesson, setCurrentLesson] = useState(lesson);

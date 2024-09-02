@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   title: "Courses",
 };
 
-interface IProps {
+interface Props {
   params: { locale: Locale };
 }
 
-const Page: NextPage<IProps> = async ({ params: { locale } }) => {
+const Page: NextPage<Props> = async ({ params: { locale } }) => {
   const t = await getTranslations({ locale });
 
   return (

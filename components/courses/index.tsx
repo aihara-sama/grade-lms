@@ -17,10 +17,14 @@ import throttle from "lodash.throttle";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import CourseOptionsPopper from "@/components/common/poppers/course-options-popper";
+import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
+import BasePopper from "@/components/common/poppers/base-popper";
+import DotsIcon from "@/components/icons/dots-icon";
+import UsersIcon from "@/components/icons/users-icon";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT } from "@/constants";
 import {
+  deleteCourseByCourseId,
   deleteCoursesByCoursesIds,
   deleteCoursesByTitleAndUserId,
   getCoursesByTitleAndUserId,
@@ -35,13 +39,16 @@ import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
-interface IProps {}
+interface Props {}
 
-const Courses: FunctionComponent<IProps> = () => {
+const Courses: FunctionComponent<Props> = () => {
   // State
   const [isDeleteCoursesModalOpen, setIsDeleteCoursesModalOpen] =
     useState(false);
+  const [isDeleteCourseModalOpen, setIsDeleteCourseModalOpen] = useState(false);
+  const [isEnrollUsersModalOpen, setIsEnrollUsersModalOpen] = useState(false);
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
+  const [selectedCourseId, setSelectedCourseId] = useState<string>();
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
@@ -50,14 +57,18 @@ const Courses: FunctionComponent<IProps> = () => {
 
   // Refs
   const isSelectedAllRef = useRef(false);
-  const coursesSearchTextRef = useRef("");
   const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
+  const coursesSearchTextRef = useRef("");
 
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
 
   // Handdlers
+  const selectAllCourses = () => {
+    setSelectedCoursesIds(courses.map(({ id }) => id));
+    setIsSelectedAll(true);
+  };
   const fetchCoursesWithCount = async () => {
     setIsCoursesLoading(true);
 
@@ -74,25 +85,6 @@ const Courses: FunctionComponent<IProps> = () => {
     } finally {
       setIsCoursesLoading(false);
     }
-  };
-
-  const openDeleteCoursesModal = () => setIsDeleteCoursesModalOpen(true);
-  const onCourseToggle = (checked: boolean, courseId: string) => {
-    if (checked) {
-      setSelectedCoursesIds((prev) => [...prev, courseId]);
-      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length + 1);
-    } else {
-      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
-      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
-    }
-  };
-  const selectAllCourses = () => {
-    setSelectedCoursesIds(courses.map(({ id }) => id));
-    setIsSelectedAll(true);
-  };
-  const deselectAllCourses = () => {
-    setSelectedCoursesIds([]);
-    setIsSelectedAll(false);
   };
   const fetchCoursesBySearch = async () => {
     try {
@@ -111,11 +103,39 @@ const Courses: FunctionComponent<IProps> = () => {
       toast.error(error.message);
     }
   };
-  const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const submitDeselectAllCourses = () => {
+    setSelectedCoursesIds([]);
+    setIsSelectedAll(false);
+  };
+  const submitDeleteSelectedCourses = async () => {
+    try {
+      await (isSelectedAllRef.current
+        ? deleteCoursesByTitleAndUserId(coursesSearchText, user.id)
+        : deleteCoursesByCoursesIds(selectedCoursesIds));
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setSelectedCoursesIds([]);
+      setIsDeleteCoursesModalOpen(false);
+      fetchCoursesBySearch();
+    }
+  };
+  const submitDeleteCourse = async () => {
+    try {
+      await deleteCourseByCourseId(selectedCourseId);
+      setIsDeleteCourseModalOpen(false);
+      setSelectedCoursesIds((_) => _.filter((id) => id !== selectedCourseId));
+      fetchCoursesBySearch();
+      toast.success("Success");
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCoursesSearchText((coursesSearchTextRef.current = e.target.value));
     fetchCoursesBySearch();
   };
-  const handleCoursesScroll = async () => {
+  const onCoursesScroll = async () => {
     if (isDocCloseToBottom()) {
       try {
         const rangeCoursesByUserId = await getOffsetCoursesByTitleAndUserId(
@@ -140,23 +160,18 @@ const Courses: FunctionComponent<IProps> = () => {
       }
     }
   };
-
-  const deleteSelectedCourses = async () => {
-    try {
-      await (isSelectedAllRef.current
-        ? deleteCoursesByTitleAndUserId(coursesSearchText, user.id)
-        : deleteCoursesByCoursesIds(selectedCoursesIds));
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setSelectedCoursesIds([]);
-      setIsDeleteCoursesModalOpen(false);
-      fetchCoursesBySearch();
+  const onCourseToggle = (checked: boolean, courseId: string) => {
+    if (checked) {
+      setSelectedCoursesIds((prev) => [...prev, courseId]);
+      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length + 1);
+    } else {
+      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
+      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
     }
   };
   // Effects
   useEffect(() => {
-    const throttled = throttle(handleCoursesScroll, 300);
+    const throttled = throttle(onCoursesScroll, 300);
     document
       .getElementById("content-wrapper")
       .addEventListener("scroll", throttled);
@@ -188,20 +203,22 @@ const Courses: FunctionComponent<IProps> = () => {
           title="Total courses"
         />
         {user.role === Role.Teacher && (
-          <CreateCourse onDone={fetchCoursesBySearch} />
+          <CreateCourse onCreated={fetchCoursesBySearch} />
         )}
       </CardsContainer>
       {selectedCoursesIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
-            onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
+            onClick={
+              isSelectedAll ? submitDeselectAllCourses : selectAllCourses
+            }
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? totalCoursesCount : selectedCoursesIds.length}{" "}
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
-            onClick={openDeleteCoursesModal}
+            onClick={() => setIsDeleteCoursesModalOpen(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Delete <DeleteIcon />
@@ -212,7 +229,7 @@ const Courses: FunctionComponent<IProps> = () => {
           Icon={<SearchIcon size="xs" />}
           placeholder={t("search")}
           className="w-auto"
-          onChange={handleSearchInputChange}
+          onChange={onSearchInputChange}
           value={coursesSearchText}
         />
       )}
@@ -239,25 +256,62 @@ const Courses: FunctionComponent<IProps> = () => {
               Lessons: lessons[0].count,
               Members: members[0].count,
               "": user.role === Role.Teacher && (
-                <CourseOptionsPopper
-                  onDone={fetchCoursesBySearch}
-                  setSelectedCoursesIds={setSelectedCoursesIds}
-                  courseId={id}
-                />
+                <BasePopper
+                  width="sm"
+                  trigger={
+                    <button
+                      className="icon-button text-neutral-500"
+                      onClick={() => setSelectedCourseId(id)}
+                    >
+                      <DotsIcon />
+                    </button>
+                  }
+                >
+                  <ul className="flex flex-col">
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsEnrollUsersModalOpen(true)}
+                    >
+                      <UsersIcon /> Enroll
+                    </li>
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsDeleteCourseModalOpen(true)}
+                    >
+                      <DeleteIcon /> Delete
+                    </li>
+                  </ul>
+                </BasePopper>
               ),
             }))}
           />
         </div>
       )}
 
-      <PromptModal
-        setIsOpen={setIsDeleteCoursesModalOpen}
-        isOpen={isDeleteCoursesModalOpen}
-        title="Delete courses"
-        action="Delete"
-        body="Are you sure you want to delete selected courses?"
-        actionHandler={deleteSelectedCourses}
-      />
+      {isDeleteCoursesModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteCoursesModalOpen(false)}
+          title="Delete courses"
+          action="Delete"
+          body="Are you sure you want to delete selected courses?"
+          actionHandler={submitDeleteSelectedCourses}
+        />
+      )}
+      {isDeleteCourseModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteCourseModalOpen(false)}
+          title="Delete course"
+          action="Delete"
+          body="Are you sure you want to delete this course?"
+          actionHandler={submitDeleteCourse}
+        />
+      )}
+      {isEnrollUsersModalOpen && (
+        <EnrollUsersInCourseModal
+          courseId={selectedCourseId}
+          onClose={() => setIsEnrollUsersModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

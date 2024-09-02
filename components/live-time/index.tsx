@@ -3,11 +3,11 @@
 import { formatDistanceToNowStrict } from "date-fns";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   date: Date;
 }
 
-const LiveTime: FunctionComponent<IProps> = ({ date }) => {
+const LiveTime: FunctionComponent<Props> = ({ date }) => {
   const [liveDate, setLiveDate] = useState<string>();
   const intervalIdRef = useRef<NodeJS.Timeout>();
 

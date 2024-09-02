@@ -5,13 +5,13 @@ import type { FunctionComponent } from "react";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import { useRouter } from "next/navigation";
 
-interface IProps {
+interface Props {
   total: number;
   title?: string;
   href?: string;
 }
 
-const TotalLessons: FunctionComponent<IProps> = ({
+const TotalLessons: FunctionComponent<Props> = ({
   total,
   href,
   title = "Total lessons",

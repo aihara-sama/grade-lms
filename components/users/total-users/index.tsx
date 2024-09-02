@@ -5,13 +5,13 @@ import type { FunctionComponent } from "react";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import { useRouter } from "next/navigation";
 
-interface IProps {
+interface Props {
   total: number;
   title?: string;
   href?: string;
 }
 
-const TotalUsers: FunctionComponent<IProps> = ({
+const TotalUsers: FunctionComponent<Props> = ({
   total,
   href,
   title = "Total users",

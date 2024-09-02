@@ -5,14 +5,14 @@ import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   params: {
     courseId: string;
     lessonId: string;
   };
 }
 
-const Page: FunctionComponent<IProps> = async ({
+const Page: FunctionComponent<Props> = async ({
   params: { lessonId, courseId },
 }) => {
   const courseData = await db

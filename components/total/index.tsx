@@ -1,14 +1,14 @@
 import Link from "next/link";
 import type { FunctionComponent, ReactNode } from "react";
 
-interface IProps {
+interface Props {
   total: number;
   title: string;
   Icon: ReactNode;
   link?: string;
 }
 
-const Total: FunctionComponent<IProps> = ({ total, link, title, Icon }) => {
+const Total: FunctionComponent<Props> = ({ total, link, title, Icon }) => {
   return (
     <div className="shadow-md flex flex-col items-center p-6 w-full rounded-md sm:w-64 text-neutral-600">
       {Icon}

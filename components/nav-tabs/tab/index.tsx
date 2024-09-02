@@ -1,12 +1,12 @@
-import type { ITabItem } from "@/interfaces/menu.interface";
+import type { TabItem } from "@/interfaces/menu.interface";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 
-interface IProps extends ITabItem {
+interface Props extends TabItem {
   isActive: boolean;
 }
 
-const Tab: FunctionComponent<IProps> = ({ Icon, isActive, title, href }) => {
+const Tab: FunctionComponent<Props> = ({ Icon, isActive, title, href }) => {
   return (
     <Link
       className={`border-b-2 border-${isActive ? "link" : "transparent"} px-0 py-[5px] mx-0 -my-[2px]`}

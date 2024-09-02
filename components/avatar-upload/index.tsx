@@ -7,12 +7,12 @@ import { type ChangeEvent, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 import { v4 as uuid } from "uuid";
 
-interface IProps {
+interface Props {
   onChange: (avatar: string) => void;
   avatar: string;
 }
 
-const AvatarUpload: FunctionComponent<IProps> = ({ onChange, avatar }) => {
+const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
   const t = useTranslations();
 
   const handleChangeAvatar = async (e: ChangeEvent<HTMLInputElement>) => {

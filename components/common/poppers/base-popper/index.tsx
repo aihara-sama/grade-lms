@@ -10,7 +10,7 @@ import type {
 } from "react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
-interface IProps {
+interface Props {
   trigger: ReactNode;
   width?: "sm" | "md" | "lg" | "full";
   popperClassName?: string;
@@ -19,7 +19,7 @@ interface IProps {
 
 const BasePopper: ForwardRefRenderFunction<
   HTMLDivElement,
-  PropsWithChildren<PropsWithClassName<IProps>>
+  PropsWithChildren<PropsWithClassName<Props>>
 > = (
   {
     children,

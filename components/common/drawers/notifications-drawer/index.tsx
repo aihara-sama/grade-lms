@@ -34,7 +34,7 @@ const NotificationsDrawer: FunctionComponent = () => {
           : notification
       )
     );
-  const handleGetNotifications = async () => {
+  const fetchNotifications = async () => {
     try {
       setNotifications(await getNotifications(user.id));
     } catch (error: any) {
@@ -54,7 +54,7 @@ const NotificationsDrawer: FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    if (isOpen) handleGetNotifications();
+    if (isOpen) fetchNotifications();
   }, [isOpen]);
 
   useEffect(() => {
@@ -73,27 +73,28 @@ const NotificationsDrawer: FunctionComponent = () => {
         )}
       </button>
 
-      <BaseDrawer
-        setIsOpen={setIsOpen}
-        isOpen={isOpen}
-        placement="right"
-        header={
-          <div className="text-center flex-1 text-md font-bold">
-            Notifications
+      {isOpen && (
+        <BaseDrawer
+          onClose={() => setIsOpen(false)}
+          placement="right"
+          header={
+            <div className="text-center flex-1 text-md font-bold">
+              Notifications
+            </div>
+          }
+        >
+          <div className="max-h-[calc(100vh-88px)] overflow-auto py-4">
+            {notifications.map((notification) => (
+              <Notification
+                notification={notification}
+                onNavigateAway={() => setIsOpen(false)}
+                onReadNotification={() => onReadNotification(notification.id)}
+                key={notification.id}
+              />
+            ))}
           </div>
-        }
-      >
-        <div className="max-h-[calc(100vh-88px)] overflow-auto py-4">
-          {notifications.map((notification) => (
-            <Notification
-              notification={notification}
-              onNavigateAway={() => setIsOpen(false)}
-              onReadNotification={() => onReadNotification(notification.id)}
-              key={notification.id}
-            />
-          ))}
-        </div>
-      </BaseDrawer>
+        </BaseDrawer>
+      )}
     </>
   );
 };

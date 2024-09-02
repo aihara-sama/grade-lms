@@ -1,10 +1,10 @@
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   onClick: () => void;
 }
 
-const Hamburger: FunctionComponent<IProps> = ({ onClick }) => {
+const Hamburger: FunctionComponent<Props> = ({ onClick }) => {
   return (
     <div
       onClick={onClick}

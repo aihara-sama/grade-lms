@@ -13,12 +13,12 @@ import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   user: User;
   courses: CourseWithRefsCount[];
 }
 
-const DashboardInsights: FunctionComponent<IProps> = ({ user, courses }) => {
+const DashboardInsights: FunctionComponent<Props> = ({ user, courses }) => {
   // State
   const [usersInsights, setUsersInsights] = useState<number[]>([]);
   const [coursesInsights, setCoursesInsights] = useState<number[]>([]);

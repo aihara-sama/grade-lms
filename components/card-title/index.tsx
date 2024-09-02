@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
 
-interface IProps {
+interface Props {
   Icon: JSX.Element;
   title: string;
   checked?: boolean;
@@ -12,7 +12,7 @@ interface IProps {
   href?: string;
 }
 
-const CardTitle: FunctionComponent<IProps> = ({
+const CardTitle: FunctionComponent<Props> = ({
   Icon,
   href,
   title,

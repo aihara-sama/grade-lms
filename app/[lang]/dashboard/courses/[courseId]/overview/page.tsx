@@ -28,13 +28,13 @@ export async function generateMetadata({
   };
 }
 
-interface IProps {
+interface Props {
   params: {
     courseId: string;
   };
 }
 
-const Page: FunctionComponent<IProps> = async ({ params }) => {
+const Page: FunctionComponent<Props> = async ({ params }) => {
   const courseData = await db
     .from("courses")
     .select("*, users(*), lessons(*)")

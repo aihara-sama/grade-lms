@@ -20,11 +20,11 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   lesson: Lesson & { course: Course };
 }
 
-const Chat: FunctionComponent<IProps> = ({ lesson }) => {
+const Chat: FunctionComponent<Props> = ({ lesson }) => {
   // State
   const [chatMessageText, setChatMessageText] = useState("");
   const [chatMessages, setChatMessages] = useState<
@@ -86,6 +86,14 @@ const Chat: FunctionComponent<IProps> = ({ lesson }) => {
       setIsCreateFileMessageModalOpen(true);
     }
   };
+  const onCreateFileMessageModalClose = (mutated?: boolean) => {
+    setIsCreateFileMessageModalOpen(false);
+
+    if (mutated) {
+      fetchChatMessages();
+    }
+  };
+
   // Effects
   useEffect(() => {
     fetchChatMessages();
@@ -150,13 +158,13 @@ const Chat: FunctionComponent<IProps> = ({ lesson }) => {
           }
         }}
       />
-      <CreateFileMessageModal
-        file={file}
-        isOpen={isCreateFileMessageModalOpen}
-        lessonId={lesson.id}
-        onDone={fetchChatMessages}
-        setIsOpen={setIsCreateFileMessageModalOpen}
-      />
+      {isCreateFileMessageModalOpen && (
+        <CreateFileMessageModal
+          file={file}
+          lessonId={lesson.id}
+          onClose={onCreateFileMessageModalClose}
+        />
+      )}
     </div>
   );
 };

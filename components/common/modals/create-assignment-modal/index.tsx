@@ -4,57 +4,47 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import { createAssignment } from "@/db/assignment";
 import { getAllCourseStudentsIds } from "@/db/user";
+import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import { useUser } from "@/hooks/use-user";
 import { NotificationType } from "@/interfaces/notifications.interface";
-import { Role } from "@/interfaces/user.interface";
 import { Event } from "@/types/events.type";
 import type { Notification } from "@/types/notifications";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
-import { getNotificationChannel } from "@/utils/get-notification-channel";
 import { db } from "@/utils/supabase/client";
 import type { OutputData } from "@editorjs/editorjs";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import type {
-  ChangeEvent,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-} from "react";
-import { useEffect, useState } from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
-const getInitAssignment = (lessonId: string): TablesInsert<"assignments"> => ({
-  lesson_id: lessonId,
-  title: "",
-  body: "{}",
-  due_date: format(getNextMorning(), "yyyy-MM-dd'T'HH:mm:ss"),
-});
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onDone: () => void;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   courseId: string;
   lessonId: string;
 }
-const CreateAssignmentModal: FunctionComponent<IProps> = ({
-  onDone,
+const CreateAssignmentModal: FunctionComponent<Props> = ({
   courseId,
   lessonId,
-  isOpen,
-  setIsOpen,
+  onClose,
 }) => {
   // States
-  const [assignment, setAssignment] = useState<TablesInsert<"assignments">>();
+  const [assignment, setAssignment] = useState<TablesInsert<"assignments">>({
+    lesson_id: lessonId,
+    title: "",
+    body: "{}",
+    due_date: getNextMorning().toISOString(),
+  });
 
   // Hooks
   const t = useTranslations();
+  const notificationChannel = useNotificationChannel();
   const { user } = useUser();
 
   // Handlers
@@ -78,16 +68,13 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
 
       if (error) console.error(error);
 
-      const room = user.role === Role.Teacher ? user.id : user.creator_id;
-
-      getNotificationChannel(room).send({
+      notificationChannel.send({
         event: Event.NotificationCreated,
         type: "broadcast",
       });
 
       toast.success(t("assignment_created"));
-      setIsOpen(false);
-      onDone();
+      onClose(true);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -108,19 +95,8 @@ const CreateAssignmentModal: FunctionComponent<IProps> = ({
     }));
   };
 
-  useEffect(() => {
-    if (!isOpen) setAssignment(getInitAssignment(lessonId));
-  }, [isOpen]);
-
-  if (!assignment) return null;
-
   return (
-    <BaseModal
-      width="lg"
-      setIsOpen={setIsOpen}
-      isOpen={isOpen}
-      title="Assignment"
-    >
+    <BaseModal width="lg" onClose={onClose} title="Assignment">
       <div>
         <Input
           autoFocus

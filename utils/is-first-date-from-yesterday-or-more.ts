@@ -1,11 +1,9 @@
-import { dateStringToDateObject } from "@/utils/date-string-to-date-object";
-
 export const isFirstDateFromYesterdayOrMore = (
   firstDateStr: string,
   secondDateStr: string
 ) => {
-  const first = dateStringToDateObject(firstDateStr);
-  const second = dateStringToDateObject(secondDateStr);
+  const first = new Date(firstDateStr);
+  const second = new Date(secondDateStr);
 
   // Ensure both dates are valid
   if (Number.isNaN(first.getTime()) || Number.isNaN(second.getTime())) {

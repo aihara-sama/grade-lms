@@ -11,9 +11,10 @@ import Total from "@/components/total";
 import CardTitle from "@/components/card-title";
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
-import AssignmentOptionsPopper from "@/components/common/poppers/assignment-options-popper";
+import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
+import DotsIcon from "@/components/icons/dots-icon";
 import Skeleton from "@/components/skeleton";
 import { ASSIGNMENTS_GET_LIMIT, LESSONS_GET_LIMIT } from "@/constants";
 import {
@@ -37,19 +38,19 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   course: Course;
   lesson: Lesson;
 }
-const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
+const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
   // States
   const [isDeleteAssignmentsModalOpen, setIsDeleteAssignmentsModalOpen] =
-    useState(false);
-  const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
     useState(false);
   const [selectedAssignmentsIds, setSelectedAssignmentsIds] = useState<
     string[]
   >([]);
+  const [isDeleteAssignmentModalOpen, setIsDeleteAssignmentModalOpen] =
+    useState(false);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string>();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isAssignmentsLoading, setIsAssignmentsLoading] = useState(true);
@@ -59,31 +60,14 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
 
   // Refs
   const isSelectedAllRef = useRef(false);
-  const assignmentsSearchTextRef = useRef("");
   const assignmentsOffsetRef = useRef(ASSIGNMENTS_GET_LIMIT);
+  const assignmentsSearchTextRef = useRef("");
 
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
 
-  const openDeleteAssignmentsModal = () =>
-    setIsDeleteAssignmentsModalOpen(true);
-  const onAssignmentToggle = (checked: boolean, lessonId: string) => {
-    if (checked) {
-      setSelectedAssignmentsIds((prev) => [...prev, lessonId]);
-      setIsSelectedAll(
-        totalAssignmentsCount === selectedAssignmentsIds.length + 1
-      );
-    } else {
-      setSelectedAssignmentsIds((prev) =>
-        prev.filter((_id) => _id !== lessonId)
-      );
-      setIsSelectedAll(
-        totalAssignmentsCount === selectedAssignmentsIds.length - 1
-      );
-    }
-  };
-
+  // Handlers
   const selectAllAssignments = () => {
     setSelectedAssignmentsIds(assignments.map(({ id }) => id));
     setIsSelectedAll(true);
@@ -92,6 +76,7 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
     setSelectedAssignmentsIds([]);
     setIsSelectedAll(false);
   };
+
   const fetchAssignmentsBySearch = async () => {
     try {
       const [
@@ -114,13 +99,6 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
       toast.error(error.message);
     }
   };
-  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setAssignmentsSearchText(
-      (assignmentsSearchTextRef.current = e.target.value)
-    );
-    fetchAssignmentsBySearch();
-  };
-
   const fetchAssignmentsWithCount = async () => {
     setIsAssignmentsLoading(true);
 
@@ -139,7 +117,21 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
       setIsAssignmentsLoading(false);
     }
   };
-  const submitDeleteSelectedAssignments = async () => {
+
+  const submitDeleteAssignment = async () => {
+    try {
+      await deleteAssignmentsByAssignmentsIds([selectedAssignmentId]);
+      setIsDeleteAssignmentModalOpen(false);
+      setSelectedAssignmentsIds((prev) =>
+        prev.filter((id) => id !== selectedAssignmentId)
+      );
+      fetchAssignmentsBySearch();
+      toast.success(t("assignment_deleted"));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const submitDeleteAssignments = async () => {
     try {
       await (isSelectedAllRef.current
         ? deleteAssignmentsByTitleAndLessonId(assignmentsSearchText, lesson.id)
@@ -153,6 +145,27 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
     }
   };
 
+  const onAssignmentToggle = (checked: boolean, lessonId: string) => {
+    if (checked) {
+      setSelectedAssignmentsIds((prev) => [...prev, lessonId]);
+      setIsSelectedAll(
+        totalAssignmentsCount === selectedAssignmentsIds.length + 1
+      );
+    } else {
+      setSelectedAssignmentsIds((prev) =>
+        prev.filter((_id) => _id !== lessonId)
+      );
+      setIsSelectedAll(
+        totalAssignmentsCount === selectedAssignmentsIds.length - 1
+      );
+    }
+  };
+  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAssignmentsSearchText(
+      (assignmentsSearchTextRef.current = e.target.value)
+    );
+    fetchAssignmentsBySearch();
+  };
   const onAssignmentsScroll = async () => {
     if (isDocCloseToBottom()) {
       try {
@@ -177,6 +190,13 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
       } catch (error: any) {
         toast.error(error.message);
       }
+    }
+  };
+  const onEditAssignmentModalClose = (mutated?: boolean) => {
+    setSelectedAssignmentId(undefined);
+
+    if (mutated) {
+      fetchAssignmentsBySearch();
     }
   };
 
@@ -218,7 +238,7 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
           <CreateAssignment
             courseId={course.id}
             lessonId={lesson.id}
-            onDone={fetchAssignmentsBySearch}
+            onCreated={fetchAssignmentsBySearch}
           />
         )}
       </CardsContainer>{" "}
@@ -236,7 +256,7 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
-            onClick={openDeleteAssignmentsModal}
+            onClick={() => setIsDeleteAssignmentsModalOpen(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Delete <DeleteIcon />
@@ -258,10 +278,7 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
           data={assignments.map(({ id, title }) => ({
             Name: (
               <CardTitle
-                onClick={() => {
-                  setSelectedAssignmentId(id);
-                  setIsEditAssignmentModalOpen(true);
-                }}
+                onClick={() => setSelectedAssignmentId(id)}
                 checked={selectedAssignmentsIds.includes(id)}
                 Icon={<AssignmentsIcon size="md" />}
                 title={title}
@@ -274,32 +291,55 @@ const Assignments: FunctionComponent<IProps> = ({ course, lesson }) => {
               />
             ),
             "": user.role === Role.Teacher && (
-              <AssignmentOptionsPopper
-                assignmentId={id}
-                onDone={fetchAssignmentsBySearch}
-                setSelectedAssignmentsIds={setSelectedAssignmentsIds}
-              />
+              <BasePopper
+                width="sm"
+                trigger={
+                  <button
+                    className="icon-button text-neutral-500"
+                    onClick={() => setSelectedAssignmentId(id)}
+                  >
+                    <DotsIcon />
+                  </button>
+                }
+              >
+                <ul className="flex flex-col">
+                  <li
+                    className="popper-list-item"
+                    onClick={() => setIsDeleteAssignmentModalOpen(false)}
+                  >
+                    <DeleteIcon /> Delete
+                  </li>
+                </ul>
+              </BasePopper>
             ),
           }))}
         />
       )}
-      <EditAssignmentModal
-        isOpen={isEditAssignmentModalOpen}
-        setIsOpen={setIsEditAssignmentModalOpen}
-        assignmentId={selectedAssignmentId}
-        onDone={() => {
-          fetchAssignmentsBySearch();
-          setSelectedAssignmentId(undefined);
-        }}
-      />
-      <PromptModal
-        isOpen={isDeleteAssignmentsModalOpen}
-        setIsOpen={setIsDeleteAssignmentsModalOpen}
-        title="Delete assignments"
-        action="Delete"
-        body={t("prompts.delete_assignments")}
-        actionHandler={submitDeleteSelectedAssignments}
-      />
+      {selectedAssignmentId && (
+        <EditAssignmentModal
+          assignmentId={selectedAssignmentId}
+          onClose={onEditAssignmentModalClose}
+          onSubmissionCreated={fetchAssignmentsBySearch}
+        />
+      )}
+      {isDeleteAssignmentsModalOpen && (
+        <PromptModal
+          title="Delete assignments"
+          action="Delete"
+          body={t("prompts.delete_assignments")}
+          actionHandler={submitDeleteAssignments}
+          onClose={() => setIsDeleteAssignmentsModalOpen(false)}
+        />
+      )}
+      {isDeleteAssignmentModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteAssignmentModalOpen(false)}
+          title="Delete assignment"
+          action="Delete"
+          body={t("prompts.delete_assignment")}
+          actionHandler={submitDeleteAssignment}
+        />
+      )}
     </>
   );
 };

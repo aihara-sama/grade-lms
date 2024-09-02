@@ -3,11 +3,11 @@ import IconTitle from "@/components/icon-title";
 import type { User } from "@/types/users";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   users: User[];
 }
 
-const Students: FunctionComponent<IProps> = ({ users }) => {
+const Students: FunctionComponent<Props> = ({ users }) => {
   return (
     <div className="mt-4 flex flex-col flex-1">
       <p className="mb-2 font-bold">Students</p>

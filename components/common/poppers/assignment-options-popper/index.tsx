@@ -8,16 +8,16 @@ import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   setSelectedAssignmentsIds: Dispatch<SetStateAction<string[]>>;
   assignmentId: string;
-  onDone: () => void;
+  onClose: (mutated?: boolean) => void;
 }
 
-const AssignmentOptionsPopper: FunctionComponent<IProps> = ({
+const AssignmentOptionsPopper: FunctionComponent<Props> = ({
   assignmentId,
   setSelectedAssignmentsIds,
-  onDone,
+  onClose,
 }) => {
   // State
   const [isDeleteAssignmentModalOpen, setIsDeleteAssignmentModalOpen] =
@@ -37,7 +37,7 @@ const AssignmentOptionsPopper: FunctionComponent<IProps> = ({
         prev.filter((id) => id !== assignmentId)
       );
       toast.success(t("assignment_deleted"));
-      onDone();
+      onClose(true);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -59,14 +59,15 @@ const AssignmentOptionsPopper: FunctionComponent<IProps> = ({
           </li>
         </ul>
       </BasePopper>
-      <PromptModal
-        setIsOpen={setIsDeleteAssignmentModalOpen}
-        isOpen={isDeleteAssignmentModalOpen}
-        title="Delete assignment"
-        action="Delete"
-        body={t("prompts.delete_assignment")}
-        actionHandler={handleDeleteAssignment}
-      />
+      {isDeleteAssignmentModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteAssignmentModalOpen(false)}
+          title="Delete assignment"
+          action="Delete"
+          body={t("prompts.delete_assignment")}
+          actionHandler={handleDeleteAssignment}
+        />
+      )}
     </>
   );
 };

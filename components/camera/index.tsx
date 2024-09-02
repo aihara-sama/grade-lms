@@ -10,13 +10,13 @@ import type { ICamera } from "@/interfaces/camera.interface";
 import { Role } from "@/interfaces/user.interface";
 import { useEffect, useRef, type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   camera: ICamera;
   toggleCamera: (id: string) => void;
   toggleAudio: (id: string) => void;
 }
 
-const Camera: FunctionComponent<IProps> = ({
+const Camera: FunctionComponent<Props> = ({
   camera,
   toggleCamera,
   toggleAudio,

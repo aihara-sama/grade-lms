@@ -5,19 +5,19 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import MembersIcon from "@/components/icons/members-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import NavTabs from "@/components/nav-tabs";
-import type { ITabItem } from "@/interfaces/menu.interface";
+import type { TabItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
-interface IProps {
+interface Props {
   course: Course;
 }
 
-const CourseHeader: FunctionComponent<PropsWithChildren<IProps>> = ({
+const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = ({
   course,
 }) => {
-  const tabs: ITabItem[] = [
+  const tabs: TabItem[] = [
     {
       title: "Overview",
       href: `/dashboard/courses/${course.id}/overview`,

@@ -4,11 +4,12 @@ import Avatar from "@/components/avatar";
 import CardTitle from "@/components/card-title";
 import CardsContainer from "@/components/cards-container";
 import PromptModal from "@/components/common/modals/prompt-modal";
-import MemberOptionsPopper from "@/components/common/poppers/member-options-popper";
+import BasePopper from "@/components/common/poppers/base-popper";
 import IconTitle from "@/components/icon-title";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
+import DotsIcon from "@/components/icons/dots-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
@@ -35,14 +36,16 @@ import { useEffect, useRef, useState } from "react";
 
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   courseId: string;
   currentUser: AuthUser;
 }
-const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
+const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
   const [isDispelMembersModalOpen, setIsDispelMembersModalOpen] =
     useState(false);
+  const [isDispelMemberModalOpen, setIsDispelMemberModalOpen] = useState(false);
   const [selectedMembersIds, setSelectedMembersIds] = useState<string[]>([]);
+  const [selectedMemberId, setSelectedMemberId] = useState<string>();
   const [members, setMembers] = useState<User[]>([]);
   const [totalMembersCount, setTotalMembersCount] = useState(0);
   const [membersSearchText, setMembersSearchText] = useState("");
@@ -91,6 +94,20 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
       toast.error(error.message);
     }
   };
+  const submitDispelUser = async () => {
+    try {
+      await dispelUsersFromCourse([selectedMemberId], courseId);
+      setIsDispelMemberModalOpen(false);
+      setSelectedMembersIds((prev) =>
+        prev.filter((id) => id !== selectedMemberId)
+      );
+      fetchMembersBySearch();
+      toast.success(t("user_deleted"));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const dispelMembers = async () => {
     try {
       await (isSelectedAllRef.current
@@ -156,6 +173,22 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
     }
   };
 
+  const onDispelMembersModalClose = (mutated?: boolean) => {
+    setIsDispelMembersModalOpen(false);
+
+    if (mutated) {
+      fetchMembersBySearch();
+    }
+  };
+
+  const onDispelMemberModalClose = (mutated?: boolean) => {
+    setIsDispelMemberModalOpen(false);
+
+    if (mutated) {
+      fetchMembersBySearch();
+    }
+  };
+
   useEffect(() => {
     const throttled = throttle(handleCoursesScroll, 300);
     document
@@ -190,7 +223,10 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
           total={totalMembersCount}
           title="Total members"
         />
-        <EnrollUsers onDone={fetchMembersBySearch} courseId={courseId} />
+        <EnrollUsers
+          onUsersEnrolled={fetchMembersBySearch}
+          courseId={courseId}
+        />
       </CardsContainer>
       {selectedMembersIds.length ? (
         <div className="mb-3 gap-2 flex">
@@ -243,24 +279,48 @@ const Members: FunctionComponent<IProps> = ({ courseId, currentUser }) => {
                 />
               ),
             "": (
-              <MemberOptionsPopper
-                onDone={fetchMembersBySearch}
-                setSelectedMembersIds={setSelectedMembersIds}
-                courseId={courseId}
-                memberId={id}
-              />
+              <BasePopper
+                width="sm"
+                trigger={
+                  <button
+                    className="icon-button text-neutral-500"
+                    onClick={() => setSelectedMemberId(id)}
+                  >
+                    <DotsIcon />
+                  </button>
+                }
+              >
+                <ul className="flex flex-col">
+                  <li
+                    className="popper-list-item"
+                    onClick={() => setIsDispelMemberModalOpen(true)}
+                  >
+                    <DeleteIcon /> Dispel
+                  </li>
+                </ul>
+              </BasePopper>
             ),
           }))}
         />
       )}
-      <PromptModal
-        isOpen={isDispelMembersModalOpen}
-        setIsOpen={setIsDispelMembersModalOpen}
-        title="Dispel Members"
-        action="Dispel"
-        actionHandler={dispelMembers}
-        body={t("prompts.dispel_users")}
-      />
+      {isDispelMembersModalOpen && (
+        <PromptModal
+          onClose={onDispelMembersModalClose}
+          title="Dispel Members"
+          action="Dispel"
+          actionHandler={dispelMembers}
+          body={t("prompts.dispel_users")}
+        />
+      )}
+      {isDispelMemberModalOpen && (
+        <PromptModal
+          onClose={onDispelMemberModalClose}
+          title="Dispel user"
+          action="Dispel"
+          body={t("prompts.dispel_user")}
+          actionHandler={submitDispelUser}
+        />
+      )}
     </>
   );
 };

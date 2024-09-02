@@ -14,11 +14,11 @@ import {
 } from "date-fns";
 import React, { useState } from "react";
 
-interface IProps {
+interface Props {
   onChange: (date: Date) => void;
 }
 
-const CalendarWidget: React.FC<IProps> = ({ onChange }) => {
+const CalendarWidget: React.FC<Props> = ({ onChange }) => {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState<Date>(today);
   const [selectedDate, setSelectedDate] = useState<Date | null>(today);

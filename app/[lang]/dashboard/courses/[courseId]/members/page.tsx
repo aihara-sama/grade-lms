@@ -6,12 +6,12 @@ import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   params: {
     courseId: string;
   };
 }
-const Page: FunctionComponent<IProps> = async ({ params: { courseId } }) => {
+const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
   const [
     {
       data: { user: currentUser },

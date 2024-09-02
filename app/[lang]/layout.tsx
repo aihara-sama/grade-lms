@@ -15,11 +15,11 @@ const latoFont = Lato({
   subsets: ["latin"],
 });
 
-interface IProps {
+interface Props {
   params: { locale: string };
 }
 
-const Layout: FunctionComponent<PropsWithChildren<IProps>> = async ({
+const Layout: FunctionComponent<PropsWithChildren<Props>> = async ({
   children,
   params: { locale },
 }) => {

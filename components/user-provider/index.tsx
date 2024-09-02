@@ -7,11 +7,11 @@ import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";
 
-interface IProps {
+interface Props {
   user: User | null;
 }
 
-const UserProvider: FunctionComponent<PropsWithChildren<IProps>> = ({
+const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
   user,
   children,
 }) => {

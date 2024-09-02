@@ -1,9 +1,8 @@
 import BaseModal from "@/components/common/modals/base-modal";
-import type { Dispatch, FunctionComponent, SetStateAction } from "react";
+import type { FunctionComponent } from "react";
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+interface Props {
+  onClose: () => void;
   title: string;
   body: string;
   action: "Delete" | "Dispel";
@@ -11,26 +10,24 @@ interface IProps {
   isInsideModal?: boolean;
 }
 
-const PromptModal: FunctionComponent<IProps> = ({
+const PromptModal: FunctionComponent<Props> = ({
   title,
   body,
-  isOpen,
   action,
   isInsideModal,
-  setIsOpen,
+  onClose,
   actionHandler,
 }) => {
   return (
     <BaseModal
       isInsideModal={isInsideModal}
       isExpanded={false}
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
+      onClose={onClose}
       title={`${title}`}
     >
       <p className="mb-4">{body}</p>
       <div className="flex justify-end gap-3">
-        <button className="outline-button" onClick={() => setIsOpen(false)}>
+        <button className="outline-button" onClick={onClose}>
           Cancel
         </button>
         <button className="primary-button" onClick={actionHandler}>

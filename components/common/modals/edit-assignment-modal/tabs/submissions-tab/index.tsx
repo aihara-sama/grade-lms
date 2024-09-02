@@ -3,30 +3,51 @@ import ViewSubmissionModal from "@/components/common/modals/view-submission-moda
 import IconTitle from "@/components/icon-title";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Table from "@/components/table";
+import {
+  getAssignmentSubmissionsWithAuthor,
+  getUserSubmissionsWithAuthor,
+} from "@/db/submission";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import { format } from "date-fns";
 import Link from "next/link";
 
-import { useState, type FunctionComponent } from "react";
+import { useEffect, useState, type FunctionComponent } from "react";
+import toast from "react-hot-toast";
 
-interface IProps {
-  submissions: SubmissionWithAuthor[];
-  onDone: () => void;
-  isAssignmentPastDue: boolean;
+interface Props {
+  assignmentId: string;
 }
 
-const SubmissionsTab: FunctionComponent<IProps> = ({
-  submissions,
-  isAssignmentPastDue,
-  onDone,
-}) => {
+const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string>();
-  const [isViewSubmissonModalOpen, setIsViewSubmissonModalOpen] =
-    useState(false);
+  const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
 
   const { user } = useUser();
+
+  const fetchSubmissions = async () => {
+    try {
+      setSubmissions(
+        await (user.role === Role.Teacher
+          ? getAssignmentSubmissionsWithAuthor(assignmentId)
+          : getUserSubmissionsWithAuthor(assignmentId, user.id))
+      );
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const onSubmissionModalClose = (mutated?: boolean) => {
+    setSelectedSubmissionId(undefined);
+
+    if (mutated) {
+      fetchSubmissions();
+    }
+  };
+
+  useEffect(() => {
+    fetchSubmissions();
+  }, []);
 
   return (
     <div className="overflow-hidden">
@@ -39,10 +60,7 @@ const SubmissionsTab: FunctionComponent<IProps> = ({
               key={id}
               title={title}
               subtitle=""
-              onClick={() => {
-                setSelectedSubmissionId(id);
-                setIsViewSubmissonModalOpen(true);
-              }}
+              onClick={() => setSelectedSubmissionId(id)}
             />
           ),
           Author: (
@@ -58,24 +76,20 @@ const SubmissionsTab: FunctionComponent<IProps> = ({
           ),
         }))}
       />
-      {user.role === Role.Teacher ? (
+
+      {user.role === Role.Teacher && selectedSubmissionId && (
         <ViewSubmissionModal
-          isOpen={isViewSubmissonModalOpen}
-          setIsOpen={setIsViewSubmissonModalOpen}
-          onDone={onDone}
+          onClose={onSubmissionModalClose}
           submissionId={selectedSubmissionId}
         />
-      ) : (
+      )}
+      {user.role === Role.Student && selectedSubmissionId && (
         <EditSubmissionModal
-          isOpen={isViewSubmissonModalOpen}
-          setIsOpen={setIsViewSubmissonModalOpen}
-          onDone={onDone}
+          onClose={onSubmissionModalClose}
           submissionId={selectedSubmissionId}
-          isAssignmentPastDue={isAssignmentPastDue}
         />
       )}
     </div>
   );
 };
-
 export default SubmissionsTab;

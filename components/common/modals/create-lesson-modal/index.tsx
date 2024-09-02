@@ -13,13 +13,8 @@ import {
   subMinutes,
 } from "date-fns";
 import { useTranslations } from "next-intl";
-import type {
-  ChangeEvent,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-} from "react";
-import { useEffect, useState } from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 const initLesson: TablesInsert<"lessons"> = {
@@ -28,24 +23,22 @@ const initLesson: TablesInsert<"lessons"> = {
   ends: new Date(addMinutes(getNextMorning(), 30)).toISOString(),
 };
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onDone: () => void;
+interface Props {
   courseId: string;
+  onClose: (mutated?: boolean) => void;
+  maybeLesson?: TablesInsert<"lessons">;
 }
 
-const CreateLessonModal: FunctionComponent<IProps> = ({
-  onDone,
-  isOpen,
-  setIsOpen,
+const CreateLessonModal: FunctionComponent<Props> = ({
   courseId,
+  maybeLesson,
+  onClose,
 }) => {
   const [lesson, setLesson] = useState<TablesInsert<"lessons">>({
     ...initLesson,
+    ...maybeLesson,
     course_id: courseId,
   });
-  console.log({ lesson });
 
   const duration = +new Date(lesson.ends) - +new Date(lesson.starts);
 
@@ -53,16 +46,18 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
   const t = useTranslations();
   const { user } = useUser();
 
-  const onDateChange = (date: Date) => {
-    setLesson((_) => ({
-      ..._,
-      starts: date.toISOString(),
-      ends: new Date(
-        addMinutes(date, millisecondsToMinutes(duration))
-      ).toISOString(),
-    }));
-  };
+  const changeDuration = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    let { ends } = lesson;
 
+    if (+value > millisecondsToMinutes(duration)) {
+      ends = format(addMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
+    } else if (+value < millisecondsToMinutes(duration) && +value > 15) {
+      ends = format(subMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
+    }
+
+    setLesson((_) => ({ ..._, ends }));
+  };
   const submitCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -78,41 +73,26 @@ const CreateLessonModal: FunctionComponent<IProps> = ({
       await createLesson(lesson);
 
       toast(t("lesson_created"));
-      setIsOpen(false);
-      onDone();
-      setLesson(initLesson);
+      onClose(true);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-
-  const changeDuration = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    let { ends } = lesson;
-
-    if (+value > millisecondsToMinutes(duration)) {
-      ends = format(addMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
-    } else if (+value < millisecondsToMinutes(duration) && +value > 15) {
-      ends = format(subMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
-    }
-
-    setLesson((_) => ({ ..._, ends }));
+  const onDateChange = (date: Date) => {
+    setLesson((_) => ({
+      ..._,
+      starts: date.toISOString(),
+      ends: new Date(
+        addMinutes(date, millisecondsToMinutes(duration))
+      ).toISOString(),
+    }));
   };
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setLesson((_) => ({ ..._, [e.target.name]: e.target.value }));
 
-  useEffect(() => {
-    if (!isOpen) setLesson({ ...initLesson, course_id: courseId });
-  }, [isOpen]);
-
   return (
-    <BaseModal
-      isExpanded={false}
-      setIsOpen={setIsOpen}
-      isOpen={isOpen}
-      title="Create lesson"
-    >
+    <BaseModal isExpanded={false} onClose={onClose} title="Create lesson">
       <form onSubmit={submitCreateLesson}>
         <Input
           autoFocus

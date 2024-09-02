@@ -29,7 +29,7 @@ export const updateAssignment = async (
   if (result.error) throw new Error(t("failed_to_update_assignment"));
 };
 
-export const getAssignmentByAssignmentId = async (assignmentId: string) => {
+export const getAssignmentById = async (assignmentId: string) => {
   const t = await loadMessages();
   const result = await db
     .from("assignments")

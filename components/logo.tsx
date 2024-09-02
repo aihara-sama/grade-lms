@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 
-interface IProps {}
+interface Props {}
 
-const Logo: FunctionComponent<IProps> = () => {
+const Logo: FunctionComponent<Props> = () => {
   return (
     <Link href="/">
       <svg

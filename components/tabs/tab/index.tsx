@@ -2,14 +2,14 @@
 
 import type { FunctionComponent, ReactNode } from "react";
 
-interface IProps {
+interface Props {
   isActive: boolean;
   Icon: ReactNode;
   title: string;
   onClick: () => void;
 }
 
-const Tab: FunctionComponent<IProps> = ({ Icon, isActive, title, onClick }) => {
+const Tab: FunctionComponent<Props> = ({ Icon, isActive, title, onClick }) => {
   return (
     <div
       className={`border-b-2 ${isActive ? "border-link" : "border-transparent"} px-[0] py-[5px] mx-[0] -my-[2px]`}

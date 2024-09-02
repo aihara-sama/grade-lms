@@ -13,13 +13,13 @@ import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   user: User;
   totalAssignmentsCount: number;
   totalSubmissionsCount: number;
 }
 
-const StudentrDashboard: FunctionComponent<IProps> = ({
+const StudentrDashboard: FunctionComponent<Props> = ({
   user,
   totalSubmissionsCount,
   totalAssignmentsCount,

@@ -19,29 +19,29 @@ const MobileDrawer: FunctionComponent = () => {
   return (
     <>
       <Hamburger onClick={() => setIsOpen(true)} />
-      <BaseDrawer
-        header={<Logo />}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        placement="left"
-      >
-        <div className="pl-7">
-          <ul className="flex flex-col gap-4 mt-4">
-            {menu
-              .filter(({ tier }) => tier.includes(user.role))
-              .map(({ title, href, Icon }, idx) => (
-                <li key={idx}>
-                  <Link href={href} className="flex items-center gap-2">
-                    {Icon}
-                    <span className="text-md"> {title}</span>
-                  </Link>
-                </li>
-              ))}
-          </ul>
-        </div>
-      </BaseDrawer>
+      {isOpen && (
+        <BaseDrawer
+          header={<Logo />}
+          placement="left"
+          onClose={() => setIsOpen(false)}
+        >
+          <div className="pl-7">
+            <ul className="flex flex-col gap-4 mt-4">
+              {menu
+                .filter(({ tier }) => tier.includes(user.role))
+                .map(({ title, href, Icon }, idx) => (
+                  <li key={idx}>
+                    <Link href={href} className="flex items-center gap-2">
+                      {Icon}
+                      <span className="text-md"> {title}</span>
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </BaseDrawer>
+      )}
     </>
   );
 };
-
 export default MobileDrawer;

@@ -12,11 +12,11 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   courseId: string;
 }
 
-const CourseInsights: FunctionComponent<IProps> = ({ courseId }) => {
+const CourseInsights: FunctionComponent<Props> = ({ courseId }) => {
   // State
   const [lessonsInsights, setLessonsInsights] = useState<number[]>([]);
   const [usersInsights, setUsersInsights] = useState<number[]>([]);

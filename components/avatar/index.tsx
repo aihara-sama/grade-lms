@@ -1,11 +1,11 @@
 import type { PropsWithClassName } from "@/types";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   avatar: string;
 }
 
-const Avatar: FunctionComponent<PropsWithClassName<IProps>> = ({
+const Avatar: FunctionComponent<PropsWithClassName<Props>> = ({
   avatar,
   className = "",
 }) => {

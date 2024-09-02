@@ -1,6 +1,6 @@
 import { LESSONS_GET_LIMIT } from "@/constants";
 import type { Lesson } from "@/types/lessons.type";
-import type { TablesInsert } from "@/types/supabase.type";
+import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
 import { db } from "@/utils/supabase/client";
 import { format } from "date-fns";
@@ -59,9 +59,9 @@ export const getLessonsCountByCourseId = async (courseId: string) => {
 
   return result.data.lessons[0].count;
 };
-export const getWeekLessons = async (days: string[]) => {
+export const getWeekLessons = async (days: string[], courseId?: string) => {
   const t = await loadMessages();
-  const result = await db
+  const builder = db
     .from("lessons")
     .select("*")
     .filter("course_id", "not.is", null)
@@ -72,24 +72,7 @@ export const getWeekLessons = async (days: string[]) => {
     )
     .order("starts", { ascending: true });
 
-  if (result.error) throw new Error(t("failed_to_load_lessons"));
-
-  return result.data;
-};
-export const getWeekLessonsByCourseId = async (
-  days: string[],
-  courseId: string
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("lessons")
-    .select("*")
-    .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
-    .lte(
-      "starts",
-      format(`${days[days.length - 1]} 23:45:00`, "yyyy-MM-dd'T'HH:mm:ss")
-    )
-    .eq("course_id", courseId);
+  const result = await (courseId ? builder.eq("course_id", courseId) : builder);
 
   if (result.error) throw new Error(t("failed_to_load_lessons"));
 
@@ -206,4 +189,21 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
     .eq("id", lesson.id);
 
   if (result.error) throw new Error(t("failed_to_extend_lesson"));
+};
+export const updateLesson = async (lesson: TablesUpdate<"lessons">) => {
+  const t = await loadMessages();
+  const result = await db.from("lessons").update(lesson).eq("id", lesson.id);
+
+  if (result.error) throw new Error(t("failed_to_update_lesson"));
+
+  return result.data;
+};
+
+export const getLessonById = async (id: string) => {
+  const t = await loadMessages();
+  const result = await db.from("lessons").select("*").eq("id", id).single();
+
+  if (result.error) throw new Error(t("failed_to_load_lesson"));
+
+  return result.data;
 };

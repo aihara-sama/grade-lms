@@ -8,13 +8,13 @@ import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   setSelectedLessonsIds: Dispatch<SetStateAction<string[]>>;
   lessonId: string;
   onDone: () => void;
 }
 
-const LessonOptionsPopper: FunctionComponent<IProps> = ({
+const LessonOptionsPopper: FunctionComponent<Props> = ({
   lessonId,
   setSelectedLessonsIds,
   onDone,
@@ -26,9 +26,7 @@ const LessonOptionsPopper: FunctionComponent<IProps> = ({
   const t = useTranslations();
 
   // Handlers
-  const openDeleteLessonModal = () => setIsDeleteLessonModalOpen(true);
-
-  const handleDeleteLesson = async () => {
+  const submitDeleteLesson = async () => {
     try {
       await deleteLessonsByLessonsIds([lessonId]);
       setIsDeleteLessonModalOpen(false);
@@ -51,19 +49,23 @@ const LessonOptionsPopper: FunctionComponent<IProps> = ({
         }
       >
         <ul className="flex flex-col">
-          <li onClick={openDeleteLessonModal} className="popper-list-item">
+          <li
+            className="popper-list-item"
+            onClick={() => setIsDeleteLessonModalOpen(true)}
+          >
             <DeleteIcon /> Delete
           </li>
         </ul>
       </BasePopper>
-      <PromptModal
-        setIsOpen={setIsDeleteLessonModalOpen}
-        isOpen={isDeleteLessonModalOpen}
-        title="Delete lesson"
-        action="Delete"
-        body={t("prompts.delete_lesson")}
-        actionHandler={handleDeleteLesson}
-      />
+      {isDeleteLessonModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteLessonModalOpen(false)}
+          title="Delete lesson"
+          action="Delete"
+          body={t("prompts.delete_lesson")}
+          actionHandler={submitDeleteLesson}
+        />
+      )}
     </>
   );
 };

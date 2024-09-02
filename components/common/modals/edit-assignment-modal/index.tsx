@@ -5,113 +5,35 @@ import SubmissionsTab from "@/components/common/modals/edit-assignment-modal/tab
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Tabs from "@/components/tabs";
-import toast from "react-hot-toast";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import { getAssignmentByAssignmentId, updateAssignment } from "@/db/assignment";
-import {
-  getSubmissionsWithAuthorByAssignmentId,
-  getSubmissionsWithAuthorByAssignmentIdAndUserId,
-} from "@/db/submission";
-import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { ResultOf } from "@/types";
-import type { SubmissionWithAuthor } from "@/types/submissions.type";
-import type { TablesUpdate } from "@/types/supabase.type";
-import { isAfter } from "date-fns";
-import { useTranslations } from "next-intl";
-import type { Dispatch, FunctionComponent, SetStateAction } from "react";
-import { useEffect, useState } from "react";
+import type { FunctionComponent } from "react";
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+interface Props {
   assignmentId: string;
-  onDone: () => void;
+  onClose: (mutated?: boolean) => void;
+  onSubmissionCreated: () => void;
 }
 
-const EditAssignmentModal: FunctionComponent<IProps> = ({
+const EditAssignmentModal: FunctionComponent<Props> = ({
   assignmentId,
-  onDone,
-  isOpen,
-  setIsOpen,
+  onClose,
+  onSubmissionCreated,
 }) => {
-  const [assignment, setAssignment] =
-    useState<ResultOf<typeof getAssignmentByAssignmentId>>();
-  const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
-
-  // Vars
-  const isAssignmentPastDue =
-    assignment && isAfter(new Date(), new Date(assignment.due_date));
-
-  const t = useTranslations();
-  const { user } = useUser();
-
-  const submitUpdateAssignment = async (
-    assignmentUpdate: TablesUpdate<"assignments">
-  ) => {
-    try {
-      await updateAssignment(assignmentUpdate);
-
-      toast(t("assignment_updated"));
-      setIsOpen(false);
-      onDone();
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  const fetchSubmissions = async () => {
-    try {
-      setSubmissions(
-        await (user.role === Role.Teacher
-          ? getSubmissionsWithAuthorByAssignmentId(assignmentId)
-          : getSubmissionsWithAuthorByAssignmentIdAndUserId(
-              assignmentId,
-              user.id
-            ))
-      );
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  const fetchAssignment = async () => {
-    try {
-      setAssignment(await getAssignmentByAssignmentId(assignmentId));
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) fetchSubmissions();
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen) fetchAssignment();
-    else setAssignment(undefined);
-  }, [isOpen]);
-
   return (
-    <BaseModal
-      width="lg"
-      setIsOpen={setIsOpen}
-      isOpen={isOpen}
-      title="Assignment"
-    >
+    <BaseModal width="lg" onClose={onClose} title="Assignment">
       <div className="">
         <Tabs
           tabs={[
             {
               title: "Overview",
               Icon: <OverviewIcon />,
-              content: assignment && (
+              content: (
                 <OverviewTab
-                  assignment={assignment}
-                  onSubmissionCreated={fetchSubmissions}
-                  submitUpdateAssignment={submitUpdateAssignment}
-                  isAssignmentPastDue={isAssignmentPastDue}
+                  assignmentId={assignmentId}
+                  onSubmissionCreated={onSubmissionCreated}
+                  onAssignmentUpdated={onClose}
                 />
               ),
               tier: [Role.Teacher, Role.Student],
@@ -119,13 +41,7 @@ const EditAssignmentModal: FunctionComponent<IProps> = ({
             {
               title: "Submissions",
               Icon: <SubmissionsIcon />,
-              content: (
-                <SubmissionsTab
-                  onDone={fetchSubmissions}
-                  submissions={submissions}
-                  isAssignmentPastDue={isAssignmentPastDue}
-                />
-              ),
+              content: <SubmissionsTab assignmentId={assignmentId} />,
               tier: [Role.Teacher, Role.Student],
             },
           ]}

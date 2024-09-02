@@ -17,7 +17,7 @@ import clsx from "clsx";
 import type { FunctionComponent } from "react";
 import { useEffect, useRef } from "react";
 
-interface IProps {
+interface Props {
   data: OutputData;
   onChange: (data: OutputData) => void;
   readOnly?: boolean;
@@ -25,7 +25,7 @@ interface IProps {
   id: string;
 }
 
-const Editor: FunctionComponent<IProps> = ({
+const Editor: FunctionComponent<Props> = ({
   data,
   onChange,
   readOnly,

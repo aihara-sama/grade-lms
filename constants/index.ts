@@ -5,3 +5,7 @@ export const ASSIGNMENTS_GET_LIMIT = 20;
 export const SUBMISSIONS_GET_LIMIT = 20;
 export const WHITEBOARD_MIN_HEIGHT = 170;
 export const PUBLIC_PAGES = ["/dashboard/lessons/:*"];
+export const MILLISECOND = 1;
+export const SECOND = MILLISECOND * 1000;
+export const MINUTE = SECOND * 60;
+export const HOUR = MINUTE * 60;

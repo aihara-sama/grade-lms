@@ -4,16 +4,26 @@ import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in
 import AddUserIcon from "@/components/icons/add-user-icon";
 import { useState, type FunctionComponent } from "react";
 
-interface IProps {
-  onDone: () => void;
+interface Props {
+  onUsersEnrolled: () => void;
   courseId: string;
 }
 
-const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId }) => {
+const EnrollUsers: FunctionComponent<Props> = ({
+  onUsersEnrolled,
+  courseId,
+}) => {
   const [isEnrollUsersModalOpen, setIsEnrollUsersModalOpen] = useState(false);
 
   // Handlers
   const openEnrollUserModal = () => setIsEnrollUsersModalOpen(true);
+  const onEnrollUsersInCourseModalClose = (mutated?: boolean) => {
+    setIsEnrollUsersModalOpen(false);
+
+    if (mutated) {
+      onUsersEnrolled();
+    }
+  };
 
   return (
     <div className="border border-dashed px-[24px] py-8 flex flex-col items-center justify-between w-[280px] rounded-[5px] border-light bg-white">
@@ -22,12 +32,12 @@ const EnrollUsers: FunctionComponent<IProps> = ({ onDone, courseId }) => {
       <button className="primary-button" onClick={openEnrollUserModal}>
         Enroll
       </button>
-      <EnrollUsersInCourseModal
-        onDone={onDone}
-        courseId={courseId}
-        isOpen={isEnrollUsersModalOpen}
-        setIsOpen={setIsEnrollUsersModalOpen}
-      />
+      {isEnrollUsersModalOpen && (
+        <EnrollUsersInCourseModal
+          onClose={onEnrollUsersInCourseModalClose}
+          courseId={courseId}
+        />
+      )}
     </div>
   );
 };

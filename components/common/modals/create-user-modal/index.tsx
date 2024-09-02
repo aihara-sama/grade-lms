@@ -17,21 +17,14 @@ import type { InputType as UserInputType } from "@/actions/create-user-action/ty
 import BaseModal from "@/components/common/modals/base-modal";
 import Select from "@/components/common/select";
 import { createUser } from "@/db/user";
-import type { ISelectItem } from "@/interfaces/menu.interface";
+import type { SelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
 import { getTimeZone } from "@/utils/get-time-zone";
 import { useTranslations } from "next-intl";
-import type {
-  ChangeEvent,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-} from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onDone: () => void;
+interface Props {
+  onClose: (mutated?: boolean) => void;
 }
 
 const initUserDetails: UserInputType = {
@@ -42,31 +35,27 @@ const initUserDetails: UserInputType = {
   timezone: getTimeZone(),
 };
 
-const CreateUserModal: FunctionComponent<IProps> = ({
-  onDone,
-  isOpen,
-  setIsOpen,
-}) => {
+const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
   const [userDetails, setUserDetails] = useState(initUserDetails);
-  const [timezones, setTimezones] = useState<ISelectItem[]>([]);
+  const [timezones, setTimezones] = useState<SelectItem[]>([]);
 
   const t = useTranslations();
 
   const submitCreateUser = async (createAnother?: boolean) => {
     try {
       await createUser(userDetails);
-      setUserDetails(initUserDetails);
-      if (!createAnother) {
-        setIsOpen(false);
+      if (createAnother) {
+        setUserDetails(initUserDetails);
+      } else {
+        onClose(true);
       }
-      onDone();
       toast.success(t("user_created"));
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
-  const onTimezoneChange = (timezone: ISelectItem) =>
+  const onTimezoneChange = (timezone: SelectItem) =>
     setUserDetails((_) => ({ ..._, timezone: timezone.title }));
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
@@ -76,19 +65,10 @@ const CreateUserModal: FunctionComponent<IProps> = ({
     setUserDetails((_) => ({ ..._, avatar }));
 
   useEffect(() => {
-    if (!isOpen) setUserDetails(initUserDetails);
-  }, [isOpen]);
-
-  useEffect(() => {
     setTimezones(tz.map(({ tzCode }) => ({ id: tzCode, title: tzCode })));
   }, []);
   return (
-    <BaseModal
-      isExpanded={false}
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
-      title="Create user"
-    >
+    <BaseModal isExpanded={false} onClose={onClose} title="Create user">
       <form noValidate>
         <Tabs
           tabs={[

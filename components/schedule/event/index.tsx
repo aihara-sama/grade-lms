@@ -11,14 +11,14 @@ import {
 } from "date-fns";
 import { memo, type FunctionComponent, type MouseEvent } from "react";
 
-interface IProps {
+interface Props {
   index: number;
   event: Lesson;
   isSummerDaylight: boolean;
   isInterdayEvent?: boolean;
 }
 
-const Event: FunctionComponent<IProps> = ({
+const Event: FunctionComponent<Props> = ({
   event,
   index,
   isSummerDaylight,

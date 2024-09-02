@@ -8,9 +8,9 @@ import { Role } from "@/interfaces/user.interface";
 import { getTimeZone } from "@/utils/get-time-zone";
 import type { ChangeEvent, FunctionComponent } from "react";
 
-interface IProps {}
+interface Props {}
 
-const GuestPrompt: FunctionComponent<IProps> = () => {
+const GuestPrompt: FunctionComponent<Props> = () => {
   // State
   const [userName, setUserName] = useState("");
 

@@ -2,64 +2,55 @@ import BaseModal from "@/components/common/modals/base-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import {
-  getSubmissionWithAuthorBySubmissionId,
-  updateSubmission,
-} from "@/db/submission";
-import type { SubmissionWithAuthor } from "@/types/submissions.type";
+import { getSubmissionWithAuthorById, updateSubmission } from "@/db/submission";
+import type { ResultOf } from "@/types";
 import type { OutputData } from "@editorjs/editorjs";
+import { isAfter } from "date-fns";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import type {
-  ChangeEvent,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-} from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   submissionId: string;
-  onDone: () => void;
-  isAssignmentPastDue: boolean;
 }
-const EditSubmissionModal: FunctionComponent<IProps> = ({
-  isOpen,
-  setIsOpen,
+const EditSubmissionModal: FunctionComponent<Props> = ({
   submissionId,
-  isAssignmentPastDue,
-  onDone,
+  onClose,
 }) => {
-  const [submission, setSubmission] = useState<SubmissionWithAuthor>();
+  const [submission, setSubmission] =
+    useState<ResultOf<typeof getSubmissionWithAuthorById>>();
 
   const t = useTranslations();
 
-  const submitUpdateSubmission = async () => {
-    try {
-      await updateSubmission(submission);
+  const isAssignmentPastDue =
+    submission && isAfter(new Date(), new Date(submission.assignment.due_date));
 
-      toast.success(t("submission_updated"));
-      setIsOpen(false);
-      onDone();
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
   const fetchSubmission = async () => {
     try {
-      const submissionData =
-        await getSubmissionWithAuthorBySubmissionId(submissionId);
+      const submissionData = await getSubmissionWithAuthorById(submissionId);
       setSubmission(submissionData);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
+
+  const submitUpdateSubmission = async () => {
+    try {
+      await updateSubmission(submission);
+
+      onClose(true);
+      toast.success(t("submission_updated"));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const onBodyChange = (data: OutputData) =>
     setSubmission((_) => ({
       ..._,
@@ -69,17 +60,11 @@ const EditSubmissionModal: FunctionComponent<IProps> = ({
     setSubmission((_) => ({ ..._, [e.target.name]: e.target.value }));
 
   useEffect(() => {
-    if (isOpen) fetchSubmission();
-  }, [isOpen]);
+    fetchSubmission();
+  }, []);
 
   return (
-    <BaseModal
-      isInsideModal
-      width="lg"
-      setIsOpen={setIsOpen}
-      isOpen={isOpen}
-      title="Submission"
-    >
+    <BaseModal isInsideModal width="lg" onClose={onClose} title="Submission">
       {submission ? (
         <div>
           <Input

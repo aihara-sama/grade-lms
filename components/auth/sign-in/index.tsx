@@ -9,9 +9,9 @@ import { useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {}
+interface Props {}
 
-const SignIn: FunctionComponent<IProps> = () => {
+const SignIn: FunctionComponent<Props> = () => {
   // Hooks
   const router = useRouter();
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   Icon: JSX.Element;
   title: string;
   subtitle: string;
@@ -9,7 +9,7 @@ interface IProps {
   onClick?: () => void;
 }
 
-const IconTitle: FunctionComponent<IProps> = ({
+const IconTitle: FunctionComponent<Props> = ({
   subtitle,
   title,
   Icon,

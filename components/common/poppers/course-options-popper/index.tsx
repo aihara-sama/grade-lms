@@ -10,13 +10,13 @@ import { useState } from "react";
 
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   setSelectedCoursesIds: Dispatch<SetStateAction<string[]>>;
   courseId: string;
   onDone: () => void;
 }
 
-const CourseOptionsPopper: FunctionComponent<IProps> = ({
+const CourseOptionsPopper: FunctionComponent<Props> = ({
   courseId,
   setSelectedCoursesIds,
   onDone,
@@ -61,20 +61,21 @@ const CourseOptionsPopper: FunctionComponent<IProps> = ({
           </li>
         </ul>
       </BasePopper>
-      <PromptModal
-        setIsOpen={setIsDeleteCourseModalOpen}
-        isOpen={isDeleteCourseModalOpen}
-        title="Delete course"
-        action="Delete"
-        body="Are you sure you want to delete this course?"
-        actionHandler={handleDeleteCourse}
-      />
-      <EnrollUsersInCourseModal
-        courseId={courseId}
-        isOpen={isEnrollUsersModalOpen}
-        setIsOpen={setIsEnrollUsersModalOpen}
-        onDone={onDone}
-      />
+      {isDeleteCourseModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteCourseModalOpen(false)}
+          title="Delete course"
+          action="Delete"
+          body="Are you sure you want to delete this course?"
+          actionHandler={handleDeleteCourse}
+        />
+      )}
+      {isEnrollUsersModalOpen && (
+        <EnrollUsersInCourseModal
+          courseId={courseId}
+          onClose={() => setIsEnrollUsersModalOpen(false)}
+        />
+      )}
     </>
   );
 };

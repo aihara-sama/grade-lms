@@ -8,13 +8,13 @@ import Link from "next/link";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   notification: ResultOf<typeof getNotifications>[number];
   onReadNotification: () => void;
   onNavigateAway: () => void;
 }
 
-const Notification: FunctionComponent<IProps> = ({
+const Notification: FunctionComponent<Props> = ({
   notification,
   onNavigateAway,
   onReadNotification,

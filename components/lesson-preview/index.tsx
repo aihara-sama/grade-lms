@@ -36,11 +36,11 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 
-interface IProps {
+interface Props {
   lesson: Lesson;
 }
 
-const LessonPreview: FunctionComponent<IProps> = ({ lesson }) => {
+const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
   // State
   const [starts, setStarts] = useState(new Date(lesson.starts));
   const [ends, setEnds] = useState(new Date(lesson.ends));

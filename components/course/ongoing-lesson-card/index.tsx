@@ -3,11 +3,11 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { type FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   courseId: string;
 }
 
-const OngoingLessonCard: FunctionComponent<IProps> = async ({ courseId }) => {
+const OngoingLessonCard: FunctionComponent<Props> = async ({ courseId }) => {
   const data = await db
     .from("courses")
     .select("lessons(*)")

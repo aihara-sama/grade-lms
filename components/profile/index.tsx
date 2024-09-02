@@ -18,11 +18,11 @@ import type { User } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   user: User;
 }
 
-const Profile: FunctionComponent<IProps> = ({ user }) => {
+const Profile: FunctionComponent<Props> = ({ user }) => {
   const router = useRouter();
   const pathName = usePathname();
   const t = useTranslations();

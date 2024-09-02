@@ -23,14 +23,14 @@ ChartJS.register(
   Legend
 );
 
-interface IProps {
+interface Props {
   labels: string[];
   data: number[];
   label: string;
   shouldCalcRightSide?: boolean;
 }
 
-const Insight: FunctionComponent<IProps> = ({
+const Insight: FunctionComponent<Props> = ({
   data,
   labels,
   label,

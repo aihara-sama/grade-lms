@@ -2,22 +2,22 @@ import BasePopper from "@/components/common/poppers/base-popper";
 import ArrowIcon from "@/components/icons/arrow-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
-import type { ISelectItem } from "@/interfaces/menu.interface";
+import type { SelectItem } from "@/interfaces/menu.interface";
 import clsx from "clsx";
 import type { ChangeEvent, ComponentProps, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 
-interface IProps {
+interface Props {
   label: string;
-  options: ISelectItem[];
+  options: SelectItem[];
   useUnselect?: boolean;
-  defaultValue: ISelectItem;
-  onChange: (option: ISelectItem) => void;
+  defaultValue: SelectItem;
+  onChange: (option: SelectItem) => void;
   fullWidth?: boolean;
   popperProps?: Partial<ComponentProps<typeof BasePopper>>;
 }
 
-const Select: FunctionComponent<IProps> = ({
+const Select: FunctionComponent<Props> = ({
   label,
   options,
   defaultValue,
@@ -28,8 +28,7 @@ const Select: FunctionComponent<IProps> = ({
 }) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
-  const [filteredOptions, setFilteredOptions] =
-    useState<ISelectItem[]>(options);
+  const [filteredOptions, setFilteredOptions] = useState<SelectItem[]>(options);
   const [searchText, setSearchText] = useState("");
   const [popperHeight, setPopperHeight] = useState(0);
 

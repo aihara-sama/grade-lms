@@ -16,8 +16,10 @@ import toast from "react-hot-toast";
 import Avatar from "@/components/avatar";
 import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses";
 import PromptModal from "@/components/common/modals/prompt-modal";
-import UserOptionsPopper from "@/components/common/poppers/user-options-popper";
+import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
+import DotsIcon from "@/components/icons/dots-icon";
+import UsersIcon from "@/components/icons/users-icon";
 import Skeleton from "@/components/skeleton";
 import { USERS_GET_LIMIT } from "@/constants";
 import {
@@ -41,12 +43,16 @@ const Users: FunctionComponent = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
   const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>();
   const [isUsersLoading, setIsUsersLoading] = useState(true);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
   const [usersSearchText, setUsersSearchText] = useState("");
   const [isEnrollUsersInCoursesModalOpen, setIsEnrollUsersInCoursesModalOpen] =
     useState(false);
+  const [isEnrollUserInCoursesModalOpen, setIsEnrollUserInCoursesModalOpen] =
+    useState(false);
   const [isSelectedAll, setIsSelectedAll] = useState(false);
+  const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -102,6 +108,19 @@ const Users: FunctionComponent = () => {
     }
   };
 
+  const submitDeleteUser = async () => {
+    try {
+      await deleteUsersByUsersIds([selectedUserId]);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsDeleteUserModalOpen(false);
+      setSelectedUsersIds((_) => _.filter((id) => id !== selectedUserId));
+      fetchUsersBySearch();
+      toast.success(t("user_deleted"));
+    }
+  };
+
   const selectAllUsers = () => {
     setSelectedUsersIds(users.map(({ id }) => id));
     setIsSelectedAll(true);
@@ -149,6 +168,14 @@ const Users: FunctionComponent = () => {
     }
   };
 
+  const onEnrollUsersInCoursesModalClose = (mutated?: boolean) => {
+    setIsEnrollUsersInCoursesModalOpen(false);
+
+    if (mutated) {
+      setSelectedUsersIds([]);
+    }
+  };
+
   // Effects
   useEffect(() => {
     const throttled = throttle(handleCoursesScroll, 300);
@@ -182,7 +209,7 @@ const Users: FunctionComponent = () => {
           total={totalUsersCount}
           title="Total users"
         />
-        <CreateUser onDone={fetchUsersBySearch} />
+        <CreateUser onUserCreated={fetchUsersBySearch} />
       </CardsContainer>
       {selectedUsersIds.length ? (
         <div className="mb-3 gap-2 flex">
@@ -233,31 +260,68 @@ const Users: FunctionComponent = () => {
               ),
               Email: email,
               "": (
-                <UserOptionsPopper
-                  onDone={fetchUsersBySearch}
-                  setSelectedUsersIds={setSelectedUsersIds}
-                  userId={id}
-                />
+                <BasePopper
+                  width="sm"
+                  trigger={
+                    <button
+                      className="icon-button text-neutral-500"
+                      onClick={() => setSelectedUserId(id)}
+                    >
+                      <DotsIcon />
+                    </button>
+                  }
+                >
+                  <ul className="flex flex-col">
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsEnrollUsersInCoursesModalOpen(true)}
+                    >
+                      <UsersIcon /> Enroll
+                    </li>
+                    <li
+                      onClick={() => setIsDeleteUserModalOpen(true)}
+                      className="popper-list-item"
+                    >
+                      <DeleteIcon /> Delete
+                    </li>
+                  </ul>
+                </BasePopper>
               ),
             }))}
           />
         </div>
       )}
 
-      <PromptModal
-        isOpen={isDeleteUsersModalOpen}
-        setIsOpen={setIsDeleteUsersModalOpen}
-        title="Delete Users"
-        action="Delete"
-        actionHandler={handleDeleteUsers}
-        body={t("prompts.delete_users")}
-      />
-      <EnrollUsersInCoursesModal
-        onDone={() => setSelectedUsersIds([])}
-        usersIds={selectedUsersIds}
-        isOpen={isEnrollUsersInCoursesModalOpen}
-        setIsOpen={setIsEnrollUsersInCoursesModalOpen}
-      />
+      {isEnrollUsersInCoursesModalOpen && (
+        <EnrollUsersInCoursesModal
+          usersIds={selectedUsersIds}
+          onClose={onEnrollUsersInCoursesModalClose}
+        />
+      )}
+      {isEnrollUserInCoursesModalOpen && (
+        <EnrollUsersInCoursesModal
+          usersIds={[selectedUserId]}
+          onClose={() => setIsEnrollUserInCoursesModalOpen(false)}
+        />
+      )}
+      {isDeleteUserModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteUsersModalOpen(false)}
+          title="Delete user"
+          action="Delete"
+          body="Are you sure you want to delete this user?"
+          actionHandler={submitDeleteUser}
+        />
+      )}
+      {isDeleteUsersModalOpen && (
+        <PromptModal
+          onClose={() => setIsDeleteUsersModalOpen(false)}
+          title="Delete Users"
+          action="Delete"
+          actionHandler={handleDeleteUsers}
+          body={t("prompts.delete_users")}
+        />
+      )}
     </>
   );
 };

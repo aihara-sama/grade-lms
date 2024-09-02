@@ -1,10 +1,10 @@
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   record: string;
 }
 
-const ChartSkeleton: FunctionComponent<IProps> = ({ record }) => {
+const ChartSkeleton: FunctionComponent<Props> = ({ record }) => {
   return (
     <>
       <div className="relative flex border border-neutral-100 p-[11px]">

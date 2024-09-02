@@ -2,7 +2,7 @@ import Avatar from "@/components/avatar";
 import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
 import Table from "@/components/table";
-import type { Dispatch, FunctionComponent, SetStateAction } from "react";
+import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 
 import { enrollUsersInCourses, getUsersNotInCourse } from "@/db/user";
@@ -12,18 +12,14 @@ import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   courseId: string;
-  onDone: () => void;
 }
 
-const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
-  isOpen,
-  setIsOpen,
+const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   courseId,
-  onDone,
+  onClose,
 }) => {
   // State
   const [users, setUsers] = useState<User[]>([]);
@@ -36,8 +32,6 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   const { user } = useUser();
 
   // Handlers
-  const closeModal = () => setIsOpen(false);
-
   const fetchUsersNotInCourse = async () => {
     try {
       setUsers(await getUsersNotInCourse(user.id, courseId));
@@ -48,10 +42,8 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   const enrollUsers = async () => {
     try {
       await enrollUsersInCourses(selectedUsersIds, [courseId]);
+      onClose(true);
       toast(t("users_enrolled"));
-      setSelectedUsersIds([]);
-      setIsOpen(false);
-      onDone();
       db.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
@@ -66,16 +58,12 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
   };
   // Effects
   useEffect(() => {
-    if (isOpen) {
-      fetchUsersNotInCourse();
-    } else {
-      setSelectedUsersIds([]);
-    }
-  }, [isOpen]);
+    fetchUsersNotInCourse();
+  }, []);
 
   // View
   return (
-    <BaseModal isOpen={isOpen} setIsOpen={setIsOpen} title="Enrollment">
+    <BaseModal onClose={() => onClose()} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select users to enroll</p>
       <div className="">
         <Table
@@ -97,7 +85,7 @@ const EnrollUsersInCourseModal: FunctionComponent<IProps> = ({
         />
       </div>
       <div className="flex justify-end gap-3 mt-4">
-        <button className="outline-button" onClick={closeModal}>
+        <button className="outline-button" onClick={() => onClose()}>
           Cancel
         </button>
         <button

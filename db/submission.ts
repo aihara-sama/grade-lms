@@ -30,7 +30,7 @@ export const updateSubmission = async (
   if (result.error) throw new Error(t("failed_to_update_submission"));
 };
 
-export const getSubmissionsWithAuthorByAssignmentId = async (
+export const getAssignmentSubmissionsWithAuthor = async (
   assignmentId: string
 ) => {
   const t = await loadMessages();
@@ -44,7 +44,7 @@ export const getSubmissionsWithAuthorByAssignmentId = async (
 
   return result.data;
 };
-export const getSubmissionsWithAuthorByAssignmentIdAndUserId = async (
+export const getUserSubmissionsWithAuthor = async (
   assignmentId: string,
   userId: string
 ) => {
@@ -60,14 +60,12 @@ export const getSubmissionsWithAuthorByAssignmentIdAndUserId = async (
 
   return result.data;
 };
-export const getSubmissionWithAuthorBySubmissionId = async (
-  submissionId: string
-) => {
+export const getSubmissionWithAuthorById = async (id: string) => {
   const t = await loadMessages();
   const result = await db
     .from("submissions")
-    .select("*, author:users(*)")
-    .eq("id", submissionId)
+    .select("*, author:users(*), assignment:assignments(due_date)")
+    .eq("id", id)
     .single();
 
   if (result.error) throw new Error(t("failed_to_load_submissions"));

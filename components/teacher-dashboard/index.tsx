@@ -22,12 +22,12 @@ import toast from "react-hot-toast";
 //   else toast.success(success);
 // };
 
-interface IProps {
+interface Props {
   totalCoursesCount: number;
   totalUsersCount: number;
 }
 
-const TeacherDashboard: FunctionComponent<IProps> = ({
+const TeacherDashboard: FunctionComponent<Props> = ({
   totalUsersCount,
   totalCoursesCount,
 }) => {

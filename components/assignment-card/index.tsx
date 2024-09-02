@@ -2,11 +2,11 @@ import CourseIcon from "@/components/icons/course-icon";
 import type { Assignment } from "@/types/assignments.type";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   assignment: Assignment;
 }
 
-const AssignmentCard: FunctionComponent<IProps> = ({ assignment }) => {
+const AssignmentCard: FunctionComponent<Props> = ({ assignment }) => {
   return (
     <div
       key={assignment.id}

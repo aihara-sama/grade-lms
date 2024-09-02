@@ -9,12 +9,12 @@ import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
+interface Props {
   course: Database["public"]["Tables"]["courses"]["Row"];
   updateCourseTitle: (title: string) => void;
 }
 
-const CourseSettings: FunctionComponent<IProps> = ({
+const CourseSettings: FunctionComponent<Props> = ({
   course,
   updateCourseTitle,
 }) => {

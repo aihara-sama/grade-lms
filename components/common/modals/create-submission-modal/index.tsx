@@ -11,52 +11,39 @@ import type { TablesInsert } from "@/types/supabase.type";
 import type { OutputData } from "@editorjs/editorjs";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import type {
-  ChangeEvent,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-} from "react";
-import { useEffect, useState } from "react";
+import type { ChangeEvent, FunctionComponent } from "react";
+import { useState } from "react";
 
 import toast from "react-hot-toast";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
-const getInitSubmission = (
-  assignmentId: string,
-  userId: string
-): TablesInsert<"submissions"> => ({
-  user_id: userId,
-  title: "My Submission",
-  body: "{}",
-  assignment_id: assignmentId,
-});
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onDone: () => void;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   courseId: string;
   lessonId: string;
   assignmentId: string;
 }
-const CreateSubmissionModal: FunctionComponent<IProps> = ({
-  onDone,
+const CreateSubmissionModal: FunctionComponent<Props> = ({
   courseId,
   lessonId,
-  isOpen,
-  setIsOpen,
+  onClose,
   assignmentId,
 }) => {
-  // States
-  const [submission, setSubmission] = useState<TablesInsert<"submissions">>();
-
   // Hooks
   const t = useTranslations();
   const notificationChannel = useNotificationChannel();
   const { user } = useUser();
+
+  // States
+  const [submission, setSubmission] = useState<TablesInsert<"submissions">>({
+    user_id: user.id,
+    title: "My Submission",
+    body: "{}",
+    assignment_id: assignmentId,
+  });
 
   // Handlers
   const fireNotificationCreated = () => {
@@ -81,8 +68,7 @@ const CreateSubmissionModal: FunctionComponent<IProps> = ({
 
       fireNotificationCreated();
       toast.success(t("submission_created"));
-      setIsOpen(false);
-      onDone();
+      onClose(false);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -97,20 +83,8 @@ const CreateSubmissionModal: FunctionComponent<IProps> = ({
       body: JSON.stringify(data),
     }));
 
-  useEffect(() => {
-    if (!isOpen) setSubmission(getInitSubmission(assignmentId, user.id));
-  }, [isOpen]);
-
-  if (!submission) return null;
-
   return (
-    <BaseModal
-      isInsideModal
-      width="lg"
-      setIsOpen={setIsOpen}
-      isOpen={isOpen}
-      title="Submission"
-    >
+    <BaseModal isInsideModal width="lg" onClose={onClose} title="Submission">
       <div>
         <Input
           autoFocus

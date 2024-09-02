@@ -1,12 +1,12 @@
 import { IconSize } from "@/components/icons";
 import type { FunctionComponent } from "react";
 
-interface IProps {
+interface Props {
   className?: string;
   size?: keyof typeof IconSize;
 }
 
-const PlusIcon: FunctionComponent<IProps> = ({ className, size }) => {
+const PlusIcon: FunctionComponent<Props> = ({ className, size }) => {
   return (
     <svg
       width={IconSize[size] || 14}

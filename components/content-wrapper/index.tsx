@@ -10,7 +10,7 @@ const ContentWrapper: FunctionComponent<PropsWithChildren> = ({ children }) => {
   return (
     <div
       id="content-wrapper"
-      className={`overflow-auto h-[calc(100vh-68px)] fixed inset-0 top-[68px] `}
+      className="overflow-auto h-[calc(100vh-68px)] flex fixed inset-0 top-[68px]"
     >
       <div
         className={`max-w-[1432px] mx-[auto] ${clsx(isExpanded && "[max-width:unset] [margin:unset]")} flex flex-1 flex-col p-6`}

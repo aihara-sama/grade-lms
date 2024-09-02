@@ -11,22 +11,18 @@ import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
-import type { Dispatch, FunctionComponent, SetStateAction } from "react";
+import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   usersIds: string[];
-  onDone: () => void;
 }
 
-const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
-  isOpen,
-  setIsOpen,
+const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   usersIds,
-  onDone,
+  onClose,
 }) => {
   // State
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
@@ -54,17 +50,15 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
   const handleEnrollUsers = async () => {
     try {
       await enrollUsersInCourses(usersIds, selectedCoursesIds);
+      onClose(true);
+      toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
+      db.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsOpen(false);
       setSelectedCoursesIds([]);
-      toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
-      onDone();
-      db.functions.invoke("check-events");
     }
   };
-  const closeModal = () => setIsOpen(false);
   const onUserToggle = (checked: boolean, userId: string) => {
     if (checked) {
       setSelectedCoursesIds((prev) => [...prev, userId]);
@@ -74,16 +68,12 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
   };
   // Effects
   useEffect(() => {
-    if (isOpen) {
-      getCourses();
-    } else {
-      setSelectedCoursesIds([]);
-    }
-  }, [isOpen]);
+    getCourses();
+  }, []);
 
   // View
   return (
-    <BaseModal isOpen={isOpen} setIsOpen={setIsOpen} title="Enrollment">
+    <BaseModal onClose={onClose} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select courses to enroll</p>
       <Table
         compact
@@ -103,7 +93,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<IProps> = ({
         }))}
       />
       <div className="flex justify-end gap-3 mt-4">
-        <button className="outline-button" onClick={closeModal}>
+        <button className="outline-button" onClick={() => onClose()}>
           Cancel
         </button>
         <button

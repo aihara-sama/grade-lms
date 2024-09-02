@@ -6,45 +6,45 @@ import { hasVerticalScrollbar } from "@/utils/has-vertical-scrollbar";
 import clsx from "clsx";
 import {
   useEffect,
-  type Dispatch,
+  useState,
   type FunctionComponent,
   type PropsWithChildren,
   type ReactNode,
-  type SetStateAction,
 } from "react";
 
-interface IProps {
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+interface Props {
+  onClose: (mutated?: boolean) => void;
   placement: "left" | "right";
   header: ReactNode;
 }
 
-const BaseDrawer: FunctionComponent<PropsWithChildren<IProps>> = ({
-  isOpen,
+const BaseDrawer: FunctionComponent<PropsWithChildren<Props>> = ({
   placement,
-  setIsOpen,
   children,
   header,
+  onClose,
 }) => {
+  const [hasRendered, setHasRendered] = useState(false);
   // Effects
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflowY = "hidden";
+    document.body.style.overflowY = "hidden";
 
-      if (hasVerticalScrollbar()) {
-        document.body.style.paddingRight = "4px";
-      }
-    } else {
+    if (hasVerticalScrollbar()) {
+      document.body.style.paddingRight = "4px";
+    }
+
+    setHasRendered(true);
+
+    return () => {
       document.body.style.overflowY = "unset";
       document.body.style.paddingRight = "0px";
-    }
-  }, [isOpen]);
+    };
+  }, []);
 
   // View
   return (
     <>
-      <Mask isOpen={isOpen} onClick={() => setIsOpen(false)} />
+      <Mask onClick={onClose} />
       {/* Actual Drawer */}
       <div
         className={clsx(
@@ -54,16 +54,16 @@ const BaseDrawer: FunctionComponent<PropsWithChildren<IProps>> = ({
               placement === "left" || placement === "right",
             "left-0": placement === "left",
             "right-0": placement === "right",
-            "transform translate-x-0": placement === "left" && isOpen,
-            "-translate-x-full": placement === "left" && !isOpen,
-            "translate-x-0": placement === "right" && isOpen,
-            "translate-x-full": placement === "right" && !isOpen,
+            "transform translate-x-0": placement === "left" && hasRendered,
+            "-translate-x-full": placement === "left" && !hasRendered,
+            "translate-x-0": placement === "right" && hasRendered,
+            "translate-x-full": placement === "right" && !hasRendered,
           }
         )}
       >
         <div className="shadow-lg py-4 pl-7 pr-3 flex justify-between">
           {header}
-          <button onClick={() => setIsOpen(false)} className="icon-button">
+          <button onClick={() => onClose()} className="icon-button">
             <CloseIcon />
           </button>
         </div>
