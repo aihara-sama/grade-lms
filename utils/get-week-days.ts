@@ -1,6 +1,6 @@
 import { addDays, format } from "date-fns";
 
-export const getWeekDays = (start = new Date()) => {
+export const getWeekDays = (start = new Date("2024-10-22T00:00:00")) => {
   return [
     format(addDays(start, 0), "MM/dd/yyyy"),
     format(addDays(start, 1), "MM/dd/yyyy"),

@@ -66,12 +66,12 @@ const Select: FunctionComponent<Props> = ({
       ref={popperRef}
       trigger={
         <div
-          className={`relative border-[1px] border-solid flex items-center justify-between px-3 py-2 rounded-[5px] cursor-pointer bg-white hover:bg-gray-100 active:bg-gray-200 gap-3 ${clsx(fullWidth ? "w-full" : "w-40")}`}
+          className={`relative border-[1px] border-solid flex items-center justify-between px-3 py-2 rounded-[5px] cursor-pointer bg-white hover:bg-gray-100 active:bg-gray-200 gap-3 ${clsx(fullWidth ? "w-full" : "w-52")}`}
         >
           <div className="absolute -top-3.5 left-1 px-1 text-neutral-500 font-bold">
             {label}
           </div>
-          <div>{defaultValue?.title || "All"}</div>
+          <div>{defaultValue?.title || (useUnselect ? "All" : "Choose")}</div>
           <ArrowIcon direction={isOpen ? "top" : "bottom"} />
         </div>
       }

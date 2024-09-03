@@ -11,7 +11,6 @@ import {
   addDays,
   addHours,
   addMinutes,
-  differenceInHours,
   format,
   isEqual,
   millisecondsToMinutes,
@@ -31,6 +30,7 @@ import type { Lesson } from "@/types/lessons.type";
 import { getEventElFromPoints } from "@/utils/get-event-el-from-points";
 import { getEventPlaceholderElFromPoints } from "@/utils/get-event-placeholder-el-from-points";
 import { getWeekDays } from "@/utils/get-week-days";
+import { isEndDST } from "@/utils/is-summer-daylight";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
@@ -41,6 +41,8 @@ const Schedule: FunctionComponent = () => {
   const [hoveredDate, setHoveredDate] = useState<Date>();
   const [courses, setCourses] = useState<SelectItem[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
+
+  console.log({ hoveredDate });
 
   // Refs
   const isDraggingEventRef = useRef(false);
@@ -78,8 +80,8 @@ const Schedule: FunctionComponent = () => {
       );
   };
   const getHourQuarter = (day: string, hour: number) => {
-    return [0, 15, 30, 45].find((quarter) =>
-      isEqual(hoveredDate, addMinutes(addHours(day, hour), quarter))
+    return [0, 15, 30, 45].find((min) =>
+      isEqual(hoveredDate, addMinutes(addHours(day, hour), min))
     );
   };
   const scroll = (direction: "top" | "bottom") => {
@@ -153,6 +155,7 @@ const Schedule: FunctionComponent = () => {
       );
       if (maybeEventPlaceholderEl) {
         const eventPlaceholderDate = maybeEventPlaceholderEl.dataset.date;
+        console.log({ eventPlaceholderDate });
 
         const eventPlaceholderEnds = new Date(
           +new Date(eventPlaceholderDate) +
@@ -177,7 +180,9 @@ const Schedule: FunctionComponent = () => {
           .filter(({ id }) => id !== draggingEvent.id)
           .find(
             (event) =>
+              // New date bigger than event date
               (+new Date(eventPlaceholderDate) >= +new Date(event.starts) &&
+                // New date less than event ends
                 +new Date(eventPlaceholderDate) < +new Date(event.ends)) ||
               (+new Date(eventPlaceholderEnds) > +new Date(event.starts) &&
                 +new Date(eventPlaceholderEnds) <= +new Date(event.ends)) ||
@@ -218,13 +223,16 @@ const Schedule: FunctionComponent = () => {
     setInitPointerPosition(undefined);
   };
 
-  const onLessonModalClose = useCallback((mutated?: boolean) => {
-    setSelectedLesson(undefined);
+  const onLessonModalClose = useCallback(
+    (mutated?: boolean) => {
+      setSelectedLesson(undefined);
 
-    if (mutated) {
-      fetchWeekLessons();
-    }
-  }, []);
+      if (mutated) {
+        fetchWeekLessons();
+      }
+    },
+    [days]
+  );
 
   // Effects
   useEffect(() => {
@@ -313,7 +321,7 @@ const Schedule: FunctionComponent = () => {
       </div>
       <div
         ref={hoursLabelsDaysWrapperRef}
-        className="flex gap-[6px] max-h-[calc(100vh_-_261px)] overflow-auto pt-[6px] pr-[6px]"
+        className="flex gap-[6px] pt-[6px] pr-[6px]"
       >
         <div className="-mt-[10px] text-sm font-bold">
           {[...Array(24)].map((_, idx) => (
@@ -335,19 +343,25 @@ const Schedule: FunctionComponent = () => {
             {days.map((day, idx) => {
               return (
                 <div className="flex-1" key={idx}>
-                  {[...Array(differenceInHours(addDays(day, 1), day))].map(
-                    (__, i) => (
-                      <Hour
-                        key={i}
-                        day={day}
-                        index={i}
-                        events={lessons}
-                        hour={+addHours(day, i)}
-                        quarter={getHourQuarter(day, i)}
-                        draggingEvent={getMaybeDraggingEvent(day, i)}
-                      />
-                    )
-                  )}
+                  {[...Array(25)].map((__, i) => (
+                    <Hour
+                      key={i}
+                      day={day}
+                      index={i}
+                      events={lessons}
+                      hour={+addHours(day, i)}
+                      quarter={getHourQuarter(
+                        day,
+                        isEndDST(addHours(day, i)) ? i + 1 : i
+                      )}
+                      // quarter2={
+                      //   isEndDST(new Date(i + 1))
+                      //     ? getHourQuarter(day, i + 1)
+                      //     : undefined
+                      // }
+                      draggingEvent={getMaybeDraggingEvent(day, i)}
+                    />
+                  ))}
                 </div>
               );
             })}
@@ -357,6 +371,7 @@ const Schedule: FunctionComponent = () => {
                 event={draggingEvent}
                 canDropEvent={canDropEvent}
                 initEventPosition={initEventPosition}
+                newStarts={hoveredDate}
               />
             )}
           </div>

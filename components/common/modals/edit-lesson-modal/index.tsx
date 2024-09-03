@@ -140,6 +140,11 @@ const EditLessonModal: FunctionComponent<Props> = memo(
       }
     }, [lesson, courses.length]);
 
+    useEffect(() => {
+      if (selectedCourse)
+        setLesson((_) => ({ ..._, course_id: selectedCourse.id }));
+    }, [selectedCourse]);
+
     // View
     return (
       <BaseModal
@@ -172,7 +177,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
                 options={courses}
                 fullWidth
                 popperProps={{
-                  popperClassName: "max-h-[160px]",
+                  popperClassName: "h-[198px]",
                 }}
               />
             )}

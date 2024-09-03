@@ -274,7 +274,7 @@ const Users: FunctionComponent = () => {
                   <ul className="flex flex-col">
                     <li
                       className="popper-list-item"
-                      onClick={() => setIsEnrollUsersInCoursesModalOpen(true)}
+                      onClick={() => setIsEnrollUserInCoursesModalOpen(true)}
                     >
                       <UsersIcon /> Enroll
                     </li>

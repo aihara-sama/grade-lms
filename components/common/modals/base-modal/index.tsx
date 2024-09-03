@@ -51,7 +51,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<Props>> = ({
     <div
       className={`fixed inset-3 z-[999] ${clsx(hasRendered && "visible overflow-visible")}`}
     >
-      <Mask onClick={onClose} />
+      <Mask onClick={() => onClose()} />
       <div
         className={`flex flex-col relative top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 z-[999] w-full
         ${clsx({
@@ -71,7 +71,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<Props>> = ({
             <div className="font-bold text-neutral-600">{title}</div>
             <div className="flex items-center">
               {headerButtons}
-              <button className="icon-button" onClick={onClose}>
+              <button className="icon-button" onClick={() => onClose()}>
                 <CloseIcon />
               </button>
             </div>

@@ -42,7 +42,11 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
 
   const submitUpdateSubmission = async () => {
     try {
-      await updateSubmission(submission);
+      await updateSubmission({
+        title: submission.title,
+        body: submission.body,
+        id: submission.id,
+      });
 
       onClose(true);
       toast.success(t("submission_updated"));
