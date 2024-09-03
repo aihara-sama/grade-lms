@@ -12,7 +12,7 @@ const Cmp = () => {
   }, []);
   return (
     <div
-      className={`size-20 bg-red-600 transition-all ${clsx(hasRendered && "translate-y-5")} `}
+      className={`size-20 bg-red-600 transition-all ${clsx(hasRendered && "translate-y-5")}`}
     ></div>
   );
 };
