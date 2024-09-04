@@ -14,6 +14,7 @@ const publicPages = [
 const intlMiddleware = createMiddleware({
   locales,
   defaultLocale: DEFAULT_LOCALE,
+  localePrefix: "as-needed",
 });
 
 export async function middleware(request: NextRequest) {
