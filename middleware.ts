@@ -10,7 +10,6 @@ const publicPages = [
   "/subscription",
   "/dashboard/lessons/:*",
 ];
-//  "/((?!api/send-notification|[a-zA-Z]{2}/sign-up|[a-zA-Z]{2}/sign-in|[a-zA-Z]{2}/dashboard/lessons/:*|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
 
 const intlMiddleware = createMiddleware({
   locales,
@@ -24,11 +23,15 @@ export async function middleware(request: NextRequest) {
   );
   const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
 
+  // Run the intlMiddleware first
+  const intlResponse = intlMiddleware(request);
+
   if (isPublicPage) {
-    return intlMiddleware(request);
+    return intlResponse;
   }
 
-  return updateSession(request, intlMiddleware(request));
+  // Update session after handling locale
+  return updateSession(request, intlResponse);
 }
 
 export const config = {
