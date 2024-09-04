@@ -5,6 +5,7 @@ import Skeleton from "@/components/skeleton";
 import { getSubmissionWithAuthorById, updateSubmission } from "@/db/submission";
 import type { ResultOf } from "@/types";
 import type { OutputData } from "@editorjs/editorjs";
+import clsx from "clsx";
 import { isAfter } from "date-fns";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
@@ -25,6 +26,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
 }) => {
   const [submission, setSubmission] =
     useState<ResultOf<typeof getSubmissionWithAuthorById>>();
+  const [isSubmitting, setIsSUbmitting] = useState(false);
 
   const t = useTranslations();
 
@@ -41,13 +43,20 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
   };
 
   const submitUpdateSubmission = async () => {
+    setIsSUbmitting(true);
     try {
-      await updateSubmission(submission);
+      await updateSubmission({
+        body: submission.body,
+        title: submission.title,
+        id: submission.id,
+      });
 
       onClose(true);
       toast.success(t("submission_updated"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSUbmitting(false);
     }
   };
 
@@ -98,7 +107,16 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
               }
               className="primary-button w-[100px]"
             >
-              Submit
+              {isSubmitting && (
+                <img
+                  className="loading-spinner"
+                  src="/gifs/loading-spinner.gif"
+                  alt=""
+                />
+              )}
+              <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+                Save
+              </span>
             </button>
           </div>
         </div>

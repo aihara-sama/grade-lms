@@ -13,6 +13,7 @@ import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
 import { db } from "@/utils/supabase/client";
 import type { OutputData } from "@editorjs/editorjs";
+import clsx from "clsx";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
@@ -41,6 +42,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
     body: "{}",
     due_date: getNextMorning().toISOString(),
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hooks
   const t = useTranslations();
@@ -49,6 +51,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
 
   // Handlers
   const submitCreateAssignment = async () => {
+    setIsSubmitting(true);
     try {
       const [createdAssignment, students] = await Promise.all([
         createAssignment(assignment),
@@ -77,6 +80,8 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
       onClose(true);
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
@@ -131,7 +136,16 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
             className="primary-button"
             onClick={submitCreateAssignment}
           >
-            Create
+            {isSubmitting && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              Create
+            </span>
           </button>
         </div>
       </div>

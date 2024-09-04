@@ -17,9 +17,10 @@ export const useNotificationChannel = () => {
 
   useEffect(() => {
     return () => {
-      channel.unsubscribe().then(() => {
-        channel = undefined;
-      });
+      if (channel)
+        channel.unsubscribe().then(() => {
+          channel = undefined;
+        });
     };
   }, []);
 

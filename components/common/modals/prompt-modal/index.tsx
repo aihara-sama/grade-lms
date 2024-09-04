@@ -1,4 +1,5 @@
 import BaseModal from "@/components/common/modals/base-modal";
+import clsx from "clsx";
 import type { FunctionComponent } from "react";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   action: "Delete" | "Dispel";
   actionHandler: () => void;
   isInsideModal?: boolean;
+  isSubmitting: boolean;
 }
 
 const PromptModal: FunctionComponent<Props> = ({
@@ -15,6 +17,7 @@ const PromptModal: FunctionComponent<Props> = ({
   body,
   action,
   isInsideModal,
+  isSubmitting,
   onClose,
   actionHandler,
 }) => {
@@ -31,7 +34,16 @@ const PromptModal: FunctionComponent<Props> = ({
           Cancel
         </button>
         <button className="primary-button" onClick={actionHandler}>
-          {action}
+          {isSubmitting && (
+            <img
+              className="loading-spinner"
+              src="/gifs/loading-spinner.gif"
+              alt=""
+            />
+          )}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+            {action}
+          </span>
         </button>
       </div>
     </BaseModal>

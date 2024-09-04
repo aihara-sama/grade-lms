@@ -24,12 +24,14 @@ export const deleteLessonsByLessonsIds = async (lessonsIds: string[]) => {
 export const getOverlappingLessons = async (
   starts: string,
   ends: string,
-  userId: string
+  userId: string,
+  lessonId?: string
 ) => {
   const t = await loadMessages();
 
   const result = await db.rpc("get_overlapping_lesson", {
     p_user_id: userId,
+    p_lesson_id: lessonId,
     p_ends: ends,
     p_starts: starts,
   });

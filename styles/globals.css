@@ -17,7 +17,7 @@
   }
   button,
   .button {
-    @apply text-[15px] font-bold whitespace-nowrap py-[6px] px-3 gap-[6px] shadow-sm [transition:0.2s] cursor-pointer rounded-[5px] flex items-center justify-center;
+    @apply text-[15px] font-bold whitespace-nowrap py-[6px] px-3 gap-[6px] shadow-sm [transition:0.2s] cursor-pointer rounded-[5px] flex items-center justify-center relative;
     @apply disabled:disabled !important;
   }
   input {
@@ -89,6 +89,9 @@
 
   .popper-list-item {
     @apply cursor-pointer hover:bg-gray-100 hover:text-link p-2 px-3 flex items-center gap-2;
+  }
+  .loading-spinner {
+    @apply size-[22.5px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
   }
 }
 @layer utilities {

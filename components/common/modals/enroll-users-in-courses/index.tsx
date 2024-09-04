@@ -10,6 +10,7 @@ import { enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { db } from "@/utils/supabase/client";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
@@ -27,6 +28,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   // State
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isSingleUser = usersIds.length === 1;
 
@@ -47,16 +49,18 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     }
   };
 
-  const handleEnrollUsers = async () => {
+  const submitEnrollUsers = async () => {
+    setIsSubmitting(true);
     try {
       await enrollUsersInCourses(usersIds, selectedCoursesIds);
       onClose(true);
       toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
       db.functions.invoke("check-events");
+      setSelectedCoursesIds([]);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setSelectedCoursesIds([]);
+      setIsSubmitting(false);
     }
   };
   const onUserToggle = (checked: boolean, userId: string) => {
@@ -99,9 +103,16 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
         <button
           disabled={!selectedCoursesIds.length}
           className="primary-button"
-          onClick={handleEnrollUsers}
+          onClick={submitEnrollUsers}
         >
-          Enroll
+          {isSubmitting && (
+            <img
+              className="loading-spinner"
+              src="/gifs/loading-spinner.gif"
+              alt=""
+            />
+          )}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Enroll</span>
         </button>
       </div>
     </BaseModal>

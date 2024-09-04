@@ -51,6 +51,10 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
   const [totalLessonsCount, setTotalLessonsCount] = useState(0);
   const [lessonsSearchText, setLessonsSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
+  const [isSubmittingDeleteLesson, setIsSubmittingDeleteLesson] =
+    useState(false);
+  const [isSubmittingDeleteLessons, setIsSubmittingDeleteLessons] =
+    useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -84,6 +88,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
       setLessons(lessonsByTitleAndCourseId);
       setTotalLessonsCount(lessonsCountByTitCoursedUserId);
+      setIsSelectedAll(false);
+      setSelectedLessonsIds([]);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -99,6 +105,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
       setLessons(lessonsByCourseId);
       setTotalLessonsCount(lessonsCountByCourseId);
+      setIsSelectedAll(false);
+      setSelectedLessonsIds([]);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -106,6 +114,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
     }
   };
   const submitDeleteLesson = async () => {
+    setIsSubmittingDeleteLesson(true);
     try {
       await deleteLessonsByLessonsIds([selectedLessonId]);
       setIsDeleteLessonModalOpen(false);
@@ -116,6 +125,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       toast.success(t("lesson_deleted"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteLesson(false);
     }
   };
   const selectAllLessons = () => {
@@ -157,7 +168,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
     }
   };
 
-  const deleteSelectedLessons = async () => {
+  const submitDeleteLessons = async () => {
+    setIsSubmittingDeleteLessons(true);
     try {
       await (isSelectedAllRef.current
         ? deleteLessonsByTitleAndCourseId(lessonsSearchText, courseId)
@@ -168,6 +180,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       fetchLessonsBySearch();
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteLessons(false);
     }
   };
 
@@ -282,15 +296,17 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       )}
       {isDeleteLessonsModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteLessons}
           onClose={() => setIsDeleteLessonsModalOpen(false)}
           title="Delete lessons"
           action="Delete"
           body={t("prompts.delete_lessons")}
-          actionHandler={deleteSelectedLessons}
+          actionHandler={submitDeleteLessons}
         />
       )}
       {isDeleteLessonModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteLesson}
           onClose={() => setIsDeleteLessonModalOpen(false)}
           title="Delete lesson"
           action="Delete"

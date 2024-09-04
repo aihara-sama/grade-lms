@@ -255,9 +255,10 @@ $$ language plpgsql;
 
 
 create or replace function get_overlapping_lesson(
-    p_user_id uuid, 
     p_starts timestamp, 
-    p_ends timestamp
+    p_ends timestamp,
+    p_user_id uuid, 
+    p_lesson_id uuid DEFAULT NULL
 )
 returns setof lessons as $$
 begin
@@ -272,7 +273,8 @@ begin
           (l.starts < p_ends and l.ends >= p_ends)     -- Case 2: Existing lesson overlaps at the end
           or
           (l.starts >= p_starts and l.ends <= p_ends)     -- Case 3: 
-      );
+      )
+      and p_lesson_id != l.id;
 end;
 $$ language plpgsql;
 

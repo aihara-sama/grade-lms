@@ -29,6 +29,9 @@ const Layout: FunctionComponent<PropsWithChildren<Props>> = async ({
 
   return (
     <html lang={locale}>
+      <head>
+        <link rel="prefetch" href="/gifs/loading-spinner.gif" as="image" />
+      </head>
       <body className={`${latoFont.className}`}>
         <NextIntlClientProvider messages={messages}>
           <PaypalProvider>

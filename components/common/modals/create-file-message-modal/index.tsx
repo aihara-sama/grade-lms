@@ -2,18 +2,22 @@ import BaseModal from "@/components/common/modals/base-modal";
 import MessagesIcon from "@/components/icons/messages-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
+import { uploadChatFile } from "@/db/message";
+import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
+import type { ChatMessageWithFiles } from "@/types/chat-messages";
+import { Event } from "@/types/events.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getFileExt } from "@/utils/get-file-ext";
 import { shortenFileName } from "@/utils/short-file-name";
 import { db } from "@/utils/supabase/client";
+import clsx from "clsx";
 import imgExtentions from "image-extensions";
 import { useTranslations } from "next-intl";
 import prettyBytes from "pretty-bytes";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { v4 as uuid } from "uuid";
 
 interface Props {
   onClose: (mutated?: boolean) => void;
@@ -29,6 +33,9 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
+  const [isSubmittingCreateMessage, setIsSubmittingCreateMessage] =
+    useState(false);
+  const channel = useLessonChannel();
 
   // State
   const [chatMessage, setChatMessage] = useState<TablesInsert<"chat_messages">>(
@@ -47,46 +54,62 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
     setChatMessage((_) => ({ ..._, text: e.target.value }));
   };
 
+  const fireChatMessageCreate = (message: ChatMessageWithFiles) => {
+    channel.send({
+      event: Event.ChatMessageCreated,
+      type: "broadcast",
+      payload: message,
+    });
+  };
+
   const submitUploadChatFile = async () => {
     try {
       const ext = await getFileExt(file);
 
-      const { data, error } = await db.storage
-        .from("chat-files")
-        .upload(`${uuid()}.${ext}`, file);
+      const { path } = await uploadChatFile(file, ext);
 
       setFileExt(ext);
-      setFilePath(data.path);
-
-      if (error) throw new Error(t("something_went_wrong"));
+      setFilePath(path);
     } catch (error: any) {
       toast.error(error.message);
+      onClose();
     }
   };
 
   const submitCreateMessage = async () => {
+    setIsSubmittingCreateMessage(true);
     try {
       const createdChatMessage = await db
         .from("chat_messages")
         .insert(chatMessage)
-        .select("id")
+        .select("*, chat_files(*)")
         .single();
 
       if (createdChatMessage.error) throw new Error(t("something_went_wrong"));
 
-      const createdChatFile = await db.from("chat_files").insert({
-        ext: fileExt,
-        name: file.name,
-        size: file.size,
-        message_id: createdChatMessage.data.id,
-        path: filePath,
-      });
+      const createdChatFile = await db
+        .from("chat_files")
+        .insert({
+          ext: fileExt,
+          name: file.name,
+          size: file.size,
+          message_id: createdChatMessage.data.id,
+          path: filePath,
+        })
+        .select("*")
+        .single();
 
       if (createdChatFile.error) throw new Error(t("something_went_wrong"));
 
+      fireChatMessageCreate({
+        ...createdChatMessage.data,
+        chat_files: [createdChatFile.data],
+      });
       onClose(true);
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingCreateMessage(false);
     }
   };
 
@@ -128,7 +151,18 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
               className="w-full mb-auto"
             />
             <button className="primary-button" onClick={submitCreateMessage}>
-              Send
+              {isSubmittingCreateMessage && (
+                <img
+                  className="loading-spinner"
+                  src="/gifs/loading-spinner.gif"
+                  alt=""
+                />
+              )}
+              <span
+                className={`${clsx(isSubmittingCreateMessage && "opacity-0")}`}
+              >
+                Send
+              </span>
             </button>
           </div>
         </>

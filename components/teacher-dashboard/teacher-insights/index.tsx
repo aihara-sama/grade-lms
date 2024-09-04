@@ -35,8 +35,8 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
         "created_at",
         format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
       )
-      .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
-      .single();
+      .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+    // .single();
   };
   const fetchUsersInsights = () => {
     return db
@@ -61,9 +61,9 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
       if (usersData.data.length) {
         setUsersInsights(Object.values(parseInsights(usersData.data)));
       }
-      if (coursesData.data.courses.length) {
+      if (coursesData.data[0]?.courses?.length) {
         setCoursesInsights(
-          Object.values(parseInsights(coursesData.data.courses))
+          Object.values(parseInsights(coursesData.data[0].courses))
         );
       }
 

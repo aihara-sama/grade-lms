@@ -9,6 +9,7 @@ import { enrollUsersInCourses, getUsersNotInCourse } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
 import { db } from "@/utils/supabase/client";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
@@ -24,6 +25,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   // State
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmiotting] = useState(false);
 
   // Refs
   const t = useTranslations();
@@ -39,7 +41,8 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       toast.error(error.message);
     }
   };
-  const enrollUsers = async () => {
+  const submitEnrollUsers = async () => {
+    setIsSubmiotting(true);
     try {
       await enrollUsersInCourses(selectedUsersIds, [courseId]);
       onClose(true);
@@ -47,6 +50,8 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       db.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmiotting(false);
     }
   };
   const onUserToggle = (checked: boolean, userId: string) => {
@@ -91,9 +96,16 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
         <button
           disabled={!selectedUsersIds.length}
           className="primary-button"
-          onClick={enrollUsers}
+          onClick={submitEnrollUsers}
         >
-          Enroll
+          {isSubmitting && (
+            <img
+              className="loading-spinner"
+              src="/gifs/loading-spinner.gif"
+              alt=""
+            />
+          )}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Enroll</span>
         </button>
       </div>
     </BaseModal>

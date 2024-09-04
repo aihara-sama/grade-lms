@@ -3,6 +3,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import { createCourse } from "@/db/course";
 import type { TablesInsert } from "@/types/supabase.type";
+import clsx from "clsx";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -17,16 +18,19 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
     title: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Handlers
-  const submitCreateCourse = async (formData: FormData) => {
+  const submitCreateCourse = async () => {
+    setIsSubmitting(true);
     try {
-      await createCourse({
-        title: formData.get("title") as string,
-      });
+      await createCourse(course);
       onClose(true);
       toast.success("Course created");
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -40,21 +44,31 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
   // View
   return (
     <BaseModal isExpanded={false} onClose={onClose} title="Create course">
-      <form action={submitCreateCourse}>
-        <Input
-          fullWIdth
-          name="title"
-          label="Course name"
-          value={course.title}
-          Icon={<CoursesIcon />}
-          placeholder="My course..."
-          onChange={onInputChange}
-          autoFocus
-        />
-        <button disabled={!course.title} className="primary-button w-full">
-          Create
-        </button>
-      </form>
+      <Input
+        fullWIdth
+        name="title"
+        label="Course name"
+        value={course.title}
+        Icon={<CoursesIcon />}
+        placeholder="My course..."
+        onChange={onInputChange}
+        autoFocus
+      />
+      <button
+        type="button"
+        onClick={submitCreateCourse}
+        disabled={!course.title || isSubmitting}
+        className="primary-button w-full"
+      >
+        {isSubmitting && (
+          <img
+            className="loading-spinner"
+            src="/gifs/loading-spinner.gif"
+            alt=""
+          />
+        )}
+        <span className={`${clsx(isSubmitting && "opacity-0")}`}>Create</span>
+      </button>
     </BaseModal>
   );
 };

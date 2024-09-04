@@ -54,6 +54,10 @@ const Courses: FunctionComponent<Props> = () => {
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
   const [coursesSearchText, setCoursesSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
+  const [isSubmittingDeleteCourse, setIsSubmittingDeleteCourse] =
+    useState(false);
+  const [isSubmittingDeleteCourses, setIsSubmittingDeleteCourses] =
+    useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -80,6 +84,8 @@ const Courses: FunctionComponent<Props> = () => {
 
       setCourses(coursesByUserId);
       setTotalCoursesCount(coursesCountByUserId);
+      setIsSelectedAll(false);
+      setSelectedCoursesIds([]);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -99,6 +105,8 @@ const Courses: FunctionComponent<Props> = () => {
 
       setCourses(coursesByTitleAndUserId);
       setTotalCoursesCount(coursesCountByTitleAndUserId);
+      setIsSelectedAll(false);
+      setSelectedCoursesIds([]);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -108,6 +116,7 @@ const Courses: FunctionComponent<Props> = () => {
     setIsSelectedAll(false);
   };
   const submitDeleteSelectedCourses = async () => {
+    setIsSubmittingDeleteCourses(true);
     try {
       await (isSelectedAllRef.current
         ? deleteCoursesByTitleAndUserId(coursesSearchText, user.id)
@@ -118,9 +127,11 @@ const Courses: FunctionComponent<Props> = () => {
       setSelectedCoursesIds([]);
       setIsDeleteCoursesModalOpen(false);
       fetchCoursesBySearch();
+      setIsSubmittingDeleteCourses(false);
     }
   };
   const submitDeleteCourse = async () => {
+    setIsSubmittingDeleteCourse(true);
     try {
       await deleteCourseByCourseId(selectedCourseId);
       setIsDeleteCourseModalOpen(false);
@@ -129,6 +140,8 @@ const Courses: FunctionComponent<Props> = () => {
       toast.success("Success");
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteCourse(false);
     }
   };
   const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -290,6 +303,7 @@ const Courses: FunctionComponent<Props> = () => {
 
       {isDeleteCoursesModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteCourses}
           onClose={() => setIsDeleteCoursesModalOpen(false)}
           title="Delete courses"
           action="Delete"
@@ -299,6 +313,7 @@ const Courses: FunctionComponent<Props> = () => {
       )}
       {isDeleteCourseModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteCourse}
           onClose={() => setIsDeleteCourseModalOpen(false)}
           title="Delete course"
           action="Delete"

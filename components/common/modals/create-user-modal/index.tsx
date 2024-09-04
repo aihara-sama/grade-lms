@@ -20,6 +20,7 @@ import { createUser } from "@/db/user";
 import type { SelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
 import { getTimeZone } from "@/utils/get-time-zone";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 
@@ -38,10 +39,12 @@ const initUserDetails: UserInputType = {
 const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
   const [userDetails, setUserDetails] = useState(initUserDetails);
   const [timezones, setTimezones] = useState<SelectItem[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useTranslations();
 
   const submitCreateUser = async (createAnother?: boolean) => {
+    setIsSubmitting(true);
     try {
       await createUser(userDetails);
       if (createAnother) {
@@ -52,6 +55,8 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
       toast.success(t("user_created"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -156,7 +161,16 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
             type="button"
             onClick={() => submitCreateUser()}
           >
-            Create
+            {isSubmitting && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              Create
+            </span>
           </button>
         </div>
       </form>

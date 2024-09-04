@@ -9,6 +9,7 @@ import { NotificationType } from "@/interfaces/notifications.interface";
 import { Event } from "@/types/events.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { OutputData } from "@editorjs/editorjs";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -44,6 +45,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
     body: "{}",
     assignment_id: assignmentId,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handlers
   const fireNotificationCreated = () => {
@@ -53,6 +55,8 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
     });
   };
   const submitCreateAssignment = async () => {
+    setIsSubmitting(true);
+
     try {
       const createdSubmission = await createSubmission(submission);
 
@@ -71,6 +75,8 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
       onClose(false);
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -111,7 +117,16 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
             className="primary-button"
             onClick={submitCreateAssignment}
           >
-            Create
+            {isSubmitting && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              Create
+            </span>
           </button>
         </div>
       </div>

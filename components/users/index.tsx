@@ -53,6 +53,8 @@ const Users: FunctionComponent = () => {
     useState(false);
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
+  const [isSubmittingDeleteUser, setIsSubmittingDeleteUser] = useState(false);
+  const [isSubmittingDeleteUsers, setIsSubmittingDeleteUsers] = useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -74,6 +76,8 @@ const Users: FunctionComponent = () => {
       ]);
       setUsers(usersByCreatorId);
       setTotalUsersCount(usersCountByCreatorId);
+      setIsSelectedAll(false);
+      setSelectedUsersIds([]);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -90,11 +94,14 @@ const Users: FunctionComponent = () => {
 
       setUsers(usersByTitleAndUserId);
       setTotalUsersCount(usersCountByTitleAndUserId);
+      setIsSelectedAll(false);
+      setSelectedUsersIds([]);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-  const handleDeleteUsers = async () => {
+  const submitDeleteUsers = async () => {
+    setIsSubmittingDeleteUsers(true);
     try {
       await (isSelectedAllRef.current
         ? deleteUsersByNameAndCreatorId(usersSearchTextRef.current, user.id)
@@ -105,19 +112,23 @@ const Users: FunctionComponent = () => {
       fetchUsersBySearch();
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteUsers(false);
     }
   };
 
   const submitDeleteUser = async () => {
+    setIsSubmittingDeleteUser(true);
     try {
       await deleteUsersByUsersIds([selectedUserId]);
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
       setIsDeleteUserModalOpen(false);
       setSelectedUsersIds((_) => _.filter((id) => id !== selectedUserId));
       fetchUsersBySearch();
       toast.success(t("user_deleted"));
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteUser(false);
     }
   };
 
@@ -306,6 +317,7 @@ const Users: FunctionComponent = () => {
       )}
       {isDeleteUserModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteUser}
           onClose={() => setIsDeleteUsersModalOpen(false)}
           title="Delete user"
           action="Delete"
@@ -315,10 +327,11 @@ const Users: FunctionComponent = () => {
       )}
       {isDeleteUsersModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteUsers}
           onClose={() => setIsDeleteUsersModalOpen(false)}
           title="Delete Users"
           action="Delete"
-          actionHandler={handleDeleteUsers}
+          actionHandler={submitDeleteUsers}
           body={t("prompts.delete_users")}
         />
       )}

@@ -47,6 +47,8 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
   const [whiteboardHeight, setWhiteboardHeight] = useState(0);
   const [whiteboardInitialData, setWhiteboardInitialData] =
     useState<ExcalidrawInitialDataState>();
+  const [isSubmittingUpdateLessonDate, setIsSubmittingUpdateLessonDate] =
+    useState(false);
 
   // Refs
   const containerRef = useRef<HTMLDivElement>();
@@ -77,11 +79,13 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
     }
   };
   const submitUpdateLessonDate = async () => {
+    setIsSubmittingUpdateLessonDate(true);
     try {
       const overlappingLessons = await getOverlappingLessons(
         format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
         format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-        user.id
+        user.id,
+        lesson.id
       );
 
       if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
@@ -100,6 +104,8 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
       toast.success(t("lesson_date_updated"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingUpdateLessonDate(false);
     }
   };
   const submitUpdateWhiteboardData = async () => {
@@ -202,7 +208,18 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
             className="primary-button"
             onClick={submitUpdateLessonDate}
           >
-            Save
+            {isSubmittingUpdateLessonDate && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span
+              className={`${clsx(isSubmittingUpdateLessonDate && "opacity-0")}`}
+            >
+              Save
+            </span>
           </button>
         )}
         <div className="mt-3 sm:mt-auto flex flex-col gap-1">

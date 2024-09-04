@@ -46,17 +46,26 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
   // States
   const [isDeleteAssignmentsModalOpen, setIsDeleteAssignmentsModalOpen] =
     useState(false);
+  const [isEditAssignmentsModalOpen, setIsEditAssignmentsModalOpen] =
+    useState(false);
+
+  const [isDeleteAssignmentModalOpen, setIsDeleteAssignmentModalOpen] =
+    useState(false);
   const [selectedAssignmentsIds, setSelectedAssignmentsIds] = useState<
     string[]
   >([]);
-  const [isDeleteAssignmentModalOpen, setIsDeleteAssignmentModalOpen] =
-    useState(false);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string>();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isAssignmentsLoading, setIsAssignmentsLoading] = useState(true);
   const [totalAssignmentsCount, setTotalAssignmentsCount] = useState(0);
   const [assignmentsSearchText, setAssignmentsSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
+  console.log({ isSelectedAll });
+
+  const [isSubmittingDeleteAssignment, setIsSubmittingDeleteAssignment] =
+    useState(false);
+  const [isSubmittingDeleteAssignments, setIsSubmittingDeleteAssignments] =
+    useState(false);
 
   // Refs
   const isSelectedAllRef = useRef(false);
@@ -95,6 +104,8 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
 
       setAssignments(assignmentsByTitleAndLessonId);
       setTotalAssignmentsCount(assignmentsCountByTitleAndLessonId);
+      setIsSelectedAll(false);
+      setSelectedAssignmentsIds([]);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -111,6 +122,8 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
 
       setAssignments(assignmentsByLessonId);
       setTotalAssignmentsCount(assignmentsCountByCourseId);
+      setIsSelectedAll(false);
+      setSelectedAssignmentsIds([]);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -119,6 +132,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
   };
 
   const submitDeleteAssignment = async () => {
+    setIsSubmittingDeleteAssignment(true);
     try {
       await deleteAssignmentsByAssignmentsIds([selectedAssignmentId]);
       setIsDeleteAssignmentModalOpen(false);
@@ -129,9 +143,13 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       toast.success(t("assignment_deleted"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteAssignment(false);
     }
   };
   const submitDeleteAssignments = async () => {
+    setIsSubmittingDeleteAssignments(true);
+
     try {
       await (isSelectedAllRef.current
         ? deleteAssignmentsByTitleAndLessonId(assignmentsSearchText, lesson.id)
@@ -142,6 +160,8 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       fetchAssignmentsBySearch();
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteAssignments(false);
     }
   };
 
@@ -192,8 +212,15 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       }
     }
   };
+
+  const onAssignmentClick = (assignmentId: string) => {
+    setSelectedAssignmentId(assignmentId);
+
+    setIsEditAssignmentsModalOpen(true);
+  };
+
   const onEditAssignmentModalClose = (mutated?: boolean) => {
-    setSelectedAssignmentId(undefined);
+    setIsEditAssignmentsModalOpen(false);
 
     if (mutated) {
       fetchAssignmentsBySearch();
@@ -278,7 +305,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
           data={assignments.map(({ id, title }) => ({
             Name: (
               <CardTitle
-                onClick={() => setSelectedAssignmentId(id)}
+                onClick={() => onAssignmentClick(id)}
                 checked={selectedAssignmentsIds.includes(id)}
                 Icon={<AssignmentsIcon size="md" />}
                 title={title}
@@ -305,7 +332,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
                 <ul className="flex flex-col">
                   <li
                     className="popper-list-item"
-                    onClick={() => setIsDeleteAssignmentModalOpen(false)}
+                    onClick={() => setIsDeleteAssignmentModalOpen(true)}
                   >
                     <DeleteIcon /> Delete
                   </li>
@@ -315,7 +342,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
           }))}
         />
       )}
-      {selectedAssignmentId && (
+      {isEditAssignmentsModalOpen && (
         <EditAssignmentModal
           assignmentId={selectedAssignmentId}
           onClose={onEditAssignmentModalClose}
@@ -324,6 +351,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       )}
       {isDeleteAssignmentsModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteAssignments}
           title="Delete assignments"
           action="Delete"
           body={t("prompts.delete_assignments")}
@@ -333,6 +361,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       )}
       {isDeleteAssignmentModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteAssignment}
           onClose={() => setIsDeleteAssignmentModalOpen(false)}
           title="Delete assignment"
           action="Delete"

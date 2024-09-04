@@ -450,9 +450,10 @@ export type Database = {
       };
       get_overlapping_lesson: {
         Args: {
-          p_user_id: string;
           p_starts: string;
           p_ends: string;
+          p_user_id: string;
+          p_lesson_id?: string;
         };
         Returns: {
           course_id: string | null;

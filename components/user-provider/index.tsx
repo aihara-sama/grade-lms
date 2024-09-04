@@ -3,6 +3,7 @@
 import GuestPrompt from "@/components/live-lesson/user-name-prompt";
 import { useUser } from "@/hooks/use-user";
 import type { IUserMetadata } from "@/interfaces/user.interface";
+import { db } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";
@@ -35,6 +36,10 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
         fcm_token: null,
         timezone: (user.user_metadata as IUserMetadata).timezone,
       });
+
+    db.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") userStore.setUser(null);
+    });
   }, []);
 
   // View

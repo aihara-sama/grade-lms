@@ -3,17 +3,23 @@
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
+import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import { db } from "@/utils/supabase/client";
+import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { FunctionComponent } from "react";
+import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface Props {}
+const SignIn: FunctionComponent = () => {
+  // State
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-const SignIn: FunctionComponent<Props> = () => {
   // Hooks
   const router = useRouter();
+  const t = useTranslations();
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -24,13 +30,21 @@ const SignIn: FunctionComponent<Props> = () => {
     const email = String(payload.get("email")).trim();
     const password = String(payload.get("password"));
 
+    setIsSubmitting(true);
+
     const { error } = await db.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) toast(error.message);
-    else router.push("/dashboard");
+    setIsSubmitting(false);
+
+    if (error) toast(t(serverErrToIntlKey(error.message)));
+    else {
+      setIsSuccess(true);
+
+      router.push("/dashboard");
+    }
   };
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
@@ -50,7 +64,19 @@ const SignIn: FunctionComponent<Props> = () => {
           Icon={<SecurityIcon />}
           fullWIdth
         />
-        <button className="primary-button w-full">Login</button>
+        <button
+          disabled={isSubmitting || isSuccess}
+          className="primary-button w-full"
+        >
+          {isSubmitting && (
+            <img
+              className="loading-spinner"
+              src="/gifs/loading-spinner.gif"
+              alt=""
+            />
+          )}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Login</span>
+        </button>
       </form>
       <p className="text-sm">
         Don&apos;t have an account?{" "}

@@ -30,6 +30,8 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
     useState(false);
   const [isDeleteAssignmentModalOpen, setIsDeleteAssignmentModalOpen] =
     useState(false);
+  const [isSubmittingDeleteAssignments, setIsSubmittingDeleteAssignments] =
+    useState(false);
 
   const t = useTranslations();
 
@@ -52,12 +54,15 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
   };
 
   const submitDeleteAssignment = async () => {
+    setIsSubmittingDeleteAssignments(true);
     try {
       await deleteAssignment(selectedAssignmentId);
       setIsDeleteAssignmentModalOpen(false);
       fetchAssignments();
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteAssignments(false);
     }
   };
 
@@ -123,12 +128,12 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
       {isEditAssignmentModalOpen && (
         <EditAssignmentModal
           assignmentId={selectedAssignmentId}
-          onSubmissionCreated={fetchAssignments}
           onClose={onEditAssignmentModalClose}
         />
       )}
       {isDeleteAssignmentModalOpen && (
         <PromptModal
+          isSubmitting={isSubmittingDeleteAssignments}
           onClose={() => setIsDeleteAssignmentModalOpen(false)}
           title="Delete assignments"
           action="Delete"

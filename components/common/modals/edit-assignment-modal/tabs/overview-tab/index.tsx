@@ -8,6 +8,7 @@ import { getAssignmentById, updateAssignment } from "@/db/assignment";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { ResultOf } from "@/types";
+import clsx from "clsx";
 import { format, isAfter } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -16,7 +17,7 @@ import toast from "react-hot-toast";
 
 interface Props {
   assignmentId: string;
-  onSubmissionCreated: () => void;
+  onSubmissionCreated?: () => void;
   onAssignmentUpdated: () => void;
 }
 
@@ -30,6 +31,7 @@ const OverviewTab: FunctionComponent<Props> = ({
     useState<ResultOf<typeof getAssignmentById>>();
   const [isCreateSubmissionModalOpen, setIsCreateSubmissionModalOpen] =
     useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // hooks
   const t = useTranslations();
@@ -48,13 +50,21 @@ const OverviewTab: FunctionComponent<Props> = ({
     }
   };
   const submitUpdateAssignment = async () => {
+    setIsSubmitting(true);
     try {
-      await updateAssignment(assignment);
+      await updateAssignment({
+        body: assignment.body,
+        title: assignment.title,
+        due_date: assignment.due_date,
+        id: assignment.id,
+      });
 
       onAssignmentUpdated();
       toast(t("assignment_updated"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -67,7 +77,7 @@ const OverviewTab: FunctionComponent<Props> = ({
   const onCreateSubmissionModalClose = (mutated?: boolean) => {
     setIsCreateSubmissionModalOpen(false);
     if (mutated) {
-      onSubmissionCreated();
+      onSubmissionCreated?.();
     }
   };
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +138,16 @@ const OverviewTab: FunctionComponent<Props> = ({
                 className="primary-button"
                 onClick={submitUpdateAssignment}
               >
-                Save
+                {isSubmitting && (
+                  <img
+                    className="loading-spinner"
+                    src="/gifs/loading-spinner.gif"
+                    alt=""
+                  />
+                )}
+                <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+                  Save
+                </span>
               </button>
             ) : (
               <button

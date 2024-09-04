@@ -21,6 +21,7 @@
   "failed_to_send_message": "Не удалось отправить сообщение",
   "failed_to_extend_lesson": "Не удалось продлить урок",
   "failed_to_save_lesson": "Не удалось сохранить урок",
+  "failed_to_upload_file": "Не удалось загрузить файл",
   "failed_to_update_submission_grade": "Не удалось изменить оценку здачи задания",
   "failed_to_update_submission": "Не удалось изменить здачу задания",
   "failed_to_update_assignment": "Не удалось изменить задание",

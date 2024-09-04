@@ -8,16 +8,21 @@ import { Role, type IUserMetadata } from "@/interfaces/user.interface";
 import { getTimeZone } from "@/utils/get-time-zone";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import { db } from "@/utils/supabase/client";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FunctionComponent } from "react";
+import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 const SignUp: FunctionComponent = () => {
+  // State
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Hooks
   const router = useRouter();
   const t = useTranslations();
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,6 +34,7 @@ const SignUp: FunctionComponent = () => {
     const email = String(payload.get("email")).trim();
     const password = String(payload.get("password"));
 
+    setIsSubmitting(true);
     const { error } = await db.auth.signUp({
       email,
       password,
@@ -42,9 +48,14 @@ const SignUp: FunctionComponent = () => {
         } as IUserMetadata,
       },
     });
+    setIsSubmitting(false);
 
     if (error) toast(t(serverErrToIntlKey(error.message)));
-    else router.push("/dashboard");
+    else {
+      setIsSuccess(true);
+
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -72,7 +83,21 @@ const SignUp: FunctionComponent = () => {
           Icon={<SecurityIcon />}
           fullWIdth
         />
-        <button className="primary-button w-full">Create account</button>
+        <button
+          disabled={isSubmitting || isSuccess}
+          className="primary-button w-full"
+        >
+          {isSubmitting && (
+            <img
+              className="loading-spinner"
+              src="/gifs/loading-spinner.gif"
+              alt=""
+            />
+          )}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+            Create account
+          </span>
+        </button>
       </form>
       <p className="text-sm">
         Already have an account?{" "}

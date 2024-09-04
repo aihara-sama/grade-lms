@@ -53,8 +53,8 @@ const Hour: FunctionComponent<Props> = ({
     setSelectedLesson({
       id: undefined,
       title: "",
-      starts: addMinutes(new Date(hour), min).toString(),
-      ends: addMinutes(new Date(hour), min + 15).toString(),
+      starts: addMinutes(new Date(hour), min).toISOString(),
+      ends: addMinutes(new Date(hour), min + 15).toISOString(),
       course_id: null,
       whiteboard_data: "{}",
       created_at: undefined,

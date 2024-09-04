@@ -4,6 +4,7 @@ import Input from "@/components/input";
 import { extendLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lessons.type";
+import clsx from "clsx";
 import { format, minutesToMilliseconds } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -18,12 +19,14 @@ interface Props {
 const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
   // State
   const [extendLessonByMin, setExtendLessonByMin] = useState(15);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useTranslations();
   const { user } = useUser();
 
   // Handlers
   const submitExtendLesson = async () => {
+    setIsSubmitting(true);
     try {
       const overlappingLessons = await getOverlappingLessons(
         lesson.starts,
@@ -31,7 +34,8 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
           +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin),
           "yyyy-MM-dd'T'HH:mm:ss"
         ),
-        user.id
+        user.id,
+        lesson.id
       );
 
       if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
@@ -42,6 +46,8 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
       toast(t("lesson_extended"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -80,7 +86,14 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
             className="primary-button w-auto"
             onClick={submitExtendLesson}
           >
-            Save
+            {isSubmitting && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
           </button>
         </div>
       </div>

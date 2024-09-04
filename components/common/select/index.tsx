@@ -71,7 +71,7 @@ const Select: FunctionComponent<Props> = ({
           <div className="absolute -top-3.5 left-1 px-1 text-neutral-500 font-bold">
             {label}
           </div>
-          <div>{defaultValue?.title || "All"}</div>
+          <div>{defaultValue?.title || (useUnselect ? "All" : "Choose")}</div>
           <ArrowIcon direction={isOpen ? "top" : "bottom"} />
         </div>
       }

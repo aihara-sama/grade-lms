@@ -27,6 +27,7 @@ import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { getLessonDuration } from "@/utils/get-lesson-duration";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 
 interface Props {
@@ -43,6 +44,10 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     const [isDeleteLessonModalOpen, setIsDeleteLessonModalOpen] =
       useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSubmittingDeleteLesson, setIsSubmittingDeleteLesson] =
+      useState(false);
+    const [isSubmittingUpdateLesson, setIsSubmittingUpdateLesson] =
+      useState(false);
 
     // Vars
 
@@ -77,7 +82,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     };
     const submitUpdateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
+      setIsSubmittingUpdateLesson(true);
       try {
         await updateLesson(lesson);
 
@@ -85,9 +90,12 @@ const EditLessonModal: FunctionComponent<Props> = memo(
         onClose(true);
       } catch (error: any) {
         toast.error(error.message);
+      } finally {
+        setIsSubmittingUpdateLesson(false);
       }
     };
     const submitDeleteLesson = async () => {
+      setIsSubmittingDeleteLesson(true);
       try {
         await deleteLessonsByLessonsIds([lesson.id]);
 
@@ -96,6 +104,8 @@ const EditLessonModal: FunctionComponent<Props> = memo(
         onClose(true);
       } catch (error: any) {
         toast.error(error.message);
+      } finally {
+        setIsSubmittingDeleteLesson(false);
       }
     };
     const onChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
@@ -148,11 +158,16 @@ const EditLessonModal: FunctionComponent<Props> = memo(
         title="View lesson"
         headerButtons={
           <>
-            <button className="icon-button" onClick={navigateToPreview}>
+            <button
+              disabled={!lesson}
+              className="icon-button"
+              onClick={navigateToPreview}
+            >
               <LessonsIcon />
             </button>
             {user.role === Role.Teacher && (
               <button
+                disabled={!lesson}
                 className="icon-button"
                 onClick={() => setIsDeleteLessonModalOpen(true)}
               >
@@ -209,7 +224,18 @@ const EditLessonModal: FunctionComponent<Props> = memo(
                   type="submit"
                   className="primary-button"
                 >
-                  Save
+                  {isSubmittingUpdateLesson && (
+                    <img
+                      className="loading-spinner"
+                      src="/gifs/loading-spinner.gif"
+                      alt=""
+                    />
+                  )}
+                  <span
+                    className={`${clsx(isSubmittingUpdateLesson && "opacity-0")}`}
+                  >
+                    Save
+                  </span>
                 </button>
               ) : (
                 <button className="outline-button" onClick={() => onClose()}>
@@ -223,6 +249,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
         )}
         {isDeleteLessonModalOpen && (
           <PromptModal
+            isSubmitting={isSubmittingDeleteLesson}
             onClose={() => setIsDeleteLessonModalOpen(false)}
             isInsideModal
             title="Delete lesson"

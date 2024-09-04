@@ -10,6 +10,7 @@ import {
   updateSubmissionGrade,
 } from "@/db/submission";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type { FunctionComponent } from "react";
@@ -30,10 +31,12 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
   const [grade, setGrade] = useState<number>();
   const [submission, setSubmission] = useState<SubmissionWithAuthor>();
   const [hoveredGrade, setHoveredGrade] = useState<number>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useTranslations();
 
   const submitUpdateGrade = async () => {
+    setIsSubmitting(true);
     try {
       await updateSubmissionGrade(submissionId, grade);
 
@@ -41,6 +44,8 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
       toast.success(t("grade_updated"));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -113,7 +118,16 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
               disabled={submission.grade === grade}
               className="primary-button w-[100px]"
             >
-              Submit
+              {isSubmitting && (
+                <img
+                  className="loading-spinner"
+                  src="/gifs/loading-spinner.gif"
+                  alt=""
+                />
+              )}
+              <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+                Submit
+              </span>
             </button>
           </div>
         </div>

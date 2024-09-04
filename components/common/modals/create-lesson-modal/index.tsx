@@ -1,11 +1,16 @@
 import BaseModal from "@/components/common/modals/base-modal";
+import Select from "@/components/common/select";
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
+import { getCoursesByUserId } from "@/db/course";
 import { createLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
+import type { SelectItem } from "@/interfaces/menu.interface";
+import type { Course } from "@/types/courses.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
+import clsx from "clsx";
 import {
   addMinutes,
   format,
@@ -14,17 +19,17 @@ import {
 } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const initLesson: TablesInsert<"lessons"> = {
   title: "",
   starts: getNextMorning().toISOString(),
-  ends: new Date(addMinutes(getNextMorning(), 30)).toISOString(),
+  ends: addMinutes(getNextMorning(), 30).toISOString(),
 };
 
 interface Props {
-  courseId: string;
+  courseId?: string;
   onClose: (mutated?: boolean) => void;
   maybeLesson?: TablesInsert<"lessons">;
 }
@@ -39,6 +44,9 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     ...maybeLesson,
     course_id: courseId,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
 
   const duration = +new Date(lesson.ends) - +new Date(lesson.starts);
 
@@ -58,8 +66,16 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
     setLesson((_) => ({ ..._, ends }));
   };
+  const fetchCourses = async () => {
+    try {
+      setCourses(await getCoursesByUserId(user.id));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
   const submitCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const overlappingLesson = await getOverlappingLessons(
@@ -76,24 +92,47 @@ const CreateLessonModal: FunctionComponent<Props> = ({
       onClose(true);
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   const onDateChange = (date: Date) => {
     setLesson((_) => ({
       ..._,
       starts: date.toISOString(),
-      ends: new Date(
-        addMinutes(date, millisecondsToMinutes(duration))
-      ).toISOString(),
+      ends: addMinutes(date, millisecondsToMinutes(duration)).toISOString(),
     }));
   };
+  const onCourseSelect = (item: SelectItem) => setSelectedCourse(item);
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setLesson((_) => ({ ..._, [e.target.name]: e.target.value }));
 
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCourse)
+      setLesson((prev) => ({ ...prev, course_id: selectedCourse.id }));
+  }, [selectedCourse]);
+
   return (
     <BaseModal isExpanded={false} onClose={onClose} title="Create lesson">
       <form onSubmit={submitCreateLesson}>
+        {!courseId && (
+          <Select
+            label="Course"
+            defaultValue={selectedCourse}
+            onChange={onCourseSelect}
+            options={courses}
+            fullWidth
+            popperProps={{
+              popperClassName: "h-[198px]",
+              className: "mb-3",
+            }}
+          />
+        )}
         <Input
           autoFocus
           fullWIdth
@@ -121,11 +160,20 @@ const CreateLessonModal: FunctionComponent<Props> = ({
         <hr className="my-3" />
         <div className="flex justify-end">
           <button
-            disabled={!lesson.title}
+            disabled={!(lesson.title && lesson.course_id)}
             className="primary-button"
             type="submit"
           >
-            Create
+            {isSubmitting && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              Create
+            </span>
           </button>
         </div>
       </form>

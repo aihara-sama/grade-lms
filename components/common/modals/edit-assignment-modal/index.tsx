@@ -13,7 +13,7 @@ import type { FunctionComponent } from "react";
 interface Props {
   assignmentId: string;
   onClose: (mutated?: boolean) => void;
-  onSubmissionCreated: () => void;
+  onSubmissionCreated?: () => void;
 }
 
 const EditAssignmentModal: FunctionComponent<Props> = ({
@@ -33,7 +33,7 @@ const EditAssignmentModal: FunctionComponent<Props> = ({
                 <OverviewTab
                   assignmentId={assignmentId}
                   onSubmissionCreated={onSubmissionCreated}
-                  onAssignmentUpdated={onClose}
+                  onAssignmentUpdated={() => onClose(true)}
                 />
               ),
               tier: [Role.Teacher, Role.Student],
