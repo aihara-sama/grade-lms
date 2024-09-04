@@ -14,7 +14,6 @@ const publicPages = [
 
 const intlMiddleware = createMiddleware({
   locales,
-  localePrefix: "as-needed",
   defaultLocale: DEFAULT_LOCALE,
 });
 
