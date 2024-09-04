@@ -4,6 +4,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import type { Database } from "@/types/supabase.type";
 import { db } from "@/utils/supabase/client";
+import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -19,20 +20,31 @@ const LessonSettings: FunctionComponent<Props> = ({
 }) => {
   const router = useRouter();
   const [lessonTitle, setLessonTitle] = useState(lesson.title);
-  const handleRenameLesson = async () => {
-    const { error } = await db
-      .from("lessons")
-      .update({
-        title: lessonTitle,
-      })
-      .eq("id", lesson.id);
 
-    if (error) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRenameLesson = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await db
+        .from("lessons")
+        .update({
+          title: lessonTitle,
+        })
+        .eq("id", lesson.id);
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Saved!");
+        updateLessonTitle(lessonTitle);
+        router.refresh();
+      }
+    } catch (error: any) {
       toast.error(error.message);
-    } else {
-      toast.success("Saved!");
-      updateLessonTitle(lessonTitle);
-      router.refresh();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -49,11 +61,18 @@ const LessonSettings: FunctionComponent<Props> = ({
             className="mb-auto"
           />
           <button
-            disabled={!lessonTitle}
+            disabled={!lessonTitle || isSubmitting}
             className="primary-button w-24"
             onClick={handleRenameLesson}
           >
-            Save
+            {isSubmitting && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
           </button>
         </div>
       </div>

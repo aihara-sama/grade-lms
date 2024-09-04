@@ -11,28 +11,24 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import Select from "@/components/common/select";
+import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
 import type { IUserMetadata } from "@/interfaces/user.interface";
-import type { User } from "@supabase/supabase-js";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
-interface Props {
-  user: User;
-}
-
-const Profile: FunctionComponent<Props> = ({ user }) => {
+const Profile: FunctionComponent = () => {
   const router = useRouter();
   const pathName = usePathname();
   const t = useTranslations();
+  const [isSubmittingRenameUser, setIsSubmittingRenameUser] = useState(false);
 
-  const [avatar, setAvatar] = useState(
-    (user.user_metadata as IUserMetadata).avatar
-  );
-  const [userName, setUserName] = useState(
-    (user.user_metadata as IUserMetadata).name
-  );
+  const { user } = useUser();
+
+  const [avatar, setAvatar] = useState(user.avatar);
+  const [userName, setUserName] = useState(user.name);
   const locale = locales.includes(pathName.split("/")[1] as Locale)
     ? pathName.split("/")[1]
     : DEFAULT_LOCALE;
@@ -44,7 +40,9 @@ const Profile: FunctionComponent<Props> = ({ user }) => {
     return segments.join("/");
   };
 
-  const handleRenameUser = async () => {
+  const submitRenameUser = async () => {
+    setIsSubmittingRenameUser(true);
+
     const { error: usersError } = await db
       .from("users")
       .update({
@@ -58,13 +56,15 @@ const Profile: FunctionComponent<Props> = ({ user }) => {
       } as IUserMetadata,
     });
 
+    setIsSubmittingRenameUser(false);
+
     if (usersError || profileError) toast.error("Something went wrong");
     else toast.success("Name changed");
   };
 
   useEffect(() => {
     (async () => {
-      if (avatar !== (user.user_metadata as IUserMetadata).avatar) {
+      if (avatar !== user.avatar) {
         const { error: usersError } = await db
           .from("users")
           .update({
@@ -90,9 +90,7 @@ const Profile: FunctionComponent<Props> = ({ user }) => {
         <div className="absolute top-[80px] sm:left-96 left-1/2 transform -translate-x-1/2 flex items-end gap-8 md:flex-row flex-col">
           <AvatarUpload avatar={avatar} onChange={setAvatar} />
           <div>
-            <p className="text-2xl font-bold text-neutral-600">
-              {(user.user_metadata as IUserMetadata).name}
-            </p>
+            <p className="text-2xl font-bold text-neutral-600">{user.name}</p>
             <p className="text-neutral-500">{user.email}</p>
           </div>
         </div>
@@ -114,13 +112,25 @@ const Profile: FunctionComponent<Props> = ({ user }) => {
             />
             <button
               disabled={
-                userName === (user.user_metadata as IUserMetadata).name ||
-                !userName.length
+                userName === user.name ||
+                !userName.length ||
+                isSubmittingRenameUser
               }
               className="primary-button w-[100px]"
-              onClick={handleRenameUser}
+              onClick={submitRenameUser}
             >
-              Save
+              {isSubmittingRenameUser && (
+                <img
+                  className="loading-spinner"
+                  src="/gifs/loading-spinner.gif"
+                  alt=""
+                />
+              )}
+              <span
+                className={`${clsx(isSubmittingRenameUser && "opacity-0")}`}
+              >
+                Save
+              </span>
             </button>
           </div>
         </div>

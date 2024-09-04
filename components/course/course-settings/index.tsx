@@ -4,6 +4,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import type { Database } from "@/types/supabase.type";
 import { db } from "@/utils/supabase/client";
+import clsx from "clsx";
 // import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
@@ -20,21 +21,31 @@ const CourseSettings: FunctionComponent<Props> = ({
 }) => {
   const router = useRouter();
   const [courseTitle, setCourseTitle] = useState(course.title);
-  const handleRenameCourse = async () => {
-    const { error } = await db
-      .from("courses")
-      .update({
-        title: courseTitle,
-      })
-      .eq("id", course.id);
 
-    if (error) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRenameCourse = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await db
+        .from("courses")
+        .update({
+          title: courseTitle,
+        })
+        .eq("id", course.id);
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Saved!");
+        updateCourseTitle(courseTitle);
+        router.refresh();
+      }
+    } catch (error: any) {
       toast.error(error.message);
-    } else {
-      toast.success("Saved!");
-      updateCourseTitle(courseTitle);
-      router.refresh();
-      // revalidatePath(`/dashboard/courses/${course.id}/overview`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -51,11 +62,18 @@ const CourseSettings: FunctionComponent<Props> = ({
             className="mb-auto"
           />
           <button
-            disabled={!courseTitle}
+            disabled={!courseTitle || isSubmitting}
             className="primary-button w-[100px]"
             onClick={handleRenameCourse}
           >
-            Save
+            {isSubmitting && (
+              <img
+                className="loading-spinner"
+                src="/gifs/loading-spinner.gif"
+                alt=""
+              />
+            )}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
           </button>
         </div>
       </div>
