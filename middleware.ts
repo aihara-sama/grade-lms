@@ -23,26 +23,19 @@ export async function middleware(request: NextRequest) {
   );
   const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
 
-  // Run the intlMiddleware first
-  const intlResponse = intlMiddleware(request);
+  // Run the intlMiddleware first to ensure locale is set
+  const response = intlMiddleware(request);
 
   if (isPublicPage) {
-    return intlResponse;
+    return response;
   }
 
-  // Update session after handling locale
-  return updateSession(request, intlResponse);
+  // Update session with the response from intlMiddleware
+  return updateSession(request, response);
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
     "/((?!api|_next/static|_next/image|favicon.ico|apple-touch-icon.png|favicon.svg|images/books|icons|manifest).*)",
   ],
 };

@@ -15,15 +15,11 @@ export async function updateSession(
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
+          // Set cookie in request and response to ensure consistency
           request.cookies.set({
             name,
             value,
             ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
           });
           response.cookies.set({
             name,
@@ -31,22 +27,10 @@ export async function updateSession(
             ...options,
           });
         },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
+        remove(name: string) {
+          // Remove cookie in request and response to ensure consistency
+          request.cookies.delete(name);
+          response.cookies.delete(name);
         },
       },
     }
