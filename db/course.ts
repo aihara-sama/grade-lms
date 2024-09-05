@@ -78,6 +78,7 @@ export const getCoursesByUserId = async (userId: string) => {
     .from("users")
     .select("id, courses(*)")
     .eq("id", userId)
+    .limit(COURSES_GET_LIMIT)
     .single();
 
   if (result.error) throw new Error(t("failed_to_load_courses"));

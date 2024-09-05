@@ -3,9 +3,16 @@ import ArrowIcon from "@/components/icons/arrow-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import type { SelectItem } from "@/interfaces/menu.interface";
+import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import clsx from "clsx";
-import type { ChangeEvent, ComponentProps, FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
+import throttle from "lodash.throttle";
+import type {
+  ChangeEvent,
+  ComponentProps,
+  FunctionComponent,
+  UIEventHandler,
+} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Props {
   label: string;
@@ -15,6 +22,8 @@ interface Props {
   onChange: (option: SelectItem) => void;
   fullWidth?: boolean;
   popperProps?: Partial<ComponentProps<typeof BasePopper>>;
+  onScrollEnd?: (search: string) => void;
+  onSearchInputChange?: (search: string) => void;
 }
 
 const Select: FunctionComponent<Props> = ({
@@ -25,6 +34,8 @@ const Select: FunctionComponent<Props> = ({
   onChange,
   popperProps,
   fullWidth,
+  onScrollEnd,
+  onSearchInputChange,
 }) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
@@ -34,23 +45,23 @@ const Select: FunctionComponent<Props> = ({
 
   const popperRef = useRef<HTMLDivElement>();
 
+  const filterByTitle = (items: SelectItem[], title: string) =>
+    items.filter((course) => course.title.includes(title));
+
   const onSearchTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
   };
 
-  useEffect(() => {
-    setFilteredOptions(options);
-  }, [options]);
-
-  useEffect(() => {
-    setFilteredOptions(
-      options.filter(({ title }) => title.includes(searchText))
-    );
-  }, [searchText]);
-
   const onResize = () => {
     setPopperHeight(popperRef.current?.getBoundingClientRect?.()?.height);
   };
+
+  const onScroll: UIEventHandler<HTMLUListElement> = useCallback(
+    throttle((e) => {
+      if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd(searchText);
+    }, 300),
+    [searchText]
+  );
 
   useEffect(onResize, []);
   useEffect(() => {
@@ -60,6 +71,15 @@ const Select: FunctionComponent<Props> = ({
       window.removeEventListener("resize", onResize);
     };
   }, []);
+
+  useEffect(() => {
+    setFilteredOptions(filterByTitle(options, searchText));
+  }, [options]);
+
+  useEffect(() => {
+    setFilteredOptions(filterByTitle(options, searchText));
+    onSearchInputChange(searchText);
+  }, [searchText]);
 
   return (
     <BasePopper
@@ -87,6 +107,8 @@ const Select: FunctionComponent<Props> = ({
           autoFocus
         />
         <ul
+          onScroll={onScroll}
+          id="my-target"
           className="overflow-auto"
           style={{
             maxHeight: `${popperHeight - 80}px`,

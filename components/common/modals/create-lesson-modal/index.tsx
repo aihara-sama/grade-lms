@@ -3,7 +3,12 @@ import Select from "@/components/common/select";
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import { getCoursesByUserId } from "@/db/course";
+import { COURSES_GET_LIMIT } from "@/constants";
+import {
+  getCoursesByTitleAndUserId,
+  getCoursesByUserId,
+  getOffsetCoursesByTitleAndUserId,
+} from "@/db/course";
 import { createLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/menu.interface";
@@ -19,7 +24,7 @@ import {
 } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 const initLesson: TablesInsert<"lessons"> = {
@@ -50,6 +55,9 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
   const duration = +new Date(lesson.ends) - +new Date(lesson.starts);
 
+  // Refs
+  const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
+
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
@@ -73,6 +81,15 @@ const CreateLessonModal: FunctionComponent<Props> = ({
       toast.error(error.message);
     }
   };
+
+  const fetchCoursesBySearch = async (search: string) => {
+    try {
+      setCourses(await getCoursesByTitleAndUserId(search, user.id));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const submitCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -105,6 +122,18 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   };
   const onCourseSelect = (item: SelectItem) => setSelectedCourse(item);
 
+  const onCoursesScrollEnd = async (search: string) => {
+    const rangeCourses = await getOffsetCoursesByTitleAndUserId(
+      user.id,
+      search,
+      coursesOffsetRef.current,
+      coursesOffsetRef.current + COURSES_GET_LIMIT - 1
+    );
+
+    setCourses((prev) => [...prev, ...rangeCourses]);
+    coursesOffsetRef.current += rangeCourses.length;
+  };
+
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setLesson((_) => ({ ..._, [e.target.name]: e.target.value }));
 
@@ -131,6 +160,8 @@ const CreateLessonModal: FunctionComponent<Props> = ({
               popperClassName: "h-[198px]",
               className: "mb-3",
             }}
+            onScrollEnd={onCoursesScrollEnd}
+            onSearchInputChange={fetchCoursesBySearch}
           />
         )}
         <Input

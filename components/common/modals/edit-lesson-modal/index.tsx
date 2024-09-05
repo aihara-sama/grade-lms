@@ -9,13 +9,18 @@ import Input from "@/components/input";
 import { addMinutes, millisecondsToMinutes, subMinutes } from "date-fns";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FunctionComponent } from "react";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import PromptModal from "@/components/common/modals/prompt-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
-import { getCoursesByUserId } from "@/db/course";
+import { COURSES_GET_LIMIT } from "@/constants";
+import {
+  getCoursesByTitleAndUserId,
+  getCoursesByUserId,
+  getOffsetCoursesByTitleAndUserId,
+} from "@/db/course";
 import {
   deleteLessonsByLessonsIds,
   getLessonById,
@@ -51,6 +56,9 @@ const EditLessonModal: FunctionComponent<Props> = memo(
 
     // Vars
 
+    // Refs
+    const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
+
     // Hooks
     const t = useTranslations();
     const router = useRouter();
@@ -76,6 +84,13 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     const fetchCourses = async () => {
       try {
         setCourses(await getCoursesByUserId(user.id));
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    };
+    const fetchCoursesBySearch = async (search: string) => {
+      try {
+        setCourses(await getCoursesByTitleAndUserId(search, user.id));
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -150,6 +165,18 @@ const EditLessonModal: FunctionComponent<Props> = memo(
       }
     }, [lesson, courses.length]);
 
+    const onCoursesScrollEnd = async (search: string) => {
+      const rangeCourses = await getOffsetCoursesByTitleAndUserId(
+        user.id,
+        search,
+        coursesOffsetRef.current,
+        coursesOffsetRef.current + COURSES_GET_LIMIT - 1
+      );
+
+      setCourses((prev) => [...prev, ...rangeCourses]);
+      coursesOffsetRef.current += rangeCourses.length;
+    };
+
     // View
     return (
       <BaseModal
@@ -187,8 +214,10 @@ const EditLessonModal: FunctionComponent<Props> = memo(
                 options={courses}
                 fullWidth
                 popperProps={{
-                  popperClassName: "max-h-[160px]",
+                  popperClassName: "h-[198px]",
                 }}
+                onScrollEnd={onCoursesScrollEnd}
+                onSearchInputChange={fetchCoursesBySearch}
               />
             )}
             <Input

@@ -22,7 +22,12 @@ import toast from "react-hot-toast";
 
 import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
 import Select from "@/components/common/select";
-import { getCoursesByUserId } from "@/db/course";
+import { COURSES_GET_LIMIT } from "@/constants";
+import {
+  getCoursesByTitleAndUserId,
+  getCoursesByUserId,
+  getOffsetCoursesByTitleAndUserId,
+} from "@/db/course";
 import { getWeekLessons, upsertLesson } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/menu.interface";
@@ -48,6 +53,7 @@ const Schedule: FunctionComponent = () => {
   const intervalIDRef = useRef<NodeJS.Timeout>();
   const draggingEventRef = useRef<HTMLDivElement>();
   const hoursLabelsDaysWrapperRef = useRef<HTMLDivElement>();
+  const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
 
   // Hooks
   const t = useTranslations();
@@ -226,6 +232,26 @@ const Schedule: FunctionComponent = () => {
     }
   }, []);
 
+  const onCoursesScrollEnd = async (search: string) => {
+    const rangeCourses = await getOffsetCoursesByTitleAndUserId(
+      user.id,
+      search,
+      coursesOffsetRef.current,
+      coursesOffsetRef.current + COURSES_GET_LIMIT - 1
+    );
+
+    setCourses((prev) => [...prev, ...rangeCourses]);
+    coursesOffsetRef.current += rangeCourses.length;
+  };
+
+  const fetchCoursesBySearch = async (search: string) => {
+    try {
+      setCourses(await getCoursesByTitleAndUserId(search, user.id));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   // Effects
   useEffect(() => {
     isDraggingEventRef.current = !!draggingEvent;
@@ -293,9 +319,13 @@ const Schedule: FunctionComponent = () => {
           onChange={(item) => setSelectedCourse(item)}
           defaultValue={selectedCourse}
           useUnselect
+          fullWidth
           popperProps={{
-            popperClassName: "max-h-64",
+            popperClassName: "h-[250px]",
+            className: "w-52",
           }}
+          onScrollEnd={onCoursesScrollEnd}
+          onSearchInputChange={fetchCoursesBySearch}
         />
       </div>
 
