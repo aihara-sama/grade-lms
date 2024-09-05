@@ -2,8 +2,6 @@
 
 import type { NextPage } from "next";
 
-const Page: NextPage = () => {
-  return <></>;
-};
+const Page: NextPage = () => <></>;
 
 export default Page;
