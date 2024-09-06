@@ -13,7 +13,6 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
-import throttle from "lodash.throttle";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -36,6 +35,7 @@ import {
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { throttleFetch } from "@/utils/throttle-fetch";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
@@ -94,6 +94,7 @@ const Courses: FunctionComponent<Props> = () => {
       setTotalCoursesCount(coursesCountByUserId);
       setIsSelectedAll(false);
       setSelectedCoursesIds([]);
+      coursesOffsetRef.current += coursesByUserId.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -115,6 +116,7 @@ const Courses: FunctionComponent<Props> = () => {
       setTotalCoursesCount(coursesCountByTitleAndUserId);
       setIsSelectedAll(false);
       setSelectedCoursesIds([]);
+      coursesOffsetRef.current = 0;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -153,29 +155,32 @@ const Courses: FunctionComponent<Props> = () => {
     setCoursesSearchText((coursesSearchTextRef.current = e.target.value));
     fetchCoursesBySearch();
   };
+  const fetchMoreCourses = async () => {
+    try {
+      const rangeCoursesByUserId = await getOffsetCoursesByTitleAndUserId(
+        user.id,
+        coursesSearchTextRef.current,
+        coursesOffsetRef.current,
+        coursesOffsetRef.current + COURSES_GET_LIMIT - 1
+      );
+
+      setCourses((prev) => [...prev, ...rangeCoursesByUserId]);
+
+      if (isSelectedAllRef.current) {
+        setSelectedCoursesIds((prev) => [
+          ...prev,
+          ...rangeCoursesByUserId.map(({ id }) => id),
+        ]);
+      }
+
+      coursesOffsetRef.current += rangeCoursesByUserId.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
   const onCoursesScroll = async (e: Event) => {
     if (isCloseToBottom(e.target as HTMLElement)) {
-      try {
-        const rangeCoursesByUserId = await getOffsetCoursesByTitleAndUserId(
-          user.id,
-          coursesSearchTextRef.current,
-          coursesOffsetRef.current,
-          coursesOffsetRef.current + COURSES_GET_LIMIT - 1
-        );
-
-        setCourses((prev) => [...prev, ...rangeCoursesByUserId]);
-
-        if (isSelectedAllRef.current) {
-          setSelectedCoursesIds((prev) => [
-            ...prev,
-            ...rangeCoursesByUserId.map(({ id }) => id),
-          ]);
-        }
-
-        coursesOffsetRef.current += rangeCoursesByUserId.length;
-      } catch (error: any) {
-        toast.error(error.message);
-      }
+      fetchMoreCourses();
     }
   };
   const onCourseToggle = (checked: boolean, courseId: string) => {
@@ -189,7 +194,7 @@ const Courses: FunctionComponent<Props> = () => {
   };
   // Effects
   useEffect(() => {
-    const throttled = throttle(onCoursesScroll, 300);
+    const throttled = throttleFetch(onCoursesScroll);
     document
       .getElementById("content-wrapper")
       .addEventListener("scroll", throttled);
@@ -212,6 +217,18 @@ const Courses: FunctionComponent<Props> = () => {
   useEffect(() => {
     setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length);
   }, [totalCoursesCount]);
+
+  useEffect(() => {
+    // Tall screens may fit more than 20 records. This will fit the screen
+    if (courses.length && totalCoursesCount !== courses.length) {
+      const contentWrapper = document.getElementById("content-wrapper");
+      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
+        fetchMoreCourses();
+      }
+    }
+  }, [courses, totalCoursesCount]);
+
+  // View
   return (
     <div className="pb-8 flex-1 flex flex-col">
       <CardsContainer>

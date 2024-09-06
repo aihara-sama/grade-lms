@@ -205,7 +205,6 @@ export const getUsersNotInCourseCount = async (
     .select("count")
     .returns<{ count: number }[]>();
 
-  console.log({ result });
   if (result.error) throw new Error(t("failed_to_load_users"));
 
   return result.data[0].count;

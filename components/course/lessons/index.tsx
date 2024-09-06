@@ -32,7 +32,7 @@ import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import throttle from "lodash.throttle";
+import { throttleFetch } from "@/utils/throttle-fetch";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -59,7 +59,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
   // Refs
   const isSelectedAllRef = useRef(false);
   const lessonsSearchTextRef = useRef("");
-  const lessonsOffsetRef = useRef(LESSONS_GET_LIMIT);
+  const lessonsOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
@@ -90,6 +90,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       setTotalLessonsCount(lessonsCountByTitCoursedUserId);
       setIsSelectedAll(false);
       setSelectedLessonsIds([]);
+      lessonsOffsetRef.current = 0;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -107,6 +108,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       setTotalLessonsCount(lessonsCountByCourseId);
       setIsSelectedAll(false);
       setSelectedLessonsIds([]);
+      lessonsOffsetRef.current += lessonsByCourseId.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -138,33 +140,38 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
     setIsSelectedAll(false);
   };
 
-  const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLessonsSearchText((lessonsSearchTextRef.current = e.target.value));
     fetchLessonsBySearch();
   };
-  const handleLessonsScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      try {
-        const offsetlessonsByUserId = await getOffsetLessonsByTitleAndCourseId(
-          courseId,
-          lessonsSearchTextRef.current,
-          lessonsOffsetRef.current,
-          lessonsOffsetRef.current + LESSONS_GET_LIMIT - 1
-        );
 
-        setLessons((prev) => [...prev, ...offsetlessonsByUserId]);
+  const fetchMoreLessons = async () => {
+    try {
+      const offsetlessonsByUserId = await getOffsetLessonsByTitleAndCourseId(
+        courseId,
+        lessonsSearchTextRef.current,
+        lessonsOffsetRef.current,
+        lessonsOffsetRef.current + LESSONS_GET_LIMIT - 1
+      );
 
-        if (isSelectedAllRef.current) {
-          setSelectedLessonsIds((prev) => [
-            ...prev,
-            ...offsetlessonsByUserId.map(({ id }) => id),
-          ]);
-        }
+      setLessons((prev) => [...prev, ...offsetlessonsByUserId]);
 
-        lessonsOffsetRef.current += offsetlessonsByUserId.length;
-      } catch (error: any) {
-        toast.error(error.message);
+      if (isSelectedAllRef.current) {
+        setSelectedLessonsIds((prev) => [
+          ...prev,
+          ...offsetlessonsByUserId.map(({ id }) => id),
+        ]);
       }
+
+      lessonsOffsetRef.current += offsetlessonsByUserId.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const onLessonsScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
+      fetchMoreLessons();
     }
   };
 
@@ -187,7 +194,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
   // Effects
   useEffect(() => {
-    const throttled = throttle(handleLessonsScroll, 300);
+    const throttled = throttleFetch(onLessonsScroll);
     document
       .getElementById("content-wrapper")
       .addEventListener("scroll", throttled);
@@ -210,6 +217,15 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
   useEffect(() => {
     isSelectedAllRef.current = isSelectedAll;
   }, [isSelectedAll]);
+  useEffect(() => {
+    // Tall screens may fit more than 20 records. This will fit the screen
+    if (lessons.length && totalLessonsCount !== lessons.length) {
+      const contentWrapper = document.getElementById("content-wrapper");
+      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
+        fetchMoreLessons();
+      }
+    }
+  }, [lessons, totalLessonsCount]);
 
   return (
     <>
@@ -245,7 +261,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
           Icon={<SearchIcon size="xs" />}
           placeholder="Search"
           className="w-auto"
-          onChange={handleSearchInputChange}
+          onChange={onSearchInputChange}
           value={lessonsSearchText}
         />
       )}

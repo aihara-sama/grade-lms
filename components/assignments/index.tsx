@@ -16,7 +16,7 @@ import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import Skeleton from "@/components/skeleton";
-import { ASSIGNMENTS_GET_LIMIT, LESSONS_GET_LIMIT } from "@/constants";
+import { LESSONS_GET_LIMIT } from "@/constants";
 import {
   deleteAssignmentsByAssignmentsIds,
   deleteAssignmentsByTitleAndLessonId,
@@ -32,7 +32,7 @@ import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import throttle from "lodash.throttle";
+import { throttleFetch } from "@/utils/throttle-fetch";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -60,7 +60,6 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
   const [totalAssignmentsCount, setTotalAssignmentsCount] = useState(0);
   const [assignmentsSearchText, setAssignmentsSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
-  console.log({ isSelectedAll });
 
   const [isSubmittingDeleteAssignment, setIsSubmittingDeleteAssignment] =
     useState(false);
@@ -69,7 +68,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
 
   // Refs
   const isSelectedAllRef = useRef(false);
-  const assignmentsOffsetRef = useRef(ASSIGNMENTS_GET_LIMIT);
+  const assignmentsOffsetRef = useRef(0);
   const assignmentsSearchTextRef = useRef("");
 
   // Hooks
@@ -106,6 +105,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       setTotalAssignmentsCount(assignmentsCountByTitleAndLessonId);
       setIsSelectedAll(false);
       setSelectedAssignmentsIds([]);
+      assignmentsOffsetRef.current = 0;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -124,6 +124,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       setTotalAssignmentsCount(assignmentsCountByCourseId);
       setIsSelectedAll(false);
       setSelectedAssignmentsIds([]);
+      assignmentsOffsetRef.current += assignmentsByLessonId.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -186,30 +187,35 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
     );
     fetchAssignmentsBySearch();
   };
+
+  const fetchMoreAssignments = async () => {
+    try {
+      const offsetAssignmentsByUserId =
+        await getOffsetAssignmentsByTitleAndLessonId(
+          lesson.id,
+          assignmentsSearchTextRef.current,
+          assignmentsOffsetRef.current,
+          assignmentsOffsetRef.current + LESSONS_GET_LIMIT - 1
+        );
+
+      setAssignments((prev) => [...prev, ...offsetAssignmentsByUserId]);
+
+      if (isSelectedAllRef.current) {
+        setSelectedAssignmentsIds((prev) => [
+          ...prev,
+          ...offsetAssignmentsByUserId.map(({ id }) => id),
+        ]);
+      }
+
+      assignmentsOffsetRef.current += offsetAssignmentsByUserId.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const onAssignmentsScroll = async (e: Event) => {
     if (isCloseToBottom(e.target as HTMLElement)) {
-      try {
-        const offsetAssignmentsByUserId =
-          await getOffsetAssignmentsByTitleAndLessonId(
-            lesson.id,
-            assignmentsSearchTextRef.current,
-            assignmentsOffsetRef.current,
-            assignmentsOffsetRef.current + LESSONS_GET_LIMIT - 1
-          );
-
-        setAssignments((prev) => [...prev, ...offsetAssignmentsByUserId]);
-
-        if (isSelectedAllRef.current) {
-          setSelectedAssignmentsIds((prev) => [
-            ...prev,
-            ...offsetAssignmentsByUserId.map(({ id }) => id),
-          ]);
-        }
-
-        assignmentsOffsetRef.current += offsetAssignmentsByUserId.length;
-      } catch (error: any) {
-        toast.error(error.message);
-      }
+      fetchMoreAssignments();
     }
   };
 
@@ -228,7 +234,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
   };
 
   useEffect(() => {
-    const throttled = throttle(onAssignmentsScroll, 300);
+    const throttled = throttleFetch(onAssignmentsScroll);
     document
       .getElementById("content-wrapper")
       .addEventListener("scroll", throttled);
@@ -251,6 +257,15 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
   useEffect(() => {
     isSelectedAllRef.current = isSelectedAll;
   }, [isSelectedAll]);
+  useEffect(() => {
+    // Tall screens may fit more than 20 records. This will fit the screen
+    if (assignments.length && totalAssignmentsCount !== assignments.length) {
+      const contentWrapper = document.getElementById("content-wrapper");
+      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
+        fetchMoreAssignments();
+      }
+    }
+  }, [assignments, totalAssignmentsCount]);
 
   return (
     <>

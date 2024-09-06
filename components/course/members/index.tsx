@@ -28,8 +28,8 @@ import {
 } from "@/db/user";
 import type { User } from "@/types/users";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { throttleFetch } from "@/utils/throttle-fetch";
 import type { User as AuthUser } from "@supabase/supabase-js";
-import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -59,7 +59,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
   // Refs
   const isSelectedAllRef = useRef(false);
   const membersSearchTextRef = useRef("");
-  const membersOffsetRef = useRef(USERS_GET_LIMIT);
+  const membersOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
@@ -85,6 +85,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       setTotalMembersCount(usersCountByCourseId);
       setIsSelectedAll(false);
       setSelectedMembersIds([]);
+      membersOffsetRef.current += usersByCourseId.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -160,29 +161,32 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       setIsSelectedAll(totalMembersCount === selectedMembersIds.length - 1);
     }
   };
+  const fetchMoreMembers = async () => {
+    try {
+      const offsetMembersByCourseId = await getOffsetUsersByNameAndCourseId(
+        membersSearchTextRef.current,
+        courseId,
+        membersOffsetRef.current,
+        membersOffsetRef.current + USERS_GET_LIMIT - 1
+      );
+
+      setMembers((prev) => [...prev, ...offsetMembersByCourseId]);
+
+      if (isSelectedAllRef.current) {
+        setSelectedMembersIds((prev) => [
+          ...prev,
+          ...offsetMembersByCourseId.map(({ id }) => id),
+        ]);
+      }
+
+      membersOffsetRef.current += offsetMembersByCourseId.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
   const onCoursesScroll = async (e: Event) => {
     if (isCloseToBottom(e.target as HTMLElement)) {
-      try {
-        const offsetMembersByCourseId = await getOffsetUsersByNameAndCourseId(
-          membersSearchTextRef.current,
-          courseId,
-          membersOffsetRef.current,
-          membersOffsetRef.current + USERS_GET_LIMIT - 1
-        );
-
-        setMembers((prev) => [...prev, ...offsetMembersByCourseId]);
-
-        if (isSelectedAllRef.current) {
-          setSelectedMembersIds((prev) => [
-            ...prev,
-            ...offsetMembersByCourseId.map(({ id }) => id),
-          ]);
-        }
-
-        membersOffsetRef.current += offsetMembersByCourseId.length;
-      } catch (error: any) {
-        toast.error(error.message);
-      }
+      fetchMoreMembers();
     }
   };
 
@@ -203,7 +207,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
   };
 
   useEffect(() => {
-    const throttled = throttle(onCoursesScroll, 300);
+    const throttled = throttleFetch(onCoursesScroll);
     document
       .getElementById("content-wrapper")
       .addEventListener("scroll", throttled);
@@ -226,6 +230,16 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
   useEffect(() => {
     setIsSelectedAll(totalMembersCount === selectedMembersIds.length);
   }, [totalMembersCount]);
+
+  useEffect(() => {
+    // Tall screens may fit more than 20 records. This will fit the screen
+    if (members.length && totalMembersCount !== members.length) {
+      const contentWrapper = document.getElementById("content-wrapper");
+      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
+        fetchMoreMembers();
+      }
+    }
+  }, [members, totalMembersCount]);
 
   return (
     <>

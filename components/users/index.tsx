@@ -34,7 +34,7 @@ import {
 import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import throttle from "lodash.throttle";
+import { throttleFetch } from "@/utils/throttle-fetch";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
@@ -59,7 +59,7 @@ const Users: FunctionComponent = () => {
   // Refs
   const isSelectedAllRef = useRef(false);
   const usersSearchTextRef = useRef("");
-  const usersOffsetRef = useRef(USERS_GET_LIMIT);
+  const usersOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
@@ -87,6 +87,7 @@ const Users: FunctionComponent = () => {
       setTotalUsersCount(usersCountByCreatorId);
       setIsSelectedAll(false);
       setSelectedUsersIds([]);
+      usersOffsetRef.current += usersByCreatorId.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -151,29 +152,35 @@ const Users: FunctionComponent = () => {
       setIsSelectedAll(totalUsersCount === selectedUsersIds.length - 1);
     }
   };
-  const onCoursesScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      try {
-        const offsetUsersByUserId = await getOffsetUsersByNameAndCreatorId(
-          usersSearchTextRef.current,
-          user.id,
-          usersOffsetRef.current,
-          usersOffsetRef.current + USERS_GET_LIMIT - 1
-        );
 
-        setUsers((prev) => [...prev, ...offsetUsersByUserId]);
+  const fetchMoreUsers = async () => {
+    try {
+      const offsetUsersByUserId = await getOffsetUsersByNameAndCreatorId(
+        usersSearchTextRef.current,
+        user.id,
+        usersOffsetRef.current,
+        usersOffsetRef.current + USERS_GET_LIMIT - 1
+      );
 
-        if (isSelectedAllRef.current) {
-          setSelectedUsersIds((prev) => [
-            ...prev,
-            ...offsetUsersByUserId.map(({ id }) => id),
-          ]);
-        }
+      setUsers((prev) => [...prev, ...offsetUsersByUserId]);
 
-        usersOffsetRef.current += offsetUsersByUserId.length;
-      } catch (error: any) {
-        toast.error(error.message);
+      if (isSelectedAllRef.current) {
+        setSelectedUsersIds((prev) => [
+          ...prev,
+          ...offsetUsersByUserId.map(({ id }) => id),
+        ]);
       }
+
+      usersOffsetRef.current += offsetUsersByUserId.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  const onCoursesScroll = (e: Event) => {
+    console.log({ isCloseToBottom: isCloseToBottom(e.target as HTMLElement) });
+
+    if (isCloseToBottom(e.target as HTMLElement)) {
+      fetchMoreUsers();
     }
   };
   const onEnrollUsersInCoursesModalClose = (mutated?: boolean) => {
@@ -186,7 +193,7 @@ const Users: FunctionComponent = () => {
 
   // Effects
   useEffect(() => {
-    const throttled = throttle(onCoursesScroll, 300);
+    const throttled = throttleFetch(onCoursesScroll);
     document
       .getElementById("content-wrapper")
       .addEventListener("scroll", throttled);
@@ -209,6 +216,16 @@ const Users: FunctionComponent = () => {
   useEffect(() => {
     setIsSelectedAll(totalUsersCount === selectedUsersIds.length);
   }, [totalUsersCount]);
+
+  useEffect(() => {
+    // Tall screens may fit more than 20 records. This will fit the screen
+    if (users.length && totalUsersCount !== users.length) {
+      const contentWrapper = document.getElementById("content-wrapper");
+      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
+        fetchMoreUsers();
+      }
+    }
+  }, [users, totalUsersCount]);
   return (
     <>
       <CardsContainer>
