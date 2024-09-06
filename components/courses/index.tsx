@@ -35,7 +35,7 @@ import {
 } from "@/db/course";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
@@ -153,8 +153,8 @@ const Courses: FunctionComponent<Props> = () => {
     setCoursesSearchText((coursesSearchTextRef.current = e.target.value));
     fetchCoursesBySearch();
   };
-  const onCoursesScroll = async () => {
-    if (isDocCloseToBottom()) {
+  const onCoursesScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
       try {
         const rangeCoursesByUserId = await getOffsetCoursesByTitleAndUserId(
           user.id,

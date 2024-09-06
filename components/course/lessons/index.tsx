@@ -31,7 +31,7 @@ import {
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
-import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -142,8 +142,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
     setLessonsSearchText((lessonsSearchTextRef.current = e.target.value));
     fetchLessonsBySearch();
   };
-  const handleLessonsScroll = async () => {
-    if (isDocCloseToBottom()) {
+  const handleLessonsScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
       try {
         const offsetlessonsByUserId = await getOffsetLessonsByTitleAndCourseId(
           courseId,

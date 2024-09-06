@@ -31,7 +31,7 @@ import { Role } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignments.type";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
-import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -186,8 +186,8 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
     );
     fetchAssignmentsBySearch();
   };
-  const onAssignmentsScroll = async () => {
-    if (isDocCloseToBottom()) {
+  const onAssignmentsScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
       try {
         const offsetAssignmentsByUserId =
           await getOffsetAssignmentsByTitleAndLessonId(

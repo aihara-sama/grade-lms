@@ -27,7 +27,7 @@ import {
   getUsersCountByTitleAndCourseId,
 } from "@/db/user";
 import type { User } from "@/types/users";
-import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import type { User as AuthUser } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
@@ -160,8 +160,8 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       setIsSelectedAll(totalMembersCount === selectedMembersIds.length - 1);
     }
   };
-  const onCoursesScroll = async () => {
-    if (isDocCloseToBottom()) {
+  const onCoursesScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
       try {
         const offsetMembersByCourseId = await getOffsetUsersByNameAndCourseId(
           membersSearchTextRef.current,
