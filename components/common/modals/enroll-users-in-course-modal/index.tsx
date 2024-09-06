@@ -3,10 +3,10 @@ import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
 import Table from "@/components/table";
 import type { FunctionComponent } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { USERS_GET_LIMIT } from "@/constants";
 import { enrollUsersInCourses, getUsersNotInCourse } from "@/db/user";
-import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
 import { db } from "@/utils/supabase/client";
 import clsx from "clsx";
@@ -28,15 +28,24 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   const [isSubmitting, setIsSubmiotting] = useState(false);
 
   // Refs
-  const t = useTranslations();
+  const usersOffsetRef = useRef(0);
 
   // Hooks
-  const { user } = useUser();
+  const t = useTranslations();
 
   // Handlers
-  const fetchUsersNotInCourse = async () => {
+  const fetchUsersNotInCourse = async (search: string = "") => {
     try {
-      setUsers(await getUsersNotInCourse(user.id, courseId));
+      const fetchedUsers = await getUsersNotInCourse(
+        courseId,
+        search,
+        usersOffsetRef.current,
+        usersOffsetRef.current + USERS_GET_LIMIT - 1
+      );
+      console.log({ fetchedUsers });
+
+      setUsers((prev) => [...prev, ...fetchedUsers]);
+      usersOffsetRef.current += fetchedUsers.length;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -72,6 +81,8 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       <p className="mb-3 text-neutral-500">Select users to enroll</p>
       <div className="">
         <Table
+          onSearchInputChange={fetchUsersNotInCourse}
+          onScrollEnd={fetchUsersNotInCourse}
           compact
           data={users.map(({ id, avatar, name, role }) => ({
             Name: (

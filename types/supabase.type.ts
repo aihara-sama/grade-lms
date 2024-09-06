@@ -477,6 +477,7 @@ export type Database = {
       get_users_not_in_course: {
         Args: {
           p_course_id: string;
+          p_user_name: string;
         };
         Returns: {
           avatar: string;

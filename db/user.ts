@@ -172,14 +172,19 @@ export const getOffsetUsersByNameAndCourseId = async (
   return result.data.users;
 };
 
-export const getUsersNotInCourse = async (userId: string, courseId: string) => {
+export const getUsersNotInCourse = async (
+  courseId: string,
+  userName: string,
+  from: number,
+  to: number
+) => {
   const t = await loadMessages();
   const result = await db
     .rpc("get_users_not_in_course", {
       p_course_id: courseId,
+      p_user_name: userName,
     })
-    .eq("creator_id", userId)
-    .neq("id", userId);
+    .range(from, to);
 
   if (result.error) throw new Error(t("failed_to_load_users"));
 

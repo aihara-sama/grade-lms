@@ -184,14 +184,17 @@ create table chat_files (
   size int not null
 );
 
-create or replace function public.get_users_not_in_course(p_course_id uuid)
+create or replace function public.get_users_not_in_course(p_course_id uuid, p_user_name text)
 returns setof public.users as $$
 begin
     return query
     select u.*
     from public.users u
     left join public.user_courses uc on u.id = uc.user_id and uc.course_id = p_course_id
-    where uc.user_id is null;
+    where uc.user_id is null
+    and u.name ILIKE '%' || p_user_name || '%'
+    and u.creator_id = auth.uid()::text
+    and u.id != auth.uid();
 end;
 $$ language plpgsql;
 
