@@ -438,6 +438,12 @@ export type Database = {
         };
         Returns: undefined;
       };
+      enroll_all_users: {
+        Args: {
+          p_course_id: string;
+        };
+        Returns: undefined;
+      };
       get_courses_not_assigned_to_user: {
         Args: {
           p_user_id: string;

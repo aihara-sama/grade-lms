@@ -78,7 +78,7 @@ const Select: FunctionComponent<Props> = ({
 
   useEffect(() => {
     setFilteredOptions(filterByTitle(options, searchText));
-    onSearchInputChange(searchText);
+    onSearchInputChange?.(searchText);
   }, [searchText]);
 
   return (

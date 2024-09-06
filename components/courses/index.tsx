@@ -28,9 +28,9 @@ import {
   deleteCoursesByCoursesIds,
   deleteCoursesByTitleAndUserId,
   getCoursesByTitleAndUserId,
+  getCoursesCount,
   getCoursesCountByTitleAndUserId,
-  getCoursesCountByUserId,
-  getCoursesWithRefsCountByUserId,
+  getCoursesWithRefsCount,
   getOffsetCoursesByTitleAndUserId,
 } from "@/db/course";
 import { useUser } from "@/hooks/use-user";
@@ -61,7 +61,7 @@ const Courses: FunctionComponent<Props> = () => {
 
   // Refs
   const isSelectedAllRef = useRef(false);
-  const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
+  const coursesOffsetRef = useRef(0);
   const coursesSearchTextRef = useRef("");
 
   // Hooks
@@ -73,13 +73,21 @@ const Courses: FunctionComponent<Props> = () => {
     setSelectedCoursesIds(courses.map(({ id }) => id));
     setIsSelectedAll(true);
   };
+  const deselectAllCourses = () => {
+    setSelectedCoursesIds([]);
+    setIsSelectedAll(false);
+  };
   const fetchCoursesWithCount = async () => {
     setIsCoursesLoading(true);
 
     try {
       const [coursesByUserId, coursesCountByUserId] = await Promise.all([
-        getCoursesWithRefsCountByUserId(user.id),
-        getCoursesCountByUserId(user.id),
+        getCoursesWithRefsCount(
+          user.id,
+          coursesOffsetRef.current,
+          coursesOffsetRef.current + COURSES_GET_LIMIT - 1
+        ),
+        getCoursesCount(user.id),
       ]);
 
       setCourses(coursesByUserId);
@@ -111,10 +119,7 @@ const Courses: FunctionComponent<Props> = () => {
       toast.error(error.message);
     }
   };
-  const submitDeselectAllCourses = () => {
-    setSelectedCoursesIds([]);
-    setIsSelectedAll(false);
-  };
+
   const submitDeleteSelectedCourses = async () => {
     setIsSubmittingDeleteCourses(true);
     try {
@@ -222,9 +227,7 @@ const Courses: FunctionComponent<Props> = () => {
       {selectedCoursesIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
-            onClick={
-              isSelectedAll ? submitDeselectAllCourses : selectAllCourses
-            }
+            onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? totalCoursesCount : selectedCoursesIds.length}{" "}

@@ -1,4 +1,3 @@
-import { SUBMISSIONS_GET_LIMIT } from "@/constants";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
 import { db } from "@/utils/supabase/client";
@@ -31,14 +30,17 @@ export const updateSubmission = async (
 };
 
 export const getAssignmentSubmissionsWithAuthor = async (
-  assignmentId: string
+  assignmentId: string,
+  from: number,
+  to: number
 ) => {
   const t = await loadMessages();
   const result = await db
     .from("submissions")
     .select("*, author:users(*)")
     .eq("assignment_id", assignmentId)
-    .limit(SUBMISSIONS_GET_LIMIT);
+    .range(from, to)
+    .order("created_at", { ascending: true });
 
   if (result.error) throw new Error(t("failed_to_load_submissions"));
 
@@ -46,7 +48,9 @@ export const getAssignmentSubmissionsWithAuthor = async (
 };
 export const getUserSubmissionsWithAuthor = async (
   assignmentId: string,
-  userId: string
+  userId: string,
+  from: number,
+  to: number
 ) => {
   const t = await loadMessages();
   const result = await db
@@ -54,7 +58,7 @@ export const getUserSubmissionsWithAuthor = async (
     .select("*, author:users(*)")
     .eq("assignment_id", assignmentId)
     .eq("user_id", userId)
-    .limit(SUBMISSIONS_GET_LIMIT);
+    .range(from, to);
 
   if (result.error) throw new Error(t("failed_to_load_submissions"));
 

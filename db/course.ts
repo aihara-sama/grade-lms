@@ -5,7 +5,7 @@ import { loadMessages } from "@/utils/load-messages";
 import { db } from "@/utils/supabase/client";
 
 // Get
-export const getCoursesCountByUserId = async (userId: string) => {
+export const getCoursesCount = async (userId: string) => {
   const t = await loadMessages();
   const result = await db
     .from("users")
@@ -57,14 +57,18 @@ export const getCoursesByTitleAndUserId = async (
   return result.data.courses;
 };
 
-export const getCoursesWithRefsCountByUserId = async (userId: string) => {
+export const getCoursesWithRefsCount = async (
+  userId: string,
+  from: number,
+  to: number
+) => {
   const t = await loadMessages();
   const result = await db
     .from("users")
     .select("courses(*, lessons(count), users(count))")
     .eq("id", userId)
-    .limit(COURSES_GET_LIMIT, { foreignTable: "courses" })
-    .order("title", { foreignTable: "courses", ascending: true })
+    .range(from, to, { foreignTable: "courses" })
+    .order("created_at", { foreignTable: "courses", ascending: true })
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
     .single();
 
@@ -97,17 +101,37 @@ export const getCourseByCourseId = async (courseId: string) => {
 
   return result.data;
 };
-export const getUnenrolledCoursesByUserId = async (userId: string) => {
+export const getUnenrolledCourses = async (
+  userId: string,
+  from: number,
+  to: number
+) => {
   const t = await loadMessages();
   const result = await db
     .rpc("get_courses_not_assigned_to_user", {
       p_user_id: userId,
     })
+    .range(from, to)
+    .order("created_at", { ascending: true })
+
     .returns<CourseWithRefsCount[]>();
 
   if (result.error) throw new Error(t("failed_to_load_courses"));
 
   return result.data;
+};
+export const getUnenrolledCoursesCount = async (userId: string) => {
+  const t = await loadMessages();
+  const result = await db
+    .rpc("get_courses_not_assigned_to_user", {
+      p_user_id: userId,
+    })
+
+    .returns<{ count: number }[]>();
+
+  if (result.error) throw new Error(t("failed_to_load_courses_count"));
+
+  return result.data[0].count;
 };
 
 export const getOffsetCoursesByTitleAndUserId = async (

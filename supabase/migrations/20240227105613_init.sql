@@ -306,3 +306,16 @@ AS $$
       WHERE sn.user_id = u.id
     );
 $$;
+
+
+CREATE OR REPLACE FUNCTION enroll_all_users(p_course_id uuid)
+RETURNS void AS $$
+BEGIN
+  -- Insert all users with the same creator_id as auth.uid() into user_courses table
+  INSERT INTO public.user_courses (user_id, course_id, created_at)
+  SELECT u.id, p_course_id, NOW()
+  FROM public.users u
+  WHERE u.creator_id = auth.uid()::text
+  ON CONFLICT DO NOTHING;  -- In case the user is already enrolled in the course, avoid errors
+END;
+$$ LANGUAGE plpgsql;

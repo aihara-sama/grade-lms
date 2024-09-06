@@ -3,13 +3,18 @@
 import BaseDrawer from "@/components/common/drawers/base-drawer";
 import Notification from "@/components/common/drawers/notifications-drawer/notification";
 import NotificationsIcon from "@/components/icons/notifications-icon";
+import { NOTIFICATIONS_GET_LIMIT } from "@/constants";
 import { getNotifications } from "@/db/notification";
 import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types";
 import { Event } from "@/types/events.type";
 import { closeNotificationChannel } from "@/utils/get-notification-channel";
-import { useEffect, useState, type FunctionComponent } from "react";
+import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { throttleFetch } from "@/utils/throttle-fetch";
+import type { FunctionComponent, UIEventHandler } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import toast from "react-hot-toast";
 
 const NotificationsDrawer: FunctionComponent = () => {
@@ -24,6 +29,9 @@ const NotificationsDrawer: FunctionComponent = () => {
   const notificationChannel = useNotificationChannel();
   const { user } = useUser();
 
+  // Refs
+  const notificationsOffsetRef = useRef(0);
+
   // Handlers
   const onNewNotification = () => setIsNewNotification(true);
   const onReadNotification = (notificationId: string) =>
@@ -36,10 +44,22 @@ const NotificationsDrawer: FunctionComponent = () => {
     );
   const fetchNotifications = async () => {
     try {
-      setNotifications(await getNotifications(user.id));
+      const fetchedNotifications = await getNotifications(
+        user.id,
+        notificationsOffsetRef.current,
+        notificationsOffsetRef.current + NOTIFICATIONS_GET_LIMIT - 1
+      );
+      setNotifications((prev) => [...prev, ...fetchedNotifications]);
+      notificationsOffsetRef.current += fetchedNotifications.length;
     } catch (error: any) {
       toast.error(error.message);
     }
+  };
+
+  const onScrollEnd = useCallback(throttleFetch(fetchNotifications), []);
+
+  const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
+    if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd();
   };
 
   // Effects
@@ -83,7 +103,10 @@ const NotificationsDrawer: FunctionComponent = () => {
             </div>
           }
         >
-          <div className="max-h-[calc(100vh-88px)] overflow-auto py-4">
+          <div
+            onScroll={onScroll}
+            className="max-h-[calc(100vh-88px)] overflow-auto py-4"
+          >
             {notifications.map((notification) => (
               <Notification
                 notification={notification}

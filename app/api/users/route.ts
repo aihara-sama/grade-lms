@@ -10,25 +10,26 @@ export async function GET(req: NextRequest) {
   } = await createClient().auth.getUser();
 
   const amount = +req.nextUrl.searchParams.get("amount");
+  const result = [];
+  let i = 0;
 
-  const result = await Promise.all(
-    new Array(amount).fill("0").map((_, idx) => {
-      const newUser = {
-        email: `${idx + 1}@mail.ru`,
-        password: "1111111",
-        user_metadata: {
-          name: `${idx + 1}`,
-          creator_id: user.id,
-          role: Role.Student,
-          avatar: "default-avatar.jpg",
-          preferred_locale: "en",
-          timezone: "Europe/Chisinau",
-        } as IUserMetadata,
-        email_confirm: true,
-      };
-      return supabaseAdmin.auth.admin.createUser(newUser);
-    })
-  );
+  for await (const password of new Array(amount).fill("1111111")) {
+    const newUser = {
+      email: `${i + 1}@mail.ru`,
+      password,
+      user_metadata: {
+        name: `${i + 1}`,
+        creator_id: user.id,
+        role: Role.Student,
+        avatar: "default-avatar.jpg",
+        preferred_locale: "en",
+        timezone: "Europe/Chisinau",
+      } as IUserMetadata,
+      email_confirm: true,
+    };
+    result.push(await supabaseAdmin.auth.admin.createUser(newUser));
+    i += 1;
+  }
 
   return Response.json({ errors: result.map(({ error }) => error?.message) });
 }

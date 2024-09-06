@@ -33,10 +33,10 @@ import {
 } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
-import { isDocCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
-import type { ChangeEvent, FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 
 const Users: FunctionComponent = () => {
   // State
@@ -66,6 +66,15 @@ const Users: FunctionComponent = () => {
   const { user } = useUser();
 
   // Handlers
+  const selectAllUsers = () => {
+    setSelectedUsersIds(users.map(({ id }) => id));
+    setIsSelectedAll(true);
+  };
+  const deselectAllUsers = () => {
+    setSelectedUsersIds([]);
+    setIsSelectedAll(false);
+  };
+
   const fetchUsersWithCount = async () => {
     setIsUsersLoading(true);
 
@@ -88,18 +97,20 @@ const Users: FunctionComponent = () => {
     try {
       const [usersByTitleAndUserId, usersCountByTitleAndUserId] =
         await Promise.all([
-          getUsersByNameAndCreatorId(usersSearchTextRef.current, user.id),
-          getUsersCountByTitleAndUserId(usersSearchTextRef.current, user.id),
+          getUsersByNameAndCreatorId(usersSearchText, user.id),
+          getUsersCountByTitleAndUserId(usersSearchText, user.id),
         ]);
 
       setUsers(usersByTitleAndUserId);
       setTotalUsersCount(usersCountByTitleAndUserId);
       setIsSelectedAll(false);
       setSelectedUsersIds([]);
+      usersOffsetRef.current = usersByTitleAndUserId.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
+
   const submitDeleteUsers = async () => {
     setIsSubmittingDeleteUsers(true);
     try {
@@ -116,7 +127,6 @@ const Users: FunctionComponent = () => {
       setIsSubmittingDeleteUsers(false);
     }
   };
-
   const submitDeleteUser = async () => {
     setIsSubmittingDeleteUser(true);
     try {
@@ -132,18 +142,6 @@ const Users: FunctionComponent = () => {
     }
   };
 
-  const selectAllUsers = () => {
-    setSelectedUsersIds(users.map(({ id }) => id));
-    setIsSelectedAll(true);
-  };
-  const deselectAllUsers = () => {
-    setSelectedUsersIds([]);
-    setIsSelectedAll(false);
-  };
-  const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUsersSearchText((usersSearchTextRef.current = e.target.value));
-    fetchUsersBySearch();
-  };
   const onUserToggle = (checked: boolean, userId: string) => {
     if (checked) {
       setSelectedUsersIds((prev) => [...prev, userId]);
@@ -153,8 +151,8 @@ const Users: FunctionComponent = () => {
       setIsSelectedAll(totalUsersCount === selectedUsersIds.length - 1);
     }
   };
-  const handleCoursesScroll = async () => {
-    if (isDocCloseToBottom()) {
+  const onCoursesScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
       try {
         const offsetUsersByUserId = await getOffsetUsersByNameAndCreatorId(
           usersSearchTextRef.current,
@@ -178,7 +176,6 @@ const Users: FunctionComponent = () => {
       }
     }
   };
-
   const onEnrollUsersInCoursesModalClose = (mutated?: boolean) => {
     setIsEnrollUsersInCoursesModalOpen(false);
 
@@ -189,7 +186,7 @@ const Users: FunctionComponent = () => {
 
   // Effects
   useEffect(() => {
-    const throttled = throttle(handleCoursesScroll, 300);
+    const throttled = throttle(onCoursesScroll, 300);
     document
       .getElementById("content-wrapper")
       .addEventListener("scroll", throttled);
@@ -248,7 +245,7 @@ const Users: FunctionComponent = () => {
         <Input
           Icon={<SearchIcon size="xs" />}
           placeholder={t("search")}
-          onChange={handleSearchInputChange}
+          onChange={(e) => setUsersSearchText(e.target.value)}
           className="w-auto"
           value={usersSearchText}
         />

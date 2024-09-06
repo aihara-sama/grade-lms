@@ -3,6 +3,7 @@ import ViewSubmissionModal from "@/components/common/modals/view-submission-moda
 import IconTitle from "@/components/icon-title";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Table from "@/components/table";
+import { SUBMISSIONS_GET_LIMIT } from "@/constants";
 import {
   getAssignmentSubmissionsWithAuthor,
   getUserSubmissionsWithAuthor,
@@ -10,10 +11,17 @@ import {
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
+import { throttleFetch } from "@/utils/throttle-fetch";
 import { format } from "date-fns";
 import Link from "next/link";
 
-import { useEffect, useState, type FunctionComponent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from "react";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -26,17 +34,32 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
   const { user } = useUser();
 
+  // Refs
+  const submissionsOffsetRef = useRef(0);
+
   const fetchSubmissions = async () => {
     try {
-      setSubmissions(
-        await (user.role === Role.Teacher
-          ? getAssignmentSubmissionsWithAuthor(assignmentId)
-          : getUserSubmissionsWithAuthor(assignmentId, user.id))
-      );
+      const fetchedSubmissions = await (user.role === Role.Teacher
+        ? getAssignmentSubmissionsWithAuthor(
+            assignmentId,
+            submissionsOffsetRef.current,
+            submissionsOffsetRef.current + SUBMISSIONS_GET_LIMIT - 1
+          )
+        : getUserSubmissionsWithAuthor(
+            assignmentId,
+            user.id,
+            submissionsOffsetRef.current,
+            submissionsOffsetRef.current + SUBMISSIONS_GET_LIMIT - 1
+          ));
+
+      setSubmissions((prev) => [...prev, ...fetchedSubmissions]);
+      submissionsOffsetRef.current += fetchedSubmissions.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
+  const onScrollEnd = useCallback(throttleFetch(fetchSubmissions), []);
+
   const onSubmissionModalClose = (mutated?: boolean) => {
     setSelectedSubmissionId(undefined);
 
@@ -52,6 +75,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   return (
     <div className="overflow-hidden">
       <Table
+        onScrollEnd={onScrollEnd}
         compact
         data={submissions.map(({ id, author, title, grade, created_at }) => ({
           Name: (

@@ -1,5 +1,6 @@
 export const COURSES_GET_LIMIT = 20;
 export const USERS_GET_LIMIT = 20;
+export const NOTIFICATIONS_GET_LIMIT = 10;
 export const LESSONS_GET_LIMIT = 20;
 export const ASSIGNMENTS_GET_LIMIT = 20;
 export const SUBMISSIONS_GET_LIMIT = 20;
@@ -9,3 +10,4 @@ export const MILLISECOND = 1;
 export const SECOND = MILLISECOND * 1000;
 export const MINUTE = SECOND * 60;
 export const HOUR = MINUTE * 60;
+export const THROTTLE_WAIT = 500;

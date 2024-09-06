@@ -11,14 +11,20 @@ export const createNotification = async (
   if (result.error) console.error(t("failed_to_create_notification"));
 };
 
-export const getNotifications = async (userId: string) => {
+export const getNotifications = async (
+  userId: string,
+  from: number,
+  to: number
+) => {
   const t = await loadMessages();
   const result = await db
     .from("notifications")
     .select(
       "id, is_read, type, created_at, course:courses(title, id), lesson:lessons(title, id), assignment:assignments(title), user:users!inner(name)"
     )
-    .eq("users.id", userId);
+    .eq("users.id", userId)
+    .range(from, to)
+    .order("created_at", { ascending: false });
 
   if (result.error) throw new Error(t("failed_to_load_notifications"));
 

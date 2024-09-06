@@ -1,49 +1,29 @@
-import SearchIcon from "@/components/icons/search-icon";
-import Input from "@/components/input";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import clsx from "clsx";
-import throttle from "lodash.throttle";
 import type { FunctionComponent, ReactNode, UIEventHandler } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { memo } from "react";
 
 interface Props {
   data: { [key: string]: ReactNode }[];
   compact?: boolean;
-  onSearchInputChange?: (search: string) => void;
-  onScrollEnd?: (search: string) => void;
+  onScrollEnd?: () => void;
 }
 
-const Table: FunctionComponent<Props> = ({
+const Table: FunctionComponent<Props> = memo(function Table({
   data,
   compact,
   onScrollEnd,
-  onSearchInputChange,
-}) => {
-  const [searchText, setSearchText] = useState("");
-
+}) {
   const keys = Object.keys(data[0] || {});
 
-  const onScroll: UIEventHandler<HTMLDivElement> = useCallback(
-    throttle((e) => {
-      if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd(searchText);
-    }, 300),
-    [searchText]
-  );
-
-  useEffect(() => {
-    onSearchInputChange?.(searchText);
-  }, [searchText]);
+  const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
+    if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd?.();
+  };
 
   if (!data.length) return null;
 
   return (
-    <div className="flex-1 ">
-      <Input
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        Icon={<SearchIcon />}
-        autoFocus
-      />
+    <div className="flex-1">
       <div className="relative rounded-md border-2 border-neutral-100">
         <div className="flex flex-col">
           <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
@@ -79,6 +59,6 @@ const Table: FunctionComponent<Props> = ({
       </div>
     </div>
   );
-};
+});
 
 export default Table;

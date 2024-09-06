@@ -43,6 +43,7 @@ export const getUsersByCreatorId = async (creatorId: string) => {
     .from("users")
     .select("*")
     .limit(COURSES_GET_LIMIT)
+    .order("created_at", { ascending: true })
     .eq("creator_id", creatorId);
 
   if (result.error) throw new Error(t("failed_to_load_users"));
@@ -107,7 +108,7 @@ export const getUsersByNameAndCreatorId = async (
     .ilike("name", `%${name}%`)
     .eq("creator_id", userId)
     .limit(USERS_GET_LIMIT)
-    .order("name", { ascending: true });
+    .order("created_at", { ascending: true });
 
   if (result.error) throw new Error(t("failed_to_load_users"));
 
@@ -184,11 +185,30 @@ export const getUsersNotInCourse = async (
       p_course_id: courseId,
       p_user_name: userName,
     })
-    .range(from, to);
+    .range(from, to)
+    .order("created_at", { ascending: true });
 
   if (result.error) throw new Error(t("failed_to_load_users"));
 
   return result.data;
+};
+export const getUsersNotInCourseCount = async (
+  courseId: string,
+  userName: string
+) => {
+  const t = await loadMessages();
+  const result = await db
+    .rpc("get_users_not_in_course", {
+      p_course_id: courseId,
+      p_user_name: userName,
+    })
+    .select("count")
+    .returns<{ count: number }[]>();
+
+  console.log({ result });
+  if (result.error) throw new Error(t("failed_to_load_users"));
+
+  return result.data[0].count;
 };
 export const getAllCourseStudentsIds = async (
   userId: string,
@@ -249,6 +269,14 @@ export const enrollUsersInCourses = async (
           : "failed_to_enroll_users"
       )
     );
+};
+export const enrollAllUsers = async (courseId: string) => {
+  const t = await loadMessages();
+  const result = await db.rpc("enroll_all_users", {
+    p_course_id: courseId,
+  });
+
+  if (result.error) throw new Error(t("failed_to_enroll_users"));
 };
 export const createUser = async (userDetails: UserInputType) => {
   const t = await loadMessages();
