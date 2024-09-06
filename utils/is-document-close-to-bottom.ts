@@ -11,5 +11,5 @@ export const isCloseToBottom = (element: HTMLElement) => {
   const visibleHeight = element.clientHeight; // Height of the visible part of the element
 
   // Check if the user is within 100px of the bottom
-  return scrollHeight - scrollPosition - visibleHeight <= 200;
+  return scrollHeight - scrollPosition - visibleHeight <= 300;
 };
