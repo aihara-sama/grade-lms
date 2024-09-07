@@ -4,11 +4,7 @@ import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import { COURSES_GET_LIMIT } from "@/constants";
-import {
-  getCoursesByTitleAndUserId,
-  getCoursesByUserId,
-  getOffsetCoursesByTitleAndUserId,
-} from "@/db/course";
+import { getCourses } from "@/db/course";
 import { createLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/menu.interface";
@@ -76,7 +72,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   };
   const fetchCourses = async () => {
     try {
-      setCourses(await getCoursesByUserId(user.id));
+      setCourses(await getCourses(user.id));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -84,7 +80,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
   const fetchCoursesBySearch = async (search: string) => {
     try {
-      setCourses(await getCoursesByTitleAndUserId(search, user.id));
+      setCourses(await getCourses(user.id, search));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -123,7 +119,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   const onCourseSelect = (item: SelectItem) => setSelectedCourse(item);
 
   const onCoursesScrollEnd = async (search: string) => {
-    const rangeCourses = await getOffsetCoursesByTitleAndUserId(
+    const rangeCourses = await getCourses(
       user.id,
       search,
       coursesOffsetRef.current,

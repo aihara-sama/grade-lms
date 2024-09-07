@@ -23,11 +23,7 @@ import toast from "react-hot-toast";
 import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
 import Select from "@/components/common/select";
 import { COURSES_GET_LIMIT } from "@/constants";
-import {
-  getCoursesByTitleAndUserId,
-  getCoursesByUserId,
-  getOffsetCoursesByTitleAndUserId,
-} from "@/db/course";
+import { getCourses } from "@/db/course";
 import { getWeekLessons, upsertLesson } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/menu.interface";
@@ -105,7 +101,7 @@ const Schedule: FunctionComponent = () => {
   };
   const fetchCourses = async () => {
     try {
-      setCourses(await getCoursesByUserId(user.id));
+      setCourses(await getCourses(user.id));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -233,7 +229,7 @@ const Schedule: FunctionComponent = () => {
   }, []);
 
   const onCoursesScrollEnd = async (search: string) => {
-    const rangeCourses = await getOffsetCoursesByTitleAndUserId(
+    const rangeCourses = await getCourses(
       user.id,
       search,
       coursesOffsetRef.current,
@@ -246,7 +242,7 @@ const Schedule: FunctionComponent = () => {
 
   const fetchCoursesBySearch = async (search: string) => {
     try {
-      setCourses(await getCoursesByTitleAndUserId(search, user.id));
+      setCourses(await getCourses(user.id, search));
     } catch (error: any) {
       toast.error(error.message);
     }

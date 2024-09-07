@@ -6,11 +6,7 @@ import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Table from "@/components/table";
 import { COURSES_GET_LIMIT } from "@/constants";
-import {
-  getCoursesCount,
-  getCoursesWithRefsCount,
-  getUnenrolledCourses,
-} from "@/db/course";
+import { getCourses, getCoursesCount, getUnenrolledCourses } from "@/db/course";
 import { enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
@@ -67,8 +63,9 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
               merge ? coursesOffsetRef.current : 0,
               coursesOffsetRef.current + COURSES_GET_LIMIT - 1
             )
-          : getCoursesWithRefsCount(
+          : getCourses(
               user.id,
+              undefined,
               merge ? coursesOffsetRef.current : 0,
               coursesOffsetRef.current + COURSES_GET_LIMIT - 1
             ),

@@ -25,12 +25,11 @@ import UsersIcon from "@/components/icons/users-icon";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT } from "@/constants";
 import {
-  deleteCourseByCourseId,
-  deleteCoursesByCoursesIds,
-  deleteCoursesByTitleAndUserId,
+  deleteAllCourses,
+  deleteCourseById,
+  deleteCoursesByIds,
+  getCourses,
   getCoursesCount,
-  getCoursesCountByTitleAndUserId,
-  getCoursesWithRefsCount,
 } from "@/db/course";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
@@ -96,7 +95,7 @@ const Courses: FunctionComponent<Props> = () => {
       const to = COURSES_GET_LIMIT - 1;
 
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCoursesWithRefsCount(user.id, from, to),
+        getCourses(user.id, undefined, from, to),
         getCoursesCount(user.id),
       ]);
 
@@ -118,8 +117,8 @@ const Courses: FunctionComponent<Props> = () => {
       const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
 
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCoursesWithRefsCount(user.id, from, to, searchText),
-        getCoursesCountByTitleAndUserId(searchText, user.id),
+        getCourses(user.id, searchText, from, to),
+        getCoursesCount(user.id, searchText),
       ]);
 
       setCourses(fetchedCourses);
@@ -134,13 +133,12 @@ const Courses: FunctionComponent<Props> = () => {
       setIsSearching(false);
     }
   };
-
   const fetchMoreCourses = async () => {
     try {
       const from = coursesOffsetRef.current;
       const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
 
-      const fetchedCourses = await getCoursesWithRefsCount(user.id, from, to);
+      const fetchedCourses = await getCourses(user.id, undefined, from, to);
 
       setCourses((prev) => [...prev, ...fetchedCourses]);
 
@@ -159,11 +157,12 @@ const Courses: FunctionComponent<Props> = () => {
 
   const submitDeleteCourse = async () => {
     setIsSubmittingDeleteCourse(true);
+
     try {
-      await deleteCourseByCourseId(selectedCourseId);
+      await deleteCourseById(selectedCourseId);
       setIsDeleteCourseModalOpen(false);
       setSelectedCoursesIds((_) => _.filter((id) => id !== selectedCourseId));
-      fetchCoursesBySearch();
+      fetchCoursesBySearch(true);
       toast.success("Success");
     } catch (error: any) {
       toast.error(error.message);
@@ -176,14 +175,15 @@ const Courses: FunctionComponent<Props> = () => {
 
     try {
       await (isSelectedAll
-        ? deleteCoursesByTitleAndUserId(searchText, user.id)
-        : deleteCoursesByCoursesIds(selectedCoursesIds));
+        ? deleteAllCourses(searchText)
+        : deleteCoursesByIds(selectedCoursesIds));
+      setSelectedCoursesIds([]);
+      setIsDeleteCoursesModalOpen(false);
+      fetchCoursesBySearch(true);
+      toast.success("success");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setSelectedCoursesIds([]);
-      setIsDeleteCoursesModalOpen(false);
-      fetchCoursesBySearch();
       setIsSubmittingDeleteCourses(false);
     }
   };
@@ -219,9 +219,6 @@ const Courses: FunctionComponent<Props> = () => {
     };
   }, [isSelectedAll]);
 
-  useEffect(() => {
-    // fetchInitialCourses();
-  }, []);
   useEffect(() => {
     if (searchText) {
       fetchCoursesBySearch();

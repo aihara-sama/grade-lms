@@ -415,26 +415,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      create_lesson_with_assignments: {
+      delete_all_courses: {
         Args: {
-          new_course_id: string;
-          new_title: string;
-          new_starts: string;
-          new_ends: string;
-          new_assignments: Json;
+          p_title: string;
         };
-        Returns: string;
+        Returns: undefined;
       };
       delete_auth_users_by_ids: {
         Args: {
           user_ids: string[];
-        };
-        Returns: undefined;
-      };
-      delete_courses_by_title_and_user_id: {
-        Args: {
-          p_user_id: string;
-          p_title: string;
         };
         Returns: undefined;
       };

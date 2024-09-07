@@ -16,11 +16,7 @@ import PromptModal from "@/components/common/modals/prompt-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT } from "@/constants";
-import {
-  getCoursesByTitleAndUserId,
-  getCoursesByUserId,
-  getOffsetCoursesByTitleAndUserId,
-} from "@/db/course";
+import { getCourses } from "@/db/course";
 import {
   deleteLessonsByLessonsIds,
   getLessonById,
@@ -83,14 +79,14 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     };
     const fetchCourses = async () => {
       try {
-        setCourses(await getCoursesByUserId(user.id));
+        setCourses(await getCourses(user.id));
       } catch (error: any) {
         toast.error(error.message);
       }
     };
     const fetchCoursesBySearch = async (search: string) => {
       try {
-        setCourses(await getCoursesByTitleAndUserId(search, user.id));
+        setCourses(await getCourses(user.id, search));
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -166,7 +162,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     }, [lesson, courses.length]);
 
     const onCoursesScrollEnd = async (search: string) => {
-      const rangeCourses = await getOffsetCoursesByTitleAndUserId(
+      const rangeCourses = await getCourses(
         user.id,
         search,
         coursesOffsetRef.current,

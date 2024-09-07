@@ -5,49 +5,19 @@ import { loadMessages } from "@/utils/load-messages";
 import { db } from "@/utils/supabase/client";
 
 // Get
-export const getCoursesCount = async (userId: string) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("users")
-    .select("courses(count)")
-    .eq("id", userId)
-    .returns<Record<"courses", { count: number }[]>[]>()
-    .single();
-
-  if (result.error) throw new Error(t("failed_to_load_courses_count"));
-
-  return result.data.courses[0].count;
-};
-
-export const getCoursesCountByTitleAndUserId = async (
-  title: string,
-  userId: string
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("users")
-    .select("courses(count)")
-    .ilike("courses.title", `%${title}%`)
-    .eq("id", userId)
-    .returns<Record<"courses", { count: number }[]>[]>()
-    .single();
-
-  if (result.error) throw new Error(t("failed_to_load_courses_count"));
-
-  return result.data.courses[0].count;
-};
-
-export const getCoursesByTitleAndUserId = async (
-  title: string,
-  userId: string
+export const getCourses = async (
+  userId: string,
+  title = "",
+  from = 0,
+  to = COURSES_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
   const result = await db
     .from("users")
     .select("courses(*, lessons(count), users(count))")
-    .ilike("courses.title", `%${title}%`)
     .eq("id", userId)
-    .limit(COURSES_GET_LIMIT, { foreignTable: "courses" })
+    .ilike("courses.title", `%${title}%`)
+    .range(from, to, { foreignTable: "courses" })
     .order("title", { foreignTable: "courses", ascending: true })
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
     .single();
@@ -56,40 +26,19 @@ export const getCoursesByTitleAndUserId = async (
 
   return result.data.courses;
 };
-
-export const getCoursesWithRefsCount = async (
-  userId: string,
-  from: number,
-  to: number,
-  title = ""
-) => {
+export const getCoursesCount = async (userId: string, title = "") => {
   const t = await loadMessages();
   const result = await db
     .from("users")
-    .select("courses(*, lessons(count), users(count))")
+    .select("courses(count)")
     .eq("id", userId)
-    .range(from, to, { foreignTable: "courses" })
-    .order("created_at", { foreignTable: "courses", ascending: true })
     .ilike("courses.title", `%${title}%`)
-    .returns<Record<"courses", CourseWithRefsCount[]>[]>()
+    .returns<Record<"courses", { count: number }[]>[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_courses"));
+  if (result.error) throw new Error(t("failed_to_load_courses_count"));
 
-  return result.data.courses;
-};
-export const getCoursesByUserId = async (userId: string) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("users")
-    .select("id, courses(*)")
-    .eq("id", userId)
-    .limit(COURSES_GET_LIMIT)
-    .single();
-
-  if (result.error) throw new Error(t("failed_to_load_courses"));
-
-  return result.data.courses;
+  return result.data.courses[0].count;
 };
 export const getCourseById = async (courseId: string) => {
   const t = await loadMessages();
@@ -135,28 +84,8 @@ export const getUnenrolledCoursesCount = async (userId: string) => {
 
   return result.data[0].count;
 };
-export const getOffsetCoursesByTitleAndUserId = async (
-  userId: string,
-  title: string,
-  from: number,
-  to: number
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("users")
-    .select("courses(*, lessons(count), users(count))")
-    .eq("id", userId)
-    .ilike("courses.title", `%${title}%`)
-    .range(from, to, { foreignTable: "courses" })
-    .order("title", { foreignTable: "courses", ascending: true })
-    .returns<Record<"courses", CourseWithRefsCount[]>[]>()
-    .single();
 
-  if (result.error) throw new Error(t("failed_to_load_courses"));
-
-  return result.data.courses;
-};
-
+// Create
 export const createCourse = async (course: TablesInsert<"courses">) => {
   const t = await loadMessages();
   const result = await db.from("courses").insert(course);
@@ -165,29 +94,25 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
 };
 
 // Delete
-export const deleteCourseByCourseId = async (courseId: string) => {
+export const deleteCourseById = async (id: string) => {
   const t = await loadMessages();
-  const result = await db.from("courses").delete().eq("id", courseId);
+  const result = await db.from("courses").delete().eq("id", id);
 
   if (result.error) throw new Error(t("failed_to_delete_course"));
 
   return result;
 };
-export const deleteCoursesByCoursesIds = async (coursesIds: string[]) => {
+export const deleteCoursesByIds = async (ids: string[]) => {
   const t = await loadMessages();
-  const result = await db.from("courses").delete().in("id", coursesIds);
+  const result = await db.from("courses").delete().in("id", ids);
 
   if (result.error) throw new Error(t("failed_to_delete_courses"));
 
   return result;
 };
-export const deleteCoursesByTitleAndUserId = async (
-  title: string,
-  userId: string
-) => {
+export const deleteAllCourses = async (title = "") => {
   const t = await loadMessages();
-  const result = await db.rpc("delete_courses_by_title_and_user_id", {
-    p_user_id: userId,
+  const result = await db.rpc("delete_all_courses", {
     p_title: title,
   });
 

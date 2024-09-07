@@ -21,25 +21,6 @@ alter table users enable row level security;
 create policy "Can view user's data." on users for select using (true);
 create policy "Can update own's data." on users for update using (auth.uid() = id);
 
-/**
-* This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
-*/ 
-create function public.handle_new_user() 
-returns trigger as $$
-begin
-  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone');
-  return new;
-end;
-$$ language plpgsql security definer;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
-
-
-/** 
-* Courses
-*/
 create table courses (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
@@ -53,7 +34,6 @@ create policy "Can delete course's data." on courses for delete using (true);
 create policy "Can update course's data." on courses for update using (true);
 create policy "Can insert course's data." on courses for insert with check (true);
 
-
 /** 
 * Junction Table: User_Courses
 * This table establishes a many-to-many relationship between users and courses.
@@ -63,29 +43,8 @@ create table user_courses (
   course_id uuid references public.courses on delete cascade not null,
   created_at timestamp not null default now(),
   primary key (user_id, course_id)
-  
 );
 
-
--- Create a trigger function to insert into user_courses table
-create function insert_user_course()
-returns trigger as $$
-begin
-    insert into user_courses (user_id, course_id)
-    values (auth.uid(), new.id);
-    
-    RETURN new;
-end;
-$$ language plpgsql;
-
--- Create a trigger on the courses table to execute the function after insert
-create trigger on_course_created
-after insert on courses
-for each row execute function insert_user_course();
-
-/** 
-* Lessons
-*/
 create table lessons (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
@@ -96,17 +55,13 @@ create table lessons (
   starts timestamp with time zone not null,
   ends timestamp with time zone not null
 );
-/** 
-* Notifications
-*/
+
 create table sent_notifications (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
   user_id uuid references auth.users on delete cascade,
   lesson_id uuid references public.lessons on delete cascade
 );
-
-
 
 create table assignments (
   id uuid not null primary key DEFAULT gen_random_uuid(),
@@ -140,31 +95,6 @@ create table notifications (
   is_read boolean not null
 );
 
--- Create a function to create a lesson and its assignments
-create function create_lesson_with_assignments(new_course_id uuid, new_title text, new_starts timestamp, new_ends timestamp, new_assignments json)
-returns uuid as $$
-declare
-    lesson_id uuid;
-begin
-    insert into public.lessons (course_id, title, starts, ends)
-    values (new_course_id, new_title, new_starts, new_ends)
-    returning id into lesson_id;
-
-    insert into public.assignments (lesson_id, title, body, due_date)
-    select lesson_id, assignment->>'title', assignment->>'body', assignment->>'due_date'
-    from json_array_elements(new_assignments) as assignment;
-
-    return lesson_id;
-end;
-$$ language plpgsql;
-
--- Example usage:
--- SELECT create_lesson_with_assignments('<course_id>', 'Lesson Title', '2024-03-03 12:00:00', '2024-03-03 14:00:00', '[{"dueDate": "2024-03-05 12:00:00", "title": "Assignment 1", "body": "Assignment 1 description"}, {"dueDate": "2024-03-08 12:00:00", "title": "Assignment 2", "body": "Assignment 2 description"}]');
-
-
-
-
-
 create table chat_messages (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   lesson_id uuid references public.lessons on delete cascade not null,
@@ -183,6 +113,37 @@ create table chat_files (
   path text not null,
   size int not null
 );
+
+/**
+* This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
+*/ 
+create function public.handle_new_user() 
+returns trigger as $$
+begin
+  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone)
+  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone');
+  return new;
+end;
+$$ language plpgsql security definer;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- Create a trigger function to insert into user_courses table
+create function insert_user_course()
+returns trigger as $$
+begin
+    insert into user_courses (user_id, course_id)
+    values (auth.uid(), new.id);
+    
+    RETURN new;
+end;
+$$ language plpgsql;
+
+-- Create a trigger on the courses table to execute the function after insert
+create trigger on_course_created
+after insert on courses
+for each row execute function insert_user_course();
 
 create or replace function public.get_users_not_in_course(p_course_id uuid, p_user_name text)
 returns setof public.users as $$
@@ -210,7 +171,7 @@ end;
 $$ language plpgsql;
 
 
-create or replace function delete_courses_by_title_and_user_id(p_user_id uuid, p_title text)
+create or replace function delete_all_courses(p_title text)
 returns void as $$
 begin
   delete from courses
@@ -218,8 +179,8 @@ begin
     select course_id
     from user_courses
     join courses on user_courses.course_id = courses.id
-    where user_courses.user_id = p_user_id
-      and (p_title = '' or courses.title ILIKE '%' || p_title || '%')
+    where user_courses.user_id = auth.uid()
+      and (courses.title ILIKE '%' || p_title || '%')
   );
 end;
 $$ language plpgsql;
