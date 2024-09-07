@@ -23,8 +23,8 @@ const Table: FunctionComponent<Props> = memo(function Table({
   if (!data.length) return null;
 
   return (
-    <div className="flex-1">
-      <div className="relative rounded-md border-2 border-neutral-100">
+    <div className="flex-1 flex">
+      <div className="relative rounded-md border-2 border-neutral-100 flex-1">
         <div className="flex flex-col">
           <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
             {keys.map((key) => (

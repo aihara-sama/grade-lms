@@ -19,6 +19,8 @@ import { useEffect, useRef, useState } from "react";
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
 import DotsIcon from "@/components/icons/dots-icon";
+import NoDataIcon from "@/components/icons/no-data-icon";
+import NotFoundIcon from "@/components/icons/not-found-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT } from "@/constants";
@@ -26,11 +28,9 @@ import {
   deleteCourseByCourseId,
   deleteCoursesByCoursesIds,
   deleteCoursesByTitleAndUserId,
-  getCoursesByTitleAndUserId,
   getCoursesCount,
   getCoursesCountByTitleAndUserId,
   getCoursesWithRefsCount,
-  getOffsetCoursesByTitleAndUserId,
 } from "@/db/course";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
@@ -52,21 +52,31 @@ const Courses: FunctionComponent<Props> = () => {
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
-  const [coursesSearchText, setCoursesSearchText] = useState("");
+  const [searchText, setCoursesSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [isSubmittingDeleteCourse, setIsSubmittingDeleteCourse] =
     useState(false);
   const [isSubmittingDeleteCourses, setIsSubmittingDeleteCourses] =
     useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Refs
-  const isSelectedAllRef = useRef(false);
   const coursesOffsetRef = useRef(0);
-  const coursesSearchTextRef = useRef("");
 
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
+
+  // Vars
+  const isData = !!courses.length && !isCoursesLoading;
+  const isNoData =
+    !isCoursesLoading &&
+    !isSearching &&
+    !totalCoursesCount &&
+    !searchText.length;
+
+  const isNotFound =
+    !isCoursesLoading && !isSearching && !courses.length && !!searchText.length;
 
   // Handdlers
   const selectAllCourses = () => {
@@ -77,66 +87,76 @@ const Courses: FunctionComponent<Props> = () => {
     setSelectedCoursesIds([]);
     setIsSelectedAll(false);
   };
-  const fetchCoursesWithCount = async () => {
+
+  const fetchInitialCourses = async () => {
     setIsCoursesLoading(true);
 
     try {
-      const [coursesByUserId, coursesCountByUserId] = await Promise.all([
-        getCoursesWithRefsCount(
-          user.id,
-          coursesOffsetRef.current,
-          coursesOffsetRef.current + COURSES_GET_LIMIT - 1
-        ),
+      const from = 0;
+      const to = COURSES_GET_LIMIT - 1;
+
+      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
+        getCoursesWithRefsCount(user.id, from, to),
         getCoursesCount(user.id),
       ]);
 
-      setCourses(coursesByUserId);
-      setTotalCoursesCount(coursesCountByUserId);
-      setIsSelectedAll(false);
-      setSelectedCoursesIds([]);
-      coursesOffsetRef.current += coursesByUserId.length;
+      setCourses(fetchedCourses);
+      setTotalCoursesCount(fetchedCoursesCount);
+
+      coursesOffsetRef.current = fetchedCourses.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsCoursesLoading(false);
     }
   };
-  const fetchCoursesBySearch = async () => {
-    try {
-      const [coursesByTitleAndUserId, coursesCountByTitleAndUserId] =
-        await Promise.all([
-          getCoursesByTitleAndUserId(coursesSearchTextRef.current, user.id),
-          getCoursesCountByTitleAndUserId(
-            coursesSearchTextRef.current,
-            user.id
-          ),
-        ]);
+  const fetchCoursesBySearch = async (refetch?: boolean) => {
+    setIsSearching(true);
 
-      setCourses(coursesByTitleAndUserId);
-      setTotalCoursesCount(coursesCountByTitleAndUserId);
+    try {
+      const from = 0;
+      const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
+
+      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
+        getCoursesWithRefsCount(user.id, from, to, searchText),
+        getCoursesCountByTitleAndUserId(searchText, user.id),
+      ]);
+
+      setCourses(fetchedCourses);
+      setTotalCoursesCount(fetchedCoursesCount);
       setIsSelectedAll(false);
       setSelectedCoursesIds([]);
-      coursesOffsetRef.current = 0;
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
 
-  const submitDeleteSelectedCourses = async () => {
-    setIsSubmittingDeleteCourses(true);
-    try {
-      await (isSelectedAllRef.current
-        ? deleteCoursesByTitleAndUserId(coursesSearchText, user.id)
-        : deleteCoursesByCoursesIds(selectedCoursesIds));
+      coursesOffsetRef.current += refetch ? fetchedCourses.length : 0;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setSelectedCoursesIds([]);
-      setIsDeleteCoursesModalOpen(false);
-      fetchCoursesBySearch();
-      setIsSubmittingDeleteCourses(false);
+      setIsSearching(false);
     }
   };
+
+  const fetchMoreCourses = async () => {
+    try {
+      const from = coursesOffsetRef.current;
+      const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
+
+      const fetchedCourses = await getCoursesWithRefsCount(user.id, from, to);
+
+      setCourses((prev) => [...prev, ...fetchedCourses]);
+
+      if (isSelectedAll) {
+        setSelectedCoursesIds((prev) => [
+          ...prev,
+          ...fetchedCourses.map(({ id }) => id),
+        ]);
+      }
+
+      coursesOffsetRef.current += fetchedCourses.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const submitDeleteCourse = async () => {
     setIsSubmittingDeleteCourse(true);
     try {
@@ -151,38 +171,23 @@ const Courses: FunctionComponent<Props> = () => {
       setIsSubmittingDeleteCourse(false);
     }
   };
-  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCoursesSearchText((coursesSearchTextRef.current = e.target.value));
-    fetchCoursesBySearch();
-  };
-  const fetchMoreCourses = async () => {
+  const submitDeleteCourses = async () => {
+    setIsSubmittingDeleteCourses(true);
+
     try {
-      const rangeCoursesByUserId = await getOffsetCoursesByTitleAndUserId(
-        user.id,
-        coursesSearchTextRef.current,
-        coursesOffsetRef.current,
-        coursesOffsetRef.current + COURSES_GET_LIMIT - 1
-      );
-
-      setCourses((prev) => [...prev, ...rangeCoursesByUserId]);
-
-      if (isSelectedAllRef.current) {
-        setSelectedCoursesIds((prev) => [
-          ...prev,
-          ...rangeCoursesByUserId.map(({ id }) => id),
-        ]);
-      }
-
-      coursesOffsetRef.current += rangeCoursesByUserId.length;
+      await (isSelectedAll
+        ? deleteCoursesByTitleAndUserId(searchText, user.id)
+        : deleteCoursesByCoursesIds(selectedCoursesIds));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setSelectedCoursesIds([]);
+      setIsDeleteCoursesModalOpen(false);
+      fetchCoursesBySearch();
+      setIsSubmittingDeleteCourses(false);
     }
   };
-  const onCoursesScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      fetchMoreCourses();
-    }
-  };
+
   const onCourseToggle = (checked: boolean, courseId: string) => {
     if (checked) {
       setSelectedCoursesIds((prev) => [...prev, courseId]);
@@ -190,6 +195,14 @@ const Courses: FunctionComponent<Props> = () => {
     } else {
       setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
       setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
+    }
+  };
+  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCoursesSearchText(e.target.value);
+  };
+  const onCoursesScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
+      fetchMoreCourses();
     }
   };
   // Effects
@@ -204,16 +217,18 @@ const Courses: FunctionComponent<Props> = () => {
         .getElementById("content-wrapper")
         .removeEventListener("scroll", throttled);
     };
-  }, []);
-  useEffect(() => {
-    fetchCoursesWithCount();
-  }, []);
-  useEffect(() => {
-    coursesSearchTextRef.current = coursesSearchText;
-  }, [coursesSearchText]);
-  useEffect(() => {
-    isSelectedAllRef.current = isSelectedAll;
   }, [isSelectedAll]);
+
+  useEffect(() => {
+    // fetchInitialCourses();
+  }, []);
+  useEffect(() => {
+    if (searchText) {
+      fetchCoursesBySearch();
+    } else {
+      fetchInitialCourses();
+    }
+  }, [searchText]);
   useEffect(() => {
     setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length);
   }, [totalCoursesCount]);
@@ -238,7 +253,7 @@ const Courses: FunctionComponent<Props> = () => {
           title="Total courses"
         />
         {user.role === Role.Teacher && (
-          <CreateCourse onCreated={fetchCoursesBySearch} />
+          <CreateCourse onCreated={() => fetchCoursesBySearch(true)} />
         )}
       </CardsContainer>
       {selectedCoursesIds.length ? (
@@ -263,12 +278,12 @@ const Courses: FunctionComponent<Props> = () => {
           placeholder={t("search")}
           className="w-auto"
           onChange={onSearchInputChange}
-          value={coursesSearchText}
+          value={searchText}
         />
       )}
-      {isCoursesLoading ? (
-        <Skeleton />
-      ) : (
+      {isCoursesLoading && <Skeleton />}
+
+      {isData && (
         <div className="flex-1 flex">
           <Table
             data={courses.map(({ id, title, lessons, users: members }) => ({
@@ -320,6 +335,24 @@ const Courses: FunctionComponent<Props> = () => {
           />
         </div>
       )}
+      {isNoData && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NoDataIcon />
+            <p className="mt-4 font-bold">View your work in a list</p>
+          </div>
+        </div>
+      )}
+      {isNotFound && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NotFoundIcon />
+            <p className="mt-4 font-bold">
+              It looks like we can&apos;t find any results for that match
+            </p>
+          </div>
+        </div>
+      )}
 
       {isDeleteCoursesModalOpen && (
         <PromptModal
@@ -328,7 +361,7 @@ const Courses: FunctionComponent<Props> = () => {
           title="Delete courses"
           action="Delete"
           body="Are you sure you want to delete selected courses?"
-          actionHandler={submitDeleteSelectedCourses}
+          actionHandler={submitDeleteCourses}
         />
       )}
       {isDeleteCourseModalOpen && (

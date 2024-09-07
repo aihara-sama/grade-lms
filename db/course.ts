@@ -60,7 +60,8 @@ export const getCoursesByTitleAndUserId = async (
 export const getCoursesWithRefsCount = async (
   userId: string,
   from: number,
-  to: number
+  to: number,
+  title = ""
 ) => {
   const t = await loadMessages();
   const result = await db
@@ -69,6 +70,7 @@ export const getCoursesWithRefsCount = async (
     .eq("id", userId)
     .range(from, to, { foreignTable: "courses" })
     .order("created_at", { foreignTable: "courses", ascending: true })
+    .ilike("courses.title", `%${title}%`)
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
     .single();
 
@@ -89,7 +91,7 @@ export const getCoursesByUserId = async (userId: string) => {
 
   return result.data.courses;
 };
-export const getCourseByCourseId = async (courseId: string) => {
+export const getCourseById = async (courseId: string) => {
   const t = await loadMessages();
   const result = await db
     .from("courses")
@@ -133,7 +135,6 @@ export const getUnenrolledCoursesCount = async (userId: string) => {
 
   return result.data[0].count;
 };
-
 export const getOffsetCoursesByTitleAndUserId = async (
   userId: string,
   title: string,
@@ -180,7 +181,6 @@ export const deleteCoursesByCoursesIds = async (coursesIds: string[]) => {
 
   return result;
 };
-
 export const deleteCoursesByTitleAndUserId = async (
   title: string,
   userId: string
