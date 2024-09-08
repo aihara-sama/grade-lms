@@ -6,6 +6,7 @@ import Input from "@/components/input";
 import CreateFileMessageModal from "@/components/common/modals/create-file-message-modal";
 import MessagesIcon from "@/components/icons/messages-icon";
 import Message from "@/components/live-lesson/chat/message";
+import Skeleton from "@/components/skeleton";
 import { createChatMessage, getChatMessages } from "@/db/message";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
@@ -33,6 +34,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
   const [file, setFile] = useState<File>();
   const [isCreateFileMessageModalOpen, setIsCreateFileMessageModalOpen] =
     useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Refs
   const messagesWrapperRef = useRef<HTMLDivElement>();
@@ -70,10 +72,14 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
   };
 
   const fetchChatMessages = async () => {
+    setIsLoading(true);
+
     try {
       setChatMessages(await getChatMessages(lesson.id));
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
   const onNewChatMessage = (payload: {
@@ -131,11 +137,14 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
         className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1"
       >
         <div className="flex flex-1 flex-col gap-2">
-          {chatMessages.map((msg, idx) => (
-            <div key={msg.id} className={`${clsx(idx === 0 && "mt-auto")}`}>
-              <Message chatMessage={msg} />
-            </div>
-          ))}
+          {isLoading && <Skeleton />}
+
+          {!isLoading &&
+            chatMessages.map((msg, idx) => (
+              <div key={msg.id} className={`${clsx(idx === 0 && "mt-auto")}`}>
+                <Message chatMessage={msg} />
+              </div>
+            ))}
         </div>
       </div>
       <Input
