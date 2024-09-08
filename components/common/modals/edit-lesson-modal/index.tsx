@@ -17,11 +17,7 @@ import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT } from "@/constants";
 import { getCourses } from "@/db/course";
-import {
-  deleteLessonsByLessonsIds,
-  getLessonById,
-  updateLesson,
-} from "@/db/lesson";
+import { deleteLessonsBIds, getLessonById, updateLesson } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
@@ -108,7 +104,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     const submitDeleteLesson = async () => {
       setIsSubmittingDeleteLesson(true);
       try {
-        await deleteLessonsByLessonsIds([lesson.id]);
+        await deleteLessonsBIds([lesson.id]);
 
         toast.success("Lesson deleted");
         setIsDeleteLessonModalOpen(false);

@@ -159,16 +159,24 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function public.get_courses_not_assigned_to_user(p_user_id uuid)
+create or replace function get_courses_not_assigned_to_user(p_user_id uuid, p_course_title text)
 returns setof public.courses as $$
 begin
     return query
     select c.*
     from public.courses c
     left join public.user_courses uc on c.id = uc.course_id and uc.user_id = p_user_id
-    where uc.user_id is null;
+    where uc.user_id is null
+    and c.title ILIKE '%' || p_course_title || '%'
+    and c.id in (
+        select c2.id
+        from public.courses c2
+        join public.users u on u.creator_id = auth.uid()::text
+        where u.id = p_user_id
+    );
 end;
 $$ language plpgsql;
+
 
 
 create or replace function delete_all_courses(p_title text)
@@ -280,3 +288,23 @@ BEGIN
   ON CONFLICT DO NOTHING;  -- In case the user is already enrolled in the course, avoid errors
 END;
 $$ LANGUAGE plpgsql;
+
+
+create function public.dispel_all_users_from_course(
+    p_course_id uuid,
+    p_user_name text
+) 
+returns void as $$
+begin
+    delete from public.user_courses
+    where user_id in (
+        select u.id
+        from public.users u
+        left join public.user_courses uc on u.id = uc.user_id and uc.course_id = p_course_id
+        where uc.user_id is not null
+        and u.name ilike '%' || p_user_name || '%'
+        and u.creator_id = auth.uid()::text
+    )
+    and course_id = p_course_id;
+end;
+$$ language plpgsql;

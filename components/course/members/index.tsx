@@ -10,28 +10,28 @@ import AvatarIcon from "@/components/icons/avatar-icon";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
+import NoDataIcon from "@/components/icons/no-data-icon";
+import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import EnrollUsers from "@/components/users/enroll-users";
-import { USERS_GET_LIMIT } from "@/constants";
+import { MEMBERS_GET_LIMIT } from "@/constants";
 import {
-  dispelAllStudentsByNameFromCourse,
-  dispelUsersFromCourse,
-  getOffsetUsersByNameAndCourseId,
+  dispelAllUsers,
+  dispelUsers,
   getUsersByCourseId,
-  getUsersByNameAndCourseId,
-  getUsersCountByCourseId,
-  getUsersCountByTitleAndCourseId,
+  getUsersByCourseIdCount,
 } from "@/db/user";
+import { Role } from "@/interfaces/user.interface";
 import type { User } from "@/types/users";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
 import type { User as AuthUser } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
-import type { ChangeEvent, FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import toast from "react-hot-toast";
@@ -48,21 +48,28 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
   const [selectedMemberId, setSelectedMemberId] = useState<string>();
   const [members, setMembers] = useState<User[]>([]);
   const [totalMembersCount, setTotalMembersCount] = useState(0);
-  const [membersSearchText, setMembersSearchText] = useState("");
-  const [isMembersLoading, setIsMembersLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [isSubmittingDispelMember, setIsSubmittingDispelMember] =
     useState(false);
   const [isSubmittingDispelMembers, setIsSubmittingDispelMembers] =
     useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Refs
-  const isSelectedAllRef = useRef(false);
-  const membersSearchTextRef = useRef("");
   const membersOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
+
+  // Vars
+  const isData = !!members.length && !isLoading;
+  const isNoData =
+    !isLoading && !isSearching && !totalMembersCount && !searchText.length;
+
+  const isNotFound =
+    !isLoading && !isSearching && !members.length && !!searchText.length;
 
   // Handlers
   const selectAllMembers = () => {
@@ -73,74 +80,106 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
     setSelectedMembersIds([]);
     setIsSelectedAll(false);
   };
-  const fetchMembersWithCount = async () => {
-    setIsMembersLoading(true);
+
+  const fetchInitialMembers = async () => {
+    setIsLoading(true);
+
     try {
-      const [usersByCourseId, usersCountByCourseId] = await Promise.all([
+      const [fetchedMembers, fetchedMembersCount] = await Promise.all([
         getUsersByCourseId(courseId),
-        getUsersCountByCourseId(courseId),
+        getUsersByCourseIdCount(courseId),
       ]);
 
-      setMembers(usersByCourseId);
-      setTotalMembersCount(usersCountByCourseId);
-      setIsSelectedAll(false);
-      setSelectedMembersIds([]);
-      membersOffsetRef.current += usersByCourseId.length;
+      setMembers(fetchedMembers);
+      setTotalMembersCount(fetchedMembersCount);
+
+      membersOffsetRef.current = fetchedMembers.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsMembersLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const fetchMembersBySearch = async () => {
-    try {
-      const [usersByTitleAndUserId, usersCountByTitleAndUserId] =
-        await Promise.all([
-          getUsersByNameAndCourseId(membersSearchTextRef.current, courseId),
-          getUsersCountByTitleAndCourseId(
-            membersSearchTextRef.current,
-            courseId
-          ),
-        ]);
+  const fetchMembersBySearch = async (refetch?: boolean) => {
+    setIsSearching(true);
 
-      setMembers(usersByTitleAndUserId);
-      setTotalMembersCount(usersCountByTitleAndUserId);
+    try {
+      const [fetchedMembers, fetchedUsersMembers] = await Promise.all([
+        getUsersByCourseId(courseId, searchText),
+        getUsersByCourseIdCount(courseId, searchText),
+      ]);
+
+      setMembers(fetchedMembers);
+      setTotalMembersCount(fetchedUsersMembers);
+
       setIsSelectedAll(false);
       setSelectedMembersIds([]);
+
+      membersOffsetRef.current += refetch ? fetchedMembers.length : 0;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  const fetchMoreMembers = async () => {
+    try {
+      const from = membersOffsetRef.current;
+      const to = membersOffsetRef.current + MEMBERS_GET_LIMIT - 1;
+
+      const fetchedMembers = await getUsersByCourseId(
+        courseId,
+        searchText,
+        from,
+        to
+      );
+
+      setMembers((prev) => [...prev, ...fetchedMembers]);
+
+      if (isSelectedAll) {
+        setSelectedMembersIds((prev) => [
+          ...prev,
+          ...fetchedMembers.map(({ id }) => id),
+        ]);
+      }
+
+      membersOffsetRef.current += fetchedMembers.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
+
   const submitDispelMember = async () => {
     setIsSubmittingDispelMember(true);
+
     try {
-      await dispelUsersFromCourse([selectedMemberId], courseId);
+      await dispelUsers(courseId, [selectedMemberId]);
+
       setIsDispelMemberModalOpen(false);
-      setSelectedMembersIds((prev) =>
-        prev.filter((id) => id !== selectedMemberId)
-      );
-      fetchMembersBySearch();
-      toast.success(t("user_deleted"));
+      setSelectedMembersIds((_) => _.filter((id) => id !== selectedMemberId));
+      fetchMembersBySearch(true);
+
+      toast.success(t("student_dispelled"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSubmittingDispelMember(false);
     }
   };
-  const submitDispelMembers = async () => {
+  const submitDispelCourseMembers = async () => {
     setIsSubmittingDispelMembers(true);
+
     try {
-      await (isSelectedAllRef.current
-        ? dispelAllStudentsByNameFromCourse(
-            membersSearchTextRef.current,
-            courseId
-          )
-        : dispelUsersFromCourse(selectedMembersIds, courseId));
+      await (isSelectedAll
+        ? dispelAllUsers(courseId, searchText)
+        : dispelUsers(courseId, selectedMembersIds));
+
       setSelectedMembersIds([]);
       setIsDispelMembersModalOpen(false);
+      fetchMembersBySearch(true);
+
       toast.success(t("users_dispelled"));
-      fetchMembersBySearch();
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -148,10 +187,6 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
     }
   };
 
-  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setMembersSearchText((membersSearchTextRef.current = e.target.value));
-    fetchMembersBySearch();
-  };
   const onMemberToggle = (checked: boolean, memberId: string) => {
     if (checked) {
       setSelectedMembersIds((prev) => [...prev, memberId]);
@@ -161,51 +196,22 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       setIsSelectedAll(totalMembersCount === selectedMembersIds.length - 1);
     }
   };
-  const fetchMoreMembers = async () => {
-    try {
-      const offsetMembersByCourseId = await getOffsetUsersByNameAndCourseId(
-        membersSearchTextRef.current,
-        courseId,
-        membersOffsetRef.current,
-        membersOffsetRef.current + USERS_GET_LIMIT - 1
-      );
 
-      setMembers((prev) => [...prev, ...offsetMembersByCourseId]);
-
-      if (isSelectedAllRef.current) {
-        setSelectedMembersIds((prev) => [
-          ...prev,
-          ...offsetMembersByCourseId.map(({ id }) => id),
-        ]);
-      }
-
-      membersOffsetRef.current += offsetMembersByCourseId.length;
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
   const onCoursesScroll = async (e: Event) => {
     if (isCloseToBottom(e.target as HTMLElement)) {
       fetchMoreMembers();
     }
   };
 
-  const onDispelMembersModalClose = (mutated?: boolean) => {
+  const onDispelMembersModalClose = () => {
     setIsDispelMembersModalOpen(false);
-
-    if (mutated) {
-      fetchMembersBySearch();
-    }
   };
 
-  const onDispelMemberModalClose = (mutated?: boolean) => {
+  const onDispelMemberModalClose = () => {
     setIsDispelMemberModalOpen(false);
-
-    if (mutated) {
-      fetchMembersBySearch();
-    }
   };
 
+  // Effects
   useEffect(() => {
     const throttled = throttleFetch(onCoursesScroll);
     document
@@ -217,16 +223,14 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
         .getElementById("content-wrapper")
         .removeEventListener("scroll", throttled);
     };
-  }, []);
+  }, [isSelectedAll, searchText]);
   useEffect(() => {
-    membersSearchTextRef.current = membersSearchText;
-  }, [membersSearchText]);
-  useEffect(() => {
-    fetchMembersWithCount();
-  }, []);
-  useEffect(() => {
-    isSelectedAllRef.current = isSelectedAll;
-  }, [isSelectedAll]);
+    if (searchText) {
+      fetchMembersBySearch();
+    } else {
+      fetchInitialMembers();
+    }
+  }, [searchText]);
   useEffect(() => {
     setIsSelectedAll(totalMembersCount === selectedMembersIds.length);
   }, [totalMembersCount]);
@@ -251,7 +255,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
           title="Total members"
         />
         <EnrollUsers
-          onUsersEnrolled={fetchMembersBySearch}
+          onUsersEnrolled={() => fetchMembersBySearch(true)}
           courseId={courseId}
         />
       </CardsContainer>
@@ -275,14 +279,13 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
         <Input
           Icon={<SearchIcon size="xs" />}
           placeholder={t("search")}
-          onChange={onSearchInputChange}
+          onChange={(e) => setSearchText(e.target.value)}
           className="w-auto"
-          value={membersSearchText}
+          value={searchText}
         />
       )}
-      {isMembersLoading ? (
-        <Skeleton />
-      ) : (
+      {isLoading && <Skeleton />}
+      {isData && (
         <Table
           data={members.map(({ name, role, id, avatar }) => ({
             Name:
@@ -305,7 +308,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
                   onToggle={(checked) => onMemberToggle(checked, id)}
                 />
               ),
-            "": (
+            "": role !== Role.Teacher && (
               <BasePopper
                 width="sm"
                 trigger={
@@ -330,13 +333,32 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
           }))}
         />
       )}
+      {isNoData && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NoDataIcon />
+            <p className="mt-4 font-bold">View your work in a list</p>
+          </div>
+        </div>
+      )}
+      {isNotFound && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NotFoundIcon />
+            <p className="mt-4 font-bold">
+              It looks like we can&apos;t find any results for that match
+            </p>
+          </div>
+        </div>
+      )}
+
       {isDispelMembersModalOpen && (
         <PromptModal
           isSubmitting={isSubmittingDispelMembers}
           onClose={onDispelMembersModalClose}
           title="Dispel Members"
           action="Dispel"
-          actionHandler={submitDispelMembers}
+          actionHandler={submitDispelCourseMembers}
           body={t("prompts.dispel_users")}
         />
       )}

@@ -3,13 +3,13 @@
 import BaseDrawer from "@/components/common/drawers/base-drawer";
 import Notification from "@/components/common/drawers/notifications-drawer/notification";
 import NotificationsIcon from "@/components/icons/notifications-icon";
+import Skeleton from "@/components/skeleton";
 import { NOTIFICATIONS_GET_LIMIT } from "@/constants";
 import { getNotifications } from "@/db/notification";
 import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types";
 import { Event } from "@/types/events.type";
-import { closeNotificationChannel } from "@/utils/get-notification-channel";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
 import type { FunctionComponent, UIEventHandler } from "react";
@@ -24,6 +24,7 @@ const NotificationsDrawer: FunctionComponent = () => {
   const [notifications, setNotifications] = useState<
     ResultOf<typeof getNotifications>
   >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Hooks
   const notificationChannel = useNotificationChannel();
@@ -67,14 +68,16 @@ const NotificationsDrawer: FunctionComponent = () => {
     notificationChannel
       .on("broadcast", { event: Event.NotificationCreated }, onNewNotification)
       .subscribe();
-
-    return () => {
-      closeNotificationChannel();
-    };
   }, []);
 
   useEffect(() => {
-    if (isOpen) fetchNotifications();
+    (async () => {
+      if (isOpen) {
+        setIsLoading(true);
+        await fetchNotifications();
+        setIsLoading(false);
+      }
+    })();
   }, [isOpen]);
 
   useEffect(() => {
@@ -103,19 +106,22 @@ const NotificationsDrawer: FunctionComponent = () => {
             </div>
           }
         >
-          <div
-            onScroll={onScroll}
-            className="max-h-[calc(100vh-88px)] overflow-auto py-4"
-          >
-            {notifications.map((notification) => (
-              <Notification
-                notification={notification}
-                onNavigateAway={() => setIsOpen(false)}
-                onReadNotification={() => onReadNotification(notification.id)}
-                key={notification.id}
-              />
-            ))}
-          </div>
+          {isLoading && <Skeleton className="px-4 pt-4" />}
+          {!isLoading && (
+            <div
+              onScroll={onScroll}
+              className="max-h-[calc(100vh-88px)] overflow-auto py-4"
+            >
+              {notifications.map((notification) => (
+                <Notification
+                  notification={notification}
+                  onNavigateAway={() => setIsOpen(false)}
+                  onReadNotification={() => onReadNotification(notification.id)}
+                  key={notification.id}
+                />
+              ))}
+            </div>
+          )}
         </BaseDrawer>
       )}
     </>

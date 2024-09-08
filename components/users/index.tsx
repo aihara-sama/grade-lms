@@ -14,22 +14,22 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import Avatar from "@/components/avatar";
-import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses";
+import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
 import DotsIcon from "@/components/icons/dots-icon";
+import NoDataIcon from "@/components/icons/no-data-icon";
+import NotFoundIcon from "@/components/icons/not-found-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import Skeleton from "@/components/skeleton";
 import { USERS_GET_LIMIT } from "@/constants";
 import {
-  deleteUsersByNameAndCreatorId,
-  deleteUsersByUsersIds,
-  getOffsetUsersByNameAndCreatorId,
-  getUsersByCreatorId,
-  getUsersByNameAndCreatorId,
-  getUsersCountByCreatorId,
-  getUsersCountByTitleAndUserId,
+  deleteAllUsers,
+  deleteUserById,
+  deleteUsersByIds,
+  getUsersByCeratorId,
+  getUsersByCreatorIdCount,
 } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
@@ -44,9 +44,11 @@ const Users: FunctionComponent = () => {
   const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
   const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>();
-  const [isUsersLoading, setIsUsersLoading] = useState(true);
+  console.log({ selectedUserId });
+
+  const [isLoading, setIsLoading] = useState(true);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
-  const [usersSearchText, setUsersSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [isEnrollUsersInCoursesModalOpen, setIsEnrollUsersInCoursesModalOpen] =
     useState(false);
   const [isEnrollUserInCoursesModalOpen, setIsEnrollUserInCoursesModalOpen] =
@@ -55,15 +57,22 @@ const Users: FunctionComponent = () => {
   const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
   const [isSubmittingDeleteUser, setIsSubmittingDeleteUser] = useState(false);
   const [isSubmittingDeleteUsers, setIsSubmittingDeleteUsers] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Refs
-  const isSelectedAllRef = useRef(false);
-  const usersSearchTextRef = useRef("");
   const usersOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
+
+  // Vars
+  const isData = !!users.length && !isLoading;
+  const isNoData =
+    !isLoading && !isSearching && !totalUsersCount && !searchText.length;
+
+  const isNotFound =
+    !isLoading && !isSearching && !users.length && !!searchText.length;
 
   // Handlers
   const selectAllUsers = () => {
@@ -75,71 +84,108 @@ const Users: FunctionComponent = () => {
     setIsSelectedAll(false);
   };
 
-  const fetchUsersWithCount = async () => {
-    setIsUsersLoading(true);
+  const fetchInitialUsers = async () => {
+    setIsLoading(true);
 
     try {
-      const [usersByCreatorId, usersCountByCreatorId] = await Promise.all([
-        getUsersByCreatorId(user.id),
-        getUsersCountByCreatorId(user.id),
+      const [fetchedUsers, fetchedUsersCount] = await Promise.all([
+        getUsersByCeratorId(user.id),
+        getUsersByCreatorIdCount(user.id),
       ]);
-      setUsers(usersByCreatorId);
-      setTotalUsersCount(usersCountByCreatorId);
-      setIsSelectedAll(false);
-      setSelectedUsersIds([]);
-      usersOffsetRef.current += usersByCreatorId.length;
+
+      setUsers(fetchedUsers);
+      setTotalUsersCount(fetchedUsersCount);
+
+      usersOffsetRef.current = fetchedUsers.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsUsersLoading(false);
+      setIsLoading(false);
     }
   };
-  const fetchUsersBySearch = async () => {
+  const fetchUsersBySearch = async (refetch?: boolean) => {
+    setIsSearching(true);
+
     try {
-      const [usersByTitleAndUserId, usersCountByTitleAndUserId] =
-        await Promise.all([
-          getUsersByNameAndCreatorId(usersSearchText, user.id),
-          getUsersCountByTitleAndUserId(usersSearchText, user.id),
+      const [fetchedUsers, fetchedUsersCount] = await Promise.all([
+        getUsersByCeratorId(user.id, searchText),
+        getUsersByCreatorIdCount(user.id, searchText),
+      ]);
+
+      setUsers(fetchedUsers);
+      setTotalUsersCount(fetchedUsersCount);
+
+      setIsSelectedAll(false);
+      setSelectedUsersIds([]);
+
+      usersOffsetRef.current += refetch ? fetchedUsers.length : 0;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  const fetchMoreUsers = async () => {
+    try {
+      const from = usersOffsetRef.current;
+      const to = usersOffsetRef.current + USERS_GET_LIMIT - 1;
+
+      const fetchedUsers = await getUsersByCeratorId(
+        user.id,
+        searchText,
+        from,
+        to
+      );
+
+      setUsers((prev) => [...prev, ...fetchedUsers]);
+
+      if (isSelectedAll) {
+        setSelectedUsersIds((prev) => [
+          ...prev,
+          ...fetchedUsers.map(({ id }) => id),
         ]);
+      }
 
-      setUsers(usersByTitleAndUserId);
-      setTotalUsersCount(usersCountByTitleAndUserId);
-      setIsSelectedAll(false);
-      setSelectedUsersIds([]);
-      usersOffsetRef.current = usersByTitleAndUserId.length;
+      usersOffsetRef.current += fetchedUsers.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
-  const submitDeleteUsers = async () => {
-    setIsSubmittingDeleteUsers(true);
-    try {
-      await (isSelectedAllRef.current
-        ? deleteUsersByNameAndCreatorId(usersSearchTextRef.current, user.id)
-        : deleteUsersByUsersIds(selectedUsersIds));
-      setSelectedUsersIds([]);
-      setIsDeleteUsersModalOpen(false);
-      toast.success(t("users_deleted"));
-      fetchUsersBySearch();
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setIsSubmittingDeleteUsers(false);
-    }
-  };
   const submitDeleteUser = async () => {
     setIsSubmittingDeleteUser(true);
+
     try {
-      await deleteUsersByUsersIds([selectedUserId]);
+      await deleteUserById(selectedUserId);
+
       setIsDeleteUserModalOpen(false);
       setSelectedUsersIds((_) => _.filter((id) => id !== selectedUserId));
-      fetchUsersBySearch();
+      fetchUsersBySearch(true);
+
       toast.success(t("user_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSubmittingDeleteUser(false);
+    }
+  };
+  const submitDeleteUsers = async () => {
+    setIsSubmittingDeleteUsers(true);
+
+    try {
+      await (isSelectedAll
+        ? deleteAllUsers(user.id, searchText)
+        : deleteUsersByIds(selectedUsersIds));
+
+      setSelectedUsersIds([]);
+      setIsDeleteUsersModalOpen(false);
+      fetchUsersBySearch(true);
+
+      toast.success(t("users_deleted"));
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteUsers(false);
     }
   };
 
@@ -153,32 +199,7 @@ const Users: FunctionComponent = () => {
     }
   };
 
-  const fetchMoreUsers = async () => {
-    try {
-      const offsetUsersByUserId = await getOffsetUsersByNameAndCreatorId(
-        usersSearchTextRef.current,
-        user.id,
-        usersOffsetRef.current,
-        usersOffsetRef.current + USERS_GET_LIMIT - 1
-      );
-
-      setUsers((prev) => [...prev, ...offsetUsersByUserId]);
-
-      if (isSelectedAllRef.current) {
-        setSelectedUsersIds((prev) => [
-          ...prev,
-          ...offsetUsersByUserId.map(({ id }) => id),
-        ]);
-      }
-
-      usersOffsetRef.current += offsetUsersByUserId.length;
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
   const onCoursesScroll = (e: Event) => {
-    console.log({ isCloseToBottom: isCloseToBottom(e.target as HTMLElement) });
-
     if (isCloseToBottom(e.target as HTMLElement)) {
       fetchMoreUsers();
     }
@@ -203,16 +224,14 @@ const Users: FunctionComponent = () => {
         .getElementById("content-wrapper")
         .removeEventListener("scroll", throttled);
     };
-  }, []);
+  }, [isSelectedAll, searchText]);
   useEffect(() => {
-    fetchUsersWithCount();
-  }, []);
-  useEffect(() => {
-    usersSearchTextRef.current = usersSearchText;
-  }, [usersSearchText]);
-  useEffect(() => {
-    isSelectedAllRef.current = isSelectedAll;
-  }, [isSelectedAll]);
+    if (searchText) {
+      fetchUsersBySearch();
+    } else {
+      fetchInitialUsers();
+    }
+  }, [searchText]);
   useEffect(() => {
     setIsSelectedAll(totalUsersCount === selectedUsersIds.length);
   }, [totalUsersCount]);
@@ -234,7 +253,7 @@ const Users: FunctionComponent = () => {
           total={totalUsersCount}
           title="Total users"
         />
-        <CreateUser onUserCreated={fetchUsersBySearch} />
+        <CreateUser onUserCreated={() => fetchUsersBySearch(true)} />
       </CardsContainer>
       {selectedUsersIds.length ? (
         <div className="mb-3 gap-2 flex">
@@ -262,14 +281,13 @@ const Users: FunctionComponent = () => {
         <Input
           Icon={<SearchIcon size="xs" />}
           placeholder={t("search")}
-          onChange={(e) => setUsersSearchText(e.target.value)}
+          onChange={(e) => setSearchText(e.target.value)}
           className="w-auto"
-          value={usersSearchText}
+          value={searchText}
         />
       )}
-      {isUsersLoading ? (
-        <Skeleton />
-      ) : (
+      {isLoading && <Skeleton />}
+      {isData && (
         <div className="flex-1 flex">
           <Table
             data={users.map(({ name, role, id, avatar, email }) => ({
@@ -299,7 +317,7 @@ const Users: FunctionComponent = () => {
                   <ul className="flex flex-col">
                     <li
                       className="popper-list-item"
-                      onClick={() => setIsEnrollUsersInCoursesModalOpen(true)}
+                      onClick={() => setIsEnrollUserInCoursesModalOpen(true)}
                     >
                       <UsersIcon /> Enroll
                     </li>
@@ -316,12 +334,23 @@ const Users: FunctionComponent = () => {
           />
         </div>
       )}
-
-      {isEnrollUsersInCoursesModalOpen && (
-        <EnrollUsersInCoursesModal
-          usersIds={selectedUsersIds}
-          onClose={onEnrollUsersInCoursesModalClose}
-        />
+      {isNoData && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NoDataIcon />
+            <p className="mt-4 font-bold">View your work in a list</p>
+          </div>
+        </div>
+      )}
+      {isNotFound && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NotFoundIcon />
+            <p className="mt-4 font-bold">
+              It looks like we can&apos;t find any results for that match
+            </p>
+          </div>
+        </div>
       )}
       {isEnrollUserInCoursesModalOpen && (
         <EnrollUsersInCoursesModal
@@ -329,6 +358,13 @@ const Users: FunctionComponent = () => {
           onClose={() => setIsEnrollUserInCoursesModalOpen(false)}
         />
       )}
+      {isEnrollUsersInCoursesModalOpen && (
+        <EnrollUsersInCoursesModal
+          usersIds={selectedUsersIds}
+          onClose={onEnrollUsersInCoursesModalClose}
+        />
+      )}
+
       {isDeleteUserModalOpen && (
         <PromptModal
           isSubmitting={isSubmittingDeleteUser}
@@ -352,5 +388,4 @@ const Users: FunctionComponent = () => {
     </>
   );
 };
-
 export default Users;

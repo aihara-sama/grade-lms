@@ -40,44 +40,35 @@ export const getCoursesCount = async (userId: string, title = "") => {
 
   return result.data.courses[0].count;
 };
-export const getCourseById = async (courseId: string) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("courses")
-    .select("*, users (*), lessons (*)")
-    .eq("id", courseId)
-    .single();
 
-  if (result.error) throw new Error(t("failed_to_load_courses"));
-
-  return result.data;
-};
 export const getUnenrolledCourses = async (
   userId: string,
-  from: number,
-  to: number
+  title = "",
+  from = 0,
+  to = COURSES_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
   const result = await db
     .rpc("get_courses_not_assigned_to_user", {
       p_user_id: userId,
+      p_course_title: title,
     })
     .range(from, to)
     .order("created_at", { ascending: true })
-
     .returns<CourseWithRefsCount[]>();
 
   if (result.error) throw new Error(t("failed_to_load_courses"));
 
   return result.data;
 };
-export const getUnenrolledCoursesCount = async (userId: string) => {
+export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
   const t = await loadMessages();
   const result = await db
     .rpc("get_courses_not_assigned_to_user", {
       p_user_id: userId,
+      p_course_title: title,
     })
-
+    .select("count")
     .returns<{ count: number }[]>();
 
   if (result.error) throw new Error(t("failed_to_load_courses_count"));

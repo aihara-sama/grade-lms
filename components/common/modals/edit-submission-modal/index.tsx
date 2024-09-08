@@ -2,7 +2,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { getSubmissionWithAuthorById, updateSubmission } from "@/db/submission";
+import { getSubmissionById, updateSubmission } from "@/db/submission";
 import type { ResultOf } from "@/types";
 import type { OutputData } from "@editorjs/editorjs";
 import clsx from "clsx";
@@ -25,7 +25,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
   onClose,
 }) => {
   const [submission, setSubmission] =
-    useState<ResultOf<typeof getSubmissionWithAuthorById>>();
+    useState<ResultOf<typeof getSubmissionById>>();
   const [isSubmitting, setIsSUbmitting] = useState(false);
 
   const t = useTranslations();
@@ -35,7 +35,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
 
   const fetchSubmission = async () => {
     try {
-      const submissionData = await getSubmissionWithAuthorById(submissionId);
+      const submissionData = await getSubmissionById(submissionId);
       setSubmission(submissionData);
     } catch (error: any) {
       toast.error(error.message);
@@ -73,7 +73,12 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
   }, []);
 
   return (
-    <BaseModal isInsideModal width="lg" onClose={onClose} title="Submission">
+    <BaseModal
+      isInsideModal
+      width="lg"
+      onClose={() => onClose()}
+      title="Submission"
+    >
       {submission ? (
         <div>
           <Input

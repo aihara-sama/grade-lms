@@ -1,21 +1,26 @@
 import { createUserAction } from "@/actions/create-user-action";
 import type { InputType as UserInputType } from "@/actions/create-user-action/types";
 import { deleteUserAction } from "@/actions/delete-user-action";
-import { COURSES_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
-import { Role } from "@/interfaces/user.interface";
+import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
 import { loadMessages } from "@/utils/load-messages";
 import { parseUsersCoursesIds } from "@/utils/parse-users-courses-ids";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import { db } from "@/utils/supabase/client";
 
 // Get
-export const getUsersByCourseId = async (courseId: string) => {
+export const getUsersByCourseId = async (
+  courseId: string,
+  userName = "",
+  from = 0,
+  to = MEMBERS_GET_LIMIT - 1
+) => {
   const t = await loadMessages();
   const result = await db
     .from("courses")
     .select("users(*)")
     .eq("id", courseId)
-    .limit(USERS_GET_LIMIT, { foreignTable: "users" })
+    .ilike("users.name", `%${userName}%`)
+    .range(from, to, { foreignTable: "users" })
     .order("created_at", { ascending: true, referencedTable: "users" })
     .single();
 
@@ -24,12 +29,16 @@ export const getUsersByCourseId = async (courseId: string) => {
   return result.data.users;
 };
 
-export const getUsersCountByCourseId = async (courseId: string) => {
+export const getUsersByCourseIdCount = async (
+  courseId: string,
+  userName = ""
+) => {
   const t = await loadMessages();
   const result = await db
     .from("courses")
     .select("users(count)")
     .eq("id", courseId)
+    .ilike("users.name", `%${userName}%`)
     .returns<Record<"users", { count: number }[]>[]>()
     .single();
 
@@ -37,26 +46,36 @@ export const getUsersCountByCourseId = async (courseId: string) => {
 
   return result.data.users[0].count;
 };
-export const getUsersByCreatorId = async (creatorId: string) => {
+export const getUsersByCeratorId = async (
+  creatorId: string,
+  name = "",
+  from = 0,
+  to = USERS_GET_LIMIT - 1
+) => {
   const t = await loadMessages();
   const result = await db
     .from("users")
     .select("*")
-    .limit(COURSES_GET_LIMIT)
-    .order("created_at", { ascending: true })
-    .eq("creator_id", creatorId);
+    .eq("creator_id", creatorId)
+    .ilike("name", `%${name}%`)
+    .range(from, to)
+    .order("created_at", { ascending: true });
 
   if (result.error) throw new Error(t("failed_to_load_users"));
 
   return result.data;
 };
 
-export const getUsersCountByCreatorId = async (creatorId: string) => {
+export const getUsersByCreatorIdCount = async (
+  creatorId: string,
+  name = ""
+) => {
   const t = await loadMessages();
   const result = await db
     .from("users")
     .select("count")
     .eq("creator_id", creatorId)
+    .ilike("name", `%${name}%`)
     .returns<{ count: number }[]>();
 
   if (result.error) throw new Error(t("failed_to_load_users_count"));
@@ -175,9 +194,9 @@ export const getOffsetUsersByNameAndCourseId = async (
 
 export const getUsersNotInCourse = async (
   courseId: string,
-  userName: string,
-  from: number,
-  to: number
+  userName = "",
+  from = 0,
+  to = USERS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
   const result = await db
@@ -194,7 +213,7 @@ export const getUsersNotInCourse = async (
 };
 export const getUsersNotInCourseCount = async (
   courseId: string,
-  userName: string
+  userName = ""
 ) => {
   const t = await loadMessages();
   const result = await db
@@ -226,23 +245,27 @@ export const getAllCourseStudentsIds = async (
   return result.data.users;
 };
 
-export const deleteUsersByUsersIds = async (usersIds: string[]) => {
+export const deleteUserById = async (id: string) => {
   const t = await loadMessages();
-  const result = await deleteUserAction(usersIds);
+  const result = await deleteUserAction([id]);
+
+  if (result.error) throw new Error(t("failed_to_delete_user"));
+};
+
+export const deleteUsersByIds = async (ids: string[]) => {
+  const t = await loadMessages();
+  const result = await deleteUserAction(ids);
 
   if (result.error) throw new Error(t("failed_to_delete_users"));
 };
-export const deleteUsersByNameAndCreatorId = async (
-  name: string,
-  creatorId: string
-) => {
+export const deleteAllUsers = async (userId: string, name: string) => {
   const t = await loadMessages();
 
   const usersIds = await db
     .from("users")
     .select("id")
-    .ilike("name", `%${name}%`)
-    .eq("creator_id", creatorId);
+    .eq("creator_id", userId)
+    .ilike("name", `%${name}%`);
 
   if (usersIds.error) throw new Error(t("failed_to_delete_users"));
 
@@ -284,10 +307,7 @@ export const createUser = async (userDetails: UserInputType) => {
   if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
 };
 
-export const dispelUsersFromCourse = async (
-  usersIds: string[],
-  courseId: string
-) => {
+export const dispelUsers = async (courseId: string, usersIds: string[]) => {
   const t = await loadMessages();
   const result = await db
     .from("user_courses")
@@ -295,37 +315,15 @@ export const dispelUsersFromCourse = async (
     .in("user_id", usersIds)
     .eq("course_id", courseId);
 
-  if (result.error)
-    throw new Error(
-      t(
-        usersIds.length === 1
-          ? "failed_to_dispel_user"
-          : "failed_to_dispel_users"
-      )
-    );
+  if (result.error) throw new Error(t("failed_to_dispel_users"));
 };
-export const dispelAllStudentsByNameFromCourse = async (
-  name: string,
-  courseId: string
-) => {
+
+export const dispelAllUsers = async (courseId: string, userName = "") => {
   const t = await loadMessages();
-
-  const studentsData = await db
-    .from("users")
-    .select("id")
-    .ilike("name", `%${name}%`)
-    .eq("role", Role.Student);
-
-  if (studentsData.error) throw new Error(t("failed_to_dispel_users"));
-
-  const result = await db
-    .from("user_courses")
-    .delete()
-    .in(
-      "user_id",
-      studentsData.data.map(({ id }) => id)
-    )
-    .eq("course_id", courseId);
+  const result = await db.rpc("dispel_all_users_from_course", {
+    p_course_id: courseId,
+    p_user_name: userName,
+  });
 
   if (result.error) throw new Error(t("failed_to_dispel_users"));
 };

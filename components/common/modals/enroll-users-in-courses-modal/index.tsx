@@ -2,11 +2,19 @@ import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
 import CheckIcon from "@/components/icons/check-icon";
 import CourseIcon from "@/components/icons/course-icon";
+import NoDataIcon from "@/components/icons/no-data-icon";
+import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import { COURSES_GET_LIMIT } from "@/constants";
-import { getCourses, getCoursesCount, getUnenrolledCourses } from "@/db/course";
+import {
+  getCourses,
+  getCoursesCount,
+  getUnenrolledCourses,
+  getUnenrolledCoursesCount,
+} from "@/db/course";
 import { enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
@@ -27,6 +35,8 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   usersIds,
   onClose,
 }) => {
+  console.log({ usersIds });
+
   // State
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
@@ -34,6 +44,8 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   const [searchText, setSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
 
   const isSingleUser = usersIds.length === 1;
 
@@ -43,6 +55,14 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
   // Refs
   const coursesOffsetRef = useRef(0);
+
+  // Vars
+  const isData = !!courses.length && !isLoading;
+  const isNoData =
+    !isLoading && !isSearching && !totalCoursesCount && !searchText.length;
+
+  const isNotFound =
+    !isLoading && !isSearching && !courses.length && !!searchText.length;
 
   // Handlers
   const selectAllCourses = () => {
@@ -54,23 +74,17 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     setIsSelectedAll(false);
   };
 
-  const fetchCourses = async (merge?: boolean) => {
+  const fetchInitialCourses = async () => {
+    setIsLoading(true);
+
     try {
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
+        isSingleUser ? getUnenrolledCourses(usersIds[0]) : getCourses(user.id),
         isSingleUser
-          ? getUnenrolledCourses(
-              usersIds[0],
-              merge ? coursesOffsetRef.current : 0,
-              coursesOffsetRef.current + COURSES_GET_LIMIT - 1
-            )
-          : getCourses(
-              user.id,
-              undefined,
-              merge ? coursesOffsetRef.current : 0,
-              coursesOffsetRef.current + COURSES_GET_LIMIT - 1
-            ),
-        getCoursesCount(user.id),
+          ? getUnenrolledCoursesCount(usersIds[0])
+          : getCoursesCount(user.id),
       ]);
+
       setCourses(fetchedCourses);
       setTotalCoursesCount(fetchedCoursesCount);
 
@@ -80,14 +94,68 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           ...fetchedCourses.map(({ id }) => id),
         ]);
       }
-      coursesOffsetRef.current =
-        fetchedCourses.length + (merge ? coursesOffsetRef.current : 0);
+      coursesOffsetRef.current = fetchedCourses.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCoursesBySearch = async (refetch?: boolean) => {
+    setIsSearching(true);
+
+    try {
+      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
+        isSingleUser
+          ? getUnenrolledCourses(usersIds[0], searchText)
+          : getCourses(user.id, searchText),
+        isSingleUser
+          ? getUnenrolledCoursesCount(usersIds[0], searchText)
+          : getCoursesCount(user.id, searchText),
+      ]);
+
+      setCourses(fetchedCourses);
+      setTotalCoursesCount(fetchedCoursesCount);
+
+      setIsSelectedAll(false);
+      setSelectedCoursesIds([]);
+
+      coursesOffsetRef.current += refetch ? fetchedCourses.length : 0;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const fetchMoreCourses = async () => {
+    try {
+      const from = coursesOffsetRef.current;
+      const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
+
+      const fetchedCourses = await (isSingleUser
+        ? getUnenrolledCourses(usersIds[0], searchText, from, to)
+        : getCourses(user.id, searchText, from, to));
+
+      setCourses((prev) => [...prev, ...fetchedCourses]);
+
+      if (isSelectedAll) {
+        setSelectedCoursesIds((prev) => [
+          ...prev,
+          ...fetchedCourses.map(({ id }) => id),
+        ]);
+      }
+
+      coursesOffsetRef.current += fetchedCourses.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
   const submitEnrollUsers = async () => {
+    console.log({ usersIds, selectedCoursesIds });
+
     setIsSubmitting(true);
     try {
       await enrollUsersInCourses(usersIds, selectedCoursesIds);
@@ -102,26 +170,29 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     }
   };
 
-  const onUserToggle = (checked: boolean, userId: string) => {
+  const onCourseToggle = (checked: boolean, courseId: string) => {
     if (checked) {
-      setSelectedCoursesIds((prev) => [...prev, userId]);
+      setSelectedCoursesIds((prev) => [...prev, courseId]);
       setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length + 1);
     } else {
-      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== userId));
+      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
       setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
     }
   };
 
-  const onScrollEnd = useCallback(throttleFetch(fetchCourses), [
+  const onScrollEnd = useCallback(throttleFetch(fetchMoreCourses), [
     searchText,
     isSelectedAll,
   ]);
 
   // Effects
   useEffect(() => {
-    fetchCourses(false);
+    if (searchText) {
+      fetchCoursesBySearch();
+    } else {
+      fetchInitialCourses();
+    }
   }, [searchText]);
-
   // View
   return (
     <BaseModal onClose={onClose} title="Enrollment">
@@ -146,25 +217,47 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
         />
       )}
 
-      <Table
-        compact
-        onScrollEnd={onScrollEnd}
-        data={courses.map(({ id, title }) => ({
-          Name: (
-            <CardTitle
-              href={`/dashboard/courses/${id}/overview`}
-              checked={selectedCoursesIds.includes(id)}
-              Icon={<CourseIcon />}
-              title={title}
-              subtitle="Active"
-              onClick={() => {}}
-              onToggle={(checked) => onUserToggle(checked, id)}
-            />
-          ),
-          "": "",
-        }))}
-      />
-      <div className="flex justify-end gap-3 mt-4">
+      {isLoading && <Skeleton className="h-[282px]" />}
+      {isData && (
+        <Table
+          compact
+          onScrollEnd={onScrollEnd}
+          data={courses.map(({ id, title }) => ({
+            Name: (
+              <CardTitle
+                href={`/dashboard/courses/${id}/overview`}
+                checked={selectedCoursesIds.includes(id)}
+                Icon={<CourseIcon />}
+                title={title}
+                subtitle="Active"
+                onClick={() => {}}
+                onToggle={(checked) => onCourseToggle(checked, id)}
+              />
+            ),
+            "": "",
+          }))}
+        />
+      )}
+      {isNoData && (
+        <div className="flex justify-center mt-12 h-[234px]">
+          <div className="flex flex-col items-center">
+            <NoDataIcon size="xl" />
+            <p className="mt-4 font-bold">View your work in a list</p>
+          </div>
+        </div>
+      )}
+      {isNotFound && (
+        <div className="flex justify-center mt-12 h-[234px]">
+          <div className="flex flex-col items-center">
+            <NotFoundIcon size="xl" />
+            <p className="mt-4 font-bold text-center">
+              It looks like we can&apos;t find any results for that match
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-end gap-3 mt-auto">
         <button className="outline-button" onClick={() => onClose()}>
           Cancel
         </button>

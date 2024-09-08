@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
-import { deleteAssignment } from "@/db/assignment";
+import { deleteAssignmentById } from "@/db/assignment";
 import type { Assignment } from "@/types/assignments.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -56,7 +56,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
   const submitDeleteAssignment = async () => {
     setIsSubmittingDeleteAssignments(true);
     try {
-      await deleteAssignment(selectedAssignmentId);
+      await deleteAssignmentById(selectedAssignmentId);
       setIsDeleteAssignmentModalOpen(false);
       fetchAssignments();
     } catch (error: any) {

@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Link from "next/link";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
@@ -10,6 +11,7 @@ interface Props {
   onClick?: () => void;
   onToggle?: (checked: boolean) => void;
   href?: string;
+  checkboxSize?: "sm" | "md";
 }
 
 const CardTitle: FunctionComponent<Props> = ({
@@ -18,6 +20,7 @@ const CardTitle: FunctionComponent<Props> = ({
   title,
   checked,
   subtitle,
+  checkboxSize = "md",
   onClick,
   onToggle,
 }) => {
@@ -40,7 +43,10 @@ const CardTitle: FunctionComponent<Props> = ({
       {onToggle && (isCardHovered || checked) ? (
         <input
           checked={checked}
-          className="m-2 cursor-pointer w-4 h-4"
+          className={`cursor-pointer w-4 h-4 ${clsx({
+            "m-[2px]": checkboxSize === "sm",
+            "m-2": checkboxSize === "md",
+          })}`}
           onChange={handleCheckboxChange}
           type="checkbox"
         />

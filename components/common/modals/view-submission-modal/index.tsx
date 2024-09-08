@@ -5,10 +5,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import StarIcon from "@/components/icons/star-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import {
-  getSubmissionWithAuthorById,
-  updateSubmissionGrade,
-} from "@/db/submission";
+import { getSubmissionById, updateSubmissionGrade } from "@/db/submission";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -51,7 +48,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
 
   const fetchSubmission = async () => {
     try {
-      const submissionData = await getSubmissionWithAuthorById(submissionId);
+      const submissionData = await getSubmissionById(submissionId);
       setSubmission(submissionData);
       setGrade(submissionData.grade);
     } catch (error: any) {
@@ -64,7 +61,12 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
   }, []);
 
   return (
-    <BaseModal isInsideModal width="lg" onClose={onClose} title="Submission">
+    <BaseModal
+      isInsideModal
+      width="lg"
+      onClose={() => onClose()}
+      title="Submission"
+    >
       {!submission ? (
         <Skeleton className="" />
       ) : (

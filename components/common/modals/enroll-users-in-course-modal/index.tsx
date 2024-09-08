@@ -6,8 +6,11 @@ import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import CheckIcon from "@/components/icons/check-icon";
+import NoDataIcon from "@/components/icons/no-data-icon";
+import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import Skeleton from "@/components/skeleton";
 import { USERS_GET_LIMIT } from "@/constants";
 import {
   enrollAllUsers,
@@ -33,11 +36,13 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 }) => {
   // State
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
+  const [usersIds, setUsersIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmiotting] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
-  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [usersCount, setUsersCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Refs
   const usersOffsetRef = useRef(0);
@@ -45,39 +50,88 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   // Hooks
   const t = useTranslations();
 
+  // Vars
+  const isData = !!users.length && !isLoading;
+  const isNoData =
+    !isLoading && !isSearching && !usersCount && !searchText.length;
+
+  const isNotFound =
+    !isLoading && !isSearching && !users.length && !!searchText.length;
+
   // Handlers
   const selectAllUsers = () => {
-    setSelectedUsersIds(users.map(({ id }) => id));
+    setUsersIds(users.map(({ id }) => id));
     setIsSelectedAll(true);
   };
   const deselectAllUsers = () => {
-    setSelectedUsersIds([]);
+    setUsersIds([]);
     setIsSelectedAll(false);
   };
-  const fetchUsers = async (merge: boolean = true) => {
+  const fetchInitialUsers = async () => {
+    setIsLoading(true);
+
     try {
       const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsersNotInCourse(
-          courseId,
-          searchText,
-          merge ? usersOffsetRef.current : 0,
-          usersOffsetRef.current + USERS_GET_LIMIT - 1
-        ),
+        getUsersNotInCourse(courseId),
+        getUsersNotInCourseCount(courseId),
+      ]);
+
+      setUsers(fetchedUsers);
+      setUsersCount(fetchedUsersCount);
+
+      if (isSelectedAll) {
+        setUsersIds((prev) => [...prev, ...fetchedUsers.map(({ id }) => id)]);
+      }
+      usersOffsetRef.current = fetchedUsers.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchUsersBySearch = async (refetch?: boolean) => {
+    setIsSearching(true);
+
+    try {
+      const [fetchedUsers, fetchedUsersCount] = await Promise.all([
+        getUsersNotInCourse(courseId, searchText),
         getUsersNotInCourseCount(courseId, searchText),
       ]);
 
-      setUsers((prev) => {
-        return [...(merge ? prev : []), ...fetchedUsers];
-      });
-      setTotalUsersCount(fetchedUsersCount);
+      setUsers(fetchedUsers);
+      setUsersCount(fetchedUsersCount);
+
+      setIsSelectedAll(false);
+      setUsersIds([]);
+
+      usersOffsetRef.current += refetch ? fetchedUsers.length : 0;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const fetchMoreUsers = async () => {
+    try {
+      const from = usersOffsetRef.current;
+      const to = usersOffsetRef.current + USERS_GET_LIMIT - 1;
+
+      const fetchedUsers = await getUsersNotInCourse(
+        courseId,
+        searchText,
+        from,
+        to
+      );
+
+      setUsers((prev) => [...prev, ...fetchedUsers]);
+
       if (isSelectedAll) {
-        setSelectedUsersIds((prev) => [
-          ...prev,
-          ...fetchedUsers.map(({ id }) => id),
-        ]);
+        setUsersIds((prev) => [...prev, ...fetchedUsers.map(({ id }) => id)]);
       }
-      usersOffsetRef.current =
-        fetchedUsers.length + (merge ? usersOffsetRef.current : 0);
+
+      usersOffsetRef.current += fetchedUsers.length;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -88,7 +142,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     try {
       await (isSelectedAll
         ? enrollAllUsers(courseId)
-        : enrollUsersInCourses(selectedUsersIds, [courseId]));
+        : enrollUsersInCourses(usersIds, [courseId]));
       onClose(true);
       toast(t("users_enrolled"));
       db.functions.invoke("check-events");
@@ -101,47 +155,51 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
   const onUserToggle = (checked: boolean, userId: string) => {
     if (checked) {
-      setSelectedUsersIds((prev) => [...prev, userId]);
+      setUsersIds((prev) => [...prev, userId]);
     } else {
-      setSelectedUsersIds((prev) => prev.filter((_id) => _id !== userId));
+      setUsersIds((prev) => prev.filter((_id) => _id !== userId));
     }
   };
-  const onScrollEnd = useCallback(throttleFetch(fetchUsers), [
+  const onScrollEnd = useCallback(throttleFetch(fetchMoreUsers), [
     searchText,
     isSelectedAll,
   ]);
 
   // Effects
   useEffect(() => {
-    fetchUsers(false);
+    if (searchText) {
+      fetchUsersBySearch();
+    } else {
+      fetchInitialUsers();
+    }
   }, [searchText]);
 
   // View
   return (
     <BaseModal onClose={() => onClose()} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select users to enroll</p>
-      <div className="">
-        {selectedUsersIds.length ? (
-          <div className="mb-3 flex gap-3">
-            <button
-              onClick={isSelectedAll ? deselectAllUsers : selectAllUsers}
-              className="outline-button flex font-semibold gap-2 items-center"
-            >
-              {isSelectedAll ? totalUsersCount : selectedUsersIds.length}{" "}
-              {isSelectedAll ? `Deselect` : "Select all"}{" "}
-              <CheckIcon size="xs" />
-            </button>
-          </div>
-        ) : (
-          <Input
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            Icon={<SearchIcon />}
-            autoFocus
-            placeholder="Search..."
-          />
-        )}
+      {usersIds.length ? (
+        <div className="mb-3 flex gap-3">
+          <button
+            onClick={isSelectedAll ? deselectAllUsers : selectAllUsers}
+            className="outline-button flex font-semibold gap-2 items-center"
+          >
+            {isSelectedAll ? usersCount : usersIds.length}{" "}
+            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+          </button>
+        </div>
+      ) : (
+        <Input
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          Icon={<SearchIcon />}
+          autoFocus
+          placeholder="Search..."
+        />
+      )}
+      {isLoading && <Skeleton className="h-[282px]" />}
 
+      {isData && (
         <Table
           onScrollEnd={onScrollEnd}
           compact
@@ -149,7 +207,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
             Name: (
               <CardTitle
                 href={`/users/${id}`}
-                checked={selectedUsersIds.includes(id)}
+                checked={usersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
                 title={name}
                 subtitle={role}
@@ -160,13 +218,31 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
             "": "",
           }))}
         />
-      </div>
-      <div className="flex justify-end gap-3 mt-4">
+      )}
+      {isNoData && (
+        <div className="flex justify-center mt-12 h-[234px]">
+          <div className="flex flex-col items-center">
+            <NoDataIcon size="xl" />
+            <p className="mt-4 font-bold">View your work in a list</p>
+          </div>
+        </div>
+      )}
+      {isNotFound && (
+        <div className="flex justify-center mt-12 h-[234px]">
+          <div className="flex flex-col items-center">
+            <NotFoundIcon size="xl" />
+            <p className="mt-4 font-bold text-center">
+              It looks like we can&apos;t find any results for that match
+            </p>
+          </div>
+        </div>
+      )}
+      <div className="flex justify-end gap-3 mt-auto">
         <button className="outline-button" onClick={() => onClose()}>
           Cancel
         </button>
         <button
-          disabled={!selectedUsersIds.length}
+          disabled={!usersIds.length}
           className="primary-button"
           onClick={submitEnrollUsers}
         >

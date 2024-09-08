@@ -427,6 +427,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      dispel_all_users_from_course: {
+        Args: {
+          p_course_id: string;
+          p_user_name: string;
+        };
+        Returns: undefined;
+      };
       enroll_all_users: {
         Args: {
           p_course_id: string;
@@ -436,6 +443,7 @@ export type Database = {
       get_courses_not_assigned_to_user: {
         Args: {
           p_user_id: string;
+          p_course_title: string;
         };
         Returns: {
           created_at: string;

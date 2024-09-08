@@ -13,7 +13,7 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
-import type { ChangeEvent, FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
@@ -38,9 +38,7 @@ import { throttleFetch } from "@/utils/throttle-fetch";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
-interface Props {}
-
-const Courses: FunctionComponent<Props> = () => {
+const Courses: FunctionComponent = () => {
   // State
   const [isDeleteCoursesModalOpen, setIsDeleteCoursesModalOpen] =
     useState(false);
@@ -49,9 +47,9 @@ const Courses: FunctionComponent<Props> = () => {
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>();
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
-  const [isCoursesLoading, setIsCoursesLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
-  const [searchText, setCoursesSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [isSubmittingDeleteCourse, setIsSubmittingDeleteCourse] =
     useState(false);
@@ -67,15 +65,12 @@ const Courses: FunctionComponent<Props> = () => {
   const { user } = useUser();
 
   // Vars
-  const isData = !!courses.length && !isCoursesLoading;
+  const isData = !!courses.length && !isLoading;
   const isNoData =
-    !isCoursesLoading &&
-    !isSearching &&
-    !totalCoursesCount &&
-    !searchText.length;
+    !isLoading && !isSearching && !totalCoursesCount && !searchText.length;
 
   const isNotFound =
-    !isCoursesLoading && !isSearching && !courses.length && !!searchText.length;
+    !isLoading && !isSearching && !courses.length && !!searchText.length;
 
   // Handdlers
   const selectAllCourses = () => {
@@ -88,14 +83,11 @@ const Courses: FunctionComponent<Props> = () => {
   };
 
   const fetchInitialCourses = async () => {
-    setIsCoursesLoading(true);
+    setIsLoading(true);
 
     try {
-      const from = 0;
-      const to = COURSES_GET_LIMIT - 1;
-
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCourses(user.id, undefined, from, to),
+        getCourses(user.id),
         getCoursesCount(user.id),
       ]);
 
@@ -106,23 +98,21 @@ const Courses: FunctionComponent<Props> = () => {
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsCoursesLoading(false);
+      setIsLoading(false);
     }
   };
   const fetchCoursesBySearch = async (refetch?: boolean) => {
     setIsSearching(true);
 
     try {
-      const from = 0;
-      const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
-
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCourses(user.id, searchText, from, to),
+        getCourses(user.id, searchText),
         getCoursesCount(user.id, searchText),
       ]);
 
       setCourses(fetchedCourses);
       setTotalCoursesCount(fetchedCoursesCount);
+
       setIsSelectedAll(false);
       setSelectedCoursesIds([]);
 
@@ -138,7 +128,7 @@ const Courses: FunctionComponent<Props> = () => {
       const from = coursesOffsetRef.current;
       const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
 
-      const fetchedCourses = await getCourses(user.id, undefined, from, to);
+      const fetchedCourses = await getCourses(user.id, searchText, from, to);
 
       setCourses((prev) => [...prev, ...fetchedCourses]);
 
@@ -160,9 +150,11 @@ const Courses: FunctionComponent<Props> = () => {
 
     try {
       await deleteCourseById(selectedCourseId);
+
       setIsDeleteCourseModalOpen(false);
       setSelectedCoursesIds((_) => _.filter((id) => id !== selectedCourseId));
       fetchCoursesBySearch(true);
+
       toast.success("Success");
     } catch (error: any) {
       toast.error(error.message);
@@ -177,6 +169,7 @@ const Courses: FunctionComponent<Props> = () => {
       await (isSelectedAll
         ? deleteAllCourses(searchText)
         : deleteCoursesByIds(selectedCoursesIds));
+
       setSelectedCoursesIds([]);
       setIsDeleteCoursesModalOpen(false);
       fetchCoursesBySearch(true);
@@ -197,14 +190,12 @@ const Courses: FunctionComponent<Props> = () => {
       setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
     }
   };
-  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCoursesSearchText(e.target.value);
-  };
   const onCoursesScroll = async (e: Event) => {
     if (isCloseToBottom(e.target as HTMLElement)) {
       fetchMoreCourses();
     }
   };
+
   // Effects
   useEffect(() => {
     const throttled = throttleFetch(onCoursesScroll);
@@ -217,7 +208,7 @@ const Courses: FunctionComponent<Props> = () => {
         .getElementById("content-wrapper")
         .removeEventListener("scroll", throttled);
     };
-  }, [isSelectedAll]);
+  }, [isSelectedAll, searchText]);
 
   useEffect(() => {
     if (searchText) {
@@ -274,12 +265,11 @@ const Courses: FunctionComponent<Props> = () => {
           Icon={<SearchIcon size="xs" />}
           placeholder={t("search")}
           className="w-auto"
-          onChange={onSearchInputChange}
+          onChange={(e) => setSearchText(e.target.value)}
           value={searchText}
         />
       )}
-      {isCoursesLoading && <Skeleton />}
-
+      {isLoading && <Skeleton />}
       {isData && (
         <div className="flex-1 flex">
           <Table

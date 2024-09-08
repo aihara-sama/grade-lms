@@ -17,16 +17,16 @@ import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import LessonIcon from "@/components/icons/lesson-icon";
+import NoDataIcon from "@/components/icons/no-data-icon";
+import NotFoundIcon from "@/components/icons/not-found-icon";
 import Skeleton from "@/components/skeleton";
 import { LESSONS_GET_LIMIT } from "@/constants";
 import {
-  deleteLessonsByLessonsIds,
-  deleteLessonsByTitleAndCourseId,
+  deleteAllLessons,
+  deleteLessonById,
+  deleteLessonsBIds as deleteLessonsByIds,
   getLessonsByCourseId,
-  getLessonsByTitleAndCourseId,
   getLessonsCountByCourseId,
-  getLessonsCountByTitleAndCourseId,
-  getOffsetLessonsByTitleAndCourseId,
 } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
@@ -34,7 +34,7 @@ import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
 import { useTranslations } from "next-intl";
-import type { ChangeEvent, FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -47,90 +47,32 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
   const [selectedLessonsIds, setSelectedLessonsIds] = useState<string[]>([]);
   const [selectedLessonId, setSelectedLessonId] = useState<string>();
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [isLessonsLoading, setIsLessonsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [totalLessonsCount, setTotalLessonsCount] = useState(0);
-  const [lessonsSearchText, setLessonsSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [isSubmittingDeleteLesson, setIsSubmittingDeleteLesson] =
     useState(false);
   const [isSubmittingDeleteLessons, setIsSubmittingDeleteLessons] =
     useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Refs
-  const isSelectedAllRef = useRef(false);
-  const lessonsSearchTextRef = useRef("");
   const lessonsOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
 
-  const openDeleteLessonsModal = () => setIsDeleteLessonsModalOpen(true);
-  const onLessonToggle = (checked: boolean, lessonId: string) => {
-    if (checked) {
-      setSelectedLessonsIds((prev) => [...prev, lessonId]);
-      setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length + 1);
-    } else {
-      setSelectedLessonsIds((prev) => prev.filter((_id) => _id !== lessonId));
-      setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length - 1);
-    }
-  };
-  const fetchLessonsBySearch = async () => {
-    try {
-      const [lessonsByTitleAndCourseId, lessonsCountByTitCoursedUserId] =
-        await Promise.all([
-          getLessonsByTitleAndCourseId(lessonsSearchTextRef.current, courseId),
-          getLessonsCountByTitleAndCourseId(
-            lessonsSearchTextRef.current,
-            courseId
-          ),
-        ]);
+  // Vars
+  const isData = !!lessons.length && !isLoading;
+  const isNoData =
+    !isLoading && !isSearching && !totalLessonsCount && !searchText.length;
 
-      setLessons(lessonsByTitleAndCourseId);
-      setTotalLessonsCount(lessonsCountByTitCoursedUserId);
-      setIsSelectedAll(false);
-      setSelectedLessonsIds([]);
-      lessonsOffsetRef.current = 0;
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-  const fetchLessonsWithCount = async () => {
-    setIsLessonsLoading(true);
+  const isNotFound =
+    !isLoading && !isSearching && !lessons.length && !!searchText.length;
 
-    try {
-      const [lessonsByCourseId, lessonsCountByCourseId] = await Promise.all([
-        getLessonsByCourseId(courseId),
-        getLessonsCountByCourseId(courseId),
-      ]);
-
-      setLessons(lessonsByCourseId);
-      setTotalLessonsCount(lessonsCountByCourseId);
-      setIsSelectedAll(false);
-      setSelectedLessonsIds([]);
-      lessonsOffsetRef.current += lessonsByCourseId.length;
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setIsLessonsLoading(false);
-    }
-  };
-  const submitDeleteLesson = async () => {
-    setIsSubmittingDeleteLesson(true);
-    try {
-      await deleteLessonsByLessonsIds([selectedLessonId]);
-      setIsDeleteLessonModalOpen(false);
-      setSelectedLessonsIds((prev) =>
-        prev.filter((id) => id !== selectedLessonId)
-      );
-      fetchLessonsBySearch();
-      toast.success(t("lesson_deleted"));
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setIsSubmittingDeleteLesson(false);
-    }
-  };
+  // Handlers
   const selectAllLessons = () => {
     setSelectedLessonsIds(lessons.map(({ id }) => id));
     setIsSelectedAll(true);
@@ -140,55 +82,123 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
     setIsSelectedAll(false);
   };
 
-  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setLessonsSearchText((lessonsSearchTextRef.current = e.target.value));
-    fetchLessonsBySearch();
-  };
+  const fetchInitialLessons = async () => {
+    setIsLoading(true);
 
+    try {
+      const [fetchedLessons, fetchedLessonsCount] = await Promise.all([
+        getLessonsByCourseId(courseId),
+        getLessonsCountByCourseId(courseId),
+      ]);
+
+      setLessons(fetchedLessons);
+      setTotalLessonsCount(fetchedLessonsCount);
+
+      lessonsOffsetRef.current = fetchedLessons.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const fetchLessonsBySearch = async (refetch?: boolean) => {
+    setIsSearching(true);
+
+    try {
+      const [fetchedLessons, fetchedLessonsCount] = await Promise.all([
+        getLessonsByCourseId(courseId, searchText),
+        getLessonsCountByCourseId(courseId, searchText),
+      ]);
+
+      setLessons(fetchedLessons);
+      setTotalLessonsCount(fetchedLessonsCount);
+
+      setIsSelectedAll(false);
+      setSelectedLessonsIds([]);
+
+      lessonsOffsetRef.current += refetch ? fetchedLessons.length : 0;
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
   const fetchMoreLessons = async () => {
     try {
-      const offsetlessonsByUserId = await getOffsetLessonsByTitleAndCourseId(
+      const from = lessonsOffsetRef.current;
+      const to = lessonsOffsetRef.current + LESSONS_GET_LIMIT - 1;
+
+      const fetchedLessons = await getLessonsByCourseId(
         courseId,
-        lessonsSearchTextRef.current,
-        lessonsOffsetRef.current,
-        lessonsOffsetRef.current + LESSONS_GET_LIMIT - 1
+        searchText,
+        from,
+        to
       );
 
-      setLessons((prev) => [...prev, ...offsetlessonsByUserId]);
+      setLessons((prev) => [...prev, ...fetchedLessons]);
 
-      if (isSelectedAllRef.current) {
+      if (isSelectedAll) {
         setSelectedLessonsIds((prev) => [
           ...prev,
-          ...offsetlessonsByUserId.map(({ id }) => id),
+          ...fetchedLessons.map(({ id }) => id),
         ]);
       }
 
-      lessonsOffsetRef.current += offsetlessonsByUserId.length;
+      lessonsOffsetRef.current += fetchedLessons.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
-  const onLessonsScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      fetchMoreLessons();
+  const submitDeleteLesson = async () => {
+    setIsSubmittingDeleteLesson(true);
+
+    try {
+      await deleteLessonById(selectedLessonId);
+
+      setIsDeleteLessonModalOpen(false);
+      setSelectedLessonsIds((_) => _.filter((id) => id !== selectedLessonId));
+      fetchLessonsBySearch(true);
+
+      toast.success(t("lesson_deleted"));
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmittingDeleteLesson(false);
     }
   };
-
   const submitDeleteLessons = async () => {
     setIsSubmittingDeleteLessons(true);
+
     try {
-      await (isSelectedAllRef.current
-        ? deleteLessonsByTitleAndCourseId(lessonsSearchText, courseId)
-        : deleteLessonsByLessonsIds(selectedLessonsIds));
+      await (isSelectedAll
+        ? deleteAllLessons(courseId, searchText)
+        : deleteLessonsByIds(selectedLessonsIds));
 
       setSelectedLessonsIds([]);
       setIsDeleteLessonsModalOpen(false);
       fetchLessonsBySearch();
+
+      toast.success(t("lessons_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSubmittingDeleteLessons(false);
+    }
+  };
+
+  const onLessonToggle = (checked: boolean, lessonId: string) => {
+    if (checked) {
+      setSelectedLessonsIds((prev) => [...prev, lessonId]);
+      setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length + 1);
+    } else {
+      setSelectedLessonsIds((prev) => prev.filter((_id) => _id !== lessonId));
+      setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length - 1);
+    }
+  };
+  const onLessonsScroll = async (e: Event) => {
+    if (isCloseToBottom(e.target as HTMLElement)) {
+      fetchMoreLessons();
     }
   };
 
@@ -204,19 +214,17 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
         .getElementById("content-wrapper")
         .removeEventListener("scroll", throttled);
     };
-  }, []);
+  }, [isSelectedAll, searchText]);
   useEffect(() => {
-    fetchLessonsWithCount();
-  }, []);
+    if (searchText) {
+      fetchLessonsBySearch();
+    } else {
+      fetchInitialLessons();
+    }
+  }, [searchText]);
   useEffect(() => {
     setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length);
   }, [totalLessonsCount]);
-  useEffect(() => {
-    lessonsSearchTextRef.current = lessonsSearchText;
-  }, [lessonsSearchText]);
-  useEffect(() => {
-    isSelectedAllRef.current = isSelectedAll;
-  }, [isSelectedAll]);
   useEffect(() => {
     // Tall screens may fit more than 20 records. This will fit the screen
     if (lessons.length && totalLessonsCount !== lessons.length) {
@@ -237,7 +245,10 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
           Icon={<LessonsIcon size="lg" />}
         />
         {user.role === Role.Teacher && (
-          <CreateLesson onCreated={fetchLessonsBySearch} courseId={courseId} />
+          <CreateLesson
+            onCreated={() => fetchLessonsBySearch(true)}
+            courseId={courseId}
+          />
         )}
       </CardsContainer>
       {selectedLessonsIds.length ? (
@@ -250,7 +261,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
-            onClick={openDeleteLessonsModal}
+            onClick={() => setIsDeleteLessonsModalOpen(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Delete <DeleteIcon />
@@ -261,13 +272,13 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
           Icon={<SearchIcon size="xs" />}
           placeholder="Search"
           className="w-auto"
-          onChange={onSearchInputChange}
-          value={lessonsSearchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          value={searchText}
         />
       )}
-      {isLessonsLoading ? (
-        <Skeleton />
-      ) : (
+
+      {isLoading && <Skeleton />}
+      {isData && (
         <Table
           data={lessons.map(({ id, title, starts }) => ({
             Name: (
@@ -310,6 +321,25 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
           }))}
         />
       )}
+      {isNoData && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NoDataIcon />
+            <p className="mt-4 font-bold">View your work in a list</p>
+          </div>
+        </div>
+      )}
+      {isNotFound && (
+        <div className="flex justify-center mt-12">
+          <div className="flex flex-col items-center">
+            <NotFoundIcon />
+            <p className="mt-4 font-bold">
+              It looks like we can&apos;t find any results for that match
+            </p>
+          </div>
+        </div>
+      )}
+
       {isDeleteLessonsModalOpen && (
         <PromptModal
           isSubmitting={isSubmittingDeleteLessons}

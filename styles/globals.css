@@ -17,7 +17,7 @@
   }
   button,
   .button {
-    @apply text-[15px] font-bold whitespace-nowrap py-[6px] px-3 gap-[6px] shadow-sm [transition:0.2s] cursor-pointer rounded-[5px] flex items-center justify-center relative;
+    @apply text-[15px] font-bold whitespace-nowrap py-[6.25px] px-3 gap-[6px] shadow-sm [transition:0.2s] cursor-pointer rounded-[5px] flex items-center justify-center relative;
     @apply disabled:disabled !important;
   }
   input {
