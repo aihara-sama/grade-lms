@@ -258,7 +258,7 @@ RETURNS TABLE (
   id text,
   email text,
   fcm_token text,
-  lesson_id text
+  lesson_id text,
   is_emails_on boolean,
   is_push_notifications_on boolean
 )
@@ -268,9 +268,9 @@ AS $$
     u.id,
     u.email,
     u.fcm_token,
+    l.id AS lesson_id,
     u.is_emails_on,
-    u.is_push_notifications_on,
-    l.id AS lesson_id
+    u.is_push_notifications_on
   FROM lessons l
   INNER JOIN user_courses uc ON l.course_id = uc.course_id
   INNER JOIN users u ON uc.user_id = u.id
