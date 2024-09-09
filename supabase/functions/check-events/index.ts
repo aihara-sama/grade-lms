@@ -36,9 +36,8 @@ Deno.serve(async (req) => {
               }),
             }
           );
+          if ((await sendEmailResult.text()) !== "OK") throw new Error(message);
         }
-
-        if ((await sendEmailResult.text()) !== "OK") throw new Error(message);
 
         if (user.is_push_notifications_on) {
           await admin.messaging(firebaseAdminApp).send({
