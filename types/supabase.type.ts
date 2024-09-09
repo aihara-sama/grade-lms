@@ -481,6 +481,8 @@ export type Database = {
           email: string;
           fcm_token: string;
           lesson_id: string;
+          is_emails_on: boolean;
+          is_push_notifications_on: boolean;
         }[];
       };
       get_users_not_in_course: {
