@@ -23,9 +23,9 @@ const CreateUser: FunctionComponent<Props> = ({ onUserCreated }) => {
 
   // View
   return (
-    <div className="px-[24px] py-8 flex flex-col items-center justify-between w-[280px] rounded-[5px] border border-dashed border-light bg-white">
+    <div className="px-6 py-8 border-dashed flex flex-col items-center justify-between sm:w-64 w-full rounded-md border border-light bg-white">
       <AddUserIcon size="lg" />
-      <hr />
+      <hr className="w-full my-3" />
       <button
         className="primary-button"
         onClick={() => setIsCreateUserModalOpen(true)}

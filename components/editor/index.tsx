@@ -91,7 +91,7 @@ const Editor: FunctionComponent<Props> = ({
 
   return (
     <div
-      className={`overflow-auto ${clsx({ "max-h-[198px]": height === "sm", "max-h-[298px]": height === "lg", "max-h-[265px]": height === "md" })} p-2 border border-gray-200`}
+      className={`overflow-auto ${clsx({ "max-h-[198px]": height === "sm", "max-h-[282px]": height === "lg", "max-h-[281px]": height === "md" })} p-2 border border-gray-200`}
       id={id}
     ></div>
   );

@@ -65,7 +65,7 @@ const DashboardSchedule: FunctionComponent = () => {
       <CalendarWidget onChange={handleDayChange} />
       <div className="mt-4">
         <h2 className="font-bold text-lg">My schedule</h2>
-        <div className="flex flex-col gap-4 max-h-[300px] overflow-auto pr-2">
+        <div className="flex flex-col gap-4 max-h-[800px] [@media(min-width:768px)]:max-h-[492px] [@media(min-width:897px)]:max-h-[300px] overflow-auto pr-2 ">
           {schedule.map((lesson) => (
             <div key={lesson.id}>
               <div className="flex justify-between items-center">

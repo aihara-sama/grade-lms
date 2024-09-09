@@ -101,7 +101,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
   };
 
   return (
-    <BaseModal width="lg" onClose={onClose} title="Assignment">
+    <BaseModal width="lg" onClose={() => onClose()} title="Assignment">
       <div>
         <Input
           autoFocus
@@ -113,7 +113,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
           value={assignment.title}
         />
         <p>Description</p>
-        <div className="min-h-[298px]">
+        <div className="min-h-[274px]">
           <Editor
             id="create-assignment-editor"
             height="lg"

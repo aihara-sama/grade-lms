@@ -32,7 +32,7 @@ const Header: FunctionComponent<Props> = () => {
       {[Role.Teacher, Role.Student].includes(user.role as Role) && (
         <>
           <Nav className="mr-auto" />
-          <NotificationsDrawer />
+          <NotificationsDrawer className="ml-auto" />
           <UserPopper className="ml-2" />
         </>
       )}

@@ -288,51 +288,52 @@ const Users: FunctionComponent = () => {
       )}
       {isLoading && <Skeleton />}
       {isData && (
-        <div className="flex-1 flex">
-          <Table
-            data={users.map(({ name, role, id, avatar, email }) => ({
-              Name: (
-                <CardTitle
-                  href={`/users/${id}`}
-                  checked={selectedUsersIds.includes(id)}
-                  Icon={<Avatar avatar={avatar} />}
-                  title={name}
-                  subtitle={role}
-                  onToggle={(checked) => onUserToggle(checked, id)}
-                />
-              ),
-              Email: email,
-              "": (
-                <BasePopper
-                  width="sm"
-                  trigger={
-                    <button
-                      className="icon-button text-neutral-500"
-                      onClick={() => setSelectedUserId(id)}
-                    >
-                      <DotsIcon />
-                    </button>
-                  }
-                >
-                  <ul className="flex flex-col">
-                    <li
-                      className="popper-list-item"
-                      onClick={() => setIsEnrollUserInCoursesModalOpen(true)}
-                    >
-                      <UsersIcon /> Enroll
-                    </li>
-                    <li
-                      onClick={() => setIsDeleteUserModalOpen(true)}
-                      className="popper-list-item"
-                    >
-                      <DeleteIcon /> Delete
-                    </li>
-                  </ul>
-                </BasePopper>
-              ),
-            }))}
-          />
-        </div>
+        <Table
+          data={users.map(({ name, role, id, avatar, email }, idx) => ({
+            Name: (
+              <CardTitle
+                href={`/users/${id}`}
+                checked={selectedUsersIds.includes(id)}
+                Icon={<Avatar avatar={avatar} />}
+                title={name}
+                subtitle={role}
+                onToggle={(checked) => onUserToggle(checked, id)}
+              />
+            ),
+            Email: email,
+            "": (
+              <BasePopper
+                placement={
+                  users.length > 7 && users.length - idx < 4 ? "top" : "bottom"
+                }
+                width="sm"
+                trigger={
+                  <button
+                    className="icon-button text-neutral-500"
+                    onClick={() => setSelectedUserId(id)}
+                  >
+                    <DotsIcon />
+                  </button>
+                }
+              >
+                <ul className="flex flex-col">
+                  <li
+                    className="popper-list-item"
+                    onClick={() => setIsEnrollUserInCoursesModalOpen(true)}
+                  >
+                    <UsersIcon /> Enroll
+                  </li>
+                  <li
+                    onClick={() => setIsDeleteUserModalOpen(true)}
+                    className="popper-list-item"
+                  >
+                    <DeleteIcon /> Delete
+                  </li>
+                </ul>
+              </BasePopper>
+            ),
+          }))}
+        />
       )}
       {isNoData && (
         <div className="flex justify-center mt-12">

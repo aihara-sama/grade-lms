@@ -59,14 +59,16 @@ const Insight: FunctionComponent<Props> = ({
         } else {
           widthAdjustment = -rightPanel - contentGap - contentPadding;
         }
-      } else {
+      } else if (window.innerWidth >= 1432) {
         widthAdjustment =
-          window.innerWidth >= 1432
-            ? -(window.innerWidth - 1432) -
-              rightPanel -
-              contentGap -
-              contentPadding
-            : -rightPanel - contentGap - contentPadding;
+          -(window.innerWidth - 1432) -
+          rightPanel -
+          contentGap -
+          contentPadding;
+      } else if (window.innerWidth < 640) {
+        widthAdjustment = -contentPadding - insightsGap;
+      } else {
+        widthAdjustment = -rightPanel - contentGap - contentPadding;
       }
 
       // Apply additional width adjustments based on screen size

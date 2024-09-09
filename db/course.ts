@@ -18,7 +18,7 @@ export const getCourses = async (
     .eq("id", userId)
     .ilike("courses.title", `%${title}%`)
     .range(from, to, { foreignTable: "courses" })
-    .order("title", { foreignTable: "courses", ascending: true })
+    .order("created_at", { foreignTable: "courses", ascending: true })
     .returns<Record<"courses", CourseWithRefsCount[]>[]>()
     .single();
 

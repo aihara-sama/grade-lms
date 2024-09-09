@@ -26,17 +26,15 @@ const LatestCourses: FunctionComponent<Props> = ({
   return (
     <div>
       <h2 className="font-bold text-lg">Latest courses</h2>
-      <div className="overflow-x-auto">
-        <div className="flex gap-4 mt-2 whitespace-nowrap pb-3">
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-          <div
-            onClick={() => setIsCreateCourseModalOpen(true)}
-            className="min-w-14 min-h-14 rounded-lg border border-neutral-300 flex items-center justify-center text-neutral-500 interactive"
-          >
-            <PlusIcon size="sm" />
-          </div>
+      <div className="overflow-x-auto flex gap-4 mt-2 whitespace-nowrap pb-3">
+        {courses.map((course) => (
+          <CourseCard key={course.id} course={course} />
+        ))}
+        <div
+          onClick={() => setIsCreateCourseModalOpen(true)}
+          className="min-w-14 min-h-14 rounded-lg border border-neutral-300 flex items-center justify-center text-neutral-500 interactive"
+        >
+          <PlusIcon size="sm" />
         </div>
       </div>
       {isCreateCourseModalOpen && (

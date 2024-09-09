@@ -299,7 +299,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       {isLoading && <Skeleton />}
       {isData && (
         <Table
-          data={assignments.map(({ id, title }) => ({
+          data={assignments.map(({ id, title }, idx) => ({
             Name: (
               <CardTitle
                 onClick={() => onAssignmentClick(id)}
@@ -316,6 +316,11 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
             ),
             "": user.role === Role.Teacher && (
               <BasePopper
+                placement={
+                  assignments.length > 7 && assignments.length - idx < 4
+                    ? "top"
+                    : "bottom"
+                }
                 width="sm"
                 trigger={
                   <button

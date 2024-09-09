@@ -1,6 +1,5 @@
 "use client";
 
-import CardsContainer from "@/components/cards-container";
 import DashboardSchedule from "@/components/common/dashboard/dashboard-schedule";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
@@ -127,20 +126,24 @@ const TeacherDashboard: FunctionComponent<Props> = ({
   }, []);
 
   return (
-    <div className="flex gap-8">
+    <div className="sm:flex-row flex gap-8 flex-col">
       <div className="flex-1 overflow-hidden">
-        <CardsContainer>
-          <Total
-            Icon={<CoursesIcon size="lg" />}
-            total={coursesCount}
-            title="Total courses"
-          />
-          <Total
-            Icon={<AvatarIcon size="lg" />}
-            total={usersCount}
-            title="Total users"
-          />
-        </CardsContainer>
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
+            <Total
+              adaptive={false}
+              Icon={<CoursesIcon size="lg" />}
+              total={coursesCount}
+              title="Total courses"
+            />
+            <Total
+              adaptive={false}
+              Icon={<AvatarIcon size="lg" />}
+              total={usersCount}
+              title="Total users"
+            />
+          </div>
+        </div>
         <hr className="my-4" />
         <LatestCourses
           courses={latestCourses}
@@ -148,7 +151,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
         />
         <TeacherInsights courses={latestCourses} />
       </div>
-      <div className="w-[278px]">
+      <div className="sm:w-[300px]">
         <DashboardSchedule />
       </div>
     </div>

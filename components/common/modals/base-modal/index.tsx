@@ -63,7 +63,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<Props>> = ({
         `}
       >
         <div
-          className={`${isExpanded ? "h-[min(500px,100%)]" : "max-h-[90vh]"} pb-3 overflow-auto transition-fade flex items-center flex-col rounded-md shadow-md bg-white -translate-y-10 opacity-0 ${clsx(
+          className={`${isExpanded ? "h-[min(484px,100%)]" : "max-h-[90vh]"} pb-3 overflow-auto transition-fade flex items-center flex-col rounded-md shadow-md bg-white -translate-y-10 opacity-0 ${clsx(
             hasRendered && "opacity-100 translate-y-0"
           )}`}
         >
@@ -77,7 +77,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<Props>> = ({
             </div>
           </div>
           <div
-            className={`overflow-auto w-full px-6 pt-3 flex flex-col ${isExpanded ? "h-[min(500px,100%)]" : "max-h-[90vh]"}`}
+            className={`overflow-auto w-full px-6 pt-3 flex flex-col ${isExpanded ? "h-[min(472px,100%)]" : "max-h-[90vh]"}`}
           >
             {children}
           </div>

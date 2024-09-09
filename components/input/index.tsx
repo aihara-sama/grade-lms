@@ -55,7 +55,7 @@ const Input: FunctionComponent<Props> = ({
           value={value}
           type={inputType}
           placeholder={placeholder}
-          className={fullWIdth ? "w-full" : ""}
+          className={fullWIdth ? "w-full" : "w-full sm:w-auto"}
           {...inputProps}
         />
         {type === "password" && (

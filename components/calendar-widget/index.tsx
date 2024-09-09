@@ -78,7 +78,7 @@ const CalendarWidget: React.FC<Props> = ({ onChange }) => {
   const daysForDisplay = getDaysForDisplay();
 
   return (
-    <div className="w-[300px] p-4 bg-white shadow-md rounded-lg text-sm">
+    <div className="sm:w-[300px] p-4 bg-white shadow-md rounded-lg text-sm">
       <div className="flex justify-between items-center mb-4">
         <button onClick={handlePrevMonth} className="icon-button">
           <ArrowLeftIcon />

@@ -280,7 +280,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       {isLoading && <Skeleton />}
       {isData && (
         <Table
-          data={lessons.map(({ id, title, starts }) => ({
+          data={lessons.map(({ id, title, starts }, idx) => ({
             Name: (
               <CardTitle
                 href={`/dashboard/courses/${courseId}/lessons/${id}/overview`}
@@ -298,6 +298,11 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
             Starts: format(new Date(starts), "EEEE, MMM d"),
             "": user.role === Role.Teacher && (
               <BasePopper
+                placement={
+                  lessons.length > 7 && lessons.length - idx < 4
+                    ? "top"
+                    : "bottom"
+                }
                 width="sm"
                 trigger={
                   <button

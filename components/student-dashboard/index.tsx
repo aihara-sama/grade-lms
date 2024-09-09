@@ -1,6 +1,5 @@
 "use client";
 
-import CardsContainer from "@/components/cards-container";
 import DashboardSchedule from "@/components/common/dashboard/dashboard-schedule";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
@@ -52,9 +51,9 @@ const StudentrDashboard: FunctionComponent<Props> = ({
   }, []);
 
   return (
-    <div className="flex gap-8">
+    <div className="sm:flex-row flex gap-8 flex-col">
       <div className="flex-1 overflow-hidden">
-        <CardsContainer>
+        <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
           <Total
             Icon={<AssignmentsIcon size="lg" />}
             total={assignmentsCount}
@@ -65,12 +64,12 @@ const StudentrDashboard: FunctionComponent<Props> = ({
             total={submissionsCount}
             title="Total submissions"
           />
-        </CardsContainer>
+        </div>
         <hr className="my-4" />
         <LatestAssignments assignments={latestAssignments} />
         <StudentInsights user={user} />
       </div>
-      <div className="w-[278px]">
+      <div className="sm:w-[300px]">
         <DashboardSchedule />
       </div>
     </div>

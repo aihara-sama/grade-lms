@@ -23,36 +23,40 @@ const Table: FunctionComponent<Props> = memo(function Table({
   if (!data.length) return null;
 
   return (
-    <div className="flex-1 flex">
-      <div className="relative rounded-md border-2 border-neutral-100 flex-1">
-        <div className="flex flex-col">
-          <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
-            {keys.map((key) => (
-              <div
-                className="text-sm flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3]"
-                key={key}
-              >
-                {key}
-              </div>
-            ))}
-          </div>
-          <div
-            className={clsx(compact && "overflow-auto h-[234px]")}
-            onScroll={onScroll}
-          >
-            <div className="p-2">
-              {data.map((row, idx) => (
-                <div key={idx} className="flex items-center gap-3 px-3 py-1">
-                  {keys.map((key, i) => (
-                    <div
-                      className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
-                      key={i}
-                    >
-                      {row[key]}
-                    </div>
-                  ))}
+    <div className={`${clsx("overflow-x-auto")}`}>
+      <div className={`${clsx("min-w-[352px]")}`}>
+        <div
+          className={`relative ${clsx(!compact && "min-h-[500px]")} rounded-md border-2 border-neutral-100 flex-1`}
+        >
+          <div className="flex flex-col">
+            <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
+              {keys.map((key) => (
+                <div
+                  className="text-sm flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3]"
+                  key={key}
+                >
+                  {key}
                 </div>
               ))}
+            </div>
+            <div
+              className={clsx(compact && "overflow-auto h-[234px]")}
+              onScroll={onScroll}
+            >
+              <div className="p-2">
+                {data.map((row, idx) => (
+                  <div key={idx} className="flex items-center gap-3 px-3 py-1">
+                    {keys.map((key, i) => (
+                      <div
+                        className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
+                        key={i}
+                      >
+                        {row[key]}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

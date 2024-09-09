@@ -287,7 +287,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       {isLoading && <Skeleton />}
       {isData && (
         <Table
-          data={members.map(({ name, role, id, avatar }) => ({
+          data={members.map(({ name, role, id, avatar }, idx) => ({
             Name:
               currentUser.id === id ? (
                 <IconTitle
@@ -310,6 +310,11 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
               ),
             "": role !== Role.Teacher && (
               <BasePopper
+                placement={
+                  members.length > 7 && members.length - idx < 4
+                    ? "top"
+                    : "bottom"
+                }
                 width="sm"
                 trigger={
                   <button

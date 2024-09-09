@@ -271,56 +271,59 @@ const Courses: FunctionComponent = () => {
       )}
       {isLoading && <Skeleton />}
       {isData && (
-        <div className="flex-1 flex">
-          <Table
-            data={courses.map(({ id, title, lessons, users: members }) => ({
-              Name: (
-                <CardTitle
-                  href={`/dashboard/courses/${id}/overview`}
-                  checked={selectedCoursesIds.includes(id)}
-                  Icon={<CourseIcon />}
-                  title={title}
-                  subtitle="Active"
-                  onToggle={
-                    user.role === Role.Teacher
-                      ? (checked) => onCourseToggle(checked, id)
-                      : undefined
-                  }
-                />
-              ),
-              Lessons: lessons[0].count,
-              Members: members[0].count,
-              "": user.role === Role.Teacher && (
-                <BasePopper
-                  width="sm"
-                  trigger={
-                    <button
-                      className="icon-button text-neutral-500"
-                      onClick={() => setSelectedCourseId(id)}
-                    >
-                      <DotsIcon />
-                    </button>
-                  }
-                >
-                  <ul className="flex flex-col">
-                    <li
-                      className="popper-list-item"
-                      onClick={() => setIsEnrollUsersModalOpen(true)}
-                    >
-                      <UsersIcon /> Enroll
-                    </li>
-                    <li
-                      className="popper-list-item"
-                      onClick={() => setIsDeleteCourseModalOpen(true)}
-                    >
-                      <DeleteIcon /> Delete
-                    </li>
-                  </ul>
-                </BasePopper>
-              ),
-            }))}
-          />
-        </div>
+        <Table
+          data={courses.map(({ id, title, lessons, users: members }, idx) => ({
+            Name: (
+              <CardTitle
+                href={`/dashboard/courses/${id}/overview`}
+                checked={selectedCoursesIds.includes(id)}
+                Icon={<CourseIcon />}
+                title={title}
+                subtitle="Active"
+                onToggle={
+                  user.role === Role.Teacher
+                    ? (checked) => onCourseToggle(checked, id)
+                    : undefined
+                }
+              />
+            ),
+            Lessons: lessons[0].count,
+            Members: members[0].count,
+            "": user.role === Role.Teacher && (
+              <BasePopper
+                placement={
+                  courses.length > 7 && courses.length - idx < 4
+                    ? "top"
+                    : "bottom"
+                }
+                width="sm"
+                trigger={
+                  <button
+                    className="icon-button text-neutral-500"
+                    onClick={() => setSelectedCourseId(id)}
+                  >
+                    <DotsIcon />
+                  </button>
+                }
+              >
+                <ul className="flex flex-col">
+                  <li
+                    className="popper-list-item"
+                    onClick={() => setIsEnrollUsersModalOpen(true)}
+                  >
+                    <UsersIcon /> Enroll
+                  </li>
+                  <li
+                    className="popper-list-item"
+                    onClick={() => setIsDeleteCourseModalOpen(true)}
+                  >
+                    <DeleteIcon /> Delete
+                  </li>
+                </ul>
+              </BasePopper>
+            ),
+          }))}
+        />
       )}
       {isNoData && (
         <div className="flex justify-center mt-12">

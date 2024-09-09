@@ -2,8 +2,10 @@ import CardTitle from "@/components/card-title";
 import EditSubmissionModal from "@/components/common/modals/edit-submission-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import ViewSubmissionModal from "@/components/common/modals/view-submission-modal";
+import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
+import DotsIcon from "@/components/icons/dots-icon";
 import NoDataIcon from "@/components/icons/no-data-icon";
 import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
@@ -46,6 +48,8 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   // States
   const [isDelSubmissionsModal, setIsDelSubmissionsModal] = useState(false);
   const [isDelSubmissionModal, setIsDelSubmissionModal] = useState(false);
+  const [isEditSubmissionModal, setIsEditSubmissionModal] = useState(false);
+  const [isViewSubmissionModal, setIsViewSubmissionModal] = useState(false);
 
   const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
   const [submissionId, setSubmissionId] = useState<string>();
@@ -213,8 +217,29 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     }
   };
 
-  const onSubmissionModalClose = (mutated?: boolean) => {
+  const onSubmissionClick = (_submissionId: string) => {
+    setSubmissionId(_submissionId);
+
+    if (user.role === Role.Teacher) {
+      setIsViewSubmissionModal(true);
+    }
+
+    if (user.role === Role.Student) {
+      setIsEditSubmissionModal(true);
+    }
+  };
+
+  const onEditSubmissionModalClose = (mutated?: boolean) => {
     setSubmissionId(undefined);
+    setIsEditSubmissionModal(false);
+
+    if (mutated) {
+      fetchSubmissionsBySearch(true);
+    }
+  };
+  const onViewSubmissionModalClose = (mutated?: boolean) => {
+    setSubmissionId(undefined);
+    setIsViewSubmissionModal(false);
 
     if (mutated) {
       fetchSubmissionsBySearch(true);
@@ -261,35 +286,64 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
         <Table
           onScrollEnd={onScrollEnd}
           compact
-          data={submissions.map(({ id, author, title, grade, created_at }) => ({
-            Name: (
-              <CardTitle
-                checkboxSize="sm"
-                checked={submissionsIds.includes(id)}
-                Icon={<SubmissionsIcon size="sm" />}
-                key={id}
-                title={title}
-                subtitle=""
-                onClick={() => setSubmissionId(id)}
-                onToggle={
-                  user.role === Role.Student
-                    ? (checked) => onSubmissionToggle(checked, id)
-                    : undefined
-                }
-              />
-            ),
-            Author: (
-              <Link className="text-sm" href={`/users/${author.id}`}>
-                {author.name}
-              </Link>
-            ),
-            Grade: <p className="text-sm">{grade}</p>,
-            Submitted: (
-              <p className="text-sm">
-                {format(new Date(created_at), "EEEE, MMM d")}
-              </p>
-            ),
-          }))}
+          data={submissions.map(
+            ({ id, author, title, grade, created_at }, idx) => ({
+              Name: (
+                <CardTitle
+                  checkboxSize="sm"
+                  checked={submissionsIds.includes(id)}
+                  Icon={<SubmissionsIcon size="sm" />}
+                  key={id}
+                  title={title}
+                  subtitle=""
+                  onClick={() => onSubmissionClick(id)}
+                  onToggle={
+                    user.role === Role.Student
+                      ? (checked) => onSubmissionToggle(checked, id)
+                      : undefined
+                  }
+                />
+              ),
+              Author: (
+                <Link className="text-sm" href={`/users/${author.id}`}>
+                  {author.name}
+                </Link>
+              ),
+              Grade: <p className="text-sm">{grade}</p>,
+              Submitted: (
+                <p className="text-sm">
+                  {format(new Date(created_at), "EEEE, MMM d")}
+                </p>
+              ),
+              "": user.role === Role.Student && (
+                <BasePopper
+                  placement={
+                    submissions.length > 7 && submissions.length - idx < 4
+                      ? "top"
+                      : "bottom"
+                  }
+                  width="sm"
+                  trigger={
+                    <button
+                      className="icon-button text-neutral-500"
+                      onClick={() => setSubmissionId(id)}
+                    >
+                      <DotsIcon />
+                    </button>
+                  }
+                >
+                  <ul className="flex flex-col">
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsDelSubmissionModal(true)}
+                    >
+                      <DeleteIcon /> Delete
+                    </li>
+                  </ul>
+                </BasePopper>
+              ),
+            })
+          )}
         />
       )}
       {isNoData && (
@@ -332,15 +386,15 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
         />
       )}
 
-      {user.role === Role.Teacher && submissionId && (
+      {user.role === Role.Teacher && isViewSubmissionModal && (
         <ViewSubmissionModal
-          onClose={onSubmissionModalClose}
+          onClose={onViewSubmissionModalClose}
           submissionId={submissionId}
         />
       )}
-      {user.role === Role.Student && submissionId && (
+      {user.role === Role.Student && isEditSubmissionModal && (
         <EditSubmissionModal
-          onClose={onSubmissionModalClose}
+          onClose={onEditSubmissionModalClose}
           submissionId={submissionId}
         />
       )}

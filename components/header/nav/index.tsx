@@ -35,7 +35,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
   };
 
   return (
-    <div className={`hidden md:flex items-center gap-8 ml-9 ${className}`}>
+    <div className={`hidden md:flex items-center gap-6 ml-9 ${className}`}>
       {menu
         .filter(({ tier }) => tier.includes(user.role))
         .map(({ title, href, Icon }, idx) => (

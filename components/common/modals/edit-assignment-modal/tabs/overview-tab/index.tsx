@@ -29,8 +29,7 @@ const OverviewTab: FunctionComponent<Props> = ({
   // States
   const [assignment, setAssignment] =
     useState<ResultOf<typeof getAssignmentById>>();
-  const [isCreateSubmissionModalOpen, setIsCreateSubmissionModalOpen] =
-    useState(false);
+  const [isCreateSubmissionModal, setIsCreateSubmissionModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // hooks
@@ -75,7 +74,8 @@ const OverviewTab: FunctionComponent<Props> = ({
     }));
   };
   const onCreateSubmissionModalClose = (mutated?: boolean) => {
-    setIsCreateSubmissionModalOpen(false);
+    setIsCreateSubmissionModal(false);
+
     if (mutated) {
       onSubmissionCreated?.();
     }
@@ -153,13 +153,13 @@ const OverviewTab: FunctionComponent<Props> = ({
               <button
                 disabled={isAssignmentPastDue}
                 className="primary-button"
-                onClick={() => setIsCreateSubmissionModalOpen(true)}
+                onClick={() => setIsCreateSubmissionModal(true)}
               >
                 Create submission
               </button>
             )}
           </div>
-          {user.role === Role.Student && isCreateSubmissionModalOpen && (
+          {user.role === Role.Student && isCreateSubmissionModal && (
             <CreateSubmissionModal
               onClose={onCreateSubmissionModalClose}
               assignmentId={assignment.id}

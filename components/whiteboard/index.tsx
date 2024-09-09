@@ -170,7 +170,7 @@ const Whiteboard: FunctionComponent<Props> = ({ lesson, onLessonExtended }) => {
       <div className="border flex items-center px-3 py-2 justify-between">
         <div className="flex items-center gap-2 font-bold">
           <WhiteboardIcon size="xs" />
-          <span className="text-center text-neutral-600 font-bold text-sm">
+          <span className="text-center text-neutral-600 font-bold text-sm whitespace-nowrap">
             {lesson.title}
           </span>
         </div>
@@ -180,7 +180,7 @@ const Whiteboard: FunctionComponent<Props> = ({ lesson, onLessonExtended }) => {
           ) : (
             <div className="flex items-center text-sm">
               <TimeIcon />
-              <p className="text-neutral-600 font-bold ml-1">
+              <p className="text-neutral-600 font-bold ml-1 whitespace-nowrap">
                 <LiveTime date={new Date(lesson.ends)} /> left
               </p>
               {user.role === Role.Teacher && (

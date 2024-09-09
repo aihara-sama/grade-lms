@@ -102,7 +102,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
           value={submission.title}
         />
         <p>Description</p>
-        <div className="min-h-[298px]">
+        <div className="min-h-[274px]">
           <Editor
             height="md"
             onChange={onBodyChange}
@@ -111,7 +111,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
           />
         </div>
 
-        <div className="flex gap-3 items-center mt-3 justify-end">
+        <div className="flex gap-3 items-center mt-[14px] justify-end">
           <button
             disabled={!submission.title}
             className="primary-button"

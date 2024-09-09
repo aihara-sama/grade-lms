@@ -17,7 +17,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import toast from "react-hot-toast";
 
-const NotificationsDrawer: FunctionComponent = () => {
+interface Props {
+  className?: string;
+}
+
+const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
   const [isNewNotification, setIsNewNotification] = useState(false);
@@ -88,7 +92,7 @@ const NotificationsDrawer: FunctionComponent = () => {
     <>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="icon-button relative"
+        className={`icon-button relative ${className}`}
       >
         <NotificationsIcon size="sm" />
         {isNewNotification && (

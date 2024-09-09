@@ -30,7 +30,7 @@ const CreateAssignment: FunctionComponent<Props> = ({
   };
   // View
   return (
-    <div className="px-6 py-8 border-dashed flex flex-col items-center justify-between w-64 rounded-md border border-light bg-white">
+    <div className="px-6 py-8 border-dashed flex flex-col items-center justify-between sm:w-64 w-full rounded-md border border-light bg-white">
       <AddAssignmentIcon size="md" />
       <hr className="w-full my-3" />
       <button className="primary-button" onClick={openCreateAssignmentModal}>

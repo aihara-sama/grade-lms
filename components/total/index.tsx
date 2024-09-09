@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Link from "next/link";
 import type { FunctionComponent, ReactNode } from "react";
 
@@ -6,11 +7,20 @@ interface Props {
   title: string;
   Icon: ReactNode;
   link?: string;
+  adaptive?: boolean;
 }
 
-const Total: FunctionComponent<Props> = ({ total, link, title, Icon }) => {
+const Total: FunctionComponent<Props> = ({
+  total,
+  link,
+  title,
+  Icon,
+  adaptive = true,
+}) => {
   return (
-    <div className="shadow-md flex flex-col items-center p-6 w-full rounded-md sm:w-64 text-neutral-600">
+    <div
+      className={`shadow-md flex flex-col items-center p-6 w-full rounded-md text-neutral-600 ${clsx(adaptive && "sm:w-64")}`}
+    >
       {Icon}
       <hr className="w-full my-3" />
       <p className="text-neutral-500">{title}</p>

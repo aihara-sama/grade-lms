@@ -89,9 +89,8 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
               data={JSON.parse(submission.body)}
             />
           </div>
-          <div className="flex gap-3 items-center mt-3">
+          <div className="flex sm:flex-row flex-col gap-3 items-center mt-3">
             <div className="flex-1">
-              <p className="mb-1">Author</p>
               <IconTitle
                 Icon={<AvatarIcon size="md" />}
                 title={submission.author.name}
