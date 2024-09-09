@@ -259,6 +259,8 @@ RETURNS TABLE (
   email text,
   fcm_token text,
   lesson_id text
+  is_emails_on boolean,
+  is_push_notifications_on boolean
 )
 LANGUAGE sql
 AS $$
@@ -266,6 +268,8 @@ AS $$
     u.id,
     u.email,
     u.fcm_token,
+    u.is_emails_on,
+    u.is_push_notifications_on,
     l.id AS lesson_id
   FROM lessons l
   INNER JOIN user_courses uc ON l.course_id = uc.course_id
