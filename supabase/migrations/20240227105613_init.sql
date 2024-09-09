@@ -15,6 +15,8 @@ create table users (
   preferred_locale text not null,
   fcm_token text,
   timezone text not null,
+  is_emails_on boolean not null,
+  is_push_notifications_on boolean not null,
   created_at timestamp not null default now()
 );
 alter table users enable row level security;
@@ -120,8 +122,8 @@ create table chat_files (
 create function public.handle_new_user() 
 returns trigger as $$
 begin
-  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone');
+  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone, is_emails_on, is_push_notifications_on)
+  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone', (new.raw_user_meta_data->>'is_emails_on')::boolean, (new.raw_user_meta_data->>'is_push_notifications_on')::boolean);
   return new;
 end;
 $$ language plpgsql security definer;

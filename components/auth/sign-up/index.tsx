@@ -45,6 +45,8 @@ const SignUp: FunctionComponent = () => {
           avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
           preferred_locale: "en",
           timezone: getTimeZone(),
+          is_emails_on: true,
+          is_push_notifications_on: true,
         } as IUserMetadata,
       },
     });

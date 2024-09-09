@@ -19,6 +19,8 @@ export interface IUserMetadata {
   fcm_token?: string;
   creator_id?: string;
   timezone: string;
+  is_push_notifications_on: boolean;
+  is_emails_on: boolean;
 }
 
 export interface AuthUser extends User {

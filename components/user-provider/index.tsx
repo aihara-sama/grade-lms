@@ -35,6 +35,9 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
           .preferred_locale,
         fcm_token: null,
         timezone: (user.user_metadata as IUserMetadata).timezone,
+        is_emails_on: (user.user_metadata as IUserMetadata).is_emails_on,
+        is_push_notifications_on: (user.user_metadata as IUserMetadata)
+          .is_push_notifications_on,
       });
 
     db.auth.onAuthStateChange((event) => {

@@ -34,6 +34,8 @@ const initUserDetails: UserInputType = {
   password: "",
   avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
   timezone: getTimeZone(),
+  is_emails_on: true,
+  is_push_notifications_on: true,
 };
 
 const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {

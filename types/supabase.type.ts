@@ -371,6 +371,8 @@ export type Database = {
           email: string;
           fcm_token: string | null;
           id: string;
+          is_emails_on: boolean;
+          is_push_notifications_on: boolean;
           name: string;
           preferred_locale: string;
           role: Database["public"]["Enums"]["role"];
@@ -383,6 +385,8 @@ export type Database = {
           email: string;
           fcm_token?: string | null;
           id: string;
+          is_emails_on: boolean;
+          is_push_notifications_on: boolean;
           name: string;
           preferred_locale: string;
           role: Database["public"]["Enums"]["role"];
@@ -395,6 +399,8 @@ export type Database = {
           email?: string;
           fcm_token?: string | null;
           id?: string;
+          is_emails_on?: boolean;
+          is_push_notifications_on?: boolean;
           name?: string;
           preferred_locale?: string;
           role?: Database["public"]["Enums"]["role"];
@@ -489,6 +495,8 @@ export type Database = {
           email: string;
           fcm_token: string | null;
           id: string;
+          is_emails_on: boolean;
+          is_push_notifications_on: boolean;
           name: string;
           preferred_locale: string;
           role: Database["public"]["Enums"]["role"];

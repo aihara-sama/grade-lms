@@ -16,46 +16,49 @@ Deno.serve(async (req) => {
     if (usersError) throw new Error(usersError.message);
 
     for (const user of users) {
-      fetch(Deno.env.get("EMAILJS_SEND_ENDPOINT"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          service_id: Deno.env.get("EMAILJS_SERVICE_ID"),
-          template_id: Deno.env.get("EMAILJS_TEMPLATE_ID"),
-          user_id: Deno.env.get("EMAILJS_USER_ID"),
-          accessToken: Deno.env.get("EMAILJS_PRIVATE_KEY"),
-          template_params: {
-            to_email: user.email,
-          },
-        }),
-      })
-        .then((r) => r.text())
-        .then((message) => {
-          if (message !== "OK") throw new Error(message);
-        })
-        .then(async () => {
-          const { error } = await db.from("sent_notifications").insert({
-            user_id: user.id,
-            lesson_id: user.lesson_id,
-          });
-
-          if (error) throw new Error(error.message);
-        })
-        .then(() => {
-          admin
-            .messaging(firebaseAdminApp)
-            .send({
-              token: user.fcm_token,
-              notification: {
-                title: "Your lessons starts soon",
-                body: "Your lesson starts soon",
+      try {
+        if (user.is_emails_on) {
+          const sendEmailResult = await fetch(
+            Deno.env.get("EMAILJS_SEND_ENDPOINT"),
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            })
-            .catch(console.error);
-        })
-        .catch(console.error);
+              body: JSON.stringify({
+                service_id: Deno.env.get("EMAILJS_SERVICE_ID"),
+                template_id: Deno.env.get("EMAILJS_TEMPLATE_ID"),
+                user_id: Deno.env.get("EMAILJS_USER_ID"),
+                accessToken: Deno.env.get("EMAILJS_PRIVATE_KEY"),
+                template_params: {
+                  to_email: user.email,
+                },
+              }),
+            }
+          );
+        }
+
+        if ((await sendEmailResult.text()) !== "OK") throw new Error(message);
+
+        if (user.is_push_notifications_on) {
+          await admin.messaging(firebaseAdminApp).send({
+            token: user.fcm_token,
+            notification: {
+              title: "Your lessons starts soon",
+              body: "Your lesson starts soon",
+            },
+          });
+        }
+
+        const { error } = await db.from("sent_notifications").insert({
+          user_id: user.id,
+          lesson_id: user.lesson_id,
+        });
+
+        if (error) throw new Error(error.message);
+      } catch (err: any) {
+        console.error(err);
+      }
     }
 
     return new Response(JSON.stringify({ users }), {
