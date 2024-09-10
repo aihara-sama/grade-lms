@@ -28,7 +28,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
         .single();
 
       if (error) throw new Error(t("failed_to_create_lesson"));
-      router.push(`/dashboard/lessons/${data.id}`);
+      router.push(`/${user.preferred_locale}/dashboard/lessons/${data.id}`);
     } catch (error: any) {
       toast.error(error.message);
     }

@@ -47,8 +47,13 @@ const Profile: FunctionComponent = () => {
   const redirectedPathName = (_locale: Locale) => {
     if (!pathName) return "/";
     const segments = pathName.split("/");
-    segments.splice(1, +(_locale === DEFAULT_LOCALE), _locale);
-    return segments.join("/");
+    console.log({ segments });
+
+    segments.splice(0, 1, _locale);
+    console.log({ segments });
+    console.log(segments.join("/"));
+
+    return `/${segments.join("/")}`;
   };
 
   const submitRenameUser = async () => {
@@ -144,9 +149,9 @@ const Profile: FunctionComponent = () => {
           }),
         ]
       );
-      router.push(redirectedPathName(_locale as Locale));
       if (userError || profileError)
         throw new Error(t("failed_to_change_language"));
+      router.push(redirectedPathName(_locale as Locale));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -249,9 +254,9 @@ const Profile: FunctionComponent = () => {
               }}
               defaultValue={{
                 title: toCapitalCase(
-                  new Intl.DisplayNames([locale], {
+                  new Intl.DisplayNames([user.preferred_locale], {
                     type: "language",
-                  }).of(locale)
+                  }).of(user.preferred_locale)
                 ),
                 id: toCapitalCase(locale),
               }}

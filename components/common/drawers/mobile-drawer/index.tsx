@@ -36,7 +36,7 @@ const MobileDrawer: FunctionComponent = () => {
         .single();
 
       if (error) throw new Error(t("failed_to_create_lesson"));
-      router.push(`/dashboard/lessons/${data.id}`);
+      router.push(`/${user.preferred_locale}/dashboard/lessons/${data.id}`);
       setIsOpen(false);
     } catch (error: any) {
       toast.error(error.message);

@@ -28,7 +28,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
       const { error } = await db.auth.signOut();
 
       if (error) throw new Error(t("something_went_wrong"));
-      router.push("/sign-in");
+      router.push(`/${user.preferred_locale}/sign-in`);
     } catch (error: any) {
       toast.error(error.message);
     }

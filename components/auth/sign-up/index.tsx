@@ -11,18 +11,20 @@ import { db } from "@/utils/supabase/client";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 const SignUp: FunctionComponent = () => {
   // State
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Hooks
-  const router = useRouter();
   const t = useTranslations();
-  const [isSuccess, setIsSuccess] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  console.log(searchParams.get("redirect"));
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +37,7 @@ const SignUp: FunctionComponent = () => {
     const password = String(payload.get("password"));
 
     setIsSubmitting(true);
-    const { error } = await db.auth.signUp({
+    const { error, data } = await db.auth.signUp({
       email,
       password,
       options: {
@@ -56,7 +58,10 @@ const SignUp: FunctionComponent = () => {
     else {
       setIsSuccess(true);
 
-      router.push("/dashboard");
+      router.push(
+        searchParams.get("redirect") ||
+          `/${data.user.user_metadata.preferred_locale}/dashboard`
+      );
     }
   };
 
@@ -103,7 +108,10 @@ const SignUp: FunctionComponent = () => {
       </form>
       <p className="text-sm">
         Already have an account?{" "}
-        <Link href="/sign-in" className="underline">
+        <Link
+          href={`/sign-in/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
+          className="underline"
+        >
           Login
         </Link>
       </p>

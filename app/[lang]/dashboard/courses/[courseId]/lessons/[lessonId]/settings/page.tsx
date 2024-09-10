@@ -6,6 +6,7 @@ import { db } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
+import { useUser } from "@/hooks/use-user";
 import type { Database } from "@/types/supabase.type";
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
 }
 const Page: FunctionComponent<Props> = ({ params }) => {
   const router = useRouter();
+  const { user } = useUser();
 
   const [course, setCourse] =
     useState<Database["public"]["Tables"]["courses"]["Row"]>();
@@ -36,7 +38,7 @@ const Page: FunctionComponent<Props> = ({ params }) => {
         .single();
 
       if (courseError || lessonError) {
-        router.push("/dashboard/courses");
+        router.push(`/${user.preferred_locale}/dashboard/courses`);
       } else {
         setCourse(courseData);
         setLesson(lessonData);
