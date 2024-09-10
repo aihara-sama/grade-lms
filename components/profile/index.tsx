@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import Select from "@/components/common/select";
+import SecurityIcon from "@/components/icons/security-icon";
 import Switch from "@/components/switch";
 import useUpdateEffect from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
@@ -26,11 +27,14 @@ const Profile: FunctionComponent = () => {
   const pathName = usePathname();
   const t = useTranslations();
   const [isSubmittingRenameUser, setIsSubmittingRenameUser] = useState(false);
+  const [isSubmittingChangePassword, setIsSubmittingChangePassword] =
+    useState(false);
 
   const { user } = useUser();
 
   const [avatar, setAvatar] = useState(user.avatar);
   const [userName, setUserName] = useState(user.name);
+  const [password, setPassword] = useState("");
   const [isEmailsOn, setIsEmailsOn] = useState(user.is_emails_on);
 
   const [isPushNotificationsOn, setIsPushNotificationsOn] = useState(
@@ -148,6 +152,22 @@ const Profile: FunctionComponent = () => {
     }
   };
 
+  const submiChangePassword = async () => {
+    setIsSubmittingChangePassword(true);
+
+    try {
+      const { error } = await db.auth.updateUser({
+        password,
+      });
+      if (error) throw new Error(t("failed_to_change_password"));
+
+      toast.success(t("password_changed"));
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmittingChangePassword(false);
+    }
+  };
   return (
     <div>
       <div className="absolute left-0 right-0 top-[68px] h-40 bg-[url(/bubbled-bg.svg)] bg-cover bg-no-repeat bg-center">
@@ -236,6 +256,39 @@ const Profile: FunctionComponent = () => {
                 id: toCapitalCase(locale),
               }}
             />
+          </div>
+        </div>
+        <div className="mt-16">
+          <p className="text-2xl font-bold text-neutral-600">Security</p>
+          <div className="flex mt-3 items-end gap-[4px]">
+            <Input
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              fullWIdth
+              name="password"
+              Icon={<SecurityIcon size="xs" />}
+              label="Password"
+              autoFocus
+              className="mb-auto"
+            />
+            <button
+              disabled={!password.length || isSubmittingChangePassword}
+              className="primary-button"
+              onClick={submiChangePassword}
+            >
+              {isSubmittingChangePassword && (
+                <img
+                  className="loading-spinner"
+                  src="/gifs/loading-spinner.gif"
+                  alt=""
+                />
+              )}
+              <span
+                className={`${clsx(isSubmittingChangePassword && "opacity-0")}`}
+              >
+                Change password
+              </span>
+            </button>
           </div>
         </div>
         <div className="mt-16">
