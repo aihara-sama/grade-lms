@@ -155,7 +155,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
         value={chatMessageText}
         Icon={
           <label>
-            <AttachIcon className={`${clsx(disabled || "interactive")}`} />
+            <AttachIcon className={`${clsx(disabled || "inter-active")}`} />
             {!disabled && (
               <input onChange={onFileChange} type="file" className="hidden" />
             )}

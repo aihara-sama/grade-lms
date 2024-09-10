@@ -14,7 +14,7 @@ const CourseCard: FunctionComponent<Props> = ({ course }) => {
     <Link
       href={`/dashboard/courses/${course.id}/overview`}
       key={course.id}
-      className="border border-neutral-300 rounded-lg px-4 py-2 flex items-center justify-between min-w-[280px] interactive"
+      className="border border-neutral-300 rounded-lg px-4 py-2 flex items-center justify-between min-w-[280px] inter-active"
     >
       <div className="flex gap-2 w-full">
         <CourseIcon size="sm" />

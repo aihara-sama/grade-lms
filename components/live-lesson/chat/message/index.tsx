@@ -49,7 +49,7 @@ const Message: FunctionComponent<Props> = ({ chatMessage }) => {
         </div>
         <div className="text-sm text-neutral-500">{chatMessage.text}</div>
         {!!chatMessage.chat_files.length && (
-          <div className="mt-1 interactive p-1 rounded-md">
+          <div className="mt-1 inter-active p-1 rounded-md">
             {chatMessage.chat_files.map((file) => (
               <div
                 onClick={() => submitDownloadFile(file)}

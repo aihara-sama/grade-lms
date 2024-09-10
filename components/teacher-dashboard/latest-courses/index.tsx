@@ -32,7 +32,7 @@ const LatestCourses: FunctionComponent<Props> = ({
         ))}
         <div
           onClick={() => setIsCreateCourseModalOpen(true)}
-          className="min-w-14 min-h-14 rounded-lg border border-neutral-300 flex items-center justify-center text-neutral-500 interactive"
+          className="min-w-14 min-h-14 rounded-lg border border-neutral-300 flex items-center justify-center text-neutral-500 inter-active"
         >
           <PlusIcon size="sm" />
         </div>

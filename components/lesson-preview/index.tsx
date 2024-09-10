@@ -65,8 +65,26 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
 
   // Handlers
   const parseWhiteboardData = () => {
+    if (user.role === Role.Student) {
+      const data = JSON.parse(lesson.whiteboard_data);
+
+      if (!data.appState) data.appState = {};
+
+      data.appState.collaborators = new Map();
+      data.appState.activeTool = {
+        type: "hand",
+        locked: false,
+        lastActiveTool: {
+          type: "hand",
+          customType: null,
+        },
+        customType: null,
+      };
+      return data;
+    }
     const data = JSON.parse(lesson.whiteboard_data);
     if (data.appState) data.appState.collaborators = new Map();
+
     return data;
   };
   const changeDateDuration = (e: ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +153,17 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
 
   // Effects
   useEffect(() => setWhiteboardInitialData(parseWhiteboardData()), []);
+
+  useEffect(() => {
+    if (user.role !== Role.Teacher) {
+      const excalidrawCanvas = document.querySelector(".student-whiteboard");
+
+      excalidrawCanvas.addEventListener("contextmenu", (event) => {
+        event.stopPropagation(); // Prevent double-click from propagating
+        event.preventDefault();
+      });
+    }
+  }, []);
   return (
     <div className="flex flex-col sm:flex-row gap-6 mt-3" ref={containerRef}>
       <main className="flex-1">
@@ -147,7 +176,7 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
           </div>
           {user.role === Role.Teacher && (
             <div
-              className="interactive p-2 border rounded-md ml-auto mr-2"
+              className="inter-active p-2 border rounded-md ml-auto mr-2"
               onClick={submitUpdateWhiteboardData}
             >
               <SaveIcon />

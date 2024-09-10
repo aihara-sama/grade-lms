@@ -113,7 +113,7 @@
     }
     @apply opacity-75 cursor-default pointer-events-none;
   }
-  .interactive {
+  .inter-active {
     @apply cursor-pointer hover:bg-gray-100/50 active:bg-gray-200/50;
   }
   .text-truncation {
@@ -136,25 +136,13 @@
     );
   }
   .student-whiteboard {
-    position: relative;
-
-    & > .excalidraw.excalidraw-container {
-      &::after {
-        position: absolute;
-        inset: 0;
-        content: "";
-        background-color: transparent;
-        cursor: not-allowed !important;
-      }
-      & * {
-        pointer-events: none !important;
-      }
-    }
-    & > .excalidraw {
-      & > .App-menu_top,
-      & > .layer-ui__wrapper__footer-right,
-      & > .undo-redo-buttons {
-        @apply hidden;
+    & .excalidraw {
+      & .App-menu_top,
+      & .layer-ui__wrapper__footer-right,
+      & .Island,
+      & .App-toolbar-container,
+      & .undo-redo-buttons {
+        @apply hidden !important;
       }
     }
   }

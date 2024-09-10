@@ -82,6 +82,8 @@ const Whiteboard: FunctionComponent<Props> = ({
     elements: readonly ExcalidrawElement[],
     appState: AppState
   ) => {
+    console.log({ elements, appState });
+
     channel.send({
       event: Event.WhiteboardChange,
       type: "broadcast",
@@ -133,18 +135,18 @@ const Whiteboard: FunctionComponent<Props> = ({
     if (user.role === Role.Student) {
       const data = JSON.parse(lesson.whiteboard_data);
 
-      if (data.appState) {
-        data.appState.collaborators = new Map();
-        data.appState.activeTool = {
+      if (!data.appState) data.appState = {};
+
+      data.appState.collaborators = new Map();
+      data.appState.activeTool = {
+        type: "hand",
+        locked: false,
+        lastActiveTool: {
           type: "hand",
-          locked: false,
-          lastActiveTool: {
-            type: "hand",
-            customType: null,
-          },
           customType: null,
-        };
-      }
+        },
+        customType: null,
+      };
       return data;
     }
     const data = JSON.parse(lesson.whiteboard_data);
@@ -189,6 +191,17 @@ const Whiteboard: FunctionComponent<Props> = ({
       );
     }
   }, [isLessonEnding]);
+
+  useEffect(() => {
+    if (user.role !== Role.Teacher) {
+      const excalidrawCanvas = document.querySelector(".student-whiteboard");
+
+      excalidrawCanvas.addEventListener("contextmenu", (event) => {
+        event.stopPropagation(); // Prevent double-click from propagating
+        event.preventDefault();
+      });
+    }
+  }, []);
   return (
     <div className="flex-[4]" ref={rootRef}>
       <div className="border flex items-center px-3 py-2 justify-between gap-3">

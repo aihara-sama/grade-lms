@@ -43,13 +43,13 @@ const Camera: FunctionComponent<Props> = ({
       </div>
       <div className="group-hover:h-[70px] absolute left-[0] right-[0] h-[0] bottom-[0] flex gap-[12px] items-center justify-center [transition:0.2s_height] overflow-hidden bg-black bg-opacity-50">
         <div
-          className="size-8 flex justify-center items-center rounded-md bg-transparent border-2 border-divider interactive"
+          className="size-8 flex justify-center items-center rounded-md bg-transparent border-2 border-divider inter-active"
           onClick={() => toggleCamera(camera.user.id)}
         >
           {camera.isCameraEnabled ? <VideoIcon /> : <VideoDisabledIcon />}
         </div>
         <div
-          className="size-8 flex justify-center items-center rounded-md interactive bg-transparent border-2 border-divider"
+          className="size-8 flex justify-center items-center rounded-md inter-active bg-transparent border-2 border-divider"
           onClick={() => toggleAudio(camera.user.id)}
         >
           {camera.isMicEnabled ? <MicroIcon /> : <MicroDisabledIcon />}
