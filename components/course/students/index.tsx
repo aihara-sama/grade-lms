@@ -17,7 +17,7 @@ const Students: FunctionComponent<Props> = ({ users }) => {
             <div className="flex justify-between items-center mb-4">
               <IconTitle
                 Icon={<Avatar avatar={user.avatar} />}
-                href={`/users/${user.id}`}
+                href={`/${user.preferred_locale}/users/${user.id}`}
                 title={user.name}
                 subtitle={user.role}
               />

@@ -39,7 +39,11 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
       {menu
         .filter(({ tier }) => tier.includes(user.role))
         .map(({ title, href, Icon }, idx) => (
-          <Link href={href} key={idx} className="flex items-center gap-2">
+          <Link
+            href={`/${user.preferred_locale}${href}`}
+            key={idx}
+            className="flex items-center gap-2"
+          >
             {Icon}
             <span className="text-sm"> {title}</span>
           </Link>

@@ -25,6 +25,7 @@ import {
   getUsersByCourseId,
   getUsersByCourseIdCount,
 } from "@/db/user";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { User } from "@/types/users";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
@@ -62,6 +63,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
   // Vars
   const isData = !!members.length && !isLoading;
@@ -295,11 +297,11 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
                   key={id}
                   title={name}
                   subtitle={role}
-                  href={`/users/${id}`}
+                  href={`/${user.preferred_locale}/users/${id}`}
                 />
               ) : (
                 <CardTitle
-                  href={`/users/${id}`}
+                  href={`/${user.preferred_locale}/users/${id}`}
                   checked={selectedMembersIds.includes(id)}
                   Icon={<Avatar avatar={avatar} />}
                   title={name}

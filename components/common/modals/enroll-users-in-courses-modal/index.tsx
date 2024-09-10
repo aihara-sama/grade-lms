@@ -222,7 +222,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           data={courses.map(({ id, title }) => ({
             Name: (
               <CardTitle
-                href={`/dashboard/courses/${id}/overview`}
+                href={`/${user.preferred_locale}/dashboard/courses/${id}/overview`}
                 checked={selectedCoursesIds.includes(id)}
                 Icon={<CourseIcon />}
                 title={title}

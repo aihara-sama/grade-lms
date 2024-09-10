@@ -18,6 +18,7 @@ import {
   getUsersNotInCourse,
   getUsersNotInCourseCount,
 } from "@/db/user";
+import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
 import { db } from "@/utils/supabase/client";
 import { throttleFetch } from "@/utils/throttle-fetch";
@@ -49,6 +50,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
   // Vars
   const isData = !!users.length && !isLoading;
@@ -206,7 +208,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           data={users.map(({ id, avatar, name, role }) => ({
             Name: (
               <CardTitle
-                href={`/users/${id}`}
+                href={`/${user.preferred_locale}/users/${id}`}
                 checked={usersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
                 title={name}

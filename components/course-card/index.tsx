@@ -1,6 +1,7 @@
 import CourseIcon from "@/components/icons/course-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import UsersIcon from "@/components/icons/users-icon";
+import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
@@ -10,9 +11,11 @@ interface Props {
 }
 
 const CourseCard: FunctionComponent<Props> = ({ course }) => {
+  const { user } = useUser();
+
   return (
     <Link
-      href={`/dashboard/courses/${course.id}/overview`}
+      href={`/${user.preferred_locale}/dashboard/courses/${course.id}/overview`}
       key={course.id}
       className="border border-neutral-300 rounded-lg px-4 py-2 flex items-center justify-between min-w-[280px] inter-active"
     >

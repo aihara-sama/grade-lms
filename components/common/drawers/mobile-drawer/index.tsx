@@ -61,7 +61,7 @@ const MobileDrawer: FunctionComponent = () => {
                   <li key={idx}>
                     <Link
                       onClick={() => setIsOpen(false)}
-                      href={href}
+                      href={`/${user.preferred_locale}${href}`}
                       className="flex items-center gap-2"
                     >
                       {Icon}

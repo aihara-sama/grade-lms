@@ -275,7 +275,7 @@ const Courses: FunctionComponent = () => {
           data={courses.map(({ id, title, lessons, users: members }, idx) => ({
             Name: (
               <CardTitle
-                href={`/dashboard/courses/${id}/overview`}
+                href={`/${user.preferred_locale}/dashboard/courses/${id}/overview`}
                 checked={selectedCoursesIds.includes(id)}
                 Icon={<CourseIcon />}
                 title={title}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useUser } from "@/hooks/use-user";
 import type { Database } from "@/types/supabase.type";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
@@ -9,6 +10,8 @@ interface Props {
 }
 
 const LessonCard: FunctionComponent<Props> = ({ lesson }) => {
+  const { user } = useUser();
+
   return (
     <div className="p-[24px] flex flex-col items-center w-[280px] rounded-[5px] border border-gray-200">
       <p className="text-xl font-bold">{lesson.title}</p>
@@ -19,7 +22,7 @@ const LessonCard: FunctionComponent<Props> = ({ lesson }) => {
         <button className="outline-button w-full">View</button>
         <Link
           className="link-button w-full"
-          href={`/dashboard/lessons/${lesson.id}`}
+          href={`/${user.preferred_locale}/dashboard/lessons/${lesson.id}`}
         >
           Enter class
         </Link>

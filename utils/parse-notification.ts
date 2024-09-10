@@ -9,7 +9,7 @@ export const parseNotification = (
     return {
       title: `New assignment in ${notification?.course?.title || "Deleted"}`,
       body: `Your teacher has created a new assignment for the ${notification?.lesson?.title || "Deleted"} lesson`,
-      href: `/en/dashboard/courses/${notification?.course?.id || "Deleted"}/lessons/${notification?.lesson?.id || "Deleted"}/assignments`,
+      href: `/dashboard/courses/${notification?.course?.id || "Deleted"}/lessons/${notification?.lesson?.id || "Deleted"}/assignments`,
       textHref: "See in assignments",
     };
   }
@@ -17,7 +17,7 @@ export const parseNotification = (
     return {
       title: `New submission in ${notification?.course?.title || "Deleted"}`,
       body: `Your student has created a new submission for the ${notification?.assignment?.title || "Deleted"} assignment`,
-      href: `/en/dashboard/courses/${notification?.course?.id || "Deleted"}/lessons/${notification?.lesson?.id || "Deleted"}/assignments`,
+      href: `/dashboard/courses/${notification?.course?.id || "Deleted"}/lessons/${notification?.lesson?.id || "Deleted"}/assignments`,
       textHref: "See in assignments",
     };
   }

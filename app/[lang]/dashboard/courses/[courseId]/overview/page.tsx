@@ -47,7 +47,7 @@ const Page: FunctionComponent<Props> = async ({ params }) => {
 
   const { users, lessons, ...courseRest } = currentCourse;
 
-  const teacher = users.find((user) => user.role === Role.Teacher);
+  const teacher = users.find(({ role }) => role === Role.Teacher);
 
   return (
     <div>
@@ -78,9 +78,7 @@ const Page: FunctionComponent<Props> = async ({ params }) => {
         </div>
         <div className="[flex-basis:300px] self-stretch xl:flex flex-col hidden">
           <Teacher teacher={teacher} />
-          <Students
-            users={users.filter((user) => user.role === Role.Student)}
-          />
+          <Students users={users.filter(({ role }) => role === Role.Student)} />
         </div>
       </div>
     </div>

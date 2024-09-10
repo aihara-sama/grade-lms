@@ -53,7 +53,11 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
       <ul className="flex flex-col">
         {menu.map(({ title, href, Icon }, idx) => (
           <li key={idx}>
-            <Link href={href} key={idx} className="base-link">
+            <Link
+              href={`/${user.preferred_locale}${href}`}
+              key={idx}
+              className="base-link"
+            >
               {Icon}
               {title}
             </Link>

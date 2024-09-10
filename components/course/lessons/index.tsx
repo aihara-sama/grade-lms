@@ -283,7 +283,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
           data={lessons.map(({ id, title, starts }, idx) => ({
             Name: (
               <CardTitle
-                href={`/dashboard/courses/${courseId}/lessons/${id}/overview`}
+                href={`/${user.preferred_locale}/dashboard/courses/${courseId}/lessons/${id}/overview`}
                 checked={selectedLessonsIds.includes(id)}
                 Icon={<LessonIcon size="md" />}
                 title={title}

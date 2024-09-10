@@ -15,7 +15,7 @@ import { addDays, format, formatDistanceToNow, startOfDay } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { FunctionComponent, UIEventHandler } from "react";
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import toast from "react-hot-toast";
 
@@ -132,14 +132,14 @@ const DashboardSchedule: FunctionComponent = () => {
               </div>
               <div className="mb-4 flex gap-3">
                 <Link
-                  href={`/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/assignments`}
+                  href={`/${user.preferred_locale}/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/assignments`}
                   className="flex items-center gap-2 border border-gray-200 py-[6px] px-3 rounded-lg hover:bg-gray-100 active:bg-gray-200 hover:text-primary"
                 >
                   <AssignmentsIcon size="xs" />
                   Assignments
                 </Link>
                 <Link
-                  href={`/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/overview`}
+                  href={`/${user.preferred_locale}/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/overview`}
                   className="flex p-3 border border-gray-200 rounded-lg hover:bg-gray-100 active:bg-gray-200 hover:text-primary"
                 >
                   <LessonsIcon size="xs" />

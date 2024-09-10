@@ -16,6 +16,7 @@ import Breadcrumbs from "@/components/breadcrumbs";
 import Camera from "@/components/camera";
 import CoursesIcon from "@/components/icons/courses-icon";
 import TimeIcon from "@/components/icons/time-icon";
+import { useUser } from "@/hooks/use-user";
 import { useVideoChat } from "@/hooks/use-video-chat";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
@@ -43,6 +44,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   } = useVideoChat();
 
   const t = useTranslations();
+  const { user } = useUser();
 
   const fetchLesson = async () => {
     try {
@@ -151,18 +153,21 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
         <Breadcrumbs
           Icon={<CoursesIcon />}
           items={[
-            { title: "Courses", href: "/dashboard/courses" },
+            {
+              title: "Courses",
+              href: `/${user.preferred_locale}/dashboard/courses`,
+            },
             {
               title: currentLesson.course.title,
-              href: `/dashboard/courses/${currentLesson.course.id}/overview`,
+              href: `/${user.preferred_locale}/dashboard/courses/${currentLesson.course.id}/overview`,
             },
             {
               title: "Lessons",
-              href: `/dashboard/courses/${currentLesson.course.id}/lessons`,
+              href: `/${user.preferred_locale}/dashboard/courses/${currentLesson.course.id}/lessons`,
             },
             {
               title: currentLesson.title,
-              href: `/dashboard/courses/${currentLesson.course.id}/lessons/${currentLesson.id}/overview`,
+              href: `/${user.preferred_locale}/dashboard/courses/${currentLesson.course.id}/lessons/${currentLesson.id}/overview`,
             },
           ]}
         />

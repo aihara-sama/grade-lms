@@ -40,5 +40,4 @@ const Breadcrumbs: FunctionComponent<Props> = ({ Icon, items }) => {
     </ul>
   );
 };
-
 export default Breadcrumbs;
