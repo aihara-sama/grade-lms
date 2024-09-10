@@ -32,6 +32,7 @@
   "failed_to_load_notifications": "Не удалось загрузить оповещания",
   "failed_to_load_messages": "Не удалось загрузить сообщения",
   "failed_to_change_password": "Не удалось изменить пароль",
+  "failed_to_save_whiteboar_data": "Не удалось сохранить данные белой доски",
   "failed_to_read_notification": "Не удалось прочитать оповещание",
   "failed_to_update_lesson_date": "Не удалось изменить дату урока",
   "failed_to_load_lessons_count": "Не удалось загрузить количество уроков",

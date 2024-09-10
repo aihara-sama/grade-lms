@@ -19,6 +19,7 @@ import { useUser } from "@/hooks/use-user";
 import { Event } from "@/types/events.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isLessonEnded } from "@/utils/is-lesson-ended";
+import { db } from "@/utils/supabase/client";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
   AppState,
@@ -27,6 +28,7 @@ import type {
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types/types";
 import clsx from "clsx";
+import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -75,30 +77,46 @@ const Whiteboard: FunctionComponent<Props> = ({
       .then(() => toast.success(t("invite_copied")))
       .catch(() => toast.error(t("something_went_wrong")));
   };
+
+  const submitUpdateWhiteboardData = async (data: string) => {
+    const { error } = await db
+      .from("lessons")
+      .update({
+        whiteboard_data: data,
+      })
+      .eq("id", lesson.id);
+
+    if (error) toast.error(t("failed_to_save_whiteboar_data"));
+  };
+
   const onPointerUpdate: ExcalidrawProps["onPointerUpdate"] = (event) => {
     pointerEventRef.current = event;
   };
-  const fireWhiteboardChange = (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState
-  ) => {
-    console.log({ elements, appState });
 
-    channel.send({
-      event: Event.WhiteboardChange,
-      type: "broadcast",
-      payload: {
-        elements,
-        appState: {
-          selectionElement: appState.selectionElement,
-          selectedElementIds: appState.selectedElementIds,
-          viewBackgroundColor: appState.viewBackgroundColor,
-          theme: appState.theme,
+  const fireWhiteboardChange = throttle(
+    (elements: readonly ExcalidrawElement[], appState: AppState) => {
+      channel.send({
+        event: Event.WhiteboardChange,
+        type: "broadcast",
+        payload: {
+          elements,
+          appState: {
+            selectionElement: appState.selectionElement,
+            selectedElementIds: appState.selectedElementIds,
+            viewBackgroundColor: appState.viewBackgroundColor,
+            theme: appState.theme,
+          },
+          pointerEvent: pointerEventRef.current,
         },
-        pointerEvent: pointerEventRef.current,
-      },
-    });
-  };
+      });
+      submitUpdateWhiteboardData(JSON.stringify({ elements, appState }));
+    },
+    1000,
+    {
+      leading: false,
+      trailing: true,
+    }
+  );
 
   const onWhiteboardChange = (payload: {
     payload: {
