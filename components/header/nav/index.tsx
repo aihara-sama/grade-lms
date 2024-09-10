@@ -28,7 +28,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
         .single();
 
       if (error) throw new Error(t("failed_to_create_lesson"));
-      router.push(`/${user.preferred_locale}/dashboard/lessons/${data.id}`);
+      router.push(`/dashboard/lessons/${data.id}`);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -39,11 +39,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
       {menu
         .filter(({ tier }) => tier.includes(user.role))
         .map(({ title, href, Icon }, idx) => (
-          <Link
-            href={`/${user.preferred_locale}${href}`}
-            key={idx}
-            className="flex items-center gap-2"
-          >
+          <Link href={`${href}`} key={idx} className="flex items-center gap-2">
             {Icon}
             <span className="text-sm"> {title}</span>
           </Link>

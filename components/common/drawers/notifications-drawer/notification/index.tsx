@@ -1,7 +1,6 @@
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import type { getNotifications } from "@/db/notification";
 import { readNotification } from "@/db/notification";
-import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types";
 import { parseNotification } from "@/utils/parse-notification";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -21,7 +20,6 @@ const Notification: FunctionComponent<Props> = ({
   onReadNotification,
 }) => {
   const { body, href, textHref, title } = parseNotification(notification);
-  const { user } = useUser();
 
   const handleReadNotification = async () => {
     try {
@@ -51,11 +49,7 @@ const Notification: FunctionComponent<Props> = ({
           <p className="text-sm text-neutral-500 mb-2">
             {formatDistanceToNowStrict(new Date(notification.created_at))}
           </p>
-          <Link
-            href={`/${user.preferred_locale}${href}`}
-            className="text-sm"
-            onClick={onNavigateAway}
-          >
+          <Link href={`${href}`} className="text-sm" onClick={onNavigateAway}>
             {textHref}
           </Link>
         </div>

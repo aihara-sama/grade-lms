@@ -300,7 +300,7 @@ const Users: FunctionComponent = () => {
           data={users.map(({ name, role, id, avatar, email }, idx) => ({
             Name: (
               <CardTitle
-                href={`/${user.preferred_locale}/users/${id}`}
+                href={`/users/${id}`}
                 checked={selectedUsersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
                 title={name}

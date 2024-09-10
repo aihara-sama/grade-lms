@@ -253,14 +253,14 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
         <div className="mt-3 sm:mt-auto flex flex-col gap-1">
           {user.role !== Role.Teacher ? (
             <Link
-              href={`/${user.preferred_locale}/dashboard/lessons/${lesson.id}`}
+              href={`/dashboard/lessons/${lesson.id}`}
               className={`button warning-button ${clsx(new Date() <= starts && "disabled")} `}
             >
               Enter class
             </Link>
           ) : (
             <Link
-              href={`/${user.preferred_locale}/dashboard/lessons/${lesson.id}`}
+              href={`/dashboard/lessons/${lesson.id}`}
               className="button warning-button"
             >
               Enter class

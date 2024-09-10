@@ -6,7 +6,6 @@ import StarIcon from "@/components/icons/star-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { getSubmissionById, updateSubmissionGrade } from "@/db/submission";
-import { useUser } from "@/hooks/use-user";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -32,7 +31,6 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useTranslations();
-  const { user } = useUser();
 
   const submitUpdateGrade = async () => {
     setIsSubmitting(true);
@@ -97,7 +95,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
                 Icon={<AvatarIcon size="md" />}
                 title={submission.author.name}
                 subtitle={submission.author.role}
-                href={`/${user.preferred_locale}/users/${submission.author.id}`}
+                href={`/users/${submission.author.id}`}
               />
             </div>
             <div className="flex gap-2 items-center text-neutral-500">

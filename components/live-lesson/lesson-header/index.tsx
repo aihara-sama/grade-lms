@@ -6,7 +6,6 @@ import NotificationsIcon from "@/components/icons/notifications-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LiveTime from "@/components/live-time";
 import NavTabs from "@/components/nav-tabs";
-import { useUser } from "@/hooks/use-user";
 import type { TabItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
@@ -23,24 +22,22 @@ const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = async ({
   course,
   lesson,
 }) => {
-  const { user } = useUser();
-
   const tabs: TabItem[] = [
     {
       title: "Overview",
-      href: `/${user.preferred_locale}/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
+      href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
       Icon: <OverviewIcon />,
       tier: [Role.Teacher, Role.Student],
     },
     {
       title: "Assignments",
-      href: `/${user.preferred_locale}/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
+      href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
       Icon: <AssignmentsIcon />,
       tier: [Role.Teacher, Role.Student],
     },
     {
       title: "Settings",
-      href: `/${user.preferred_locale}/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
+      href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
       Icon: <SettingsIcon />,
       tier: [Role.Teacher, Role.Student],
     },
@@ -55,19 +52,19 @@ const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = async ({
         items={[
           {
             title: "Courses",
-            href: `/${user.preferred_locale}/dashboard/courses`,
+            href: `/dashboard/courses`,
           },
           {
             title: course.title,
-            href: `/${user.preferred_locale}/dashboard/courses/${course.id}/overview`,
+            href: `/dashboard/courses/${course.id}/overview`,
           },
           {
             title: "Lessons",
-            href: `/${user.preferred_locale}/dashboard/courses/${course.id}/lessons`,
+            href: `/dashboard/courses/${course.id}/lessons`,
           },
           {
             title: lesson.title,
-            href: `/${user.preferred_locale}/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
+            href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
           },
         ]}
       />

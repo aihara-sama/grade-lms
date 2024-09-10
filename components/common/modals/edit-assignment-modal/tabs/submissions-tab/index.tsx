@@ -305,10 +305,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                 />
               ),
               Author: (
-                <Link
-                  className="text-sm"
-                  href={`/${user.preferred_locale}/users/${author.id}`}
-                >
+                <Link className="text-sm" href={`/users/${author.id}`}>
                   {author.name}
                 </Link>
               ),

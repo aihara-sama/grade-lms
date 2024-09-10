@@ -59,7 +59,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     // Handlers
     const navigateToPreview = () =>
       router.push(
-        `/${user.preferred_locale}/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}`
+        `/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}`
       );
 
     const fetchLesson = async () => {

@@ -28,7 +28,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
       const { error } = await db.auth.signOut();
 
       if (error) throw new Error(t("something_went_wrong"));
-      router.push(`/${user.preferred_locale}/sign-in`);
+      router.push(`/sign-in`);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -53,11 +53,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
       <ul className="flex flex-col">
         {menu.map(({ title, href, Icon }, idx) => (
           <li key={idx}>
-            <Link
-              href={`/${user.preferred_locale}${href}`}
-              key={idx}
-              className="base-link"
-            >
+            <Link href={`${href}`} key={idx} className="base-link">
               {Icon}
               {title}
             </Link>

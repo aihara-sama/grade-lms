@@ -1,5 +1,4 @@
 import { db } from "@/utils/supabase/client";
-import { createClient } from "@/utils/supabase/server";
 import { format } from "date-fns";
 import Link from "next/link";
 import { type FunctionComponent } from "react";
@@ -16,10 +15,6 @@ const OngoingLessonCard: FunctionComponent<Props> = async ({ courseId }) => {
     .lte("lessons.starts", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
     .gte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 
-  const {
-    data: { user },
-  } = await createClient().auth.getUser();
-
   const lesson = data.data?.[0]?.lessons?.[0];
 
   return (
@@ -32,10 +27,7 @@ const OngoingLessonCard: FunctionComponent<Props> = async ({ courseId }) => {
       <p className="text-sm mb-[8px] text-light">Ongoing lesson</p>
       <hr className="w-48 mb-2" />
       <p className="mb-1 text-lg font-bold">{lesson?.title || "No lesson"}</p>
-      <Link
-        className="mt-3"
-        href={`/${user.user_metadata.preferred_locale}/dashboard/lessons/${lesson?.id}`}
-      >
+      <Link className="mt-3" href={`/dashboard/lessons/${lesson?.id}`}>
         {lesson && <button className="warning-button w-64">Enter class</button>}
       </Link>
     </div>

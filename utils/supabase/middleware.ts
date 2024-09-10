@@ -36,11 +36,16 @@ export async function updateSession(
     }
   );
 
-  const { error } = await supabase.auth.getUser();
-  const locale = getLocale(request);
-  console.log(request);
+  const { error, data } = await supabase.auth.getUser();
 
-  console.log({ error });
+  if (data.user) {
+    response.cookies.set(
+      "NEXT_LOCALE",
+      data.user.user_metadata.preferred_locale
+    );
+  }
+
+  const locale = getLocale(request);
 
   if (error)
     return NextResponse.redirect(

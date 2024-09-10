@@ -132,14 +132,14 @@ const DashboardSchedule: FunctionComponent = () => {
               </div>
               <div className="mb-4 flex gap-3">
                 <Link
-                  href={`/${user.preferred_locale}/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/assignments`}
+                  href={`/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/assignments`}
                   className="flex items-center gap-2 border border-gray-200 py-[6px] px-3 rounded-lg hover:bg-gray-100 active:bg-gray-200 hover:text-primary"
                 >
                   <AssignmentsIcon size="xs" />
                   Assignments
                 </Link>
                 <Link
-                  href={`/${user.preferred_locale}/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/overview`}
+                  href={`/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/overview`}
                   className="flex p-3 border border-gray-200 rounded-lg hover:bg-gray-100 active:bg-gray-200 hover:text-primary"
                 >
                   <LessonsIcon size="xs" />
