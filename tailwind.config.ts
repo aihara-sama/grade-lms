@@ -32,6 +32,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        timeoutLine: {
+          "0%": { width: "100%" },
+          "100%": { width: "0%" },
+        },
+      },
+      animation: {
+        "timeout-line": "timeoutLine linear forwards",
+      },
       colors: {
         primary: "#555555",
         link: "#1C92FF",

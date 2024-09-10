@@ -7,7 +7,7 @@ import Logo from "@/components/logo";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import { db } from "@/utils/supabase/client";
-import { addMinutes, format } from "date-fns";
+import { addMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
@@ -29,8 +29,8 @@ const MobileDrawer: FunctionComponent = () => {
       const { error, data } = await db
         .from("lessons")
         .insert({
-          starts: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
-          ends: format(addMinutes(new Date(), 30), "yyyy-MM-dd'T'HH:mm:ss"),
+          starts: new Date().toISOString(),
+          ends: addMinutes(new Date(), 30).toISOString(),
         })
         .select("id")
         .single();

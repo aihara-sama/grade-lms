@@ -7,8 +7,6 @@ import "@/styles/globals.css";
 import { Lato } from "next/font/google";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { Toaster } from "react-hot-toast";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const latoFont = Lato({
   weight: ["100", "300", "400", "700", "900"],
@@ -36,8 +34,7 @@ const Layout: FunctionComponent<PropsWithChildren<Props>> = async ({
         <NextIntlClientProvider messages={messages}>
           <PaypalProvider>
             {children}
-            <Toaster position="bottom-right" />
-            <ToastContainer />
+            <Toaster position="top-right" />
             <ProgressBar />
           </PaypalProvider>
         </NextIntlClientProvider>

@@ -13,6 +13,7 @@ import InviteIcon from "@/components/icons/invite-icon";
 import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import LiveTime from "@/components/live-time";
+import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-template";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { Event } from "@/types/events.type";
@@ -28,7 +29,7 @@ import type {
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
@@ -39,10 +40,15 @@ const Excalidraw = dynamic(
 
 interface Props {
   lesson: Lesson;
+  isLessonEnding: boolean;
   onLessonExtended: () => void;
 }
 
-const Whiteboard: FunctionComponent<Props> = ({ lesson, onLessonExtended }) => {
+const Whiteboard: FunctionComponent<Props> = ({
+  lesson,
+  isLessonEnding,
+  onLessonExtended,
+}) => {
   // Hooks
   const t = useTranslations();
   const channel = useLessonChannel();
@@ -165,9 +171,27 @@ const Whiteboard: FunctionComponent<Props> = ({ lesson, onLessonExtended }) => {
   useEffect(() => setWhiteboardInitialData(parseWhiteboardData()), []);
   useEffect(() => setIsExpanded(true), []);
 
+  useEffect(() => {
+    if (isLessonEnding) {
+      toast(
+        ({ id }) => (
+          <ExtendLessonTemplate
+            duration={5000}
+            onExtendClick={() => {
+              toast.dismiss(id);
+              setIsExtendLessonModalOpen(true);
+            }}
+          />
+        ),
+        {
+          duration: 5000,
+        }
+      );
+    }
+  }, [isLessonEnding]);
   return (
     <div className="flex-[4]" ref={rootRef}>
-      <div className="border flex items-center px-3 py-2 justify-between">
+      <div className="border flex items-center px-3 py-2 justify-between gap-3">
         <div className="flex items-center gap-2 font-bold">
           <WhiteboardIcon size="xs" />
           <span className="text-center text-neutral-600 font-bold text-sm whitespace-nowrap">

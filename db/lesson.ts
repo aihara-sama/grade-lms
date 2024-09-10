@@ -134,10 +134,7 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
   const result = await db
     .from("lessons")
     .update({
-      ends: format(
-        +new Date(lesson.ends) + miliseconds,
-        "yyyy-MM-dd'T'HH:mm:ss"
-      ),
+      ends: new Date(+new Date(lesson.ends) + miliseconds).toISOString(),
     })
     .eq("id", lesson.id);
 

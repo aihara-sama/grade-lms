@@ -11,7 +11,6 @@ import Whiteboard from "@/components/whiteboard";
 import { Role } from "@/interfaces/user.interface";
 import clsx from "clsx";
 import { useEffect, useState, type FunctionComponent } from "react";
-import { toast } from "react-toastify";
 
 import Breadcrumbs from "@/components/breadcrumbs";
 import Camera from "@/components/camera";
@@ -24,6 +23,7 @@ import { execAtStartOfMin } from "@/utils/interval-at-start-of-min";
 import { isLessonEnded } from "@/utils/is-lesson-ended";
 import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
 
 interface Props {
   lesson: Lesson & { course: Course };
@@ -32,6 +32,7 @@ interface Props {
 const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   // State
   const [isAsideOpen, setIsAsideOpen] = useState(true);
+  const [isLessonEnding, setIsLessonEnding] = useState(false);
   const [currentLesson, setCurrentLesson] = useState(lesson);
   const {
     cameras,
@@ -136,7 +137,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
           }
 
           if (timeRemains <= 1000 * 60) {
-            toast.warn("The lesson is coming to an end");
+            setIsLessonEnding(true);
           }
         } catch (error: any) {
           console.error(error);
@@ -167,7 +168,11 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
         />
       )}
       <main className="flex gap-6 mt-4">
-        <Whiteboard onLessonExtended={fetchLesson} lesson={currentLesson} />
+        <Whiteboard
+          isLessonEnding={isLessonEnding}
+          onLessonExtended={fetchLesson}
+          lesson={currentLesson}
+        />
         <div
           className={`pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >

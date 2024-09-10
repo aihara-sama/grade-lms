@@ -5,7 +5,7 @@ import { extendLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lessons.type";
 import clsx from "clsx";
-import { format, minutesToMilliseconds } from "date-fns";
+import { minutesToMilliseconds } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
@@ -27,23 +27,26 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
   // Handlers
   const submitExtendLesson = async () => {
     setIsSubmitting(true);
-    try {
-      const overlappingLessons = await getOverlappingLessons(
-        lesson.starts,
-        format(
-          +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin),
-          "yyyy-MM-dd'T'HH:mm:ss"
-        ),
-        user.id,
-        lesson.id
-      );
 
-      if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
+    try {
+      // Dont check for quick lessons
+      if (lesson.course_id) {
+        const overlappingLessons = await getOverlappingLessons(
+          lesson.starts,
+          new Date(
+            +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin)
+          ).toISOString(),
+          user.id,
+          lesson.id
+        );
+
+        if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
+      }
 
       await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin));
 
       onClose(true);
-      toast(t("lesson_extended"));
+      toast.success(t("lesson_extended"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
