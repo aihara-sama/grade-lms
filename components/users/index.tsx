@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import Avatar from "@/components/avatar";
+import EditUserModal from "@/components/common/modals/edit-user-modal";
 import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
@@ -57,6 +58,7 @@ const Users: FunctionComponent = () => {
   const [isSubmittingDeleteUser, setIsSubmittingDeleteUser] = useState(false);
   const [isSubmittingDeleteUsers, setIsSubmittingDeleteUsers] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isEditUserModal, setIsEditUserModal] = useState(false);
 
   // Refs
   const usersOffsetRef = useRef(0);
@@ -210,6 +212,13 @@ const Users: FunctionComponent = () => {
       setSelectedUsersIds([]);
     }
   };
+  const onEditUserModalClose = (mutated?: boolean) => {
+    setIsEditUserModal(false);
+
+    if (mutated) {
+      fetchInitialUsers();
+    }
+  };
 
   // Effects
   useEffect(() => {
@@ -318,6 +327,12 @@ const Users: FunctionComponent = () => {
                 <ul className="flex flex-col">
                   <li
                     className="popper-list-item"
+                    onClick={() => setIsEditUserModal(true)}
+                  >
+                    <AvatarIcon size="xs" /> Edit
+                  </li>
+                  <li
+                    className="popper-list-item"
                     onClick={() => setIsEnrollUserInCoursesModalOpen(true)}
                   >
                     <UsersIcon /> Enroll
@@ -363,6 +378,9 @@ const Users: FunctionComponent = () => {
           usersIds={selectedUsersIds}
           onClose={onEnrollUsersInCoursesModalClose}
         />
+      )}
+      {isEditUserModal && (
+        <EditUserModal userId={selectedUserId} onClose={onEditUserModalClose} />
       )}
 
       {isDeleteUserModalOpen && (

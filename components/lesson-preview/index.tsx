@@ -23,7 +23,6 @@ import type {
 } from "@excalidraw/excalidraw/types/types";
 import type { ChangeEvent, FunctionComponent } from "react";
 
-import CalendarIcon from "@/components/icons/calendar-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
 import { getOverlappingLessons } from "@/db/lesson";
@@ -267,12 +266,6 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
               Enter class
             </Link>
           )}
-          <Link
-            className="button link-button flex gap-2 items-center"
-            href="/dashboard/schedule"
-          >
-            Find in schedule <CalendarIcon />
-          </Link>
         </div>
       </aside>
     </div>

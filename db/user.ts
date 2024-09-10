@@ -1,6 +1,8 @@
 import { createUserAction } from "@/actions/create-user-action";
-import type { InputType as UserInputType } from "@/actions/create-user-action/types";
+import type { InputType as CreateUserInputType } from "@/actions/create-user-action/types";
 import { deleteUserAction } from "@/actions/delete-user-action";
+import { editUserAction } from "@/actions/edit-user-action";
+import type { InputType as EditUserInputType } from "@/actions/edit-user-action/types";
 import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
 import { loadMessages } from "@/utils/load-messages";
 import { parseUsersCoursesIds } from "@/utils/parse-users-courses-ids";
@@ -8,6 +10,14 @@ import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import { db } from "@/utils/supabase/client";
 
 // Get
+export const getUserById = async (id: string) => {
+  const t = await loadMessages();
+  const result = await db.from("users").select("*").eq("id", id).single();
+
+  if (result.error || !result.data) throw new Error(t("failed_to_load_user"));
+
+  return result.data;
+};
 export const getUsersByCourseId = async (
   courseId: string,
   userName = "",
@@ -28,7 +38,6 @@ export const getUsersByCourseId = async (
 
   return result.data.users;
 };
-
 export const getUsersByCourseIdCount = async (
   courseId: string,
   userName = ""
@@ -81,115 +90,6 @@ export const getUsersByCreatorIdCount = async (
   if (result.error) throw new Error(t("failed_to_load_users_count"));
 
   return result.data[0].count;
-};
-export const getUsersCountByTitleAndUserId = async (
-  name: string,
-  creatorId: string
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("users")
-    .select("count")
-    .ilike("name", `%${name}%`)
-    .eq("creator_id", creatorId)
-    .returns<{ count: number }[]>();
-
-  if (result.error) throw new Error(t("failed_to_load_users_count"));
-
-  return result.data[0].count;
-};
-export const getUsersCountByTitleAndCourseId = async (
-  name: string,
-  courseId: string
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("courses")
-    .select("users(count)")
-    .ilike("users.name", `%${name}%`)
-    .eq("id", courseId)
-    .returns<Record<"users", { count: number }[]>[]>()
-    .single();
-
-  if (result.error) throw new Error(t("failed_to_load_users_count"));
-
-  return result.data.users[0].count;
-};
-
-export const getUsersByNameAndCreatorId = async (
-  name: string,
-  userId: string
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("users")
-    .select("*")
-    .ilike("name", `%${name}%`)
-    .eq("creator_id", userId)
-    .limit(USERS_GET_LIMIT)
-    .order("created_at", { ascending: true });
-
-  if (result.error) throw new Error(t("failed_to_load_users"));
-
-  return result.data;
-};
-export const getUsersByNameAndCourseId = async (
-  name: string,
-  courseId: string
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("courses")
-    .select("users(*)")
-    .ilike("users.name", `%${name}%`)
-    .eq("id", courseId)
-    .limit(USERS_GET_LIMIT, { foreignTable: "users" })
-    .order("name", { ascending: true, referencedTable: "users" })
-    .single();
-
-  if (result.error) throw new Error(t("failed_to_load_users"));
-
-  return result.data.users;
-};
-
-export const getOffsetUsersByNameAndCreatorId = async (
-  name: string,
-  creatorId: string,
-  from: number,
-  to: number
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("users")
-    .select("*")
-    .eq("creator_id", creatorId)
-    .ilike("name", `%${name}%`)
-    .range(from, to)
-    .order("created_at", { ascending: true });
-
-  if (result.error) throw new Error(t("failed_to_load_users"));
-
-  return result.data;
-};
-export const getOffsetUsersByNameAndCourseId = async (
-  name: string,
-  courseId: string,
-  from: number,
-  to: number
-) => {
-  const t = await loadMessages();
-  const result = await db
-    .from("courses")
-    .select("users(*)")
-    .eq("id", courseId)
-    .ilike("users.name", `%${name}%`)
-    .range(from, to, { foreignTable: "users" })
-    .order("created_at", { ascending: true, referencedTable: "users" })
-    .single();
-
-  if (result.error) throw new Error(t("failed_to_load_users"));
-
-  return result.data.users;
 };
 
 export const getUsersNotInCourse = async (
@@ -273,7 +173,6 @@ export const deleteAllUsers = async (userId: string, name: string) => {
 
   if (result.error) throw new Error(t("failed_to_delete_users"));
 };
-
 export const enrollUsersInCourses = async (
   usersIds: string[],
   coursesIds: string[]
@@ -300,9 +199,15 @@ export const enrollAllUsers = async (courseId: string) => {
 
   if (result.error) throw new Error(t("failed_to_enroll_users"));
 };
-export const createUser = async (userDetails: UserInputType) => {
+export const createUser = async (userDetails: CreateUserInputType) => {
   const t = await loadMessages();
   const result = await createUserAction(userDetails);
+
+  if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
+};
+export const editUser = async (userDetails: EditUserInputType) => {
+  const t = await loadMessages();
+  const result = await editUserAction(userDetails);
 
   if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
 };

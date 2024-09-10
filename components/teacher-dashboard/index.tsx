@@ -14,12 +14,6 @@ import { getToken } from "firebase/messaging";
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-// const handleRequest = async (builder: ?, success: string, error: string) => {
-//   const result = await builder;
-
-//   if (result.error) toast.error(error);
-//   else toast.success(success);
-// };
 
 interface Props {
   totalCoursesCount: number;
