@@ -46,7 +46,9 @@ const Select: FunctionComponent<Props> = ({
   const popperRef = useRef<HTMLDivElement>();
 
   const filterByTitle = (items: SelectItem[], title: string) =>
-    items.filter((course) => course.title.includes(title));
+    items.filter((course) =>
+      course.title.toLowerCase().includes(title.toLocaleLowerCase())
+    );
 
   const onSearchTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);

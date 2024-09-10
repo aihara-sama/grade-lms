@@ -12,10 +12,11 @@ import toast from "react-hot-toast";
 
 import Select from "@/components/common/select";
 import Switch from "@/components/switch";
+import useUpdateEffect from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
-import type { IUserMetadata } from "@/interfaces/user.interface";
+import { type IUserMetadata } from "@/interfaces/user.interface";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -27,11 +28,11 @@ const Profile: FunctionComponent = () => {
   const [isSubmittingRenameUser, setIsSubmittingRenameUser] = useState(false);
 
   const { user } = useUser();
-  console.log({ user });
 
   const [avatar, setAvatar] = useState(user.avatar);
   const [userName, setUserName] = useState(user.name);
   const [isEmailsOn, setIsEmailsOn] = useState(user.is_emails_on);
+
   const [isPushNotificationsOn, setIsPushNotificationsOn] = useState(
     user.is_push_notifications_on
   );
@@ -91,7 +92,7 @@ const Profile: FunctionComponent = () => {
     })();
   }, [avatar]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     Promise.all([
       db
         .from("users")
@@ -106,7 +107,7 @@ const Profile: FunctionComponent = () => {
       }),
     ]);
   }, [isEmailsOn]);
-  useEffect(() => {
+  useUpdateEffect(() => {
     Promise.all([
       db
         .from("users")
@@ -121,6 +122,31 @@ const Profile: FunctionComponent = () => {
       }),
     ]);
   }, [isPushNotificationsOn]);
+
+  const submitChangePreferredLocale = async (_locale: Locale) => {
+    try {
+      const [{ error: userError }, { error: profileError }] = await Promise.all(
+        [
+          db
+            .from("users")
+            .update({
+              preferred_locale: _locale,
+            })
+            .eq("id", user.id),
+          db.auth.updateUser({
+            data: {
+              preferred_locale: _locale,
+            },
+          }),
+        ]
+      );
+      router.push(redirectedPathName(_locale as Locale));
+      if (userError || profileError)
+        throw new Error(t("failed_to_change_language"));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div>
@@ -199,7 +225,7 @@ const Profile: FunctionComponent = () => {
               }))}
               label="Language"
               onChange={({ id }) => {
-                router.push(redirectedPathName(id.toLowerCase() as Locale));
+                submitChangePreferredLocale(id.toLocaleLowerCase() as Locale);
               }}
               defaultValue={{
                 title: toCapitalCase(

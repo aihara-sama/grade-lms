@@ -44,7 +44,6 @@ const Users: FunctionComponent = () => {
   const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
   const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>();
-  console.log({ selectedUserId });
 
   const [isLoading, setIsLoading] = useState(true);
   const [totalUsersCount, setTotalUsersCount] = useState(0);

@@ -13,6 +13,7 @@
   "failed_to_create_notification": "Не удалось создать оповещание",
   "failed_to_load_courses": "Не удалось загрузить курсы",
   "failed_to_load_lessons": "Не удалось загрузить уроки",
+  "failed_to_change_language": "Не удалось изменить язык",
   "failed_to_load_lesson": "Не удалось загрузить урок",
   "failed_to_delete_lessons": "Не удалось удалить урокм",
   "failed_to_load_submissions": "Не удалось загрузить здачи задания",

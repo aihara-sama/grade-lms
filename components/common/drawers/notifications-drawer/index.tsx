@@ -12,6 +12,7 @@ import type { ResultOf } from "@/types";
 import { Event } from "@/types/events.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { REALTIME_CHANNEL_STATES } from "@supabase/supabase-js";
 import type { FunctionComponent, UIEventHandler } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -69,9 +70,15 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
 
   // Effects
   useEffect(() => {
-    notificationChannel
-      .on("broadcast", { event: Event.NotificationCreated }, onNewNotification)
-      .subscribe();
+    if (notificationChannel.state === REALTIME_CHANNEL_STATES.joined) {
+      notificationChannel
+        .on(
+          "broadcast",
+          { event: Event.NotificationCreated },
+          onNewNotification
+        )
+        .subscribe();
+    }
   }, []);
 
   useEffect(() => {

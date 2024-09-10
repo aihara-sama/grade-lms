@@ -35,8 +35,6 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   usersIds,
   onClose,
 }) => {
-  console.log({ usersIds });
-
   // State
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
   const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
@@ -154,15 +152,14 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   };
 
   const submitEnrollUsers = async () => {
-    console.log({ usersIds, selectedCoursesIds });
-
     setIsSubmitting(true);
+
     try {
       await enrollUsersInCourses(usersIds, selectedCoursesIds);
       onClose(true);
-      toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
-      db.functions.invoke("check-events");
       setSelectedCoursesIds([]);
+      db.functions.invoke("check-events");
+      toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
