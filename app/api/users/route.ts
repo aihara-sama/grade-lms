@@ -11,7 +11,8 @@ export async function GET(req: NextRequest) {
 
   const amount = +req.nextUrl.searchParams.get("amount");
   const result = [];
-  let i = 0;
+
+  let i = +req.nextUrl.searchParams.get("from") || 0;
 
   for await (const password of new Array(amount).fill("1111111")) {
     const newUser = {
