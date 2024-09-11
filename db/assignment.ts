@@ -83,11 +83,10 @@ export const deleteLessonsAssignments = async (
   title: string
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("assignments")
-    .delete()
-    .eq("lesson_id", lessonId)
-    .ilike("title", `%${title}%`);
+  const result = await db.rpc("delete_lesson_assignments", {
+    p_lesson_id: lessonId,
+    p_title: title,
+  });
 
   if (result.error) throw new Error(t("failed_to_delete_assignments"));
 };
@@ -103,7 +102,9 @@ export const deleteAssignmentById = async (assignmentId: string) => {
 
 export const deleteAssignmentsByIds = async (ids: string[]) => {
   const t = await loadMessages();
-  const result = await db.from("assignments").delete().in("id", ids);
+  const result = await db.rpc("delete_assignments_by_ids", {
+    p_assignments_ids: ids,
+  });
 
   if (result.error) throw new Error(t("failed_to_delete_assignments"));
 

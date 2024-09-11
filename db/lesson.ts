@@ -91,9 +91,11 @@ export const deleteLessonById = async (id: string) => {
 
   return result;
 };
-export const deleteLessonsBIds = async (ids: string[]) => {
+export const deleteLessonsByds = async (ids: string[]) => {
   const t = await loadMessages();
-  const result = await db.from("lessons").delete().in("id", ids);
+  const result = await db.rpc("delete_lessons_by_ids", {
+    p_lessons_ids: ids,
+  });
 
   if (result.error) throw new Error(t("failed_to_delete_lessons"));
 

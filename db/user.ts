@@ -191,6 +191,14 @@ export const enrollUsersInCourses = async (
       )
     );
 };
+export const enrollAllUsersInCourses = async (coursesIds: string[]) => {
+  const t = await loadMessages();
+  const result = await db.rpc("enroll_all_users_in_courses", {
+    p_courses_ids: coursesIds,
+  });
+
+  if (result.error) throw new Error(t("failed_to_enroll_users"));
+};
 export const enrollAllUsers = async (courseId: string) => {
   const t = await loadMessages();
   const result = await db.rpc("enroll_all_users", {
@@ -214,11 +222,10 @@ export const editUser = async (userDetails: EditUserInputType) => {
 
 export const dispelUsers = async (courseId: string, usersIds: string[]) => {
   const t = await loadMessages();
-  const result = await db
-    .from("user_courses")
-    .delete()
-    .in("user_id", usersIds)
-    .eq("course_id", courseId);
+  const result = await db.rpc("dispel_users_from_course", {
+    p_course_id: courseId,
+    p_users_ids: usersIds,
+  });
 
   if (result.error) throw new Error(t("failed_to_dispel_users"));
 };

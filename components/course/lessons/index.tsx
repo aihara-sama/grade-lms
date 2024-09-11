@@ -24,7 +24,7 @@ import { LESSONS_GET_LIMIT } from "@/constants";
 import {
   deleteAllLessons,
   deleteLessonById,
-  deleteLessonsBIds as deleteLessonsByIds,
+  deleteLessonsByds as deleteLessonsByIds,
   getLessonsByCourseId,
   getLessonsCountByCourseId,
 } from "@/db/lesson";

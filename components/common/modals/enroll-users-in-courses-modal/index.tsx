@@ -15,7 +15,7 @@ import {
   getUnenrolledCourses,
   getUnenrolledCoursesCount,
 } from "@/db/course";
-import { enrollUsersInCourses } from "@/db/user";
+import { enrollAllUsersInCourses, enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { db } from "@/utils/supabase/client";
@@ -155,7 +155,9 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     setIsSubmitting(true);
 
     try {
-      await enrollUsersInCourses(usersIds, selectedCoursesIds);
+      await (isSelectedAll
+        ? enrollAllUsersInCourses(selectedCoursesIds)
+        : enrollUsersInCourses(usersIds, selectedCoursesIds));
       onClose(true);
       setSelectedCoursesIds([]);
       db.functions.invoke("check-events");

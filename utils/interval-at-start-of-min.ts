@@ -1,6 +1,6 @@
 import { addMinutes, differenceInMilliseconds, startOfMinute } from "date-fns";
 
-type ExecuteEveryMinute = (fn: (stop: () => void) => void) => void;
+type ExecuteEveryMinute = (fn: (stop: () => void) => void) => () => void;
 
 export const execAtStartOfMin: ExecuteEveryMinute = (fn) => {
   let shouldExec = true;
@@ -26,4 +26,6 @@ export const execAtStartOfMin: ExecuteEveryMinute = (fn) => {
       setInterval(fn, 60 * 1000);
     }, timeUntilNextMinute);
   }
+
+  return stop;
 };

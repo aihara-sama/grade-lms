@@ -316,3 +316,70 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION public.enroll_all_users_in_courses(
+    p_courses_ids uuid[]
+)
+RETURNS void AS $$
+BEGIN
+  -- Insert all users with the same creator_id as auth.uid() into user_courses table for each provided course_id
+  INSERT INTO public.user_courses (user_id, course_id, created_at)
+  SELECT u.id, course_id, NOW()
+  FROM public.users u
+  CROSS JOIN UNNEST(p_courses_ids) AS course_id
+  WHERE u.creator_id = auth.uid()::text
+  ON CONFLICT DO NOTHING;  -- In case the user is already enrolled in the course, avoid errors
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION public.delete_lessons_by_ids(p_lessons_ids uuid[])
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.lessons
+  WHERE id = ANY(p_lessons_ids);
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION public.dispel_users_from_course(
+    p_course_id uuid,
+    p_users_ids uuid[]
+) 
+RETURNS void AS $$
+BEGIN
+    DELETE FROM public.user_courses
+    WHERE user_id = ANY(p_users_ids)
+    AND course_id = p_course_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION public.delete_lesson_assignments(
+  p_lesson_id uuid,
+  p_title text
+)
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.assignments
+  WHERE lesson_id = p_lesson_id
+  AND title ILIKE '%' || p_title || '%';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION public.delete_assignments_by_ids(p_assignments_ids uuid[])
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.assignments
+  WHERE id = ANY(p_assignments_ids);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION public.delete_submissions_by_ids(p_submissions_ids uuid[])
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.submissions
+  WHERE id = ANY(p_submissions_ids);
+END;
+$$ LANGUAGE plpgsql;

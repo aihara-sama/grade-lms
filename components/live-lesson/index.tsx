@@ -115,8 +115,8 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     if (isLessonEnded(new Date(lesson.ends))) endSession();
   }, [lesson]);
   useEffect(() => {
-    if (!isLessonEnded(new Date(lesson.ends)))
-      execAtStartOfMin(async (stop) => {
+    if (!isLessonEnded(new Date(lesson.ends))) {
+      const stop = execAtStartOfMin(async () => {
         try {
           const { data, error } = await db
             .from("lessons")
@@ -143,6 +143,13 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
           console.error(error);
         }
       });
+
+      return () => {
+        stop();
+      };
+    }
+
+    return () => {};
   }, []);
 
   return (

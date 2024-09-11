@@ -427,6 +427,12 @@ export type Database = {
         };
         Returns: undefined;
       };
+      delete_assignments_by_ids: {
+        Args: {
+          p_assignments_ids: string[];
+        };
+        Returns: undefined;
+      };
       delete_auth_users_by_ids: {
         Args: {
           user_ids: string[];
@@ -439,6 +445,25 @@ export type Database = {
         };
         Returns: undefined;
       };
+      delete_lesson_assignments: {
+        Args: {
+          p_lesson_id: string;
+          p_title: string;
+        };
+        Returns: undefined;
+      };
+      delete_lessons_by_ids: {
+        Args: {
+          p_lessons_ids: string[];
+        };
+        Returns: undefined;
+      };
+      delete_submissions_by_ids: {
+        Args: {
+          p_submissions_ids: string[];
+        };
+        Returns: undefined;
+      };
       dispel_all_users_from_course: {
         Args: {
           p_course_id: string;
@@ -446,9 +471,22 @@ export type Database = {
         };
         Returns: undefined;
       };
+      dispel_users_from_course: {
+        Args: {
+          p_course_id: string;
+          p_users_ids: string[];
+        };
+        Returns: undefined;
+      };
       enroll_all_users: {
         Args: {
           p_course_id: string;
+        };
+        Returns: undefined;
+      };
+      enroll_all_users_in_courses: {
+        Args: {
+          p_courses_ids: string[];
         };
         Returns: undefined;
       };

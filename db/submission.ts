@@ -139,7 +139,9 @@ export const deleteSubmissionById = async (id: string) => {
 };
 export const deleteSubmissionsByIds = async (ids: string[]) => {
   const t = await loadMessages();
-  const result = await db.from("submissions").delete().in("id", ids);
+  const result = await db.rpc("delete_submissions_by_ids", {
+    p_submissions_ids: ids,
+  });
 
   if (result.error) throw new Error(t("failed_to_delete_submissions"));
 
