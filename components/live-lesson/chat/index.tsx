@@ -65,6 +65,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
       });
 
       setChatMessageText("");
+      setChatMessages((prev) => [...prev, createdChatMessage]);
       fireChatMessageCreate(createdChatMessage);
     } catch (error: any) {
       toast.error(error.message);

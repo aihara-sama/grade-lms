@@ -206,7 +206,7 @@ const Courses: FunctionComponent = () => {
     return () => {
       document
         .getElementById("content-wrapper")
-        .removeEventListener("scroll", throttled);
+        ?.removeEventListener("scroll", throttled);
     };
   }, [isSelectedAll, searchText]);
 

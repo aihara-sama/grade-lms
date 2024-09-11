@@ -156,8 +156,10 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   const onUserToggle = (checked: boolean, userId: string) => {
     if (checked) {
       setUsersIds((prev) => [...prev, userId]);
+      setIsSelectedAll(usersCount === usersIds.length + 1);
     } else {
       setUsersIds((prev) => prev.filter((_id) => _id !== userId));
+      setIsSelectedAll(usersCount === usersIds.length - 1);
     }
   };
   const onScrollEnd = useCallback(throttleFetch(fetchMoreUsers), [
