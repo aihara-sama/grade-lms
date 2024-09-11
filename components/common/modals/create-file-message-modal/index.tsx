@@ -18,6 +18,7 @@ import prettyBytes from "pretty-bytes";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import videoExtensions from "video-extensions";
 
 interface Props {
   onClose: (mutated?: boolean) => void;
@@ -65,6 +66,11 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   const submitUploadChatFile = async () => {
     try {
       const ext = await getFileExt(file);
+
+      if (videoExtensions.includes(ext))
+        throw new Error(t("video_format_is_not_allowed"));
+
+      if (file.size >= 1000 * 10000) throw new Error(t("file_size_too_big"));
 
       const { path } = await uploadChatFile(file, ext);
 

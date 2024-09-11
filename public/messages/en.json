@@ -18,6 +18,8 @@
   "failed_to_update_lesson": "Failed to update lesson",
   "failed_to_load_courses": "Failed to load course",
   "failed_to_save_whiteboar_data": "Failed to save whiteboard data",
+  "video_format_is_not_allowed": "Video format is not allowed",
+  "file_size_too_big": "File size too big",
   "failed_to_save_lesson": "Failed to save lesson",
   "failed_to_load_lessons": "Failed to load lessons",
   "failed_to_load_lesson": "Failed to load lesson",

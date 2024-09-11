@@ -21,6 +21,8 @@
   "failed_to_delete_lesson": "Не удалось удалить урок",
   "failed_to_update_lesson": "Не удалось изменить урок",
   "failed_to_send_message": "Не удалось отправить сообщение",
+  "video_format_is_not_allowed": "Видео формат не поддерживаеться",
+  "file_size_too_big": "Слишком большой размер файла",
   "failed_to_extend_lesson": "Не удалось продлить урок",
   "failed_to_save_lesson": "Не удалось сохранить урок",
   "failed_to_upload_file": "Не удалось загрузить файл",
