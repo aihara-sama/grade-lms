@@ -4,7 +4,6 @@ import type { ReturnType } from "@/actions/delete-user-action/types";
 import { Role } from "@/interfaces/user.interface";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
-import pLimit from "p-limit";
 
 const handler = async (usersIds: string[]): Promise<ReturnType> => {
   try {
@@ -24,9 +23,7 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
     }
 
     const result = await Promise.all(
-      usersIds.map((userId) =>
-        pLimit(5)(() => supabaseAdmin.auth.admin.deleteUser(userId))
-      )
+      usersIds.map((userId) => supabaseAdmin.auth.admin.deleteUser(userId))
     );
     console.log(result.map(({ error }) => error?.message || "").join("|"));
 
