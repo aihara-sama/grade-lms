@@ -196,6 +196,14 @@ const Courses: FunctionComponent = () => {
     }
   };
 
+  const onEnrollUsersInCourseModalClose = (mutated?: boolean) => {
+    setIsEnrollUsersModalOpen(false);
+
+    if (mutated) {
+      fetchCoursesBySearch(true);
+    }
+  };
+
   // Effects
   useEffect(() => {
     const throttled = throttleFetch(onCoursesScroll);
@@ -367,7 +375,7 @@ const Courses: FunctionComponent = () => {
       {isEnrollUsersModalOpen && (
         <EnrollUsersInCourseModal
           courseId={selectedCourseId}
-          onClose={() => setIsEnrollUsersModalOpen(false)}
+          onClose={onEnrollUsersInCourseModalClose}
         />
       )}
     </div>

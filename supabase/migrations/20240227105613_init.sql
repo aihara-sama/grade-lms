@@ -303,3 +303,16 @@ begin
     and course_id = p_course_id;
 end;
 $$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION public.delete_courses_by_ids(p_courses_ids uuid[])
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.courses
+  WHERE id = ANY(p_courses_ids)
+  AND id IN (
+    SELECT uc.course_id
+    FROM public.user_courses uc
+    WHERE uc.user_id = auth.uid()
+  );
+END;
+$$ LANGUAGE plpgsql;

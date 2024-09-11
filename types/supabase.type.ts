@@ -433,6 +433,12 @@ export type Database = {
         };
         Returns: undefined;
       };
+      delete_courses_by_ids: {
+        Args: {
+          p_courses_ids: string[];
+        };
+        Returns: undefined;
+      };
       dispel_all_users_from_course: {
         Args: {
           p_course_id: string;

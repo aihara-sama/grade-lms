@@ -24,6 +24,8 @@ export async function GET(req: NextRequest) {
         avatar: "default-avatar.jpg",
         preferred_locale: "en",
         timezone: "Europe/Chisinau",
+        is_emails_on: true,
+        is_push_notifications_on: true,
       } as IUserMetadata,
       email_confirm: true,
     };
