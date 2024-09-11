@@ -2,6 +2,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import MessagesIcon from "@/components/icons/messages-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
+import { MAX_CHAT_FILE_SIZE } from "@/constants";
 import { uploadChatFile } from "@/db/message";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
@@ -70,7 +71,8 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
       if (videoExtensions.includes(ext))
         throw new Error(t("video_format_is_not_allowed"));
 
-      if (file.size >= 1000 * 10000) throw new Error(t("file_size_too_big"));
+      if (file.size >= MAX_CHAT_FILE_SIZE)
+        throw new Error(t("file_size_too_big"));
 
       const { path } = await uploadChatFile(file, ext);
 

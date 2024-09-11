@@ -1,6 +1,7 @@
 "use client";
 
 import CameraIcon from "@/components/icons/camera-icon";
+import { MAX_AVATAR_SIZE } from "@/constants";
 import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import { type ChangeEvent, type FunctionComponent } from "react";
@@ -17,11 +18,18 @@ const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
 
   const handleChangeAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
-      const avatarFile = e.target.files[0];
+      const file = e.target.files[0];
+
+      const allowedExtensions = ["image/jpeg", "image/png", "image/gif"];
+
+      if (!allowedExtensions.includes(file.type))
+        throw new Error(t("selected_file_ext_is_not_allowed"));
+
+      if (file.size >= MAX_AVATAR_SIZE) throw new Error(t("file_size_too_big"));
 
       const { data, error } = await db.storage
         .from("avatars")
-        .upload(uuid(), avatarFile);
+        .upload(uuid(), file);
 
       if (error) throw new Error(t("something_went_wrong"));
       onChange(data.path);
@@ -40,7 +48,12 @@ const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
       <label>
         <div className="flex cursor-pointer absolute bottom-[2px] right-[12px] p-[10px] rounded-[50%] border border-3 border-white bg-gray-100 shadow-md hover:bg-gray-200 active:bg-gray-500">
           <CameraIcon size="sm" />
-          <input onChange={handleChangeAvatar} type="file" className="hidden" />
+          <input
+            accept=".jpg,.jpeg,.png,.gif"
+            onChange={handleChangeAvatar}
+            type="file"
+            className="hidden"
+          />
         </div>
       </label>
     </div>

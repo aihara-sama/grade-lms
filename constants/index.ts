@@ -12,3 +12,5 @@ export const SECOND = MILLISECOND * 1000;
 export const MINUTE = SECOND * 60;
 export const HOUR = MINUTE * 60;
 export const THROTTLE_WAIT = 300;
+export const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
+export const MAX_CHAT_FILE_SIZE = 10 * 1024 * 1024; // 2MB
