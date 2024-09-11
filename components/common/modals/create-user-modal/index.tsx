@@ -75,7 +75,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
     setTimezones(tz.map(({ tzCode }) => ({ id: tzCode, title: tzCode })));
   }, []);
   return (
-    <BaseModal isExpanded={false} onClose={onClose} title="Create user">
+    <BaseModal isExpanded={false} onClose={() => onClose()} title="Create user">
       <form noValidate>
         <Tabs
           tabs={[

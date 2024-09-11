@@ -143,7 +143,11 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   }, [selectedCourse]);
 
   return (
-    <BaseModal isExpanded={false} onClose={onClose} title="Create lesson">
+    <BaseModal
+      isExpanded={false}
+      onClose={() => onClose()}
+      title="Create lesson"
+    >
       <form onSubmit={submitCreateLesson}>
         {!courseId && (
           <Select

@@ -65,7 +65,11 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
   };
   // View
   return (
-    <BaseModal isExpanded={false} title="Extend lesson" onClose={onClose}>
+    <BaseModal
+      isExpanded={false}
+      title="Extend lesson"
+      onClose={() => onClose()}
+    >
       <div>
         <div>
           <Input

@@ -173,7 +173,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     return (
       <BaseModal
         isExpanded={false}
-        onClose={onClose}
+        onClose={() => onClose()}
         title="View lesson"
         headerButtons={
           <>

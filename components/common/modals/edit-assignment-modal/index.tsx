@@ -22,7 +22,7 @@ const EditAssignmentModal: FunctionComponent<Props> = ({
   onSubmissionCreated,
 }) => {
   return (
-    <BaseModal width="lg" onClose={onClose} title="Assignment">
+    <BaseModal width="lg" onClose={() => onClose()} title="Assignment">
       <div className="">
         <Tabs
           tabs={[

@@ -25,7 +25,7 @@ const PromptModal: FunctionComponent<Props> = ({
     <BaseModal
       isInsideModal={isInsideModal}
       isExpanded={false}
-      onClose={onClose}
+      onClose={() => onClose()}
       title={`${title}`}
     >
       <p className="mb-4">{body}</p>

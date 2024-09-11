@@ -90,7 +90,12 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
     }));
 
   return (
-    <BaseModal isInsideModal width="lg" onClose={onClose} title="Submission">
+    <BaseModal
+      isInsideModal
+      width="lg"
+      onClose={() => onClose()}
+      title="Submission"
+    >
       <div>
         <Input
           autoFocus

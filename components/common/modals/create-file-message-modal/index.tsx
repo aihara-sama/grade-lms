@@ -126,7 +126,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   }, [file]);
 
   return (
-    <BaseModal onClose={onClose} title="Send File" isExpanded={false}>
+    <BaseModal onClose={() => onClose()} title="Send File" isExpanded={false}>
       {filePath ? (
         <>
           <div className="flex gap-2 mb-2">

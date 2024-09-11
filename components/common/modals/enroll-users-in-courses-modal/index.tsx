@@ -192,7 +192,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   }, [searchText]);
   // View
   return (
-    <BaseModal onClose={onClose} title="Enrollment">
+    <BaseModal onClose={() => onClose()} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select courses to enroll</p>
       {selectedCoursesIds.length ? (
         <div className="mb-3 flex gap-3">
