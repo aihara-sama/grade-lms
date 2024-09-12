@@ -121,7 +121,7 @@
   }
   .truncate-fade {
     position: relative;
-    display: inline-block;
+    /* display: inline-block; */
     overflow: hidden;
     white-space: nowrap;
     mask-image: linear-gradient(

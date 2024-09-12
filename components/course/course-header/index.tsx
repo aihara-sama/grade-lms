@@ -1,3 +1,5 @@
+"use client";
+
 import Breadcrumbs from "@/components/breadcrumbs";
 import CoursesIcon from "@/components/icons/courses-icon";
 import OverviewIcon from "@/components/icons/dashboard-icon";
@@ -14,7 +16,7 @@ interface Props {
   course: Course;
 }
 
-const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = async ({
+const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = ({
   course,
 }) => {
   const tabs: TabItem[] = [
@@ -55,11 +57,16 @@ const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = async ({
           },
           {
             title: course.title,
-            href: `/dashboard/courses/${course.id}`,
+            href: `/dashboard/courses/${course.id}/overview`,
           },
         ]}
       />
-      <p className="text-3xl font-bold text-neutral-600 my-3">{course.title}</p>
+      <p
+        className="text-3xl font-bold text-neutral-600 my-3 truncate-fade max-w-96"
+        title={course.title}
+      >
+        {course.title}
+      </p>
       <NavTabs tabs={tabs} />
     </>
   );

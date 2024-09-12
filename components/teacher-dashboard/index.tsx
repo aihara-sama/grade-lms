@@ -44,7 +44,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
       .select("courses(*, users(count), lessons(count))")
       .eq("id", user.id)
       .limit(10)
-      .order("created_at", { ascending: true, referencedTable: "courses" })
+      .order("created_at", { ascending: false, referencedTable: "courses" })
       .returns<Record<"courses", CourseWithRefsCount[]>[]>()
       .single();
 
@@ -145,7 +145,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
         />
         <TeacherInsights courses={latestCourses} />
       </div>
-      <div className="sm:w-[300px]">
+      <div className="sm:w-[284px]">
         <DashboardSchedule />
       </div>
     </div>

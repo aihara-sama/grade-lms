@@ -1,3 +1,5 @@
+"use client";
+
 import Breadcrumbs from "@/components/breadcrumbs";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
@@ -18,7 +20,7 @@ interface Props {
   lesson: Lesson;
 }
 
-const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = async ({
+const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = ({
   course,
   lesson,
 }) => {
@@ -69,11 +71,14 @@ const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = async ({
         ]}
       />
       <div className="flex items-center justify-between">
-        <p className="text-3xl font-bold text-neutral-600 my-3">
+        <p
+          className="text-3xl font-bold text-neutral-600 my-3 truncate-fade max-w-96 mr-8"
+          title={lesson.title}
+        >
           {lesson.title}
         </p>
         <div className="flex items-center gap-3">
-          <div className="text-4 flex items-center gap-1 relative text-sm">
+          <div className="text-4 flex items-center gap-1 relative text-sm whitespace-nowrap">
             <div
               className={`absolute block w-2 h-2 rounded-[50%] -left-4 top-[12px] ${
                 isThisLessonOngoing ? "bg-green-500" : "bg-yellow-200"

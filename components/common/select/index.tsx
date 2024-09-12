@@ -93,7 +93,9 @@ const Select: FunctionComponent<Props> = ({
           <div className="absolute -top-3.5 left-1 px-1 text-neutral-500 font-bold">
             {label}
           </div>
-          <div>{defaultValue?.title || (useUnselect ? "All" : "Choose")}</div>
+          <div className="truncate">
+            {defaultValue?.title || (useUnselect ? "All" : "Choose")}
+          </div>
           <ArrowIcon direction={isOpen ? "top" : "bottom"} />
         </div>
       }
@@ -129,7 +131,7 @@ const Select: FunctionComponent<Props> = ({
           )}
           {filteredOptions.map((option, idx) => (
             <li
-              className="px-[14px] py-[10px] rounded-[3px] cursor-pointer font-bold hover:bg-gray-100"
+              className="px-[14px] py-[10px] rounded-[3px] cursor-pointer font-bold hover:bg-gray-100 truncate"
               onClick={() => {
                 onChange(option);
                 setIsOpen(false);

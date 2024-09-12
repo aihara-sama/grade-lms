@@ -68,16 +68,20 @@ const SignUp: FunctionComponent = () => {
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
       <p className="page-title mb-6 text-center">Create account</p>
-      <form noValidate onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <Input
+          autoFocus
+          required
           name="name"
           type="text"
           placeholder="Name"
           Icon={<AvatarIcon size="xs" />}
           fullWIdth
           maxLength={76}
+          minLength={1}
         />
         <Input
+          required
           name="email"
           type="email"
           placeholder="Email"
@@ -85,13 +89,16 @@ const SignUp: FunctionComponent = () => {
           fullWIdth
         />
         <Input
+          required
           name="password"
           type="password"
           placeholder="Password"
           Icon={<SecurityIcon />}
           fullWIdth
+          minLength={6}
         />
         <button
+          type="submit"
           disabled={isSubmitting || isSuccess}
           className="primary-button w-full"
         >

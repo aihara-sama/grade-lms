@@ -19,7 +19,7 @@ const CourseCard: FunctionComponent<Props> = ({ course }) => {
       <div className="flex gap-2 w-full">
         <CourseIcon size="sm" />
         <div
-          className="text-sm flex-1 truncate-fade max-w-[105px] w-full font-semibold"
+          className="text-sm flex-1 truncate-fade max-w-40 w-full font-semibold"
           title={course.title}
         >
           {course.title}

@@ -2,7 +2,7 @@
 
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
-import type { Database } from "@/types/supabase.type";
+import type { Course } from "@/types/courses.type";
 import { db } from "@/utils/supabase/client";
 import clsx from "clsx";
 // import { revalidatePath } from "next/cache";
@@ -11,7 +11,7 @@ import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  course: Database["public"]["Tables"]["courses"]["Row"];
+  course: Course;
   updateCourseTitle: (title: string) => void;
 }
 

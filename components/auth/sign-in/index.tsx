@@ -55,6 +55,7 @@ const SignIn: FunctionComponent = () => {
       <p className="page-title mb-6 text-center">Login</p>
       <form onSubmit={handleSubmit}>
         <Input
+          required
           name="email"
           type="email"
           placeholder="Email"
@@ -62,6 +63,7 @@ const SignIn: FunctionComponent = () => {
           fullWIdth
         />
         <Input
+          required
           name="password"
           type="password"
           placeholder="Password"
