@@ -14,7 +14,7 @@ import Table from "@/components/table";
 import Total from "@/components/total";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
@@ -23,7 +23,7 @@ import NoDataIcon from "@/components/icons/no-data-icon";
 import NotFoundIcon from "@/components/icons/not-found-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import Skeleton from "@/components/skeleton";
-import { COURSES_GET_LIMIT } from "@/constants";
+import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllCourses,
   deleteCourseById,
@@ -35,6 +35,7 @@ import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
@@ -101,13 +102,13 @@ const Courses: FunctionComponent = () => {
       setIsLoading(false);
     }
   };
-  const fetchCoursesBySearch = async (refetch?: boolean) => {
+  const fetchCoursesBySearch = async (search: string, refetch?: boolean) => {
     setIsSearching(true);
 
     try {
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCourses(user.id, searchText),
-        getCoursesCount(user.id, searchText),
+        getCourses(user.id, search),
+        getCoursesCount(user.id, search),
       ]);
 
       setCourses(fetchedCourses);
@@ -153,7 +154,7 @@ const Courses: FunctionComponent = () => {
 
       setIsDeleteCourseModalOpen(false);
       setSelectedCoursesIds((_) => _.filter((id) => id !== selectedCourseId));
-      fetchCoursesBySearch(true);
+      fetchCoursesBySearch(searchText, true);
 
       toast.success("Success");
     } catch (error: any) {
@@ -172,7 +173,7 @@ const Courses: FunctionComponent = () => {
 
       setSelectedCoursesIds([]);
       setIsDeleteCoursesModalOpen(false);
-      fetchCoursesBySearch(true);
+      fetchCoursesBySearch(searchText, true);
       toast.success("success");
     } catch (error: any) {
       toast.error(error.message);
@@ -180,6 +181,17 @@ const Courses: FunctionComponent = () => {
       setIsSubmittingDeleteCourses(false);
     }
   };
+
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchCoursesBySearch(search);
+      } else {
+        fetchInitialCourses();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   const onCourseToggle = (checked: boolean, courseId: string) => {
     if (checked) {
@@ -200,7 +212,7 @@ const Courses: FunctionComponent = () => {
     setIsEnrollUsersModalOpen(false);
 
     if (mutated) {
-      fetchCoursesBySearch(true);
+      fetchCoursesBySearch(searchText, true);
     }
   };
 
@@ -218,13 +230,8 @@ const Courses: FunctionComponent = () => {
     };
   }, [isSelectedAll, searchText]);
 
-  useEffect(() => {
-    if (searchText) {
-      fetchCoursesBySearch();
-    } else {
-      fetchInitialCourses();
-    }
-  }, [searchText]);
+  useEffect(() => throttledSearch(searchText), [searchText]);
+
   useEffect(() => {
     setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length);
   }, [totalCoursesCount]);
@@ -249,7 +256,9 @@ const Courses: FunctionComponent = () => {
           title="Total courses"
         />
         {user.role === Role.Teacher && (
-          <CreateCourse onCreated={() => fetchCoursesBySearch(true)} />
+          <CreateCourse
+            onCreated={() => fetchCoursesBySearch(searchText, true)}
+          />
         )}
       </CardsContainer>
       {selectedCoursesIds.length ? (

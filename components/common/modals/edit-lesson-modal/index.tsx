@@ -9,13 +9,13 @@ import Input from "@/components/input";
 import { addMinutes, millisecondsToMinutes, subMinutes } from "date-fns";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FunctionComponent } from "react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import PromptModal from "@/components/common/modals/prompt-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
-import { COURSES_GET_LIMIT } from "@/constants";
+import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/course";
 import { deleteLessonsByds, getLessonById, updateLesson } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
@@ -24,6 +24,7 @@ import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { getLessonDuration } from "@/utils/get-lesson-duration";
+import { throttleSearch } from "@/utils/throttle-search";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 
@@ -80,13 +81,17 @@ const EditLessonModal: FunctionComponent<Props> = memo(
         toast.error(error.message);
       }
     };
-    const fetchCoursesBySearch = async (search: string) => {
-      try {
-        setCourses(await getCourses(user.id, search));
-      } catch (error: any) {
-        toast.error(error.message);
-      }
-    };
+    const fetchCoursesBySearch = useCallback(
+      throttleSearch(async (search: string) => {
+        try {
+          setCourses(await getCourses(user.id, search));
+        } catch (error: any) {
+          toast.error(error.message);
+        }
+      }, THROTTLE_SEARCH_WAIT),
+      []
+    );
+
     const submitUpdateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setIsSubmittingUpdateLesson(true);

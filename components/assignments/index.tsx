@@ -18,7 +18,7 @@ import DotsIcon from "@/components/icons/dots-icon";
 import NoDataIcon from "@/components/icons/no-data-icon";
 import NotFoundIcon from "@/components/icons/not-found-icon";
 import Skeleton from "@/components/skeleton";
-import { ASSIGNMENTS_GET_LIMIT } from "@/constants";
+import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAssignmentById,
   deleteAssignmentsByIds,
@@ -33,9 +33,10 @@ import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -107,13 +108,16 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       setIsLoading(false);
     }
   };
-  const fetchAssignmentsBySearch = async (refetch?: boolean) => {
+  const fetchAssignmentsBySearch = async (
+    search: string,
+    refetch?: boolean
+  ) => {
     setIsSearching(true);
 
     try {
       const [fetchedAssignments, fetchedAssignmentsCount] = await Promise.all([
-        getAssignmentsByLessonId(lesson.id, searchText),
-        getAssignmentsCountByLessonId(lesson.id, searchText),
+        getAssignmentsByLessonId(lesson.id, search),
+        getAssignmentsCountByLessonId(lesson.id, search),
       ]);
 
       setAssignments(fetchedAssignments);
@@ -164,7 +168,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
 
       setIsDelAssignmentModal(false);
       setAssignmentsIds((_) => _.filter((id) => id !== assignmentId));
-      fetchAssignmentsBySearch(true);
+      fetchAssignmentsBySearch(searchText, true);
 
       toast.success(t("assignment_deleted"));
     } catch (error: any) {
@@ -183,7 +187,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
 
       setAssignmentsIds([]);
       setIsDelAssignmentsModal(false);
-      fetchAssignmentsBySearch(true);
+      fetchAssignmentsBySearch(searchText, true);
 
       toast.success(t("assignments_deleted"));
     } catch (error: any) {
@@ -192,6 +196,17 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
       setIsSubmittingDelAssigns(false);
     }
   };
+
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchAssignmentsBySearch(search);
+      } else {
+        fetchInitialAssignments();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   const onAssignmentToggle = (checked: boolean, lessonId: string) => {
     if (checked) {
@@ -215,7 +230,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
     setIsEditAssignmentModal(false);
 
     if (mutated) {
-      fetchAssignmentsBySearch();
+      fetchAssignmentsBySearch(searchText);
     }
   };
 
@@ -232,13 +247,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
         ?.removeEventListener("scroll", throttled);
     };
   }, [isSelectedAll, searchText]);
-  useEffect(() => {
-    if (searchText) {
-      fetchAssignmentsBySearch();
-    } else {
-      fetchInitialAssignments();
-    }
-  }, [searchText]);
+  useEffect(() => throttledSearch(searchText), [searchText]);
   useEffect(() => {
     setIsSelectedAll(assignmentsCount === assignmentsIds.length);
   }, [assignmentsCount]);
@@ -265,7 +274,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
           <CreateAssignment
             courseId={course.id}
             lessonId={lesson.id}
-            onCreated={() => fetchAssignmentsBySearch(true)}
+            onCreated={() => fetchAssignmentsBySearch(searchText, true)}
           />
         )}
       </CardsContainer>{" "}
@@ -366,7 +375,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
         <EditAssignmentModal
           assignmentId={assignmentId}
           onClose={onEditAssignmentModalClose}
-          onSubmissionCreated={fetchAssignmentsBySearch}
+          onSubmissionCreated={() => fetchAssignmentsBySearch(searchText)}
         />
       )}
       {isDelAssignmentsModal && (

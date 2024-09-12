@@ -3,7 +3,7 @@ import Select from "@/components/common/select";
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import { COURSES_GET_LIMIT } from "@/constants";
+import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/course";
 import { createLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
@@ -11,6 +11,7 @@ import type { SelectItem } from "@/interfaces/menu.interface";
 import type { Course } from "@/types/courses.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
+import { throttleSearch } from "@/utils/throttle-search";
 import clsx from "clsx";
 import {
   addMinutes,
@@ -20,7 +21,7 @@ import {
 } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 const initLesson: TablesInsert<"lessons"> = {
@@ -78,13 +79,16 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     }
   };
 
-  const fetchCoursesBySearch = async (search: string) => {
-    try {
-      setCourses(await getCourses(user.id, search));
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+  const fetchCoursesBySearch = useCallback(
+    throttleSearch(async (search: string) => {
+      try {
+        setCourses(await getCourses(user.id, search));
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   const submitCreateLesson = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

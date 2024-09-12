@@ -8,7 +8,7 @@ import CreateLesson from "@/components/live-lesson/create-lesson";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import { format } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import CardTitle from "@/components/card-title";
 import PromptModal from "@/components/common/modals/prompt-modal";
@@ -20,7 +20,7 @@ import LessonIcon from "@/components/icons/lesson-icon";
 import NoDataIcon from "@/components/icons/no-data-icon";
 import NotFoundIcon from "@/components/icons/not-found-icon";
 import Skeleton from "@/components/skeleton";
-import { LESSONS_GET_LIMIT } from "@/constants";
+import { LESSONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllLessons,
   deleteLessonById,
@@ -33,6 +33,7 @@ import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -101,13 +102,13 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       setIsLoading(false);
     }
   };
-  const fetchLessonsBySearch = async (refetch?: boolean) => {
+  const fetchLessonsBySearch = async (search: string, refetch?: boolean) => {
     setIsSearching(true);
 
     try {
       const [fetchedLessons, fetchedLessonsCount] = await Promise.all([
-        getLessonsByCourseId(courseId, searchText),
-        getLessonsCountByCourseId(courseId, searchText),
+        getLessonsByCourseId(courseId, search),
+        getLessonsCountByCourseId(courseId, search),
       ]);
 
       setLessons(fetchedLessons);
@@ -158,7 +159,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
       setIsDeleteLessonModalOpen(false);
       setSelectedLessonsIds((_) => _.filter((id) => id !== selectedLessonId));
-      fetchLessonsBySearch(true);
+      fetchLessonsBySearch(searchText, true);
 
       toast.success(t("lesson_deleted"));
     } catch (error: any) {
@@ -177,7 +178,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
       setSelectedLessonsIds([]);
       setIsDeleteLessonsModalOpen(false);
-      fetchLessonsBySearch();
+      fetchLessonsBySearch(searchText);
 
       toast.success(t("lessons_deleted"));
     } catch (error: any) {
@@ -186,6 +187,17 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       setIsSubmittingDeleteLessons(false);
     }
   };
+
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchLessonsBySearch(search);
+      } else {
+        fetchInitialLessons();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   const onLessonToggle = (checked: boolean, lessonId: string) => {
     if (checked) {
@@ -215,13 +227,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
         ?.removeEventListener("scroll", throttled);
     };
   }, [isSelectedAll, searchText]);
-  useEffect(() => {
-    if (searchText) {
-      fetchLessonsBySearch();
-    } else {
-      fetchInitialLessons();
-    }
-  }, [searchText]);
+  useEffect(() => throttledSearch(searchText), [searchText]);
   useEffect(() => {
     setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length);
   }, [totalLessonsCount]);
@@ -246,7 +252,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
         />
         {user.role === Role.Teacher && (
           <CreateLesson
-            onCreated={() => fetchLessonsBySearch(true)}
+            onCreated={() => fetchLessonsBySearch(searchText, true)}
             courseId={courseId}
           />
         )}

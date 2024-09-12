@@ -18,7 +18,7 @@ import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import EnrollUsers from "@/components/users/enroll-users";
-import { MEMBERS_GET_LIMIT } from "@/constants";
+import { MEMBERS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   dispelAllUsers,
   dispelUsers,
@@ -29,10 +29,11 @@ import { Role } from "@/interfaces/user.interface";
 import type { User } from "@/types/users";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import type { User as AuthUser } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import toast from "react-hot-toast";
 
@@ -101,13 +102,13 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
     }
   };
 
-  const fetchMembersBySearch = async (refetch?: boolean) => {
+  const fetchMembersBySearch = async (search: string, refetch?: boolean) => {
     setIsSearching(true);
 
     try {
       const [fetchedMembers, fetchedUsersMembers] = await Promise.all([
-        getUsersByCourseId(courseId, searchText),
-        getUsersByCourseIdCount(courseId, searchText),
+        getUsersByCourseId(courseId, search),
+        getUsersByCourseIdCount(courseId, search),
       ]);
 
       setMembers(fetchedMembers);
@@ -158,7 +159,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
 
       setIsDispelMemberModalOpen(false);
       setSelectedMembersIds((_) => _.filter((id) => id !== selectedMemberId));
-      fetchMembersBySearch(true);
+      fetchMembersBySearch(searchText, true);
 
       toast.success(t("student_dispelled"));
     } catch (error: any) {
@@ -177,7 +178,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
 
       setSelectedMembersIds([]);
       setIsDispelMembersModalOpen(false);
-      fetchMembersBySearch(true);
+      fetchMembersBySearch(searchText, true);
 
       toast.success(t("users_dispelled"));
     } catch (error: any) {
@@ -186,6 +187,17 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       setIsSubmittingDispelMembers(false);
     }
   };
+
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchMembersBySearch(search);
+      } else {
+        fetchInitialMembers();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   const onMemberToggle = (checked: boolean, memberId: string) => {
     if (checked) {
@@ -224,13 +236,8 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
         ?.removeEventListener("scroll", throttled);
     };
   }, [isSelectedAll, searchText]);
-  useEffect(() => {
-    if (searchText) {
-      fetchMembersBySearch();
-    } else {
-      fetchInitialMembers();
-    }
-  }, [searchText]);
+  useEffect(() => throttledSearch(searchText), [searchText]);
+
   useEffect(() => {
     setIsSelectedAll(totalMembersCount === selectedMembersIds.length);
   }, [totalMembersCount]);
@@ -255,7 +262,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
           title="Total members"
         />
         <EnrollUsers
-          onUsersEnrolled={() => fetchMembersBySearch(true)}
+          onUsersEnrolled={() => fetchMembersBySearch(searchText, true)}
           courseId={courseId}
         />
       </CardsContainer>

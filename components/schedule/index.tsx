@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 
 import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
 import Select from "@/components/common/select";
-import { COURSES_GET_LIMIT } from "@/constants";
+import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/course";
 import { getWeekLessons, upsertLesson } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
@@ -32,6 +32,7 @@ import type { Lesson } from "@/types/lessons.type";
 import { getEventElFromPoints } from "@/utils/get-event-el-from-points";
 import { getEventPlaceholderElFromPoints } from "@/utils/get-event-placeholder-el-from-points";
 import { getWeekDays } from "@/utils/get-week-days";
+import { throttleSearch } from "@/utils/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
@@ -240,13 +241,16 @@ const Schedule: FunctionComponent = () => {
     coursesOffsetRef.current += rangeCourses.length;
   };
 
-  const fetchCoursesBySearch = async (search: string) => {
-    try {
-      setCourses(await getCourses(user.id, search));
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+  const fetchCoursesBySearch = useCallback(
+    throttleSearch(async (search: string) => {
+      try {
+        setCourses(await getCourses(user.id, search));
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   // Effects
   useEffect(() => {

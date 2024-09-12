@@ -11,7 +11,7 @@ import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { USERS_GET_LIMIT } from "@/constants";
+import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
 import {
   enrollAllUsers,
   enrollUsersInCourses,
@@ -21,6 +21,7 @@ import {
 import type { User } from "@/types/users";
 import { db } from "@/utils/supabase/client";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
@@ -90,13 +91,13 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     }
   };
 
-  const fetchUsersBySearch = async (refetch?: boolean) => {
+  const fetchUsersBySearch = async (search: string, refetch?: boolean) => {
     setIsSearching(true);
 
     try {
       const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsersNotInCourse(courseId, searchText),
-        getUsersNotInCourseCount(courseId, searchText),
+        getUsersNotInCourse(courseId, search),
+        getUsersNotInCourseCount(courseId, search),
       ]);
 
       setUsers(fetchedUsers);
@@ -153,6 +154,17 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     }
   };
 
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchUsersBySearch(search);
+      } else {
+        fetchInitialUsers();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
+
   const onUserToggle = (checked: boolean, userId: string) => {
     if (checked) {
       setUsersIds((prev) => [...prev, userId]);
@@ -168,13 +180,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   ]);
 
   // Effects
-  useEffect(() => {
-    if (searchText) {
-      fetchUsersBySearch();
-    } else {
-      fetchInitialUsers();
-    }
-  }, [searchText]);
+  useEffect(() => throttledSearch(searchText), [searchText]);
 
   // View
   return (

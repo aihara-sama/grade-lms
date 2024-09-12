@@ -144,5 +144,4 @@ const Select: FunctionComponent<Props> = ({
     </BasePopper>
   );
 };
-
 export default Select;

@@ -8,7 +8,7 @@ import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
-import { COURSES_GET_LIMIT } from "@/constants";
+import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   getCourses,
   getCoursesCount,
@@ -20,6 +20,7 @@ import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { db } from "@/utils/supabase/client";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -100,17 +101,17 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     }
   };
 
-  const fetchCoursesBySearch = async (refetch?: boolean) => {
+  const fetchCoursesBySearch = async (search: string, refetch?: boolean) => {
     setIsSearching(true);
 
     try {
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
         isSingleUser
-          ? getUnenrolledCourses(usersIds[0], searchText)
-          : getCourses(user.id, searchText),
+          ? getUnenrolledCourses(usersIds[0], search)
+          : getCourses(user.id, search),
         isSingleUser
-          ? getUnenrolledCoursesCount(usersIds[0], searchText)
-          : getCoursesCount(user.id, searchText),
+          ? getUnenrolledCoursesCount(usersIds[0], search)
+          : getCoursesCount(user.id, search),
       ]);
 
       setCourses(fetchedCourses);
@@ -169,6 +170,17 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     }
   };
 
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchCoursesBySearch(search);
+      } else {
+        fetchInitialCourses();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
+
   const onCourseToggle = (checked: boolean, courseId: string) => {
     if (checked) {
       setSelectedCoursesIds((prev) => [...prev, courseId]);
@@ -185,13 +197,8 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   ]);
 
   // Effects
-  useEffect(() => {
-    if (searchText) {
-      fetchCoursesBySearch();
-    } else {
-      fetchInitialCourses();
-    }
-  }, [searchText]);
+  useEffect(() => throttledSearch(searchText), [searchText]);
+
   // View
   return (
     <BaseModal onClose={() => onClose()} title="Enrollment">

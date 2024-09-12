@@ -13,7 +13,7 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
-import { SUBMISSIONS_GET_LIMIT } from "@/constants";
+import { SUBMISSIONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllMySubmissions,
   deleteSubmissionById,
@@ -27,6 +27,7 @@ import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { SubmissionWithAuthor } from "@/types/submissions.type";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -117,18 +118,21 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       setIsLoading(false);
     }
   };
-  const fetchSubmissionsBySearch = async (refetch?: boolean) => {
+  const fetchSubmissionsBySearch = async (
+    search: string,
+    refetch?: boolean
+  ) => {
     setIsSearching(true);
 
     try {
       const [fetchedSubmissions, fetchedSubmissionsCount] = await Promise.all([
         user.role === Role.Teacher
-          ? getAssignmentSubmissions(assignmentId, searchText)
-          : getUserSubmissions(user.id, assignmentId, searchText),
+          ? getAssignmentSubmissions(assignmentId, search)
+          : getUserSubmissions(user.id, assignmentId, search),
 
         user.role === Role.Teacher
-          ? getAssignmentSubmissionsCount(assignmentId, searchText)
-          : getUserSubmissionsCount(user.id, assignmentId, searchText),
+          ? getAssignmentSubmissionsCount(assignmentId, search)
+          : getUserSubmissionsCount(user.id, assignmentId, search),
       ]);
 
       setSubmissions(fetchedSubmissions);
@@ -176,7 +180,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
       setIsDelSubmissionModal(false);
       setSubmissionsIds((_) => _.filter((id) => id !== submissionId));
-      fetchSubmissionsBySearch(true);
+      fetchSubmissionsBySearch(searchText, true);
 
       toast.success(t("submission_deleted"));
     } catch (error: any) {
@@ -195,7 +199,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
       setSubmissionsIds([]);
       setIsDelSubmissionsModal(false);
-      fetchSubmissionsBySearch(true);
+      fetchSubmissionsBySearch(searchText, true);
 
       toast.success(t("submissions_deleted"));
     } catch (error: any) {
@@ -204,6 +208,17 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       setIsSubmittingDelSubmissions(false);
     }
   };
+
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchSubmissionsBySearch(search);
+      } else {
+        fetchInitialSubmissions();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   const onScrollEnd = useCallback(throttleFetch(fetchMoreSubmissions), []);
 
@@ -234,7 +249,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsEditSubmissionModal(false);
 
     if (mutated) {
-      fetchSubmissionsBySearch(true);
+      fetchSubmissionsBySearch(searchText, true);
     }
   };
   const onViewSubmissionModalClose = (mutated?: boolean) => {
@@ -242,17 +257,12 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsViewSubmissionModal(false);
 
     if (mutated) {
-      fetchSubmissionsBySearch(true);
+      fetchSubmissionsBySearch(searchText, true);
     }
   };
 
-  useEffect(() => {
-    if (searchText) {
-      fetchSubmissionsBySearch();
-    } else {
-      fetchInitialSubmissions();
-    }
-  }, [searchText]);
+  useEffect(() => throttledSearch(searchText), [searchText]);
+
   return (
     <div className="overflow-hidden">
       {submissionsIds.length ? (
