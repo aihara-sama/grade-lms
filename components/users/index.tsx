@@ -10,7 +10,7 @@ import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 import CreateUser from "@/components/users/create-user";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import Avatar from "@/components/avatar";
@@ -24,7 +24,7 @@ import NoDataIcon from "@/components/icons/no-data-icon";
 import NotFoundIcon from "@/components/icons/not-found-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import Skeleton from "@/components/skeleton";
-import { USERS_GET_LIMIT } from "@/constants";
+import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
 import {
   deleteAllUsers,
   deleteUserById,
@@ -36,18 +36,19 @@ import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/users";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 const Users: FunctionComponent = () => {
   // State
-  const [users, setUsers] = useState<User[]>([]);
   const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
-  const [selectedUsersIds, setSelectedUsersIds] = useState<string[]>([]);
-  const [selectedUserId, setSelectedUserId] = useState<string>();
+  const [usersIds, setUsersIds] = useState<string[]>([]);
+  const [userId, setUserId] = useState<string>();
+  const [users, setUsers] = useState<User[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [usersCount, setUsersCount] = useState(0);
   const [searchText, setSearchText] = useState("");
   const [isEnrollUsersInCoursesModalOpen, setIsEnrollUsersInCoursesModalOpen] =
     useState(false);
@@ -70,18 +71,18 @@ const Users: FunctionComponent = () => {
   // Vars
   const isData = !!users.length && !isLoading;
   const isNoData =
-    !isLoading && !isSearching && !totalUsersCount && !searchText.length;
+    !isLoading && !isSearching && !usersCount && !searchText.length;
 
   const isNotFound =
     !isLoading && !isSearching && !users.length && !!searchText.length;
 
   // Handlers
   const selectAllUsers = () => {
-    setSelectedUsersIds(users.map(({ id }) => id));
+    setUsersIds(users.map(({ id }) => id));
     setIsSelectedAll(true);
   };
   const deselectAllUsers = () => {
-    setSelectedUsersIds([]);
+    setUsersIds([]);
     setIsSelectedAll(false);
   };
 
@@ -95,7 +96,7 @@ const Users: FunctionComponent = () => {
       ]);
 
       setUsers(fetchedUsers);
-      setTotalUsersCount(fetchedUsersCount);
+      setUsersCount(fetchedUsersCount);
 
       usersOffsetRef.current = fetchedUsers.length;
     } catch (error: any) {
@@ -104,20 +105,20 @@ const Users: FunctionComponent = () => {
       setIsLoading(false);
     }
   };
-  const fetchUsersBySearch = async (refetch?: boolean) => {
+  const fetchUsersBySearch = async (search: string, refetch?: boolean) => {
     setIsSearching(true);
 
     try {
       const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsersByCeratorId(user.id, searchText),
-        getUsersByCreatorIdCount(user.id, searchText),
+        getUsersByCeratorId(user.id, search),
+        getUsersByCreatorIdCount(user.id, search),
       ]);
 
       setUsers(fetchedUsers);
-      setTotalUsersCount(fetchedUsersCount);
+      setUsersCount(fetchedUsersCount);
 
       setIsSelectedAll(false);
-      setSelectedUsersIds([]);
+      setUsersIds([]);
 
       usersOffsetRef.current += refetch ? fetchedUsers.length : 0;
     } catch (error: any) {
@@ -141,10 +142,7 @@ const Users: FunctionComponent = () => {
       setUsers((prev) => [...prev, ...fetchedUsers]);
 
       if (isSelectedAll) {
-        setSelectedUsersIds((prev) => [
-          ...prev,
-          ...fetchedUsers.map(({ id }) => id),
-        ]);
+        setUsersIds((prev) => [...prev, ...fetchedUsers.map(({ id }) => id)]);
       }
 
       usersOffsetRef.current += fetchedUsers.length;
@@ -157,11 +155,11 @@ const Users: FunctionComponent = () => {
     setIsSubmittingDeleteUser(true);
 
     try {
-      await deleteUserById(selectedUserId);
+      await deleteUserById(userId);
 
       setIsDeleteUserModalOpen(false);
-      setSelectedUsersIds((_) => _.filter((id) => id !== selectedUserId));
-      fetchUsersBySearch(true);
+      setUsersIds((_) => _.filter((id) => id !== userId));
+      fetchUsersBySearch(searchText, true);
 
       toast.success(t("user_deleted"));
     } catch (error: any) {
@@ -176,11 +174,11 @@ const Users: FunctionComponent = () => {
     try {
       await (isSelectedAll
         ? deleteAllUsers(user.id, searchText)
-        : deleteUsersByIds(selectedUsersIds));
+        : deleteUsersByIds(usersIds));
 
-      setSelectedUsersIds([]);
+      setUsersIds([]);
       setIsDeleteUsersModalOpen(false);
-      fetchUsersBySearch(true);
+      fetchUsersBySearch(searchText, true);
 
       toast.success(t("users_deleted"));
     } catch (error: any) {
@@ -190,16 +188,26 @@ const Users: FunctionComponent = () => {
     }
   };
 
-  const onUserToggle = (checked: boolean, userId: string) => {
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchUsersBySearch(search);
+      } else {
+        fetchInitialUsers();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
+
+  const onUserToggle = (checked: boolean, _userId: string) => {
     if (checked) {
-      setSelectedUsersIds((prev) => [...prev, userId]);
-      setIsSelectedAll(totalUsersCount === selectedUsersIds.length + 1);
+      setUsersIds((prev) => [...prev, _userId]);
+      setIsSelectedAll(usersCount === usersIds.length + 1);
     } else {
-      setSelectedUsersIds((prev) => prev.filter((_id) => _id !== userId));
-      setIsSelectedAll(totalUsersCount === selectedUsersIds.length - 1);
+      setUsersIds((prev) => prev.filter((_id) => _id !== _userId));
+      setIsSelectedAll(usersCount === usersIds.length - 1);
     }
   };
-
   const onCoursesScroll = (e: Event) => {
     if (isCloseToBottom(e.target as HTMLElement)) {
       fetchMoreUsers();
@@ -209,7 +217,7 @@ const Users: FunctionComponent = () => {
     setIsEnrollUsersInCoursesModalOpen(false);
 
     if (mutated) {
-      setSelectedUsersIds([]);
+      setUsersIds([]);
     }
   };
   const onEditUserModalClose = (mutated?: boolean) => {
@@ -233,43 +241,42 @@ const Users: FunctionComponent = () => {
         ?.removeEventListener("scroll", throttled);
     };
   }, [isSelectedAll, searchText]);
-  useEffect(() => {
-    if (searchText) {
-      fetchUsersBySearch();
-    } else {
-      fetchInitialUsers();
-    }
-  }, [searchText]);
-  useEffect(() => {
-    setIsSelectedAll(totalUsersCount === selectedUsersIds.length);
-  }, [totalUsersCount]);
+
+  useEffect(() => throttledSearch(searchText), [searchText]);
+
+  useEffect(
+    () => setIsSelectedAll(usersCount === usersIds.length),
+    [usersCount]
+  );
 
   useEffect(() => {
     // Tall screens may fit more than 20 records. This will fit the screen
-    if (users.length && totalUsersCount !== users.length) {
+    if (users.length && usersCount !== users.length) {
       const contentWrapper = document.getElementById("content-wrapper");
       if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
         fetchMoreUsers();
       }
     }
-  }, [users, totalUsersCount]);
+  }, [users, usersCount]);
   return (
     <>
       <CardsContainer>
         <Total
           Icon={<AvatarIcon size="lg" />}
-          total={totalUsersCount}
+          total={usersCount}
           title="Total users"
         />
-        <CreateUser onUserCreated={() => fetchUsersBySearch(true)} />
+        <CreateUser
+          onUserCreated={() => fetchUsersBySearch(searchText, true)}
+        />
       </CardsContainer>
-      {selectedUsersIds.length ? (
+      {usersIds.length ? (
         <div className="mb-3 gap-2 flex">
           <button
             onClick={isSelectedAll ? deselectAllUsers : selectAllUsers}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAll ? totalUsersCount : selectedUsersIds.length}{" "}
+            {isSelectedAll ? usersCount : usersIds.length}{" "}
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
@@ -300,7 +307,7 @@ const Users: FunctionComponent = () => {
           data={users.map(({ name, role, id, avatar, email }, idx) => ({
             Name: (
               <CardTitle
-                checked={selectedUsersIds.includes(id)}
+                checked={usersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
                 title={name}
                 subtitle={role}
@@ -317,7 +324,7 @@ const Users: FunctionComponent = () => {
                 trigger={
                   <button
                     className="icon-button text-neutral-500"
-                    onClick={() => setSelectedUserId(id)}
+                    onClick={() => setUserId(id)}
                   >
                     <DotsIcon />
                   </button>
@@ -368,18 +375,18 @@ const Users: FunctionComponent = () => {
       )}
       {isEnrollUserInCoursesModalOpen && (
         <EnrollUsersInCoursesModal
-          usersIds={[selectedUserId]}
+          usersIds={[userId]}
           onClose={() => setIsEnrollUserInCoursesModalOpen(false)}
         />
       )}
       {isEnrollUsersInCoursesModalOpen && (
         <EnrollUsersInCoursesModal
-          usersIds={selectedUsersIds}
+          usersIds={usersIds}
           onClose={onEnrollUsersInCoursesModalClose}
         />
       )}
       {isEditUserModal && (
-        <EditUserModal userId={selectedUserId} onClose={onEditUserModalClose} />
+        <EditUserModal userId={userId} onClose={onEditUserModalClose} />
       )}
 
       {isDeleteUserModalOpen && (
