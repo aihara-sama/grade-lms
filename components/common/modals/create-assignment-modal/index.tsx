@@ -101,12 +101,12 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
   };
 
   return (
-    <BaseModal width="lg" onClose={() => onClose()} title="Assignment">
+    <BaseModal width="lg" onClose={() => onClose()} title="Create assignment">
       <div>
         <Input
           autoFocus
           fullWIdth
-          Icon={<LessonsIcon size="xs" />}
+          startIcon={<LessonsIcon size="xs" />}
           placeholder="Assignment name"
           name="title"
           onChange={onInputChange}

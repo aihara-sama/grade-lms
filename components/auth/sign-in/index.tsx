@@ -59,7 +59,7 @@ const SignIn: FunctionComponent = () => {
           name="email"
           type="email"
           placeholder="Email"
-          Icon={<EmailIcon />}
+          startIcon={<EmailIcon />}
           fullWIdth
         />
         <Input
@@ -67,7 +67,7 @@ const SignIn: FunctionComponent = () => {
           name="password"
           type="password"
           placeholder="Password"
-          Icon={<SecurityIcon />}
+          startIcon={<SecurityIcon />}
           fullWIdth
         />
         <button

@@ -89,14 +89,14 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     value={userDetails.name}
                     fullWIdth
                     name="name"
-                    Icon={<AvatarIcon size="xs" />}
+                    startIcon={<AvatarIcon size="xs" />}
                     label="Name"
                     autoFocus
                   />
                   <Input
                     onChange={onInputChange}
                     value={userDetails.email}
-                    Icon={<EmailIcon size="xs" />}
+                    startIcon={<EmailIcon size="xs" />}
                     label="Email"
                     type="email"
                     name="email"
@@ -106,7 +106,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     onChange={onInputChange}
                     value={userDetails.password}
                     name="password"
-                    Icon={<SecurityIcon size="xs" />}
+                    startIcon={<SecurityIcon size="xs" />}
                     label="Password"
                     type="password"
                     fullWIdth

@@ -115,7 +115,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
           className="outline-button w-full"
           onClick={() => setIsCreateAssignmentModalOpen(true)}
         >
-          Create assignments
+          Create
         </button>
       </div>
       {isCreateAssignmentModalOpen && (
@@ -135,7 +135,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
         <PromptModal
           isSubmitting={isSubmittingDeleteAssignments}
           onClose={() => setIsDeleteAssignmentModalOpen(false)}
-          title="Delete assignments"
+          title="Delete assignment"
           action="Delete"
           body={t("prompts.delete_assignment")}
           actionHandler={submitDeleteAssignment}

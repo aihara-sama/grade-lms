@@ -2,6 +2,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
 import { extendLesson, getOverlappingLessons } from "@/db/lesson";
+import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lessons.type";
 import clsx from "clsx";
@@ -23,6 +24,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
 
   const t = useTranslations();
   const { user } = useUser();
+  const { setLesson } = useLesson();
 
   // Handlers
   const submitExtendLesson = async () => {
@@ -43,7 +45,9 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
         if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
       }
 
-      await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin));
+      setLesson(
+        await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin))
+      );
 
       onClose(true);
       toast.success(t("lesson_extended"));
@@ -77,7 +81,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
             onChange={onExtendLessonInputChange}
             autoFocus
             fullWIdth
-            Icon={<TimeIcon />}
+            startIcon={<TimeIcon />}
             type="number"
             label="Add minutes"
           />

@@ -100,7 +100,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
         <Input
           autoFocus
           fullWIdth
-          Icon={<LessonsIcon size="xs" />}
+          startIcon={<LessonsIcon size="xs" />}
           placeholder="Submission name"
           name="title"
           onChange={onInputChange}

@@ -1,4 +1,5 @@
 import LessonPreview from "@/components/lesson-preview";
+import LessonProvider from "@/components/lesson-provider";
 import LessonHeader from "@/components/live-lesson/lesson-header";
 import { db } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
@@ -33,10 +34,10 @@ const Page: FunctionComponent<Props> = async ({
     return redirect(`/dashboard/courses/${courseId}/lessons`);
 
   return (
-    <div>
+    <LessonProvider lesson={lessonData.data}>
       <LessonHeader course={courseData.data} lesson={lessonData.data} />
-      <LessonPreview lesson={lessonData.data} />
-    </div>
+      <LessonPreview />
+    </LessonProvider>
   );
 };
 

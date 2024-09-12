@@ -4,7 +4,8 @@ import AttachIcon from "@/components/icons/attach-icon";
 import Input from "@/components/input";
 
 import CreateFileMessageModal from "@/components/common/modals/create-file-message-modal";
-import MessagesIcon from "@/components/icons/messages-icon";
+import ChatIcon from "@/components/icons/chat-icon";
+import SendMessageIcon from "@/components/icons/send-message-icon";
 import Message from "@/components/live-lesson/chat/message";
 import Skeleton from "@/components/skeleton";
 import { createChatMessage, getChatMessages } from "@/db/message";
@@ -125,8 +126,8 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
     <div className="rounded-md relative px-4 py-0 pb-4 flex-1 flex flex-col border border-gray-200">
       <div className="flex justify-center py-3">
         <div className="flex items-center gap-2">
-          <MessagesIcon size="xs" />
-          <p className="text-lg font-bold text-center">Chat</p>
+          <ChatIcon size="sm" />
+          <p className="text-lg font-bold text-center">Messages</p>
         </div>
       </div>
       <hr />
@@ -154,13 +155,26 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
         fullWIdth
         onChange={(e) => setChatMessageText(e.target.value)}
         value={chatMessageText}
-        Icon={
+        startIcon={
           <label>
             <AttachIcon className={`${clsx(disabled || "inter-active")}`} />
             {!disabled && (
               <input onChange={onFileChange} type="file" className="hidden" />
             )}
           </label>
+        }
+        endIcon={
+          <button
+            disabled={!chatMessageText.length}
+            className={`p-1 rounded-md bg-blue-200  ${clsx({
+              "opacity-75 cursor-default": !chatMessageText.length,
+              "cursor-pointer hover:bg-blue-300 active:bg-blue-600":
+                chatMessageText.length,
+            })}`}
+            onClick={() => submitCreateChatMesssage()}
+          >
+            <SendMessageIcon size="xs" />
+          </button>
         }
         onKeyDown={(e) => {
           if (e.key === "Enter") {

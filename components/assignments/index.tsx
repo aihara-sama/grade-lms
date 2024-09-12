@@ -298,7 +298,7 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
         </div>
       ) : (
         <Input
-          Icon={<SearchIcon size="xs" />}
+          startIcon={<SearchIcon size="xs" />}
           placeholder="Search"
           className="w-auto"
           onChange={(e) => setSearchText(e.target.value)}

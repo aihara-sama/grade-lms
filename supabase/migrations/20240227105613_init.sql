@@ -237,7 +237,9 @@ begin
           or
           (l.starts >= p_starts and l.ends <= p_ends)     -- Case 3: 
       )
-      and p_lesson_id != l.id;
+        -- Exclude the lesson if p_lesson_id is provided
+      AND (p_lesson_id IS NULL OR l.id != p_lesson_id);
+
 end;
 $$ language plpgsql;
 

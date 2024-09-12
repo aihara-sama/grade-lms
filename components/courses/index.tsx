@@ -279,7 +279,7 @@ const Courses: FunctionComponent = () => {
         </div>
       ) : (
         <Input
-          Icon={<SearchIcon size="xs" />}
+          startIcon={<SearchIcon size="xs" />}
           placeholder={t("search")}
           className="w-auto"
           onChange={(e) => setSearchText(e.target.value)}

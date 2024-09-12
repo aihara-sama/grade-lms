@@ -138,9 +138,13 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
     .update({
       ends: new Date(+new Date(lesson.ends) + miliseconds).toISOString(),
     })
-    .eq("id", lesson.id);
+    .eq("id", lesson.id)
+    .select("*")
+    .single();
 
   if (result.error) throw new Error(t("failed_to_extend_lesson"));
+
+  return result.data;
 };
 export const updateLesson = async (lesson: TablesUpdate<"lessons">) => {
   const t = await loadMessages();

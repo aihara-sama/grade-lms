@@ -1,7 +1,5 @@
 "use client";
 
-import ExpandHorizontalIcon from "@/components/icons/expand-horizontal-icon";
-import TimeIcon from "@/components/icons/time-icon";
 import ResizeHandler from "@/components/resize-handler";
 import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
 import { Role } from "@/interfaces/user.interface";
@@ -10,15 +8,14 @@ import { useEffect, useRef, useState } from "react";
 // import toast from "react-hot-toast";
 import ExtendLessonModal from "@/components/common/modals/extend-lesson-modal";
 import InviteIcon from "@/components/icons/invite-icon";
-import ShrinkHorizontalIcon from "@/components/icons/shrink-horizontal-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
-import LiveTime from "@/components/live-time";
+import LessonStatus from "@/components/lesson-status";
 import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-template";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { Event } from "@/types/events.type";
 import type { Lesson } from "@/types/lessons.type";
-import { isLessonEnded } from "@/utils/is-lesson-ended";
+import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import { db } from "@/utils/supabase/client";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
@@ -55,7 +52,7 @@ const Whiteboard: FunctionComponent<Props> = ({
   const t = useTranslations();
   const channel = useLessonChannel();
   const { user } = useUser();
-  const { isExpanded, setIsExpanded } = useIsLessonHrExpanded();
+  const { setIsExpanded } = useIsLessonHrExpanded();
 
   // State
   const [isExtendLessonModalOpen, setIsExtendLessonModalOpen] = useState(false);
@@ -229,32 +226,16 @@ const Whiteboard: FunctionComponent<Props> = ({
             {lesson.title}
           </span>
         </div>
-        <div className="flex items-center gap-3">
-          {isLessonEnded(new Date(lesson.ends)) ? (
-            <p className="text-yellow-600 ml-1">This lesson has ended</p>
-          ) : (
-            <div className="flex items-center text-sm">
-              <TimeIcon />
-              <p className="text-neutral-600 font-bold ml-1 whitespace-nowrap">
-                <LiveTime date={new Date(lesson.ends)} /> left
-              </p>
-              {user.role === Role.Teacher && (
-                <button
-                  className="text-link"
-                  onClick={() => setIsExtendLessonModalOpen(true)}
-                >
-                  Extend?
-                </button>
-              )}
-            </div>
+        <div className="flex gap-3 items-center">
+          <LessonStatus showTimeLeft />
+          {isLessonOngoing(lesson) && user.role === Role.Teacher && (
+            <button
+              className="text-link"
+              onClick={() => setIsExtendLessonModalOpen(true)}
+            >
+              Extend?
+            </button>
           )}
-
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="icon-button "
-          >
-            {isExpanded ? <ShrinkHorizontalIcon /> : <ExpandHorizontalIcon />}
-          </button>
           {user.role === Role.Teacher && (
             <button className="icon-button" onClick={invite}>
               <InviteIcon size="sm" />

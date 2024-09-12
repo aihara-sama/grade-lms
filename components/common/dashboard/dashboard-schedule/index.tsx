@@ -122,7 +122,7 @@ const DashboardSchedule: FunctionComponent = () => {
               </div>
               <div
                 title={lesson.title}
-                className="w-full text-base font-bold truncate-fade max-w-[225px]"
+                className="w-full text-base font-bold truncate-fade"
               >
                 {lesson.title}
               </div>

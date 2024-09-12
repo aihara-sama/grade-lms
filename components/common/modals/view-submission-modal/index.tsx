@@ -74,7 +74,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
           <Input
             disabled
             fullWIdth
-            Icon={<LessonsIcon size="xs" />}
+            startIcon={<LessonsIcon size="xs" />}
             placeholder="Submission name"
             name="title"
             value={submission.title}

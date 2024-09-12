@@ -13,12 +13,7 @@ import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
 import { throttleSearch } from "@/utils/throttle-search";
 import clsx from "clsx";
-import {
-  addMinutes,
-  format,
-  millisecondsToMinutes,
-  subMinutes,
-} from "date-fns";
+import { addMinutes, millisecondsToMinutes, subMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -64,9 +59,9 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     let { ends } = lesson;
 
     if (+value > millisecondsToMinutes(duration)) {
-      ends = format(addMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
+      ends = addMinutes(ends, 15).toISOString();
     } else if (+value < millisecondsToMinutes(duration) && +value > 15) {
-      ends = format(subMinutes(ends, 15), "yyyy-MM-dd'T'HH:mm:ss");
+      ends = subMinutes(ends, 15).toISOString();
     }
 
     setLesson((_) => ({ ..._, ends }));
@@ -174,7 +169,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           value={lesson.title}
           onChange={onInputChange}
           name="title"
-          Icon={<LessonsIcon size="xs" />}
+          startIcon={<LessonsIcon size="xs" />}
           placeholder="Lesson name"
           className="mb-4"
         />
@@ -187,7 +182,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           fullWIdth
           label="Duration"
           type="number"
-          Icon={<LessonsIcon />}
+          startIcon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={changeDuration}
           className="mt-2"

@@ -7,12 +7,7 @@ import Input from "@/components/input";
 import ResizeHandler from "@/components/resize-handler";
 import { db } from "@/utils/supabase/client";
 import { Excalidraw } from "@excalidraw/excalidraw";
-import {
-  addMinutes,
-  format,
-  millisecondsToMinutes,
-  subMinutes,
-} from "date-fns";
+import { addMinutes, millisecondsToMinutes, subMinutes } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -26,23 +21,27 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
 import { getOverlappingLessons } from "@/db/lesson";
+import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { Lesson } from "@/types/lessons.type";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 
-interface Props {
-  lesson: Lesson;
-}
+const LessonPreview: FunctionComponent = () => {
+  // Hooks
+  const t = useTranslations();
+  const { user } = useUser();
+  const { lesson, isEnded, isOngoing, setLesson } = useLesson();
 
-const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
   // State
   const [starts, setStarts] = useState(new Date(lesson.starts));
   const [ends, setEnds] = useState(new Date(lesson.ends));
+  console.log({
+    starts: starts.toISOString(),
+    lessonStarts: new Date(lesson.starts).toISOString(),
+  });
   const [whiteboardHeight, setWhiteboardHeight] = useState(0);
   const [whiteboardInitialData, setWhiteboardInitialData] =
     useState<ExcalidrawInitialDataState>();
@@ -56,11 +55,6 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
 
   // Vars
   const duration = +new Date(ends) - +new Date(starts);
-  const isThisLessonOngoing = isLessonOngoing(lesson);
-
-  // Hooks
-  const t = useTranslations();
-  const { user } = useUser();
 
   // Handlers
   const parseWhiteboardData = () => {
@@ -99,24 +93,27 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
     setIsSubmittingUpdateLessonDate(true);
     try {
       const overlappingLessons = await getOverlappingLessons(
-        format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
-        format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
+        starts.toISOString(),
+        ends.toISOString(),
         user.id,
         lesson.id
       );
 
       if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
 
-      const { error } = await db
+      const { error, data } = await db
         .from("lessons")
         .update({
-          starts: format(starts, "yyyy-MM-dd'T'HH:mm:ss"),
-          ends: format(ends, "yyyy-MM-dd'T'HH:mm:ss"),
-          whiteboard_data: JSON.stringify(whiteboardDataRef.current),
+          starts: starts.toISOString(),
+          ends: ends.toISOString(),
         })
-        .eq("id", lesson.id);
+        .eq("id", lesson.id)
+        .select("*")
+        .single();
 
       if (error) throw new Error(t("failed_to_update_lesson_date"));
+
+      setLesson(data);
 
       toast.success(t("lesson_date_updated"));
     } catch (error: any) {
@@ -206,7 +203,7 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
           />
         </div>
       </main>
-      <aside className="pt-12 flex flex-col">
+      <aside className="flex flex-col">
         <p className="text-neutral-600 ">Timeline</p>
         <hr className="mb-6" />
         <DateInput
@@ -214,24 +211,25 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
           onChange={onDateChange}
           label="Starts at"
           popperPlacement="bottom-start"
-          disabled={user.role !== Role.Teacher || isThisLessonOngoing}
+          disabled={user.role !== Role.Teacher || isOngoing || isEnded}
         />
         <Input
           className="mt-3 mb-0"
           label="Duration"
           fullWIdth
           type="number"
-          Icon={<LessonsIcon />}
+          startIcon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={changeDateDuration}
-          disabled={user.role !== Role.Teacher || isThisLessonOngoing}
+          disabled={user.role !== Role.Teacher || isOngoing || isEnded}
         />
         {user.role === Role.Teacher && (
           <button
             disabled={
-              (lesson.starts === format(starts, "yyyy-MM-dd'T'HH:mm:ss") &&
-                lesson.ends === format(ends, "yyyy-MM-dd'T'HH:mm:ss")) ||
-              isThisLessonOngoing
+              (new Date(lesson.starts).toISOString() === starts.toISOString() &&
+                new Date(lesson.ends).toISOString() === ends.toISOString()) ||
+              isOngoing ||
+              isEnded
             }
             className="primary-button"
             onClick={submitUpdateLessonDate}
@@ -251,21 +249,12 @@ const LessonPreview: FunctionComponent<Props> = ({ lesson }) => {
           </button>
         )}
         <div className="mt-3 sm:mt-auto flex flex-col gap-1">
-          {user.role !== Role.Teacher ? (
-            <Link
-              href={`/dashboard/lessons/${lesson.id}`}
-              className={`button warning-button ${clsx(new Date() <= starts && "disabled")} `}
-            >
-              Enter class
-            </Link>
-          ) : (
-            <Link
-              href={`/dashboard/lessons/${lesson.id}`}
-              className="button warning-button"
-            >
-              Enter class
-            </Link>
-          )}
+          <Link
+            href={`/dashboard/lessons/${lesson.id}`}
+            className={`button warning-button ${clsx(new Date() <= starts && "disabled")} `}
+          >
+            Enter class
+          </Link>
         </div>
       </aside>
     </div>

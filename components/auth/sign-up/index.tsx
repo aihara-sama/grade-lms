@@ -75,7 +75,7 @@ const SignUp: FunctionComponent = () => {
           name="name"
           type="text"
           placeholder="Name"
-          Icon={<AvatarIcon size="xs" />}
+          startIcon={<AvatarIcon size="xs" />}
           fullWIdth
           maxLength={76}
           minLength={1}
@@ -85,7 +85,7 @@ const SignUp: FunctionComponent = () => {
           name="email"
           type="email"
           placeholder="Email"
-          Icon={<EmailIcon />}
+          startIcon={<EmailIcon />}
           fullWIdth
         />
         <Input
@@ -93,7 +93,7 @@ const SignUp: FunctionComponent = () => {
           name="password"
           type="password"
           placeholder="Password"
-          Icon={<SecurityIcon />}
+          startIcon={<SecurityIcon />}
           fullWIdth
           minLength={6}
         />

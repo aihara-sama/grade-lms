@@ -152,7 +152,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
           </div>
           <div className="flex items-center gap-2 mb-1">
             <Input
-              Icon={<MessagesIcon size="xs" />}
+              startIcon={<MessagesIcon size="xs" />}
               value={chatMessage.text}
               onChange={onTextChange}
               fullWIdth

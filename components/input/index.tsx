@@ -2,11 +2,13 @@
 
 import CrossEyeIcon from "@/components/icons/cross-eye-icon";
 import EyeIcon from "@/components/icons/eye-icon";
+import clsx from "clsx";
 import type { FunctionComponent, InputHTMLAttributes } from "react";
 import { useEffect, useRef, useState } from "react";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
-  Icon: JSX.Element;
+  startIcon: JSX.Element;
+  endIcon?: JSX.Element;
   label?: string;
   value?: string;
   onClick?: React.MouseEventHandler<HTMLInputElement>;
@@ -16,7 +18,8 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input: FunctionComponent<Props> = ({
-  Icon,
+  startIcon: Icon,
+  endIcon,
   type,
   label,
   value,
@@ -50,12 +53,17 @@ const Input: FunctionComponent<Props> = ({
         <div className="absolute top-2/4 flex *:translate-y-[-50%] left-3 text-neutral-600">
           {Icon}
         </div>
+        {endIcon && (
+          <div className="absolute top-2/4 flex *:translate-y-[-50%] right-3 text-neutral-600">
+            {endIcon}
+          </div>
+        )}
         <input
           ref={inputRef}
           value={value}
           type={inputType}
           placeholder={placeholder}
-          className={fullWIdth ? "w-full" : "w-full sm:w-auto"}
+          className={`${fullWIdth ? "w-full" : "w-full sm:w-auto"} ${clsx(endIcon && "pr-10")}`}
           {...inputProps}
         />
         {type === "password" && (

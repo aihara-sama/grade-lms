@@ -217,7 +217,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
         <Input
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          Icon={<SearchIcon />}
+          startIcon={<SearchIcon />}
           autoFocus
           placeholder="Search..."
         />

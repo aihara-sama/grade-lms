@@ -1,3 +1,4 @@
+import LessonProvider from "@/components/lesson-provider";
 import LiveLesson from "@/components/live-lesson";
 import { db } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
@@ -20,7 +21,11 @@ const Page: FunctionComponent<Props> = async ({ params: { lessonId } }) => {
     return redirect("/dashboard");
   }
 
-  return <LiveLesson lesson={lessonResult.data} />;
+  return (
+    <LessonProvider lesson={lessonResult.data}>
+      <LiveLesson lesson={lessonResult.data} />
+    </LessonProvider>
+  );
 };
 
 export default Page;

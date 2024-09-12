@@ -294,7 +294,7 @@ const Users: FunctionComponent = () => {
         </div>
       ) : (
         <Input
-          Icon={<SearchIcon size="xs" />}
+          startIcon={<SearchIcon size="xs" />}
           placeholder={t("search")}
           onChange={(e) => setSearchText(e.target.value)}
           className="w-auto"

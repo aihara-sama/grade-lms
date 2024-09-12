@@ -3,12 +3,11 @@
 import type { User } from "@/types/users";
 import { create } from "zustand";
 
-export const useUser = create<{
+interface Store {
   user: User;
   setUser: (user: User) => void;
-}>((set) => ({
+}
+export const useUser = create<Store>((set) => ({
   user: null,
-  setUser: (user: User) => {
-    return set({ user });
-  },
+  setUser: (user: User) => set({ user }),
 }));

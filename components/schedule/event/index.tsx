@@ -1,5 +1,7 @@
 import { useSchedule } from "@/hooks/useSchedule";
 import type { Lesson } from "@/types/lessons.type";
+import { isLessonEnded } from "@/utils/is-lesson-ended";
+import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import { minToPx } from "@/utils/min-to-px";
 import clsx from "clsx";
 import {
@@ -32,6 +34,8 @@ const Event: FunctionComponent<Props> = ({
 
   const isBeforeMidnight = format(new Date(eventStarts), "HH:mm") === "23:45";
   const isQuarter = millisecondsToMinutes(duration) === 15;
+  const isOngoing = isLessonOngoing(event);
+  const isEnded = isLessonEnded(new Date(event.ends));
 
   // Hooks
   const draggingEvent = useSchedule((state) => state.draggingEvent);
@@ -46,6 +50,8 @@ const Event: FunctionComponent<Props> = ({
 
   // Handlers
   const handlePointerDown = (e: MouseEvent) => {
+    if (isOngoing || isEnded) return;
+
     setInitPointerPosition({
       pointerX: e.clientX,
       pointerY: e.clientY,

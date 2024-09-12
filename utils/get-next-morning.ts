@@ -1,5 +1,14 @@
-import { addDays, setHours, setMinutes, setSeconds } from "date-fns";
+import {
+  addDays,
+  setHours,
+  setMilliseconds,
+  setMinutes,
+  setSeconds,
+} from "date-fns";
 
 export const getNextMorning = () => {
-  return addDays(setSeconds(setMinutes(setHours(new Date(), 8), 0), 0), 1);
+  return addDays(
+    setMilliseconds(setSeconds(setMinutes(setHours(new Date(), 8), 0), 0), 0),
+    1
+  );
 };

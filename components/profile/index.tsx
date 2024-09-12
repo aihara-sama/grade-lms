@@ -195,7 +195,7 @@ const Profile: FunctionComponent = () => {
               value={userName}
               fullWIdth
               name="name"
-              Icon={<AvatarIcon size="xs" />}
+              startIcon={<AvatarIcon size="xs" />}
               label="Name"
               autoFocus
               className="mb-auto"
@@ -272,7 +272,7 @@ const Profile: FunctionComponent = () => {
               value={password}
               fullWIdth
               name="password"
-              Icon={<SecurityIcon size="xs" />}
+              startIcon={<SecurityIcon size="xs" />}
               label="Password"
               autoFocus
               className="mb-auto"

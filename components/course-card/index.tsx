@@ -14,25 +14,25 @@ const CourseCard: FunctionComponent<Props> = ({ course }) => {
     <Link
       href={`/dashboard/courses/${course.id}/overview`}
       key={course.id}
-      className="border border-neutral-300 rounded-lg px-4 py-2 flex items-center justify-between min-w-[280px] inter-active"
+      className="border border-neutral-300 rounded-lg px-4 py-2 flex items-center justify-between min-w-[280px] max-w-[280px] inter-active"
     >
-      <div className="flex gap-2 w-full">
+      <div className="flex gap-2 w-full overflow-hidden">
         <CourseIcon size="sm" />
         <div
-          className="text-sm flex-1 truncate-fade max-w-40 w-full font-semibold"
+          className="text-sm flex-1 truncate-fade max-w-40 w-full font-semibold mr-2"
           title={course.title}
         >
           {course.title}
         </div>
       </div>
       <div className="flex gap-3 items-center text-neutral-600">
-        <div>
+        <div className="flex flex-col items-center">
           <div>
             <UsersIcon size="xs" />
           </div>
           <div>{course.users[0].count}</div>
         </div>
-        <div>
+        <div className="flex flex-col items-center">
           <div>
             <LessonsIcon size="xs" />
           </div>

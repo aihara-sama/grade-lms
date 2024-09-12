@@ -24,6 +24,7 @@ import { Role } from "@/interfaces/user.interface";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { getLessonDuration } from "@/utils/get-lesson-duration";
+import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import { throttleSearch } from "@/utils/throttle-search";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -189,15 +190,17 @@ const EditLessonModal: FunctionComponent<Props> = memo(
             >
               <LessonsIcon />
             </button>
-            {user.role === Role.Teacher && (
-              <button
-                disabled={!lesson}
-                className="icon-button"
-                onClick={() => setIsDeleteLessonModalOpen(true)}
-              >
-                <DeleteIcon />
-              </button>
-            )}
+            {lesson &&
+              !isLessonOngoing(lesson) &&
+              user.role === Role.Teacher && (
+                <button
+                  disabled={!lesson}
+                  className="icon-button"
+                  onClick={() => setIsDeleteLessonModalOpen(true)}
+                >
+                  <DeleteIcon />
+                </button>
+              )}
           </>
         }
       >
@@ -220,7 +223,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
             <Input
               name="title"
               fullWIdth
-              Icon={<LessonsIcon size="xs" />}
+              startIcon={<LessonsIcon size="xs" />}
               placeholder="Lesson name"
               onChange={onInputChange}
               value={lesson.title}
@@ -231,16 +234,16 @@ const EditLessonModal: FunctionComponent<Props> = memo(
               date={new Date(lesson.starts)}
               onChange={onDateChange}
               label="Starts at"
-              disabled={user.role !== Role.Teacher}
+              disabled={isLessonOngoing(lesson) || user.role !== Role.Teacher}
             />
             <Input
               fullWIdth
               label="Duration:"
               type="number"
-              Icon={<TimeIcon />}
+              startIcon={<TimeIcon />}
               value={`${millisecondsToMinutes(getLessonDuration(lesson))}`}
               onChange={onChangeDuration}
-              disabled={user.role !== Role.Teacher}
+              disabled={isLessonOngoing(lesson) || user.role !== Role.Teacher}
             />
             <hr className="my-3" />
             <div className="flex justify-end">

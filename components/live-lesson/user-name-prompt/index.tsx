@@ -43,7 +43,7 @@ const GuestPrompt: FunctionComponent<Props> = () => {
       <Input
         value={userName}
         onChange={handleInputChange}
-        Icon={<AvatarIcon size="xs" />}
+        startIcon={<AvatarIcon size="xs" />}
         label="Enter your name"
         autoFocus
       />

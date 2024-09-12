@@ -1,6 +1,7 @@
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
+import { Role } from "@/interfaces/user.interface";
 import { Event } from "@/types/events.type";
 import type { User } from "@/types/users";
 import type {
@@ -209,7 +210,10 @@ export const useVideoChat = () => {
   }, []);
 
   return {
-    cameras,
+    cameras: [
+      ...cameras.filter(({ user: { role } }) => role === Role.Teacher),
+      ...cameras.filter(({ user: { role } }) => role !== Role.Teacher),
+    ],
     fireAndToggleAudio,
     fireAndToggleCamera,
     endSession,
