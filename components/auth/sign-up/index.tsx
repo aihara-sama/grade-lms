@@ -24,7 +24,6 @@ const SignUp: FunctionComponent = () => {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  console.log(searchParams.get("redirect"));
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -37,6 +36,7 @@ const SignUp: FunctionComponent = () => {
     const password = String(payload.get("password"));
 
     setIsSubmitting(true);
+
     const { error, data } = await db.auth.signUp({
       email,
       password,
@@ -75,6 +75,7 @@ const SignUp: FunctionComponent = () => {
           placeholder="Name"
           Icon={<AvatarIcon size="xs" />}
           fullWIdth
+          maxLength={76}
         />
         <Input
           name="email"

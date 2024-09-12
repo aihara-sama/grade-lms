@@ -68,13 +68,6 @@
   "lesson_saved": "Lesson successfully saved",
   "user_deleted": "User successfully deleted",
   "lessons_deleted": "Lessons successfully deleted",
-  "auth": {
-    "an_email_address_is_too_long": "An email address is too long",
-    "unauthorized": "Unauthorized",
-    "user_not_found": "User not found",
-    "user_already_registered": "A user with this email address has already been registered",
-    "forbidden": "Forbidden"
-  },
 
   "failed_to_load_users": "Failed to load users",
   "failed_to_load_users_count": "Failed to load users count",
@@ -100,5 +93,16 @@
     "delete_submissions": "Are you sure you want to delete selected submissions?",
     "delete_assignments": "Are you sure you want to delete selected assignments?",
     "delete_assignment": "Are you sure you want to delete this assignment?"
+  },
+  "auth": {
+    "an_email_address_is_too_long": "An email address is too long",
+    "user_not_found": "User not found",
+    "user_already_registered": "A user with this email address has already been registered",
+    "signup_requires_a_valid_password": "Signup requires a valid password",
+    "password_should_be_at_least_6_characters": "Password should be at least 6 characters.",
+    "password_cannot_be_longer_than_72_characters": "Password cannot be longer than 72 characters",
+    "unable_to_validate_email_address_invalid_format": "Unable to validate email address: invalid format",
+    "to_signup_please_provide_your_email_or_phone_number": "To signup, please provide your email",
+    "invalid_login_credentials": "Invalid login credentials"
   }
 }

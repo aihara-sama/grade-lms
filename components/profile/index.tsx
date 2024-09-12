@@ -18,6 +18,7 @@ import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
 import { type IUserMetadata } from "@/interfaces/user.interface";
+import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -30,7 +31,7 @@ const Profile: FunctionComponent = () => {
   const [isSubmittingChangePassword, setIsSubmittingChangePassword] =
     useState(false);
 
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   const [avatar, setAvatar] = useState(user.avatar);
   const [userName, setUserName] = useState(user.name);
@@ -47,11 +48,8 @@ const Profile: FunctionComponent = () => {
   const redirectedPathName = (_locale: Locale) => {
     if (!pathName) return "/";
     const segments = pathName.split("/");
-    console.log({ segments });
 
     segments.splice(0, 1, _locale);
-    console.log({ segments });
-    console.log(segments.join("/"));
 
     return `/${segments.join("/")}`;
   };
@@ -96,7 +94,10 @@ const Profile: FunctionComponent = () => {
         });
 
         if (usersError || profileError) toast.error("Something went wrong");
-        else toast.success("Avatar changed");
+        else {
+          setUser({ ...user, avatar });
+          toast.success("Avatar changed");
+        }
       }
     })();
   }, [avatar]);
@@ -164,7 +165,7 @@ const Profile: FunctionComponent = () => {
       const { error } = await db.auth.updateUser({
         password,
       });
-      if (error) throw new Error(t("failed_to_change_password"));
+      if (error) throw new Error(t(serverErrToIntlKey(error.message)));
 
       toast.success(t("password_changed"));
     } catch (error: any) {

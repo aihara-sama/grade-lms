@@ -23,6 +23,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
   // Handlers
   const submitCreateCourse = async () => {
     setIsSubmitting(true);
+
     try {
       await createCourse(course);
       onClose(true);
