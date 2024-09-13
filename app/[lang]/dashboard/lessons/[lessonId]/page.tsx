@@ -1,3 +1,4 @@
+import ChatProvider from "@/components/chat-provider";
 import LessonProvider from "@/components/lesson-provider";
 import LiveLesson from "@/components/live-lesson";
 import { db } from "@/utils/supabase/client";
@@ -23,7 +24,9 @@ const Page: FunctionComponent<Props> = async ({ params: { lessonId } }) => {
 
   return (
     <LessonProvider lesson={lessonResult.data}>
-      <LiveLesson lesson={lessonResult.data} />
+      <ChatProvider>
+        <LiveLesson lesson={lessonResult.data} />
+      </ChatProvider>
     </LessonProvider>
   );
 };

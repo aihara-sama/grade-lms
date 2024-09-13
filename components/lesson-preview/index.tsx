@@ -38,10 +38,7 @@ const LessonPreview: FunctionComponent = () => {
   // State
   const [starts, setStarts] = useState(new Date(lesson.starts));
   const [ends, setEnds] = useState(new Date(lesson.ends));
-  console.log({
-    starts: starts.toISOString(),
-    lessonStarts: new Date(lesson.starts).toISOString(),
-  });
+
   const [whiteboardHeight, setWhiteboardHeight] = useState(0);
   const [whiteboardInitialData, setWhiteboardInitialData] =
     useState<ExcalidrawInitialDataState>();

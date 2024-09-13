@@ -4,16 +4,21 @@ import Tab from "@/components/tabs/tab";
 import { useUser } from "@/hooks/use-user";
 import type { ITab } from "@/interfaces/tabs.interface";
 import type { FunctionComponent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   tabs: ITab[];
+  onChange?: (tab: number) => void;
 }
 
-const Tabs: FunctionComponent<Props> = ({ tabs }) => {
+const Tabs: FunctionComponent<Props> = ({ tabs, onChange }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const { user } = useUser();
+
+  useEffect(() => {
+    onChange?.(activeTab);
+  }, [activeTab]);
 
   return (
     <div className="overflow-auto flex flex-col flex-1">

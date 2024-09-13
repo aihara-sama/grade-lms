@@ -10,12 +10,13 @@ import Tabs from "@/components/tabs";
 import Whiteboard from "@/components/whiteboard";
 import { Role } from "@/interfaces/user.interface";
 import clsx from "clsx";
-import { useEffect, useState, type FunctionComponent } from "react";
+import { useEffect, useRef, useState, type FunctionComponent } from "react";
 
 import Breadcrumbs from "@/components/breadcrumbs";
 import Camera from "@/components/camera";
 import CoursesIcon from "@/components/icons/courses-icon";
 import TimeIcon from "@/components/icons/time-icon";
+import { useChat } from "@/hooks/use-chat";
 import { useVideoChat } from "@/hooks/use-video-chat";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
@@ -41,24 +42,12 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     endSession,
     startSession,
   } = useVideoChat();
+  const [isNewChatMessage, setIsNewChatMessage] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const { messages } = useChat();
 
   const t = useTranslations();
-
-  const fetchLesson = async () => {
-    try {
-      const { data, error } = await db
-        .from("lessons")
-        .select("*, course:courses(*)")
-        .eq("id", lesson.id)
-        .single();
-
-      if (error) throw new Error(t("something_went_wrong"));
-
-      setCurrentLesson(data);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+  const activeTabRef = useRef(activeTab);
 
   const tabs = [
     {
@@ -90,7 +79,14 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     {
       title: "Messages",
       content: <Chat lesson={lesson} />,
-      Icon: <ChatIcon />,
+      Icon: (
+        <div className="relative">
+          <ChatIcon />
+          {isNewChatMessage && (
+            <div className="absolute right-[7px] top-[7px] w-[10px] h-[10px] bg-red-500 rounded-[50%] border border-white"></div>
+          )}
+        </div>
+      ),
       tier: [Role.Teacher, Role.Student, Role.Guest],
     },
   ];
@@ -108,6 +104,23 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
       tier: [Role.Teacher],
     });
   }
+
+  const fetchLesson = async () => {
+    try {
+      const { data, error } = await db
+        .from("lessons")
+        .select("*, course:courses(*)")
+        .eq("id", lesson.id)
+        .single();
+
+      if (error) throw new Error(t("something_went_wrong"));
+
+      setCurrentLesson(data);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   useEffect(() => {
     if (!isLessonEnded(new Date(lesson.ends))) startSession();
   }, []);
@@ -152,6 +165,15 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     return () => {};
   }, []);
 
+  useEffect(() => {
+    if (activeTab === 1) setIsNewChatMessage(false);
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 1 && messages.length) setIsNewChatMessage(true);
+  }, [messages]);
+
   return (
     <div>
       {currentLesson.course && (
@@ -195,7 +217,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
           <aside
             className={`${isAsideOpen ? "flex" : "hidden"} flex-col gap-3 w-[350px]`}
           >
-            <Tabs tabs={tabs} />
+            <Tabs tabs={tabs} onChange={setActiveTab} />
           </aside>
         </div>
       </main>

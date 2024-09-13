@@ -7,14 +7,14 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { v4 as uuid } from "uuid";
 
-let channel: RealtimeChannel;
+let lessonChannel: RealtimeChannel;
 
 export const useLessonChannel = () => {
   const params = useParams<{ lessonId?: string }>();
   const { user } = useUser();
 
-  channel =
-    channel ||
+  lessonChannel =
+    lessonChannel ||
     db.channel(params.lessonId || uuid(), {
       config: {
         presence: {
@@ -25,11 +25,11 @@ export const useLessonChannel = () => {
 
   useEffect(() => {
     return () => {
-      if (channel)
-        channel.unsubscribe().then(() => {
-          channel = undefined;
+      if (lessonChannel)
+        lessonChannel.unsubscribe().then(() => {
+          lessonChannel = undefined;
         });
     };
   }, []);
-  return channel;
+  return lessonChannel;
 };

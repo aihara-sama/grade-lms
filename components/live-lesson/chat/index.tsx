@@ -7,11 +7,10 @@ import CreateFileMessageModal from "@/components/common/modals/create-file-messa
 import ChatIcon from "@/components/icons/chat-icon";
 import SendMessageIcon from "@/components/icons/send-message-icon";
 import Message from "@/components/live-lesson/chat/message";
-import Skeleton from "@/components/skeleton";
 import { createChatMessage, getChatMessages } from "@/db/message";
-import { useLessonChannel } from "@/hooks/use-lesson-channel";
+import { useChat } from "@/hooks/use-chat";
+import { useChatChannel } from "@/hooks/use-chat-channel";
 import { useUser } from "@/hooks/use-user";
-import type { ResultOf } from "@/types";
 import type { ChatMessage } from "@/types/chat-messages";
 import type { Course } from "@/types/courses.type";
 import { Event } from "@/types/events.type";
@@ -29,20 +28,17 @@ interface Props {
 const Chat: FunctionComponent<Props> = ({ lesson }) => {
   // State
   const [chatMessageText, setChatMessageText] = useState("");
-  const [chatMessages, setChatMessages] = useState<
-    ResultOf<typeof getChatMessages>
-  >([]);
   const [file, setFile] = useState<File>();
   const [isCreateFileMessageModalOpen, setIsCreateFileMessageModalOpen] =
     useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { messages, setMessages } = useChat();
 
   // Refs
   const messagesWrapperRef = useRef<HTMLDivElement>();
 
   // Hooks
   const { user } = useUser();
-  const channel = useLessonChannel();
+  const channel = useChatChannel();
 
   const disabled = isLessonEnded(new Date(lesson.ends));
 
@@ -54,6 +50,17 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
       payload: chatMessage,
     });
   };
+
+  const fetchChatMessages = async () => {
+    try {
+      const fetchedMessages = await getChatMessages(lesson.id);
+
+      setMessages(() => fetchedMessages);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const submitCreateChatMesssage = async (replyId?: string) => {
     try {
       const createdChatMessage = await createChatMessage({
@@ -66,27 +73,12 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
       });
 
       setChatMessageText("");
-      setChatMessages((prev) => [...prev, createdChatMessage]);
+      setMessages((prev) => [...prev, createdChatMessage]);
       fireChatMessageCreate(createdChatMessage);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-
-  const fetchChatMessages = async () => {
-    setIsLoading(true);
-
-    try {
-      setChatMessages(await getChatMessages(lesson.id));
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const onNewChatMessage = (payload: {
-    payload: ResultOf<typeof getChatMessages>[number];
-  }) => setChatMessages((prev) => [...prev, payload.payload]);
 
   const onFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files.length) {
@@ -103,24 +95,13 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
   };
 
   // Effects
-  useEffect(() => {
-    fetchChatMessages();
-  }, []);
 
   useEffect(() => {
     messagesWrapperRef.current.scrollTo(
       0,
       messagesWrapperRef.current.scrollHeight
     );
-  }, [chatMessages]);
-
-  useEffect(() => {
-    channel.on<ResultOf<typeof getChatMessages>[number]>(
-      "broadcast",
-      { event: Event.ChatMessageCreated },
-      onNewChatMessage
-    );
-  }, []);
+  }, [messages]);
 
   return (
     <div className="rounded-md relative px-4 py-0 pb-4 flex-1 flex flex-col border border-gray-200">
@@ -139,14 +120,11 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
         className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1"
       >
         <div className="flex flex-1 flex-col gap-2">
-          {isLoading && <Skeleton />}
-
-          {!isLoading &&
-            chatMessages.map((msg, idx) => (
-              <div key={msg.id} className={`${clsx(idx === 0 && "mt-auto")}`}>
-                <Message chatMessage={msg} />
-              </div>
-            ))}
+          {messages.map((msg, idx) => (
+            <div key={msg.id} className={`${clsx(idx === 0 && "mt-auto")}`}>
+              <Message chatMessage={msg} />
+            </div>
+          ))}
         </div>
       </div>
       <Input

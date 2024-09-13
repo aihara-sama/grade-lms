@@ -14,7 +14,6 @@ import type { MediaConnection } from "peerjs";
 import { useEffect, useRef, useState } from "react";
 
 export const useVideoChat = () => {
-  const [peer, setPeer] = useState<Peer>();
   const [cameras, setCameras] = useState<ICamera[]>([]);
 
   // Hooks
@@ -23,16 +22,28 @@ export const useVideoChat = () => {
 
   // Refs
   const localStreamRef = useRef<MediaStream>();
+  const joinedCount = useRef(0);
+  const peerRef = useRef<Peer>();
+  const isUnmounting = useRef(false);
 
   const endSession = () => {
-    if (peer) {
-      peer.disconnect();
-      peer.destroy();
-      setPeer(undefined);
+    if (peerRef.current) {
+      peerRef.current.disconnect();
+      peerRef.current.destroy();
+      peerRef.current = undefined;
+
+      cameras.forEach((camera) => {
+        camera.stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      });
+
+      setCameras([]);
+
+      localStreamRef.current?.getTracks().forEach((track) => {
+        track.stop();
+      });
     }
-    localStreamRef.current?.getTracks().forEach((track) => {
-      track.stop();
-    });
   };
   const addCamera = (stream: MediaStream, _user: User) => {
     setCameras((_) => {
@@ -113,11 +124,15 @@ export const useVideoChat = () => {
       Object.keys(channel.presenceState())
         .filter((id) => id !== user.id)
         .forEach((id) => {
-          const outgoingCall = peer.call(id, localStreamRef.current, {
-            metadata: {
-              user,
-            },
-          });
+          const outgoingCall = peerRef.current.call(
+            id,
+            localStreamRef.current,
+            {
+              metadata: {
+                user,
+              },
+            }
+          );
 
           outgoingCall.on("stream", (remoteStream) => {
             addCamera(
@@ -178,27 +193,30 @@ export const useVideoChat = () => {
   const startSession = () => {
     // Handle SSR for navigator
     import("peerjs").then(({ default: Peer }) => {
-      setPeer(new Peer(user.id));
+      peerRef.current = new Peer(user.id);
+
+      peerRef.current.on("open", onPeerOpen);
+      peerRef.current.on("call", onPeerCall);
     });
   };
 
   useEffect(() => {
     return () => {
-      localStreamRef.current?.getTracks().forEach((track) => {
-        track.stop();
-      });
+      isUnmounting.current = true;
     };
   }, []);
-  useEffect(() => {
-    if (peer) {
-      peer.on("open", onPeerOpen);
-      peer.on("call", onPeerCall);
-    }
 
+  useEffect(() => {
+    joinedCount.current = cameras.length;
+  }, [cameras]);
+
+  useEffect(() => {
     return () => {
-      endSession();
+      if (isUnmounting.current) {
+        endSession();
+      }
     };
-  }, [peer]);
+  }, [cameras]);
 
   useEffect(() => {
     channel.on("broadcast", { event: Event.ToggleCamera }, (payload) =>
