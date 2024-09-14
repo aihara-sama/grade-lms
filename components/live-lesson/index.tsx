@@ -125,6 +125,8 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     if (!isLessonEnded(new Date(lesson.ends))) startSession();
   }, []);
   useEffect(() => {
+    console.log({ isEnded: isLessonEnded(new Date(lesson.ends)) });
+
     if (isLessonEnded(new Date(lesson.ends))) endSession();
   }, [lesson]);
   useEffect(() => {

@@ -22,28 +22,16 @@ export const useVideoChat = () => {
 
   // Refs
   const localStreamRef = useRef<MediaStream>();
-  const joinedCount = useRef(0);
   const peerRef = useRef<Peer>();
-  const isUnmounting = useRef(false);
 
   const endSession = () => {
     if (peerRef.current) {
       peerRef.current.disconnect();
       peerRef.current.destroy();
-      peerRef.current = undefined;
-
-      cameras.forEach((camera) => {
-        camera.stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-      });
-
-      setCameras([]);
-
-      localStreamRef.current?.getTracks().forEach((track) => {
-        track.stop();
-      });
     }
+    localStreamRef.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
   };
   const addCamera = (stream: MediaStream, _user: User) => {
     setCameras((_) => {
@@ -202,21 +190,9 @@ export const useVideoChat = () => {
 
   useEffect(() => {
     return () => {
-      isUnmounting.current = true;
+      endSession();
     };
   }, []);
-
-  useEffect(() => {
-    joinedCount.current = cameras.length;
-  }, [cameras]);
-
-  useEffect(() => {
-    return () => {
-      if (isUnmounting.current) {
-        endSession();
-      }
-    };
-  }, [cameras]);
 
   useEffect(() => {
     channel.on("broadcast", { event: Event.ToggleCamera }, (payload) =>
