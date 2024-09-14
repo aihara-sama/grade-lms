@@ -1,24 +1,31 @@
-import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
 import { Role } from "@/interfaces/user.interface";
 import { Event } from "@/types/events.type";
 import type { User } from "@/types/users";
+import { db } from "@/utils/supabase/client";
 import type {
   REALTIME_SUBSCRIBE_STATES,
   RealtimePresenceJoinPayload,
   RealtimePresenceLeavePayload,
 } from "@supabase/supabase-js";
+import { useParams } from "next/navigation";
 import type Peer from "peerjs";
 import type { MediaConnection } from "peerjs";
 import { useEffect, useRef, useState } from "react";
 
 export const useVideoChat = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
-
+  const { lessonId } = useParams();
   // Hooks
-  const channel = useLessonChannel();
   const { user } = useUser();
+  const channel = db.channel(lessonId as string, {
+    config: {
+      presence: {
+        key: user.id,
+      },
+    },
+  });
 
   // Refs
   const localStreamRef = useRef<MediaStream>();
@@ -32,6 +39,8 @@ export const useVideoChat = () => {
     localStreamRef.current?.getTracks().forEach((track) => {
       track.stop();
     });
+
+    channel.unsubscribe();
   };
   const addCamera = (stream: MediaStream, _user: User) => {
     setCameras((_) => {
@@ -149,6 +158,8 @@ export const useVideoChat = () => {
   };
 
   const onPeerOpen = () => {
+    alert("on peer open");
+
     navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
@@ -190,7 +201,15 @@ export const useVideoChat = () => {
 
   useEffect(() => {
     return () => {
-      endSession();
+      if (peerRef.current) {
+        peerRef.current.disconnect();
+        peerRef.current.destroy();
+      }
+      localStreamRef.current?.getTracks().forEach((track) => {
+        track.stop();
+      });
+
+      channel.unsubscribe();
     };
   }, []);
 
