@@ -1,15 +1,17 @@
 "use client";
 
+import type { MediaConnection } from "peerjs";
 import Peer from "peerjs";
 import React, { useEffect, useRef, useState } from "react";
 
 const VideoMeetingPage: React.FC = () => {
   const [peerId, setPeerId] = useState<string | null>(null);
-  const [remotePeerId, setRemotePeerId] = useState<string>("");
+  const [remotePeerIds, setRemotePeerIds] = useState<string[]>([]);
   const [peer, setPeer] = useState<Peer | null>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+  const remoteVideoRefs = useRef<{ [key: string]: HTMLVideoElement }>({}); // Store refs for remote videos
+  const connectionsRef = useRef<{ [key: string]: MediaConnection }>({}); // Store active connections
 
   useEffect(() => {
     // Initialize Peer
@@ -21,18 +23,36 @@ const VideoMeetingPage: React.FC = () => {
       setPeerId(id);
     });
 
-    // Handle incoming connection (remote user calls)
+    // Handle incoming connections
     newPeer.on("call", (call) => {
       // Answer the call and stream local video
       if (localStreamRef.current) {
         call.answer(localStreamRef.current);
       }
 
+      // Save connection
+      connectionsRef.current[call.peer] = call;
+
       call.on("stream", (remoteStream) => {
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = remoteStream;
-          remoteVideoRef.current.play();
+        // Create a video element for the new remote peer
+        if (!remoteVideoRefs.current[call.peer]) {
+          const video = document.createElement("video");
+          video.className = "w-80 h-60 bg-black";
+          document.getElementById("remote-videos")?.appendChild(video);
+          remoteVideoRefs.current[call.peer] = video;
         }
+
+        remoteVideoRefs.current[call.peer].srcObject = remoteStream;
+        remoteVideoRefs.current[call.peer].play();
+      });
+
+      // Handle call closure
+      call.on("close", () => {
+        if (remoteVideoRefs.current[call.peer]) {
+          remoteVideoRefs.current[call.peer].srcObject = null;
+        }
+        delete remoteVideoRefs.current[call.peer];
+        delete connectionsRef.current[call.peer];
       });
     });
 
@@ -60,20 +80,40 @@ const VideoMeetingPage: React.FC = () => {
     };
   }, []);
 
-  const callPeer = () => {
-    if (!remotePeerId || !peer) return;
+  const callPeers = () => {
+    if (!peer) return;
 
-    if (localStreamRef.current) {
-      // Call the remote peer
-      const call = peer.call(remotePeerId, localStreamRef.current);
+    remotePeerIds.forEach((remotePeerId) => {
+      if (localStreamRef.current) {
+        // Call the remote peer
+        const call = peer.call(remotePeerId, localStreamRef.current);
 
-      call.on("stream", (remoteStream) => {
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = remoteStream;
-          remoteVideoRef.current.play();
-        }
-      });
-    }
+        // Save connection
+        connectionsRef.current[remotePeerId] = call;
+
+        call.on("stream", (remoteStream) => {
+          // Create a video element for the new remote peer
+          if (!remoteVideoRefs.current[remotePeerId]) {
+            const video = document.createElement("video");
+            video.className = "w-80 h-60 bg-black";
+            document.getElementById("remote-videos")?.appendChild(video);
+            remoteVideoRefs.current[remotePeerId] = video;
+          }
+
+          remoteVideoRefs.current[remotePeerId].srcObject = remoteStream;
+          remoteVideoRefs.current[remotePeerId].play();
+        });
+
+        // Handle call closure
+        call.on("close", () => {
+          if (remoteVideoRefs.current[remotePeerId]) {
+            remoteVideoRefs.current[remotePeerId].srcObject = null;
+          }
+          delete remoteVideoRefs.current[remotePeerId];
+          delete connectionsRef.current[remotePeerId];
+        });
+      }
+    });
   };
 
   return (
@@ -83,18 +123,19 @@ const VideoMeetingPage: React.FC = () => {
       {/* Display Peer ID */}
       <div className="my-4">
         <p>Your Peer ID: {peerId}</p>
-        <input
-          type="text"
-          placeholder="Enter remote peer ID"
-          value={remotePeerId}
-          onChange={(e) => setRemotePeerId(e.target.value)}
+        <textarea
+          placeholder="Enter remote peer IDs, separated by commas"
+          value={remotePeerIds.join(",")}
+          onChange={(e) =>
+            setRemotePeerIds(e.target.value.split(",").map((id) => id.trim()))
+          }
           className="border p-2 rounded"
         />
         <button
-          onClick={callPeer}
+          onClick={callPeers}
           className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
         >
-          Call Peer
+          Call Peers
         </button>
       </div>
 
@@ -104,9 +145,9 @@ const VideoMeetingPage: React.FC = () => {
           <h2 className="text-lg font-bold">Your Video (Always Present)</h2>
           <video ref={localVideoRef} className="w-80 h-60 bg-black" muted />
         </div>
-        <div className="ml-8">
-          <h2 className="text-lg font-bold">Remote Video</h2>
-          <video ref={remoteVideoRef} className="w-80 h-60 bg-black" />
+        <div id="remote-videos" className="ml-8">
+          <h2 className="text-lg font-bold">Remote Videos</h2>
+          {/* Remote videos will be dynamically added here */}
         </div>
       </div>
     </div>
