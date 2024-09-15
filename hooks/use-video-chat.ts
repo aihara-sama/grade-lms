@@ -106,6 +106,8 @@ export const useVideoChat = () => {
           });
 
           outgoingCall.on("close", () => {
+            console.log("outgoing call close", id);
+
             setCameras((_) => _.filter((camera) => camera.user.id !== id));
           });
         });
@@ -143,6 +145,8 @@ export const useVideoChat = () => {
       addCamera(remoteStream, incomingCall.metadata.user);
     });
     incomingCall.on("close", () => {
+      console.log("incomingCall close", incomingCall.metadata.user.id);
+
       setCameras((_) =>
         _.filter((camera) => camera.user.id !== incomingCall.metadata.user.id)
       );
