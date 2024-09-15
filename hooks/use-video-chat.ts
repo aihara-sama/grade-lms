@@ -1,6 +1,5 @@
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
-import { Role } from "@/interfaces/user.interface";
 import { Event } from "@/types/events.type";
 import type { User } from "@/types/users";
 import { db } from "@/utils/supabase/client";
@@ -214,10 +213,7 @@ export const useVideoChat = () => {
   }, []);
 
   return {
-    cameras: [
-      ...cameras.filter(({ user: { role } }) => role === Role.Teacher),
-      ...cameras.filter(({ user: { role } }) => role !== Role.Teacher),
-    ],
+    cameras,
     fireAndToggleAudio,
     fireAndToggleCamera,
     endSession,
