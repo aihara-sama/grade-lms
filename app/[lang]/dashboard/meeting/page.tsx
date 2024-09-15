@@ -139,7 +139,6 @@ const VideoMeetingPage: React.FC = () => {
       .then((stream) => {
         localStreamRef.current = stream;
         localVideoRef.current.srcObject = stream;
-        localVideoRef.current.play();
 
         peerRef.current = new Peer(user.id);
 
@@ -188,7 +187,12 @@ const VideoMeetingPage: React.FC = () => {
       <div className="flex">
         <div>
           <h2 className="text-lg font-bold">Your Video (Always Present)</h2>
-          <video ref={localVideoRef} className="w-80 h-60 bg-black" muted />
+          <video
+            ref={localVideoRef}
+            autoPlay
+            className="w-80 h-60 bg-black"
+            muted
+          />
 
           {/* Toggle Buttons for Video and Audio */}
           <div className="flex mt-4">
@@ -212,14 +216,13 @@ const VideoMeetingPage: React.FC = () => {
             {remotePeers.map((remotePeer) => (
               <div key={remotePeer.id} className="w-80 h-60 bg-black m-2">
                 <video
+                  autoPlay
                   ref={(el) => {
                     if (el) {
                       el.srcObject = remotePeer.stream;
-                      el.play();
                     }
                   }}
                   className="w-full h-full"
-                  playsInline
                 />
                 <p className="text-center text-sm">Peer ID: {remotePeer.id}</p>
               </div>
