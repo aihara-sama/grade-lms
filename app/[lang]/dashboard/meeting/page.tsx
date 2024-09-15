@@ -1,5 +1,12 @@
 "use client";
 
+import { useUser } from "@/hooks/use-user";
+import { db } from "@/utils/supabase/client";
+import type {
+  REALTIME_SUBSCRIBE_STATES,
+  RealtimePresenceJoinPayload,
+  User,
+} from "@supabase/supabase-js";
 import type { MediaConnection } from "peerjs";
 import Peer from "peerjs";
 import React, { useEffect, useRef, useState } from "react";
@@ -10,48 +17,73 @@ type RemotePeer = {
 };
 
 const VideoMeetingPage: React.FC = () => {
+  const peerRef = useRef<Peer>();
   const [peerId, setPeerId] = useState<string | null>(null);
   const [remotePeerIds, setRemotePeerIds] = useState<string[]>([]);
-  const [peer, setPeer] = useState<Peer | null>(null);
   const [remotePeers, setRemotePeers] = useState<RemotePeer[]>([]);
   const [videoEnabled, setVideoEnabled] = useState<boolean>(true);
   const [audioEnabled, setAudioEnabled] = useState<boolean>(true);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const connectionsRef = useRef<{ [key: string]: MediaConnection }>({});
+  const { user } = useUser();
+
+  const channel = db.channel("room name", {
+    config: {
+      presence: {
+        key: user.id,
+      },
+    },
+  });
+
+  const onPresenceJoin = (
+    payload: RealtimePresenceJoinPayload<{ user: User }>
+  ) => {
+    console.log("onPresenceJoin");
+
+    if (payload.key === user.id) {
+      console.log("payload.key === user.id");
+
+      Object.keys(channel.presenceState())
+        .filter((id) => id !== user.id)
+        .forEach((id) => {
+          console.log(`calling - ${id}`);
+
+          const call = peerRef.current.call(id, localStreamRef.current);
+
+          connectionsRef.current[id] = call;
+
+          call.on("stream", (remoteStream) => {
+            setRemotePeers((prevPeers) => [
+              ...prevPeers,
+              { id, stream: remoteStream },
+            ]);
+          });
+
+          call.on("close", () => {
+            setRemotePeers((prevPeers) =>
+              prevPeers.filter(({ id: _id }) => _id !== id)
+            );
+            delete connectionsRef.current[id];
+          });
+          call.on("error", (error) => {
+            console.log(`Error while calling${error}`);
+          });
+        });
+    }
+  };
+  const onPresenceSubscribe = async (
+    status: `${REALTIME_SUBSCRIBE_STATES}`
+  ) => {
+    if (status === "SUBSCRIBED") {
+      await channel.track({
+        user,
+      });
+    }
+  };
 
   useEffect(() => {
-    // Initialize Peer
-    const newPeer = new Peer();
-    setPeer(newPeer);
-
-    // Get own Peer ID
-    newPeer.on("open", (id) => {
-      setPeerId(id);
-    });
-
     // Handle incoming connections
-    newPeer.on("call", (call) => {
-      if (localStreamRef.current) {
-        call.answer(localStreamRef.current);
-      }
-
-      connectionsRef.current[call.peer] = call;
-
-      call.on("stream", (remoteStream) => {
-        setRemotePeers((prevPeers) => [
-          ...prevPeers,
-          { id: call.peer, stream: remoteStream },
-        ]);
-      });
-
-      call.on("close", () => {
-        setRemotePeers((prevPeers) =>
-          prevPeers.filter(({ id }) => id !== call.peer)
-        );
-        delete connectionsRef.current[call.peer];
-      });
-    });
 
     // Get local media stream
     navigator.mediaDevices
@@ -63,23 +95,60 @@ const VideoMeetingPage: React.FC = () => {
           localVideoRef.current.srcObject = stream;
           localVideoRef.current.play();
         }
+
+        peerRef.current = new Peer(user.id);
+
+        // Get own Peer ID
+        peerRef.current.on("open", (id) => {
+          setPeerId(id);
+
+          channel
+            .on("presence", { event: "join" }, onPresenceJoin)
+            .subscribe(onPresenceSubscribe);
+        });
+
+        peerRef.current.on("call", (call) => {
+          console.log("Being called");
+
+          if (localStreamRef.current) {
+            call.answer(localStreamRef.current);
+          }
+
+          connectionsRef.current[user.id] = call;
+
+          call.on("stream", (remoteStream) => {
+            setRemotePeers((prevPeers) => [
+              ...prevPeers,
+              { id: user.id, stream: remoteStream },
+            ]);
+          });
+
+          call.on("close", () => {
+            setRemotePeers((prevPeers) =>
+              prevPeers.filter(({ id }) => id !== user.id)
+            );
+            delete connectionsRef.current[user.id];
+          });
+        });
+
+        // Initialize Peer
       });
 
     return () => {
-      if (newPeer) {
-        newPeer.disconnect();
-        newPeer.destroy();
+      if (peerRef.current) {
+        peerRef.current.disconnect();
+        peerRef.current.destroy();
       }
       localStreamRef.current?.getTracks().forEach((track) => track.stop());
     };
   }, []);
 
   const callPeers = () => {
-    if (!peer) return;
+    if (!peerRef.current) return;
 
     remotePeerIds.forEach((remotePeerId) => {
       if (localStreamRef.current) {
-        const call = peer.call(remotePeerId, localStreamRef.current);
+        const call = peerRef.current.call(remotePeerId, localStreamRef.current);
 
         connectionsRef.current[remotePeerId] = call;
 
