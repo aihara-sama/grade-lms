@@ -27,7 +27,6 @@ const Camera: FunctionComponent<Props> = ({
         ref={(el) => {
           if (el) {
             el.srcObject = camera.stream;
-            el.play();
           }
         }}
         playsInline
