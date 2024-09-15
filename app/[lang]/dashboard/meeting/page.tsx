@@ -16,6 +16,21 @@ type RemotePeer = {
   stream: MediaStream;
 };
 
+const Camera = ({ peer }: { peer: any }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    videoRef.current.srcObject = peer.stream;
+  }, []);
+
+  return (
+    <div key={peer.id} className="w-80 h-60 bg-black m-2">
+      <video ref={videoRef} autoPlay className="w-full h-full" />
+      <p className="text-center text-sm">Peer ID: {peer.id}</p>
+    </div>
+  );
+};
+
 const VideoMeetingPage: React.FC = () => {
   const peerRef = useRef<Peer>();
   const [remotePeerIds, setRemotePeerIds] = useState<string[]>([]);
@@ -214,18 +229,7 @@ const VideoMeetingPage: React.FC = () => {
           <h2 className="text-lg font-bold">Remote Videos</h2>
           <div className="flex flex-wrap">
             {remotePeers.map((remotePeer) => (
-              <div key={remotePeer.id} className="w-80 h-60 bg-black m-2">
-                <video
-                  autoPlay
-                  ref={(el) => {
-                    if (el) {
-                      el.srcObject = remotePeer.stream;
-                    }
-                  }}
-                  className="w-full h-full"
-                />
-                <p className="text-center text-sm">Peer ID: {remotePeer.id}</p>
-              </div>
+              <Camera key={remotePeer.id} peer={remotePeer} />
             ))}
           </div>
         </div>
