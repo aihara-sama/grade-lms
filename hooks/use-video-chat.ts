@@ -172,8 +172,6 @@ export const useVideoChat = () => {
       localStreamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
-
-      channel.unsubscribe();
     };
   }, []);
 
