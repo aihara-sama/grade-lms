@@ -45,9 +45,26 @@ export const useVideoChat = () => {
     channel.unsubscribe();
   };
   const addCamera = (stream: MediaStream, _user: User) => {
-    setCameras((_) => {
+    setCameras((currentCameras) => {
+      const existingCameraIndex = currentCameras.findIndex(
+        (camera) => camera.user.id === _user.id
+      );
+
+      if (existingCameraIndex !== -1) {
+        // Replace the existing camera for the user
+        const updatedCameras = [...currentCameras];
+        updatedCameras[existingCameraIndex] = {
+          stream,
+          isCameraEnabled: true,
+          isMicEnabled: true,
+          user: _user,
+        };
+        return updatedCameras;
+      }
+
+      // Add new camera if no camera for the user exists
       return [
-        ..._,
+        ...currentCameras,
         {
           stream,
           isCameraEnabled: true,
