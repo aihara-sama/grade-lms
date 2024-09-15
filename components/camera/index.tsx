@@ -19,6 +19,7 @@ const Camera: FunctionComponent<Props> = ({
   toggleCamera,
   toggleAudio,
 }) => {
+  alert(camera.stream.id);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const { user } = useUser();
