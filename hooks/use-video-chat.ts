@@ -137,6 +137,10 @@ export const useVideoChat = () => {
               channel.presenceState<{ user: User }>()[id][0].user
             );
           });
+
+          outgoingCall.on("error", (error) => {
+            alert(error);
+          });
         });
     }
   };
@@ -170,6 +174,7 @@ export const useVideoChat = () => {
         localStreamRef.current = stream;
       })
       .catch((error) => {
+        alert(error);
         console.error("Error accessing media devices: ", error);
       });
   };
@@ -177,6 +182,9 @@ export const useVideoChat = () => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.on("stream", (remoteStream) => {
       addCamera(remoteStream, incomingCall.metadata.user);
+    });
+    incomingCall.on("error", (error) => {
+      alert(error);
     });
   };
 
