@@ -6,7 +6,7 @@ import VideoDisabledIcon from "@/components/icons/video-disabled-icon";
 import VideoIcon from "@/components/icons/video-icon";
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
-import { type FunctionComponent } from "react";
+import { useEffect, useRef, type FunctionComponent } from "react";
 
 interface Props {
   camera: ICamera;
@@ -19,17 +19,26 @@ const Camera: FunctionComponent<Props> = ({
   toggleCamera,
   toggleAudio,
 }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const { user } = useUser();
+
+  useEffect(() => {
+    videoRef.current.srcObject = camera.stream;
+  }, []);
 
   return (
     <div className="relative flex group">
       <video
-        ref={(el) => {
-          if (el) {
-            el.srcObject = camera.stream;
-          }
-        }}
+        // ref={(el) => {
+        //   if (el) {
+        //     el.srcObject = camera.stream;
+        //     el.play();
+        //   }
+        // }}
+        // playsInline
         className="w-full rounded-[8px] h-[236px] object-cover"
+        ref={videoRef}
         autoPlay
         muted={camera.user.id === user.id}
       ></video>
