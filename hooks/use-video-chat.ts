@@ -16,6 +16,7 @@ export const useVideoChat = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
   const { lessonId } = useParams();
   // Hooks
+  const camerasRef = useRef<ICamera[]>([]);
   const { user } = useUser();
   const channel = db.channel(lessonId as string, {
     config: {
@@ -40,7 +41,11 @@ export const useVideoChat = () => {
 
     channel.unsubscribe();
   };
-  const addCamera = (stream: MediaStream, _user: User) => {
+  const addCamera = (
+    stream: MediaStream,
+    _user: User,
+    connection?: MediaConnection
+  ) => {
     setCameras((_) => {
       return [
         ..._,
@@ -49,6 +54,7 @@ export const useVideoChat = () => {
           isCameraEnabled: true,
           isMicEnabled: true,
           user: _user,
+          connection,
         },
       ];
     });
@@ -102,18 +108,15 @@ export const useVideoChat = () => {
             outgoingCall.once("stream", (remoteStream) => {
               addCamera(
                 remoteStream,
-                channel.presenceState<{ user: User }>()[id][0].user
+                channel.presenceState<{ user: User }>()[id][0].user,
+                outgoingCall
               );
             });
 
             outgoingCall.on("close", () => {
-              alert(`outgoing call close${id}`);
-
               setCameras((_) => _.filter((camera) => camera.user.id !== id));
             });
-            outgoingCall.on("error", (err) => {
-              alert(`outgoing call error ${err} ${id}`);
-            });
+            outgoingCall.on("error", () => {});
           });
         });
     }
@@ -147,7 +150,7 @@ export const useVideoChat = () => {
   const onPeerCall = (incomingCall: MediaConnection) => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
-      addCamera(remoteStream, incomingCall.metadata.user);
+      addCamera(remoteStream, incomingCall.metadata.user, incomingCall);
     });
     incomingCall.on("close", () => {
       alert(`incomingCall close ${incomingCall.metadata.user.id}`);
@@ -173,11 +176,20 @@ export const useVideoChat = () => {
   };
 
   useEffect(() => {
+    camerasRef.current = cameras;
+  }, [cameras]);
+
+  useEffect(() => {
     return () => {
       if (peerRef.current) {
         peerRef.current.disconnect();
         peerRef.current.destroy();
       }
+
+      camerasRef.current.forEach((camera) => {
+        if (camera.connection) camera.connection.close();
+      });
+
       localStreamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
