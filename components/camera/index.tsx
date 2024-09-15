@@ -29,7 +29,6 @@ const Camera: FunctionComponent<Props> = ({
             el.srcObject = camera.stream;
           }
         }}
-        playsInline
         className="w-full rounded-[8px] h-[236px] object-cover"
         autoPlay
         muted={camera.user.id === user.id}
