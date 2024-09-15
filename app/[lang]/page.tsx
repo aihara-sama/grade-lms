@@ -6,7 +6,7 @@ import Link from "next/link";
 const Page: NextPage = () => {
   return (
     <>
-      <Link href="/en/meeting">Start Video Meeting</Link>
+      <Link href="/en/dashboard/meeting">Start Video Meeting</Link>
     </>
   );
 };
