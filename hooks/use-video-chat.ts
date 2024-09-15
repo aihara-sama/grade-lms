@@ -47,7 +47,7 @@ export const useVideoChat = () => {
   const addCamera = (stream: MediaStream, _user: User) => {
     setCameras((currentCameras) => {
       const existingCameraIndex = currentCameras.findIndex(
-        (camera) => camera.user.id === _user.id
+        (camera) => camera.stream.id === stream.id
       );
 
       if (existingCameraIndex !== -1) {
@@ -133,10 +133,14 @@ export const useVideoChat = () => {
   const onPresenceJoin = (
     payload: RealtimePresenceJoinPayload<{ user: User }>
   ) => {
+    console.log("onPresenceJoin");
+
     if (payload.key === user.id) {
       Object.keys(channel.presenceState())
         .filter((id) => id !== user.id)
         .forEach((id) => {
+          console.log("Calling...");
+
           const outgoingCall = peerRef.current.call(
             id,
             localStreamRef.current,
@@ -148,6 +152,8 @@ export const useVideoChat = () => {
           );
 
           outgoingCall.on("stream", (remoteStream) => {
+            console.log("outgoingCall - on:stream");
+
             addCamera(
               remoteStream,
               channel.presenceState<{ user: User }>()[id][0].user
@@ -178,9 +184,13 @@ export const useVideoChat = () => {
   };
 
   const onPeerOpen = () => {
+    console.log("onPeerOpen");
+
     navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
+        console.log("git user media");
+
         channel
           .on("presence", { event: "join" }, onPresenceJoin)
           .on("presence", { event: "leave" }, onPresenceLeave)
@@ -190,13 +200,16 @@ export const useVideoChat = () => {
         localStreamRef.current = stream;
       })
       .catch((error) => {
-        alert(error);
         console.error("Error accessing media devices: ", error);
       });
   };
   const onPeerCall = (incomingCall: MediaConnection) => {
+    console.log("onPeerCall");
+
     incomingCall.answer(localStreamRef.current);
     incomingCall.on("stream", (remoteStream) => {
+      console.log("onPeerCall - on:stream");
+
       addCamera(remoteStream, incomingCall.metadata.user);
     });
     incomingCall.on("error", (error) => {
@@ -207,6 +220,8 @@ export const useVideoChat = () => {
   const startSession = () => {
     // Handle SSR for navigator
     import("peerjs").then(({ default: Peer }) => {
+      console.log("Peer imported");
+
       peerRef.current = new Peer(user.id);
 
       peerRef.current.on("open", onPeerOpen);
