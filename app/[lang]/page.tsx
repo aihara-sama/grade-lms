@@ -116,24 +116,26 @@ const Page: NextPage = () => {
         const { data } = await db.from("visitors").select("*");
 
         data.forEach((visitor) => {
-          const outgoingCall = peerRef.current.call(
-            visitor.id,
-            localStreamRef.current,
-            {
-              metadata: {
-                user,
-              },
-            }
-          );
-
-          outgoingCall.once("stream", (remoteStream) => {
-            addCamera(remoteStream, visitor);
-          });
-
-          outgoingCall.on("close", () => {
-            setCameras((_) =>
-              _.filter((camera) => camera.user.id !== visitor.id)
+          peerRef.current.connect(visitor.id).on("open", () => {
+            const outgoingCall = peerRef.current.call(
+              visitor.id,
+              localStreamRef.current,
+              {
+                metadata: {
+                  user,
+                },
+              }
             );
+
+            outgoingCall.once("stream", (remoteStream) => {
+              addCamera(remoteStream, visitor);
+            });
+
+            outgoingCall.on("close", () => {
+              setCameras((_) =>
+                _.filter((camera) => camera.user.id !== visitor.id)
+              );
+            });
           });
         });
 
@@ -179,6 +181,7 @@ const Page: NextPage = () => {
     return () => {
       if (peerRef.current) {
         peerRef.current.disconnect();
+        peerRef.current.destroy();
       }
       localStreamRef.current?.getTracks().forEach((track) => {
         track.stop();

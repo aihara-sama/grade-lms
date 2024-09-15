@@ -32,6 +32,7 @@ export const useVideoChat = () => {
   const endSession = () => {
     if (peerRef.current) {
       peerRef.current.disconnect();
+      peerRef.current.destroy();
     }
     localStreamRef.current?.getTracks().forEach((track) => {
       track.stop();
@@ -87,30 +88,32 @@ export const useVideoChat = () => {
       Object.keys(channel.presenceState())
         .filter((id) => id !== user.id)
         .forEach((id) => {
-          const outgoingCall = peerRef.current.call(
-            id,
-            localStreamRef.current,
-            {
-              metadata: {
-                user,
-              },
-            }
-          );
-
-          outgoingCall.once("stream", (remoteStream) => {
-            addCamera(
-              remoteStream,
-              channel.presenceState<{ user: User }>()[id][0].user
+          peerRef.current.connect(id).on("open", () => {
+            const outgoingCall = peerRef.current.call(
+              id,
+              localStreamRef.current,
+              {
+                metadata: {
+                  user,
+                },
+              }
             );
-          });
 
-          outgoingCall.on("close", () => {
-            alert(`outgoing call close${id}`);
+            outgoingCall.once("stream", (remoteStream) => {
+              addCamera(
+                remoteStream,
+                channel.presenceState<{ user: User }>()[id][0].user
+              );
+            });
 
-            setCameras((_) => _.filter((camera) => camera.user.id !== id));
-          });
-          outgoingCall.on("error", (err) => {
-            alert(`outgoing call error ${err} ${id}`);
+            outgoingCall.on("close", () => {
+              alert(`outgoing call close${id}`);
+
+              setCameras((_) => _.filter((camera) => camera.user.id !== id));
+            });
+            outgoingCall.on("error", (err) => {
+              alert(`outgoing call error ${err} ${id}`);
+            });
           });
         });
     }
@@ -173,6 +176,7 @@ export const useVideoChat = () => {
     return () => {
       if (peerRef.current) {
         peerRef.current.disconnect();
+        peerRef.current.destroy();
       }
       localStreamRef.current?.getTracks().forEach((track) => {
         track.stop();
