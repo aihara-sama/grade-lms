@@ -158,8 +158,6 @@ export const useVideoChat = () => {
   };
 
   const onPeerOpen = () => {
-    alert("on peer open");
-
     navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
