@@ -106,12 +106,7 @@ export const useVideoChat = () => {
           });
 
           outgoingCall.on("close", () => {
-            alert(`outgoing call close${id}`);
-
             setCameras((_) => _.filter((camera) => camera.user.id !== id));
-          });
-          outgoingCall.on("error", (err) => {
-            alert(`outgoing call error ${err} ${id}`);
           });
         });
     }
@@ -148,15 +143,9 @@ export const useVideoChat = () => {
       addCamera(remoteStream, incomingCall.metadata.user);
     });
     incomingCall.on("close", () => {
-      alert(`incomingCall close ${incomingCall.metadata.user.id}`);
-
       setCameras((_) =>
         _.filter((camera) => camera.user.id !== incomingCall.metadata.user.id)
       );
-    });
-
-    incomingCall.on("error", (err) => {
-      alert(`incoming call error ${err} ${incomingCall.metadata.user.id}`);
     });
   };
 
