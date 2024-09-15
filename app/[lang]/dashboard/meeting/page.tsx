@@ -126,27 +126,23 @@ const VideoMeetingPage: React.FC = () => {
   };
 
   const onPeerCall = (call: MediaConnection) => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        call.answer(stream);
-        connectionsRef.current[user.id] = call;
+    call.answer(localStreamRef.current);
+    connectionsRef.current[user.id] = call;
 
-        call.on("stream", (remoteStream) => {
-          setRemotePeers((prevPeers) => {
-            if (!prevPeers.find((peer) => peer.id === user.id))
-              return [...prevPeers, { id: user.id, stream: remoteStream }];
-            return prevPeers;
-          });
-        });
-
-        call.on("close", () => {
-          setRemotePeers((prevPeers) =>
-            prevPeers.filter(({ id }) => id !== user.id)
-          );
-          delete connectionsRef.current[user.id];
-        });
+    call.on("stream", (remoteStream) => {
+      setRemotePeers((prevPeers) => {
+        if (!prevPeers.find((peer) => peer.id === user.id))
+          return [...prevPeers, { id: user.id, stream: remoteStream }];
+        return prevPeers;
       });
+    });
+
+    call.on("close", () => {
+      setRemotePeers((prevPeers) =>
+        prevPeers.filter(({ id }) => id !== user.id)
+      );
+      delete connectionsRef.current[user.id];
+    });
   };
 
   useEffect(() => {

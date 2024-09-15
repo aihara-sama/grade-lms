@@ -176,17 +176,10 @@ export const useVideoChat = () => {
       });
   };
   const onPeerCall = (incomingCall: MediaConnection) => {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then((stream) => {
-        incomingCall.answer(stream);
-        incomingCall.on("stream", (remoteStream) => {
-          addCamera(remoteStream, incomingCall.metadata.user);
-        });
-      })
-      .catch((error) => {
-        console.error("Error accessing media devices: ", error);
-      });
+    incomingCall.answer(localStreamRef.current);
+    incomingCall.on("stream", (remoteStream) => {
+      addCamera(remoteStream, incomingCall.metadata.user);
+    });
   };
 
   const startSession = () => {
