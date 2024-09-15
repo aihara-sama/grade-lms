@@ -35,13 +35,8 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   const [isAsideOpen, setIsAsideOpen] = useState(true);
   const [isLessonEnding, setIsLessonEnding] = useState(false);
   const [currentLesson, setCurrentLesson] = useState(lesson);
-  const {
-    cameras,
-    fireAndToggleAudio,
-    fireAndToggleCamera,
-    endSession,
-    startSession,
-  } = useVideoChat();
+  const { cameras, toggleAudio, toggleCamera, endSession, startSession } =
+    useVideoChat();
   const [isNewChatMessage, setIsNewChatMessage] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const { messages } = useChat();
@@ -63,8 +58,8 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
             ) : (
               cameras.map((camera, idx) => (
                 <Camera
-                  toggleCamera={fireAndToggleCamera}
-                  toggleAudio={fireAndToggleAudio}
+                  toggleCamera={toggleCamera}
+                  toggleAudio={toggleAudio}
                   camera={camera}
                   key={idx}
                 />
@@ -125,8 +120,6 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     if (!isLessonEnded(new Date(lesson.ends))) startSession();
   }, []);
   useEffect(() => {
-    console.log({ isEnded: isLessonEnded(new Date(lesson.ends)) });
-
     if (isLessonEnded(new Date(lesson.ends))) endSession();
   }, [lesson]);
   useEffect(() => {

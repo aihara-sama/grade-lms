@@ -55,25 +55,6 @@ export const useVideoChat = () => {
     });
   };
 
-  const fireToggleCamera = (userId: string) => {
-    channel.send({
-      type: "broadcast",
-      event: Event.ToggleCamera,
-      payload: {
-        userId,
-      },
-    });
-  };
-  const fireToggleAudio = (userId: string) => {
-    channel.send({
-      type: "broadcast",
-      event: Event.ToggleAudio,
-      payload: {
-        userId,
-      },
-    });
-  };
-
   const toggleCamera = (userId: string) => {
     setCameras((prev) => {
       return prev.map((cam) => {
@@ -99,15 +80,6 @@ export const useVideoChat = () => {
         return cam;
       });
     });
-  };
-
-  const fireAndToggleCamera = (userId: string) => {
-    toggleCamera(userId);
-    fireToggleCamera(userId);
-  };
-  const fireAndToggleAudio = (userId: string) => {
-    toggleAudio(userId);
-    fireToggleAudio(userId);
   };
 
   const onPresenceJoin = (
@@ -172,9 +144,6 @@ export const useVideoChat = () => {
   const onPeerCall = (incomingCall: MediaConnection) => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
-      console.log({ audio: remoteStream.getAudioTracks().length });
-      console.log({ video: remoteStream.getVideoTracks().length });
-
       addCamera(remoteStream, incomingCall.metadata.user);
     });
   };
@@ -214,8 +183,8 @@ export const useVideoChat = () => {
 
   return {
     cameras,
-    fireAndToggleAudio,
-    fireAndToggleCamera,
+    toggleAudio,
+    toggleCamera,
     endSession,
     startSession,
   };
