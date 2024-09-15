@@ -1,7 +1,6 @@
 "use client";
 
-import { v4 as uuid } from "uuid";
-
+import { useUser } from "@/hooks/use-user";
 import { db } from "@/utils/supabase/client";
 import type { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import Peer from "peerjs";
@@ -18,7 +17,7 @@ const VideoMeetingPage: React.FC = () => {
   const [remotePeers, setRemotePeers] = useState<RemotePeer[]>([]); // Store remote streams
   const localStreamRef = useRef<MediaStream | null>(null);
 
-  const user = { id: uuid() };
+  const { user } = useUser();
   const channel = db.channel("id", {
     config: {
       presence: {
