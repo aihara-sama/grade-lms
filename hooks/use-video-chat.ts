@@ -32,7 +32,6 @@ export const useVideoChat = () => {
   const endSession = () => {
     if (peerRef.current) {
       peerRef.current.disconnect();
-      peerRef.current.destroy();
     }
     localStreamRef.current?.getTracks().forEach((track) => {
       track.stop();
@@ -174,7 +173,6 @@ export const useVideoChat = () => {
     return () => {
       if (peerRef.current) {
         peerRef.current.disconnect();
-        peerRef.current.destroy();
       }
       localStreamRef.current?.getTracks().forEach((track) => {
         track.stop();
