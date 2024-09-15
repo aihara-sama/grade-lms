@@ -1,21 +1,19 @@
 "use client";
 
+import Camera from "@/components/camera";
 import { useUser } from "@/hooks/use-user";
+import type { ICamera } from "@/interfaces/camera.interface";
+import type { User } from "@/types/users";
 import { db } from "@/utils/supabase/client";
 import type { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import Peer from "peerjs";
 import React, { useEffect, useRef, useState } from "react";
 
-type RemotePeer = {
-  id: string;
-  stream: MediaStream;
-};
-
 const VideoMeetingPage: React.FC = () => {
   const [remotePeerIds, setRemotePeerIds] = useState<string[]>([]);
   const peerRef = useRef<Peer>();
-  const [remotePeers, setRemotePeers] = useState<RemotePeer[]>([]); // Store remote streams
   const localStreamRef = useRef<MediaStream | null>(null);
+  const [cameras, setCameras] = useState<ICamera[]>([]);
 
   const { user } = useUser();
   const channel = db.channel("id", {
@@ -45,23 +43,34 @@ const VideoMeetingPage: React.FC = () => {
         .forEach((id) => {
           if (localStreamRef.current) {
             // Call the remote peer
-            const call = peerRef.current.call(id, localStreamRef.current);
+            const call = peerRef.current.call(id, localStreamRef.current, {
+              metadata: {
+                user,
+              },
+            });
 
             // Save connection
 
             call.once("stream", (remoteStream) => {
               // Add new remote peer to the state
-              setRemotePeers((prevPeers) => [
-                ...prevPeers,
-                { id, stream: remoteStream },
+              // setRemotePeers((prevPeers) => [
+              //   ...prevPeers,
+              //   { id, stream: remoteStream },
+              // ]);
+              setCameras((_) => [
+                ..._,
+                {
+                  stream: remoteStream,
+                  user: channel.presenceState<{ user: User }>()[id][0].user,
+                  isCameraEnabled: true,
+                  isMicEnabled: true,
+                },
               ]);
             });
 
             // Handle call closure
             call.on("close", () => {
-              setRemotePeers((prevPeers) =>
-                prevPeers.filter((peer) => peer.id !== id)
-              );
+              setCameras((_) => _.filter((camera) => camera.user.id !== id));
             });
           }
         });
@@ -73,14 +82,22 @@ const VideoMeetingPage: React.FC = () => {
     peerRef.current = new Peer(user.id);
 
     // Get own Peer ID
-    peerRef.current.on("open", async (id) => {
+    peerRef.current.on("open", async () => {
       // Get local media stream and display it
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then(async (stream) => {
           localStreamRef.current = stream; // Save the local stream
 
-          setRemotePeers((prevPeers) => [...prevPeers, { id, stream }]);
+          setCameras((_) => [
+            ..._,
+            {
+              stream,
+              user,
+              isCameraEnabled: true,
+              isMicEnabled: true,
+            },
+          ]);
 
           channel
             .on("presence", { event: "join" }, callPeers)
@@ -99,17 +116,20 @@ const VideoMeetingPage: React.FC = () => {
 
       call.once("stream", (remoteStream) => {
         // Add new remote peer to the state
-        setRemotePeers((prevPeers) => [
-          ...prevPeers,
-          { id: call.peer, stream: remoteStream },
+        setCameras((_) => [
+          ..._,
+          {
+            stream: remoteStream,
+            user: call.metadata.user,
+            isCameraEnabled: true,
+            isMicEnabled: true,
+          },
         ]);
       });
 
       // Handle call closure
       call.on("close", () => {
-        setRemotePeers((prevPeers) =>
-          prevPeers.filter((peer) => peer.id !== call.peer)
-        );
+        setCameras((_) => _.filter((camera) => camera.user.id !== call.peer));
       });
     });
 
@@ -153,20 +173,13 @@ const VideoMeetingPage: React.FC = () => {
           <h2 className="text-lg font-bold">Remote Videos</h2>
           <div className="flex flex-wrap">
             {/* Dynamically render remote video elements */}
-            {remotePeers.map((remotePeer) => (
-              <div key={remotePeer.id} className="w-80 h-60 bg-black m-2">
-                <video
-                  ref={(el) => {
-                    if (el) {
-                      el.srcObject = remotePeer.stream;
-                      el.play();
-                    }
-                  }}
-                  className="w-full h-full"
-                  playsInline
-                />
-                <p className="text-center text-sm">Peer ID: {remotePeer.id}</p>
-              </div>
+            {cameras.map((camera, idx) => (
+              <Camera
+                toggleCamera={() => {}}
+                toggleAudio={() => {}}
+                camera={camera}
+                key={idx}
+              />
             ))}
           </div>
         </div>
