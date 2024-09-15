@@ -6,7 +6,7 @@ import VideoDisabledIcon from "@/components/icons/video-disabled-icon";
 import VideoIcon from "@/components/icons/video-icon";
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
-import { useEffect, useRef, type FunctionComponent } from "react";
+import { type FunctionComponent } from "react";
 
 interface Props {
   camera: ICamera;
@@ -19,28 +19,17 @@ const Camera: FunctionComponent<Props> = ({
   toggleCamera,
   toggleAudio,
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
   const { user } = useUser();
-
-  useEffect(() => {
-    videoRef.current.srcObject = camera.stream;
-  }, []);
 
   return (
     <div className="relative flex group">
       <video
-        // ref={(el) => {
-        //   if (el) {
-        //     el.srcObject = camera.stream;
-        //     el.play();
-        //   }
-        // }}
-        // playsInline
-        className="w-full rounded-[8px] h-[236px] object-cover"
-        ref={videoRef}
+        ref={(el) => {
+          if (el) el.srcObject = camera.stream;
+        }}
         autoPlay
         muted={camera.user.id === user.id}
+        className="w-full rounded-[8px] h-[236px] object-cover"
       ></video>
       <div className="group-hover:h-[70px] absolute top-[0] left-[0] right-[0] h-[0] flex gap-[6px] text-[white] flex-col justify-center pl-[12px] overflow-hidden [transition:0.2s_height] bg-black bg-opacity-50">
         <p className="text-sm">{camera.user.name}</p>
