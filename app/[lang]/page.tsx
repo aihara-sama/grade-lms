@@ -1,211 +1,161 @@
 "use client";
 
-import { Event } from "@/types/events.type";
 import { db } from "@/utils/supabase/client";
-import type { NextPage } from "next";
-import Link from "next/link";
-import type Peer from "peerjs";
 import type { MediaConnection } from "peerjs";
-import type { FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
-import { v4 as uuid } from "uuid";
+import Peer from "peerjs";
+import React, { useEffect, useRef, useState } from "react";
 
-const Camera: FunctionComponent<{
-  camera: {
-    stream: MediaStream;
-    connection?: MediaConnection;
-    isMicEnabled: boolean;
-    isCameraEnabled: boolean;
-    user: { id: string };
-  };
-  user: { id: string };
-}> = ({ camera, user }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+const VideoMeetingPage: React.FC = () => {
+  const [peerId, setPeerId] = useState<string | null>(null);
+  const [remotePeerIds, setRemotePeerIds] = useState<string[]>([]);
+  const [peer, setPeer] = useState<Peer | null>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const remoteVideoRefs = useRef<{ [key: string]: HTMLVideoElement }>({}); // Store refs for remote videos
+  const connectionsRef = useRef<{ [key: string]: MediaConnection }>({}); // Store active connections
 
   useEffect(() => {
-    videoRef.current.srcObject = camera.stream;
+    // Initialize Peer
+    const newPeer = new Peer();
+    setPeer(newPeer);
+
+    // Get own Peer ID
+    newPeer.on("open", async (id) => {
+      setPeerId(id);
+      await db.from("visitors").insert({
+        id,
+      });
+    });
+
+    // Handle incoming connections
+    newPeer.on("call", (call) => {
+      // Answer the call and stream local video
+      if (localStreamRef.current) {
+        call.answer(localStreamRef.current);
+      }
+
+      // Save connection
+      connectionsRef.current[call.peer] = call;
+
+      call.once("stream", (remoteStream) => {
+        // Create a video element for the new remote peer
+        if (!remoteVideoRefs.current[call.peer]) {
+          const video = document.createElement("video");
+          video.className = "w-80 h-60 bg-black";
+          document.getElementById("remote-videos")?.appendChild(video);
+          remoteVideoRefs.current[call.peer] = video;
+        }
+
+        remoteVideoRefs.current[call.peer].srcObject = remoteStream;
+        remoteVideoRefs.current[call.peer].play();
+      });
+
+      // Handle call closure
+      call.on("close", () => {
+        if (remoteVideoRefs.current[call.peer]) {
+          remoteVideoRefs.current[call.peer].srcObject = null;
+        }
+        delete remoteVideoRefs.current[call.peer];
+        delete connectionsRef.current[call.peer];
+      });
+    });
+
+    // Get local media stream and display it
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        localStreamRef.current = stream; // Save the local stream
+
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+          localVideoRef.current.play();
+        }
+      });
+
+    // Cleanup on unmount or navigating away
+    return () => {
+      if (newPeer) {
+        newPeer.disconnect(); // Disconnect peer connection
+        newPeer.destroy(); // Destroy peer to ensure connection is closed
+      }
+
+      // Stop all media tracks
+      localStreamRef.current?.getTracks().forEach((track) => track.stop());
+    };
   }, []);
 
+  const callPeers = async () => {
+    const { data } = await db.from("visitors").select("*").neq("id", peerId);
+
+    data.forEach(({ id: remotePeerId }) => {
+      if (localStreamRef.current) {
+        // Call the remote peer
+        const call = peer.call(remotePeerId, localStreamRef.current);
+
+        // Save connection
+        connectionsRef.current[remotePeerId] = call;
+
+        call.once("stream", (remoteStream) => {
+          // Create a video element for the new remote peer
+          if (!remoteVideoRefs.current[remotePeerId]) {
+            const video = document.createElement("video");
+            video.className = "w-80 h-60 bg-black";
+            document.getElementById("remote-videos")?.appendChild(video);
+            remoteVideoRefs.current[remotePeerId] = video;
+          }
+
+          remoteVideoRefs.current[remotePeerId].srcObject = remoteStream;
+          remoteVideoRefs.current[remotePeerId].play();
+        });
+
+        // Handle call closure
+        call.on("close", () => {
+          if (remoteVideoRefs.current[remotePeerId]) {
+            remoteVideoRefs.current[remotePeerId].srcObject = null;
+          }
+          delete remoteVideoRefs.current[remotePeerId];
+          delete connectionsRef.current[remotePeerId];
+        });
+      }
+    });
+  };
+
   return (
-    <div className="relative flex group">
-      <video
-        className="w-full rounded-[8px] h-[236px] object-cover"
-        ref={videoRef}
-        autoPlay
-        muted={camera.user.id === user.id}
-      ></video>
-      <div className="group-hover:h-[70px] absolute top-[0] left-[0] right-[0] h-[0] flex gap-[6px] text-[white] flex-col justify-center pl-[12px] overflow-hidden [transition:0.2s_height] bg-black bg-opacity-50">
-        <p className="text-xs text-slate-200">{camera.user.id}</p>
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+      <h1 className="text-2xl font-bold">PeerJS Video Chat</h1>
+
+      {/* Display Peer ID */}
+      <div className="my-4">
+        <p>Your Peer ID: {peerId}</p>
+        <textarea
+          placeholder="Enter remote peer IDs, separated by commas"
+          value={remotePeerIds.join(",")}
+          onChange={(e) =>
+            setRemotePeerIds(e.target.value.split(",").map((id) => id.trim()))
+          }
+          className="border p-2 rounded"
+        />
+        <button
+          onClick={callPeers}
+          className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+        >
+          Call Peers
+        </button>
+      </div>
+
+      {/* Video elements */}
+      <div className="flex">
+        <div>
+          <h2 className="text-lg font-bold">Your Video (Always Present)</h2>
+          <video ref={localVideoRef} className="w-80 h-60 bg-black" muted />
+        </div>
+        <div id="remote-videos" className="ml-8">
+          <h2 className="text-lg font-bold">Remote Videos</h2>
+          {/* Remote videos will be dynamically added here */}
+        </div>
       </div>
     </div>
   );
 };
 
-const Page: NextPage = () => {
-  const [cameras, setCameras] = useState<
-    {
-      stream: MediaStream;
-      connection?: MediaConnection;
-      isMicEnabled: boolean;
-      isCameraEnabled: boolean;
-      user: { id: string };
-    }[]
-  >([]);
-  // Hooks
-  const user = { id: uuid() };
-  const channel = db.channel("id", {
-    config: {
-      presence: {
-        key: user.id,
-      },
-    },
-  });
-
-  // Refs
-  const localStreamRef = useRef<MediaStream>();
-  const peerRef = useRef<Peer>();
-
-  const addCamera = (stream: MediaStream, _user: { id: string }) => {
-    setCameras((_) => {
-      return [
-        ..._,
-        {
-          stream,
-          isCameraEnabled: true,
-          isMicEnabled: true,
-          user: _user,
-        },
-      ];
-    });
-  };
-
-  const toggleCamera = (userId: string) => {
-    setCameras((prev) => {
-      return prev.map((cam) => {
-        if (cam.user.id === userId) {
-          cam.stream.getVideoTracks().forEach((track) => {
-            track.enabled = !cam.isCameraEnabled;
-          });
-          cam.isCameraEnabled = !cam.isCameraEnabled;
-        }
-        return cam;
-      });
-    });
-  };
-  const toggleAudio = (userId: string) => {
-    setCameras((prev) => {
-      return prev.map((cam) => {
-        if (cam.user.id === userId) {
-          cam.stream.getAudioTracks().forEach((track) => {
-            track.enabled = !cam.isMicEnabled;
-          });
-          cam.isMicEnabled = !cam.isMicEnabled;
-        }
-        return cam;
-      });
-    });
-  };
-
-  const onPeerOpen = () => {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then(async (stream) => {
-        addCamera(stream, user);
-        localStreamRef.current = stream;
-
-        const { data } = await db.from("visitors").select("*");
-
-        data.forEach((visitor) => {
-          peerRef.current.connect(visitor.id).on("open", () => {
-            const outgoingCall = peerRef.current.call(
-              visitor.id,
-              localStreamRef.current,
-              {
-                metadata: {
-                  user,
-                },
-              }
-            );
-
-            outgoingCall.once("stream", (remoteStream) => {
-              addCamera(remoteStream, visitor);
-            });
-
-            outgoingCall.on("close", () => {
-              setCameras((_) =>
-                _.filter((camera) => camera.user.id !== visitor.id)
-              );
-            });
-          });
-        });
-
-        await db.from("visitors").insert({
-          id: user.id,
-        });
-      })
-      .catch((error) => {
-        console.error("Error accessing media devices: ", error);
-      });
-  };
-  const onPeerCall = (incomingCall: MediaConnection) => {
-    incomingCall.answer(localStreamRef.current);
-    incomingCall.once("stream", (remoteStream) => {
-      addCamera(remoteStream, incomingCall.metadata.user);
-    });
-    incomingCall.on("close", () => {
-      setCameras((_) =>
-        _.filter((camera) => camera.user.id !== incomingCall.metadata.user.id)
-      );
-    });
-
-    incomingCall.on("error", () => {});
-  };
-
-  const startSession = () => {
-    // Handle SSR for navigator
-    import("peerjs").then(({ default: Peer }) => {
-      peerRef.current = new Peer(user.id);
-
-      peerRef.current.on("open", onPeerOpen);
-      peerRef.current.on("call", onPeerCall);
-      peerRef.current.on("close", () => {});
-
-      peerRef.current.on("disconnected", () => {});
-
-      peerRef.current.on("error", () => {});
-    });
-  };
-
-  useEffect(() => {
-    startSession();
-    return () => {
-      if (peerRef.current) {
-        peerRef.current.disconnect();
-        peerRef.current.destroy();
-      }
-      localStreamRef.current?.getTracks().forEach((track) => {
-        track.stop();
-      });
-    };
-  }, []);
-
-  useEffect(() => {
-    channel.on("broadcast", { event: Event.ToggleCamera }, (payload) =>
-      toggleCamera(payload.payload.userId)
-    );
-    channel.on("broadcast", { event: Event.ToggleAudio }, (payload) =>
-      toggleAudio(payload.payload.userId)
-    );
-  }, []);
-
-  return (
-    <>
-      <Link href="/dashboard">Dashboard</Link>
-      {cameras.map((camera, idx) => (
-        <Camera user={user} camera={camera} key={idx} />
-      ))}
-    </>
-  );
-};
-
-export default Page;
+export default VideoMeetingPage;
