@@ -46,18 +46,15 @@ export const useVideoChat = () => {
   };
   const addCamera = (stream: MediaStream, _user: User) => {
     setCameras((_) => {
-      if (!_.some((camera) => camera.user.id === _user.id)) {
-        return [
-          ..._,
-          {
-            stream,
-            isCameraEnabled: true,
-            isMicEnabled: true,
-            user: _user,
-          },
-        ];
-      }
-      return _;
+      return [
+        ..._,
+        {
+          stream,
+          isCameraEnabled: true,
+          isMicEnabled: true,
+          user: _user,
+        },
+      ];
     });
   };
 
