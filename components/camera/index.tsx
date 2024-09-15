@@ -6,7 +6,7 @@ import VideoDisabledIcon from "@/components/icons/video-disabled-icon";
 import VideoIcon from "@/components/icons/video-icon";
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
-import { type FunctionComponent } from "react";
+import { memo, type FunctionComponent } from "react";
 
 interface Props {
   camera: ICamera;
@@ -14,12 +14,13 @@ interface Props {
   toggleAudio: (id: string) => void;
 }
 
-const Camera: FunctionComponent<Props> = ({
+const Camera: FunctionComponent<Props> = memo(function Camera({
   camera,
-  toggleCamera,
   toggleAudio,
-}) => {
+  toggleCamera,
+}) {
   const { user } = useUser();
+  // const { toggleAudio, toggleCamera } = useVideoChat();
 
   return (
     <div className="relative flex group">
@@ -54,6 +55,6 @@ const Camera: FunctionComponent<Props> = ({
       )}
     </div>
   );
-};
+});
 
 export default Camera;

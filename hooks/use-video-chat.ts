@@ -1,6 +1,5 @@
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
-import { Event } from "@/types/events.type";
 import type { User } from "@/types/users";
 import { db } from "@/utils/supabase/client";
 import type {
@@ -10,7 +9,7 @@ import type {
 import { useParams } from "next/navigation";
 import type Peer from "peerjs";
 import type { MediaConnection } from "peerjs";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useVideoChat = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
@@ -57,7 +56,7 @@ export const useVideoChat = () => {
     });
   };
 
-  const toggleCamera = (userId: string) => {
+  const toggleCamera = useCallback((userId: string) => {
     setCameras((prev) => {
       return prev.map((cam) => {
         if (cam.user.id === userId) {
@@ -69,8 +68,8 @@ export const useVideoChat = () => {
         return cam;
       });
     });
-  };
-  const toggleAudio = (userId: string) => {
+  }, []);
+  const toggleAudio = useCallback((userId: string) => {
     setCameras((prev) => {
       return prev.map((cam) => {
         if (cam.user.id === userId) {
@@ -82,7 +81,7 @@ export const useVideoChat = () => {
         return cam;
       });
     });
-  };
+  }, []);
 
   const onPresenceJoin = (
     payload: RealtimePresenceJoinPayload<{ user: User }>
@@ -172,15 +171,6 @@ export const useVideoChat = () => {
         track.stop();
       });
     };
-  }, []);
-
-  useEffect(() => {
-    channel.on("broadcast", { event: Event.ToggleCamera }, (payload) =>
-      toggleCamera(payload.payload.userId)
-    );
-    channel.on("broadcast", { event: Event.ToggleAudio }, (payload) =>
-      toggleAudio(payload.payload.userId)
-    );
   }, []);
 
   return {
