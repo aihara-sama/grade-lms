@@ -15,6 +15,9 @@ import { useEffect, useRef, useState } from "react";
 export const useVideoChat = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
   const { lessonId } = useParams();
+
+  console.log({ cameras });
+
   // Hooks
   const { user } = useUser();
   const channel = db.channel(lessonId as string, {
