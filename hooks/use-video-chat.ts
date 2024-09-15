@@ -6,7 +6,6 @@ import { db } from "@/utils/supabase/client";
 import type {
   REALTIME_SUBSCRIBE_STATES,
   RealtimePresenceJoinPayload,
-  RealtimePresenceLeavePayload,
 } from "@supabase/supabase-js";
 import { useParams } from "next/navigation";
 import type Peer from "peerjs";
@@ -105,16 +104,14 @@ export const useVideoChat = () => {
               channel.presenceState<{ user: User }>()[id][0].user
             );
           });
+
+          outgoingCall.on("close", () => {
+            setCameras((_) => _.filter((camera) => camera.user.id !== id));
+          });
         });
     }
   };
-  const onPresenceLeave = (
-    payload: RealtimePresenceLeavePayload<{ user: User }>
-  ) => {
-    setCameras((_) =>
-      _.filter((camera) => payload.leftPresences[0].user.id !== camera.user.id)
-    );
-  };
+
   const onPresenceSubscribe = async (
     status: `${REALTIME_SUBSCRIBE_STATES}`
   ) => {
@@ -131,7 +128,6 @@ export const useVideoChat = () => {
       .then((stream) => {
         channel
           .on("presence", { event: "join" }, onPresenceJoin)
-          .on("presence", { event: "leave" }, onPresenceLeave)
           .subscribe(onPresenceSubscribe);
 
         addCamera(stream, user);
@@ -145,6 +141,11 @@ export const useVideoChat = () => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
       addCamera(remoteStream, incomingCall.metadata.user);
+    });
+    incomingCall.on("close", () => {
+      setCameras((_) =>
+        _.filter((camera) => camera.user.id !== incomingCall.metadata.user.id)
+      );
     });
   };
 
