@@ -128,7 +128,7 @@ export const useVideoChat = () => {
             }
           );
 
-          outgoingCall.on("stream", (remoteStream) => {
+          outgoingCall.once("stream", (remoteStream) => {
             addCamera(
               remoteStream,
               channel.presenceState<{ user: User }>()[id][0].user
@@ -155,8 +155,6 @@ export const useVideoChat = () => {
   };
 
   const onPeerOpen = () => {
-    alert("on peer open");
-
     navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
@@ -174,7 +172,10 @@ export const useVideoChat = () => {
   };
   const onPeerCall = (incomingCall: MediaConnection) => {
     incomingCall.answer(localStreamRef.current);
-    incomingCall.on("stream", (remoteStream) => {
+    incomingCall.once("stream", (remoteStream) => {
+      console.log({ audio: remoteStream.getAudioTracks().length });
+      console.log({ video: remoteStream.getVideoTracks().length });
+
       addCamera(remoteStream, incomingCall.metadata.user);
     });
   };
