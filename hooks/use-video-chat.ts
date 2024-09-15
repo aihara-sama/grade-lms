@@ -16,6 +16,8 @@ import { useEffect, useRef, useState } from "react";
 
 export const useVideoChat = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
+  console.log({ cameras });
+
   const { lessonId } = useParams();
   // Hooks
   const { user } = useUser();
