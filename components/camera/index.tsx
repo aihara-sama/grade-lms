@@ -4,9 +4,10 @@ import MicroDisabledIcon from "@/components/icons/micro-disabled-icon";
 import MicroIcon from "@/components/icons/micro-icon";
 import VideoDisabledIcon from "@/components/icons/video-disabled-icon";
 import VideoIcon from "@/components/icons/video-icon";
+import Video from "@/components/video";
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
-import { memo, type FunctionComponent } from "react";
+import { type FunctionComponent } from "react";
 
 interface Props {
   camera: ICamera;
@@ -14,24 +15,16 @@ interface Props {
   toggleAudio: (id: string) => void;
 }
 
-const Camera: FunctionComponent<Props> = memo(function Camera({
+const Camera: FunctionComponent<Props> = ({
   camera,
   toggleAudio,
   toggleCamera,
-}) {
+}) => {
   const { user } = useUser();
-  // const { toggleAudio, toggleCamera } = useVideoChat();
 
   return (
     <div className="relative flex group">
-      <video
-        ref={(el) => {
-          if (el) el.srcObject = camera.stream;
-        }}
-        autoPlay
-        muted={camera.user.id === user.id}
-        className="w-full rounded-[8px] h-[236px] object-cover"
-      ></video>
+      <Video isMuted={camera.user.id === user.id} stream={camera.stream} />
       <div className="group-hover:h-[70px] absolute top-[0] left-[0] right-[0] h-[0] flex gap-[6px] text-[white] flex-col justify-center pl-[12px] overflow-hidden [transition:0.2s_height] bg-black bg-opacity-50">
         <p className="text-sm">{camera.user.name}</p>
         <p className="text-xs text-slate-200">{camera.user.role}</p>
@@ -54,6 +47,6 @@ const Camera: FunctionComponent<Props> = memo(function Camera({
       )}
     </div>
   );
-});
+};
 
 export default Camera;

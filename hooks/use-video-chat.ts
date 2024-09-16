@@ -14,10 +14,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useVideoChat = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
-  const { lessonId } = useParams();
 
   // Hooks
   const { user } = useUser();
+  const { lessonId } = useParams();
   const channel = db.channel(lessonId as string, {
     config: {
       presence: {
