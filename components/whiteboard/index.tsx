@@ -215,13 +215,17 @@ const Whiteboard: FunctionComponent<Props> = ({
   return (
     <div className="flex-[4]" ref={rootRef}>
       <div className="border flex items-center px-3 py-2 justify-between gap-3">
-        <div className="flex items-center gap-2 font-bold">
-          <WhiteboardIcon size="xs" />
-          <span className="text-center text-neutral-600 font-bold text-sm whitespace-nowrap">
+        <div className="flex items-center gap-2 font-bold overflow-hidden w-[14px] flex-1">
+          <div className="flex-shrink-0">
+            {" "}
+            {/* Prevent icon from shrinking */}
+            <WhiteboardIcon size="xs" />
+          </div>
+          <span className="text-neutral-600 font-bold text-sm whitespace-nowrap truncate">
             {lesson.title}
           </span>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-3 items-center flex-shrink-0">
           <LessonStatus showTimeLeft />
           {isLessonOngoing(lesson) && user.role === Role.Teacher && (
             <button
@@ -238,6 +242,7 @@ const Whiteboard: FunctionComponent<Props> = ({
           )}
         </div>
       </div>
+
       <div
         className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-25px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
         style={{
