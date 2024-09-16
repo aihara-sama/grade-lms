@@ -201,7 +201,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
           lesson={currentLesson}
         />
         <div
-          className={`pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
+          className={`h-[calc(100vh-132px)] pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >
           <button
             className={`icon-button shadow-md absolute top-2/4 -left-[16px] transform -translate-y-1/2 ${clsx(isAsideOpen && "[&>.icon]:rotate-180")}`}
