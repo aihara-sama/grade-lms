@@ -48,7 +48,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     {
       title: "Cameras",
       content: (
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 max-h-[calc(100vh-196px)] overflow-auto">
           <div className="flex flex-col gap-3">
             {isLessonEnded(new Date(lesson.ends)) ? (
               <div className="mt-5 flex flex-col items-center gap-4 text-neutral-500">
