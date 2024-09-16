@@ -43,11 +43,12 @@ const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft }) => {
     <div className="flex items-center gap-3">
       <div className="text-4 flex items-center gap-2 relative text-sm whitespace-nowrap">
         <div className={`size-2 rounded-[50%] ${getStatusColor()}`}></div>
-        {isOngoing && showTimeLeft ? (
-          <span className="font-bold">{liveDate} left</span>
-        ) : (
-          <span className="font-bold">Ongoing</span>
-        )}
+        {isOngoing &&
+          (showTimeLeft ? (
+            <span className="font-bold">{liveDate} left</span>
+          ) : (
+            <span className="font-bold">Ongoing</span>
+          ))}
         {isEnded && <span className="font-bold">Ended</span>}
         {!isOngoing && !isEnded && (
           <div>

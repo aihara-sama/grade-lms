@@ -25,7 +25,6 @@ import type {
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types/types";
 import clsx from "clsx";
-import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -90,30 +89,26 @@ const Whiteboard: FunctionComponent<Props> = ({
     pointerEventRef.current = event;
   };
 
-  const fireWhiteboardChange = throttle(
-    (elements: readonly ExcalidrawElement[], appState: AppState) => {
-      channel.send({
-        event: Event.WhiteboardChange,
-        type: "broadcast",
-        payload: {
-          elements,
-          appState: {
-            selectionElement: appState.selectionElement,
-            selectedElementIds: appState.selectedElementIds,
-            viewBackgroundColor: appState.viewBackgroundColor,
-            theme: appState.theme,
-          },
-          pointerEvent: pointerEventRef.current,
+  const fireWhiteboardChange = (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState
+  ) => {
+    channel.send({
+      event: Event.WhiteboardChange,
+      type: "broadcast",
+      payload: {
+        elements,
+        appState: {
+          selectionElement: appState.selectionElement,
+          selectedElementIds: appState.selectedElementIds,
+          viewBackgroundColor: appState.viewBackgroundColor,
+          theme: appState.theme,
         },
-      });
-      submitUpdateWhiteboardData(JSON.stringify({ elements, appState }));
-    },
-    1000,
-    {
-      leading: false,
-      trailing: true,
-    }
-  );
+        pointerEvent: pointerEventRef.current,
+      },
+    });
+    submitUpdateWhiteboardData(JSON.stringify({ elements, appState }));
+  };
 
   const onWhiteboardChange = (payload: {
     payload: {

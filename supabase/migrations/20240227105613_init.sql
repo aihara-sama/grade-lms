@@ -385,9 +385,3 @@ BEGIN
   WHERE id = ANY(p_submissions_ids);
 END;
 $$ LANGUAGE plpgsql;
-
-
-create table visitors (
-  -- UUID from auth.users
-  id uuid not null primary key
-);

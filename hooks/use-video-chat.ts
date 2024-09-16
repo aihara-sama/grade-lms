@@ -5,6 +5,7 @@ import { db } from "@/utils/supabase/client";
 import type {
   REALTIME_SUBSCRIBE_STATES,
   RealtimePresenceJoinPayload,
+  RealtimePresenceLeavePayload,
 } from "@supabase/supabase-js";
 import { useParams } from "next/navigation";
 import type Peer from "peerjs";
@@ -14,8 +15,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export const useVideoChat = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
   const { lessonId } = useParams();
-
-  console.log({ cameras });
 
   // Hooks
   const { user } = useUser();
@@ -114,6 +113,14 @@ export const useVideoChat = () => {
     }
   };
 
+  const onPresenceLeave = (
+    payload: RealtimePresenceLeavePayload<{ user: User }>
+  ) => {
+    setCameras((_) =>
+      _.filter((camera) => payload.leftPresences[0].user.id !== camera.user.id)
+    );
+  };
+
   const onPresenceSubscribe = async (
     status: `${REALTIME_SUBSCRIBE_STATES}`
   ) => {
@@ -130,6 +137,7 @@ export const useVideoChat = () => {
       .then((stream) => {
         channel
           .on("presence", { event: "join" }, onPresenceJoin)
+          .on("presence", { event: "leave" }, onPresenceLeave)
           .subscribe(onPresenceSubscribe);
 
         addCamera(stream, user);
@@ -170,6 +178,7 @@ export const useVideoChat = () => {
       localStreamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
+      channel.unsubscribe();
     };
   }, []);
 
