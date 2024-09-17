@@ -2,8 +2,6 @@
 
 import { useLesson } from "@/hooks/use-lesson";
 import type { Lesson } from "@/types/lessons.type";
-import { isLessonEnded } from "@/utils/is-lesson-ended";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";
 
@@ -21,8 +19,10 @@ const LessonProvider: FunctionComponent<PropsWithChildren<Props>> = ({
   // Effects
   useEffect(() => {
     lessonStore.setLesson(lesson);
-    lessonStore.setisEnded(isLessonEnded(new Date(lesson.ends)));
-    lessonStore.setisOngoing(isLessonOngoing(lesson));
+
+    return () => {
+      lessonStore.setLesson(null);
+    };
   }, []);
 
   // View

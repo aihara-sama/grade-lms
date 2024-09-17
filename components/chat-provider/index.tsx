@@ -20,6 +20,7 @@ const ChatProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
     payload: ResultOf<typeof getChatMessages>[number];
   }) => {
     setMessages((prev) => [...prev, payload.payload]);
+    console.log("onNewChatMessage");
   };
 
   const fetchChatMessages = async () => {

@@ -113,11 +113,8 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
       </div>
       <hr />
       <div
-        style={{
-          maxHeight: `${typeof window !== "undefined" ? window.innerHeight - 380 : 0}px`,
-        }}
         ref={messagesWrapperRef}
-        className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1"
+        className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1 max-h-[calc(100vh-345px)]"
       >
         <div className="flex flex-1 flex-col gap-2">
           {messages.map((msg, idx) => (
