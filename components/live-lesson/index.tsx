@@ -48,7 +48,12 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     {
       title: "Cameras",
       content: (
-        <div className="flex flex-col flex-1 max-h-[calc(100vh-196px)] overflow-auto">
+        <div
+          className={`flex flex-col flex-1 ${clsx({
+            "max-h-[calc(100vh-196px)]": !currentLesson.course_id,
+            "max-h-[calc(100vh-216px)]": !!currentLesson.course_id,
+          })} overflow-auto`}
+        >
           <div className="flex flex-col gap-3">
             {isLessonEnded(new Date(lesson.ends)) ? (
               <div className="mt-5 flex flex-col items-center gap-4 text-neutral-500">
@@ -201,7 +206,10 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
           lesson={currentLesson}
         />
         <div
-          className={`h-[calc(100vh-132px)] pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
+          className={` ${clsx({
+            "h-[calc(100vh-132px)]": !currentLesson.course_id,
+            "h-[calc(100vh-152px)]": !!currentLesson.course_id,
+          })}  pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >
           <button
             className={`icon-button shadow-md absolute top-2/4 -left-[16px] transform -translate-y-1/2 ${clsx(isAsideOpen && "[&>.icon]:rotate-180")}`}

@@ -4,25 +4,27 @@ import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import { db } from "@/utils/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
-let channel: RealtimeChannel;
+let notificationChannel: RealtimeChannel;
 
 export const useNotificationChannel = () => {
   const { user } = useUser();
+  const { lessonId } = useParams();
 
-  channel =
-    channel ||
+  notificationChannel =
+    notificationChannel ||
     db.channel(user.role === Role.Teacher ? user.id : user.creator_id);
 
   useEffect(() => {
     return () => {
-      if (channel)
-        channel.unsubscribe().then(() => {
-          channel = undefined;
+      if (notificationChannel)
+        notificationChannel.unsubscribe().then(() => {
+          notificationChannel = undefined;
         });
     };
-  }, []);
+  }, [lessonId]);
 
-  return channel;
+  return notificationChannel;
 };

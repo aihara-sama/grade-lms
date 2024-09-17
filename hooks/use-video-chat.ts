@@ -180,7 +180,7 @@ export const useVideoChat = () => {
       });
       channel.unsubscribe();
     };
-  }, []);
+  }, [lessonId]);
 
   return {
     cameras,

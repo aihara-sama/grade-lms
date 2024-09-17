@@ -56,7 +56,9 @@ const Whiteboard: FunctionComponent<Props> = ({
   // State
   const [isExtendLessonModalOpen, setIsExtendLessonModalOpen] = useState(false);
   const [whiteboardHeight, setWhiteboardHeight] = useState(500);
-  const [whiteboardInitialHeight] = useState(window.innerHeight - 185);
+  const [whiteboardInitialHeight] = useState(
+    window.innerHeight - (lesson.course_id ? 205 : 185)
+  );
   const [whiteboardInitialData, setWhiteboardInitialData] =
     useState<ExcalidrawInitialDataState>();
 

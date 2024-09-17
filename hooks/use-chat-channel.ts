@@ -8,15 +8,18 @@ import { useEffect } from "react";
 let chatChannel: RealtimeChannel;
 
 export const useChatChannel = () => {
-  const params = useParams<{ lessonId?: string }>();
+  const { lessonId } = useParams<{ lessonId?: string }>();
 
-  chatChannel = chatChannel || db.channel(`chat-${params.lessonId}`);
+  chatChannel = chatChannel || db.channel(`chat-${lessonId}`);
 
   useEffect(() => {
     return () => {
-      chatChannel = undefined;
+      if (chatChannel)
+        chatChannel.unsubscribe().then(() => {
+          chatChannel = undefined;
+        });
     };
-  }, []);
+  }, [lessonId]);
 
   return chatChannel;
 };
