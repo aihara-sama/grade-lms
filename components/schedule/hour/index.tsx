@@ -14,6 +14,8 @@ import {
   addMilliseconds,
   addMinutes,
   format,
+  isAfter,
+  isBefore,
   millisecondsToMinutes,
   startOfDay,
 } from "date-fns";
@@ -50,15 +52,16 @@ const Hour: FunctionComponent<Props> = ({
   const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
 
   const onEventPlaceholderClick = (min: number) => {
-    setSelectedLesson({
-      id: undefined,
-      title: "",
-      starts: addMinutes(new Date(hour), min).toISOString(),
-      ends: addMinutes(new Date(hour), min + 15).toISOString(),
-      course_id: null,
-      whiteboard_data: "{}",
-      created_at: undefined,
-    });
+    if (isBefore(new Date(), addMinutes(new Date(hour), min)))
+      setSelectedLesson({
+        id: undefined,
+        title: "",
+        starts: addMinutes(new Date(hour), min).toISOString(),
+        ends: addMinutes(new Date(hour), min + 15).toISOString(),
+        course_id: null,
+        whiteboard_data: "{}",
+        created_at: undefined,
+      });
   };
 
   const getEventPlaceholderHeight = (idx: number) => {
@@ -94,12 +97,18 @@ const Hour: FunctionComponent<Props> = ({
               key={idx}
               onClick={() => onEventPlaceholderClick(idx * 15)}
               data-date={addMinutes(new Date(hour), idx * 15)}
-              className={`event-placeholder absolute w-full text-center border-2 border-dashed border-neutral-400 rounded-sm opacity-0 [transition:0.1s] bg-[white] h-5 flex justify-center items-center bg-transparent active:bg-gray-100 ${clsx(
+              className={`event-placeholder absolute w-full text-center border-2 border-dashed border-neutral-400 rounded-sm opacity-0 [transition:0.1s] bg-[white] h-5 flex justify-center items-center active:bg-gray-100 ${clsx(
                 {
                   "opacity-0": quarter !== idx * 15,
                   "opacity-100": quarter === idx * 15,
                   "pointer-events-none": user.role !== Role.Teacher,
-                  "hover:cursor-pointer hover:opacity-100": !draggingEvent,
+                  "hover:cursor-pointer hover:opacity-100":
+                    !draggingEvent &&
+                    isBefore(new Date(), addMinutes(new Date(hour), idx * 15)),
+                  "cursor-not-allowed": isAfter(
+                    new Date(),
+                    addMinutes(new Date(hour), idx * 15)
+                  ),
                 }
               )}`}
               style={{
