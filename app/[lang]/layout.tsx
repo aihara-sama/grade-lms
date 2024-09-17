@@ -29,6 +29,7 @@ const Layout: FunctionComponent<PropsWithChildren<Props>> = async ({
     <html lang={locale}>
       <head>
         <link rel="prefetch" href="/gifs/loading-spinner.gif" as="image" />
+        <link rel="prefetch" href="/bubbled-bg.svg" as="image" />
       </head>
       <body className={`${latoFont.className}`}>
         <NextIntlClientProvider messages={messages}>
