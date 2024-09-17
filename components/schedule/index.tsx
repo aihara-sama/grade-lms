@@ -13,6 +13,7 @@ import {
   addMinutes,
   differenceInHours,
   format,
+  isAfter,
   isEqual,
   millisecondsToMinutes,
   subDays,
@@ -32,6 +33,7 @@ import type { Lesson } from "@/types/lessons.type";
 import { getEventElFromPoints } from "@/utils/get-event-el-from-points";
 import { getEventPlaceholderElFromPoints } from "@/utils/get-event-placeholder-el-from-points";
 import { getWeekDays } from "@/utils/get-week-days";
+import { execAtStartOfMin } from "@/utils/interval-at-start-of-min";
 import { throttleSearch } from "@/utils/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -43,6 +45,8 @@ const Schedule: FunctionComponent = () => {
   const [hoveredDate, setHoveredDate] = useState<Date>();
   const [courses, setCourses] = useState<SelectItem[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
+  const [value, setValue] = useState(0);
+  console.log({ value });
 
   // Refs
   const isDraggingEventRef = useRef(false);
@@ -185,7 +189,8 @@ const Schedule: FunctionComponent = () => {
               (+new Date(eventPlaceholderEnds) > +new Date(event.starts) &&
                 +new Date(eventPlaceholderEnds) <= +new Date(event.ends)) ||
               (+new Date(event.starts) > +new Date(eventPlaceholderDate) &&
-                +new Date(event.ends) < +new Date(eventPlaceholderEnds))
+                +new Date(event.ends) < +new Date(eventPlaceholderEnds)) ||
+              isAfter(new Date(), new Date(eventPlaceholderEnds))
           );
 
         if (canDrop !== canDropEvent) {
@@ -285,6 +290,8 @@ const Schedule: FunctionComponent = () => {
     setDays(getWeekDays());
   }, []);
 
+  useEffect(() => execAtStartOfMin(() => setValue((prev) => prev + 1)), []);
+
   // View
   return (
     <div onMouseUp={onMouseUp}>
@@ -368,6 +375,7 @@ const Schedule: FunctionComponent = () => {
                   {[...Array(differenceInHours(addDays(day, 1), day))].map(
                     (__, i) => (
                       <Hour
+                        value={value}
                         key={i}
                         day={day}
                         index={i}

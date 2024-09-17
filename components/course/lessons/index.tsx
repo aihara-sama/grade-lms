@@ -32,6 +32,7 @@ import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import { throttleFetch } from "@/utils/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle-search";
 import { useTranslations } from "next-intl";
@@ -286,23 +287,23 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       {isLoading && <Skeleton />}
       {isData && (
         <Table
-          data={lessons.map(({ id, title, starts }, idx) => ({
+          data={lessons.map((lesson, idx) => ({
             Name: (
               <CardTitle
-                href={`/dashboard/courses/${courseId}/lessons/${id}/overview`}
-                checked={selectedLessonsIds.includes(id)}
+                href={`/dashboard/courses/${courseId}/lessons/${lesson.id}/overview`}
+                checked={selectedLessonsIds.includes(lesson.id)}
                 Icon={<LessonIcon size="md" />}
-                title={title}
+                title={lesson.title}
                 subtitle=""
                 onToggle={
                   user.role === Role.Teacher
-                    ? (checked) => onLessonToggle(checked, id)
+                    ? (checked) => onLessonToggle(checked, lesson.id)
                     : undefined
                 }
               />
             ),
-            Starts: format(new Date(starts), "EEEE, MMM d"),
-            "": user.role === Role.Teacher && (
+            Starts: format(new Date(lesson.starts), "EEEE, MMM d"),
+            "": user.role === Role.Teacher && !isLessonOngoing(lesson) && (
               <BasePopper
                 placement={
                   lessons.length > 7 && lessons.length - idx < 4
@@ -313,7 +314,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
                 trigger={
                   <button
                     className="icon-button text-neutral-500"
-                    onClick={() => setSelectedLessonId(id)}
+                    onClick={() => setSelectedLessonId(lesson.id)}
                   >
                     <DotsIcon />
                   </button>

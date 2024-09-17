@@ -29,6 +29,7 @@ interface Props {
   events: Lesson[];
   draggingEvent?: Lesson;
   hour: number;
+  value: number;
 }
 
 const Hour: FunctionComponent<Props> = ({
