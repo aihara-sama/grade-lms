@@ -6,6 +6,9 @@ type ServerErr = Record<
 >;
 
 const serverErrors: ServerErr = {
+  "Password too short": "auth.password_too_short",
+  "Invalid email": "auth.invalid_email",
+  "Name is required": "auth.name_is_required",
   "An email address is too long": "auth.an_email_address_is_too_long",
   "User not found": "auth.user_not_found",
   "A user with this email address has already been registered":

@@ -97,11 +97,14 @@
   "auth": {
     "an_email_address_is_too_long": "An email address is too long",
     "user_not_found": "User not found",
+    "name_is_required": "Name is required",
     "user_already_registered": "A user with this email address has already been registered",
     "signup_requires_a_valid_password": "Signup requires a valid password",
     "password_should_be_at_least_6_characters": "Password should be at least 6 characters.",
+    "password_too_short": "Password too short",
     "password_cannot_be_longer_than_72_characters": "Password cannot be longer than 72 characters",
     "unable_to_validate_email_address_invalid_format": "Unable to validate email address: invalid format",
+    "invalid_email": "Invalid email",
     "to_signup_please_provide_your_email_or_phone_number": "To signup, please provide your email",
     "invalid_login_credentials": "Invalid login credentials"
   }

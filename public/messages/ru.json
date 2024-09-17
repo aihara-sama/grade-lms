@@ -97,11 +97,14 @@
   "auth": {
     "an_email_address_is_too_long": "Адрес электронной почты слишком длинный",
     "user_not_found": "Пользователь не найден",
+    "name_is_required": "Имя пользователя обезательно",
     "user_already_registered": "Пользователь с этим адресом электронной почты уже зарегистрирован",
     "signup_requires_a_valid_password": "Для регистрации требуется действительный пароль",
     "password_should_be_at_least_6_characters": "Пароль должен содержать не менее 6 символов",
     "password_cannot_be_longer_than_72_characters": "Пароль не может быть длиннее 72 символов",
     "unable_to_validate_email_address_invalid_format": "Не удается проверить адрес электронной почты: неверный формат",
+    "invalid_email": "Невалидный емайл",
+    "password_too_short": "Пароль слишком короткий",
     "to_signup_please_provide_your_email_or_phone_number": "Для регистрации укажите ваш адрес электронной почты",
     "invalid_login_credentials": "Неверные учетные данные для входа"
   }

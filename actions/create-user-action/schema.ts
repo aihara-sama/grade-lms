@@ -25,7 +25,12 @@ export const CreateUser = z.object({
     .min(1, {
       message: "Avatar is required",
     }),
-  email: z.string().email(),
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email is required",
+    })
+    .email(),
   password: z
     .string({
       required_error: "Password is required",

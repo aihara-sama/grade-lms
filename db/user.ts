@@ -210,6 +210,7 @@ export const enrollAllUsers = async (courseId: string) => {
 export const createUser = async (userDetails: CreateUserInputType) => {
   const t = await loadMessages();
   const result = await createUserAction(userDetails);
+  console.log({ result });
 
   if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
 };
