@@ -333,8 +333,6 @@ AS $$
     );
 $$;
 
-
-
 CREATE OR REPLACE FUNCTION enroll_all_users(p_course_id uuid)
 RETURNS void AS $$
 BEGIN
@@ -505,16 +503,19 @@ WITH CHECK (
   exists (
     select 1 
     from public.courses c
-    where c.id = course_id 
+    where c.id = user_courses.course_id 
     and c.creator_id = auth.uid()::text
   )
 );
 
 -- Policy: Select allowed if the user is the creator of the course
-CREATE POLICY "Can select if assigned to course" 
-ON user_courses
+CREATE POLICY "Can select if user is assigned to the course"
+ON public.user_courses
 FOR SELECT
-USING ( user_id = auth.uid() );
+TO authenticated
+USING (
+  true
+);
 
 -- Policy: Update allowed if the user is the creator of the course
 CREATE POLICY "Can update for course creator" ON public.user_courses
@@ -552,6 +553,8 @@ ON public.lessons
 FOR INSERT
 to authenticated
 with check (
+  course_id IS NULL
+  OR
   EXISTS (
     SELECT 1
     FROM user_courses uc
@@ -567,6 +570,8 @@ CREATE POLICY "Can select if assigned to course"
 ON lessons
 FOR SELECT
 USING (
+  course_id IS NULL
+  OR
   EXISTS (
     SELECT 1
     FROM user_courses uc
