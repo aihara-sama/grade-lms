@@ -141,7 +141,6 @@ returns trigger as $$
 begin
     insert into user_courses (user_id, course_id)
     values (auth.uid(), new.id);
-    insert into priv (id) values(new.id);
     
     RETURN new;
 end;
