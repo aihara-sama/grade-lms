@@ -175,41 +175,44 @@ AFTER INSERT ON submissions
 FOR EACH ROW
 EXECUTE FUNCTION notify_on_submission();
 
-
 -- Function to create notifications after an assignment is created
 CREATE OR REPLACE FUNCTION notify_users_on_assignment()
 RETURNS TRIGGER AS $$
 DECLARE
-  course_id UUID;
+  lesson_course_id UUID;  -- Renamed to avoid ambiguity
   current_user_id UUID := auth.uid();  -- Get the current authenticated user
   assigned_user RECORD;
 BEGIN
-  -- Step 1: Find the course_id associated with the lesson the assignment belongs to
-  SELECT course_id INTO course_id
-  FROM lessons
-  WHERE id = NEW.lesson_id;
+  -- Log the assignment creation for debugging
+  RAISE NOTICE 'Creating notifications for assignment with lesson_id: %', NEW.lesson_id;
 
-  -- Step 2: Insert notifications for each user enrolled in the course, except the current user
-  FOR assigned_user IN 
-    SELECT user_id 
-    FROM user_courses 
-    WHERE course_id = course_id
-    AND user_id != current_user_id  -- Exclude the current user
+  -- Find the course_id associated with the lesson the assignment belongs to
+  SELECT l.course_id INTO lesson_course_id
+  FROM lessons l
+  WHERE l.id = NEW.lesson_id;
+
+  -- Log the course_id found
+  RAISE NOTICE 'Course ID for lesson: %', lesson_course_id;
+
+  -- Insert notifications for each user enrolled in the course, except the current user
+  FOR assigned_user IN
+    SELECT uc.user_id
+    FROM user_courses uc
+    WHERE uc.course_id = lesson_course_id
+    AND uc.user_id != current_user_id  -- Exclude the current user
   LOOP
-    -- Step 3: Insert the notification
+    -- Log each user for whom a notification will be created
+    RAISE NOTICE 'Creating notification for user: %', assigned_user.user_id;
+
+    -- Insert the notification
     INSERT INTO notifications (user_id, course_id, lesson_id, assignment_id, created_at, type, is_read)
-    VALUES (assigned_user.user_id, course_id, NEW.lesson_id, NEW.id, NOW(), 'Assignment', FALSE);
+    VALUES (assigned_user.user_id, lesson_course_id, NEW.lesson_id, NEW.id, NOW(), 'Assignment', FALSE);
   END LOOP;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to call the function after an assignment is created
-CREATE TRIGGER after_assignment_created
-AFTER INSERT ON assignments
-FOR EACH ROW
-EXECUTE FUNCTION notify_users_on_assignment();
 
 
 create or replace function public.get_users_not_in_course(p_course_id uuid, p_user_name text)

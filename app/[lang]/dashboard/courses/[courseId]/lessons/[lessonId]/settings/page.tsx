@@ -6,6 +6,7 @@ import { db } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
+import LessonProvider from "@/components/lesson-provider";
 import { useUser } from "@/hooks/use-user";
 import type { Database } from "@/types/supabase.type";
 
@@ -49,7 +50,7 @@ const Page: FunctionComponent<Props> = ({ params }) => {
   return (
     <div>
       {course && lesson && (
-        <>
+        <LessonProvider lesson={lesson}>
           <LessonHeader course={course} lesson={lesson} />
           <LessonSettings
             updateLessonTitle={(title) =>
@@ -57,7 +58,7 @@ const Page: FunctionComponent<Props> = ({ params }) => {
             }
             lesson={lesson}
           />
-        </>
+        </LessonProvider>
       )}
     </div>
   );
