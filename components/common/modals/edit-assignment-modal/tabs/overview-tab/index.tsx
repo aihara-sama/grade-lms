@@ -163,8 +163,6 @@ const OverviewTab: FunctionComponent<Props> = ({
             <CreateSubmissionModal
               onClose={onCreateSubmissionModalClose}
               assignmentId={assignment.id}
-              lessonId={assignment.lesson_id}
-              courseId={assignment.lesson.course_id}
             />
           )}
         </div>

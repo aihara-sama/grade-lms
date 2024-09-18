@@ -13,10 +13,6 @@ export interface IUserMetadata {
   avatar: string;
   email: string;
   preferred_locale: Locale;
-  /**
-   * Push Notifications Token
-   */
-  fcm_token?: string;
   creator_id?: string;
   timezone: string;
   is_push_notifications_on: boolean;

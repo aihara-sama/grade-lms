@@ -33,7 +33,6 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
         role: (user.user_metadata as IUserMetadata).role,
         preferred_locale: (user.user_metadata as IUserMetadata)
           .preferred_locale,
-        fcm_token: null,
         timezone: (user.user_metadata as IUserMetadata).timezone,
         is_emails_on: (user.user_metadata as IUserMetadata).is_emails_on,
         is_push_notifications_on: (user.user_metadata as IUserMetadata)

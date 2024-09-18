@@ -28,7 +28,7 @@ const Page: FunctionComponent<Props> = async ({
   return (
     <>
       <LessonHeader course={course.data} lesson={lesson.data} />
-      <Assignments course={course.data} lesson={lesson.data} />
+      <Assignments lesson={lesson.data} />
     </>
   );
 };

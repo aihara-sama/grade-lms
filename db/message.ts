@@ -10,7 +10,7 @@ export const createChatMessage = async (
   const result = await db
     .from("chat_messages")
     .insert(chatMessage)
-    .select("*, chat_files(*)")
+    .select("*, chat_files(*), author:users(*)")
     .single();
 
   if (result.error) throw new Error(t("failed_to_send_message"));
@@ -22,7 +22,7 @@ export const getChatMessages = async (lessonId: string) => {
   const t = await loadMessages();
   const result = await db
     .from("chat_messages")
-    .select("*, chat_files(*)")
+    .select("*, chat_files(*), author:users(*)")
     .eq("lesson_id", lessonId);
 
   if (result.error) throw new Error(t("failed_to_load_messages"));

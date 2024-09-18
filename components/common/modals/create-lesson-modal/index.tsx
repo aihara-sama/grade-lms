@@ -19,12 +19,6 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-const initLesson: TablesInsert<"lessons"> = {
-  title: "",
-  starts: getNextMorning().toISOString(),
-  ends: addMinutes(getNextMorning(), 30).toISOString(),
-};
-
 interface Props {
   courseId?: string;
   onClose: (mutated?: boolean) => void;
@@ -36,10 +30,18 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   maybeLesson,
   onClose,
 }) => {
+  // Hooks
+  const t = useTranslations();
+  const { user } = useUser();
+
+  // State
   const [lesson, setLesson] = useState<TablesInsert<"lessons">>({
-    ...initLesson,
-    ...maybeLesson,
+    title: "",
+    starts: getNextMorning().toISOString(),
+    ends: addMinutes(getNextMorning(), 30).toISOString(),
+    creator_id: user.id,
     course_id: courseId,
+    ...maybeLesson,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -49,10 +51,6 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
   // Refs
   const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
-
-  // Hooks
-  const t = useTranslations();
-  const { user } = useUser();
 
   const changeDuration = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

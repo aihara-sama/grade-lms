@@ -82,9 +82,15 @@ const TeacherDashboard: FunctionComponent<Props> = ({
 
   useEffect(() => {
     (async () => {
+      const { data } = await db
+        .from("fcm_tokens")
+        .select("fcm_token")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
       if (
         Notification.permission !== "granted" ||
-        (Notification.permission === "granted" && !user.fcm_token)
+        (Notification.permission === "granted" && !data)
       ) {
         console.log("should ask permission");
 
@@ -98,16 +104,12 @@ const TeacherDashboard: FunctionComponent<Props> = ({
               }).then((token) => {
                 Promise.all([
                   db
-                    .from("users")
-                    .update({
+                    .from("fcm_tokens")
+                    .insert({
                       fcm_token: token,
+                      user_id: user.id,
                     })
-                    .eq("id", user.id),
-                  db.auth.updateUser({
-                    data: {
-                      fcm_token: token,
-                    },
-                  }),
+                    .eq("user_id", user.id),
                 ])
                   .then(() => toast.success("Notifications enabled!"))
                   .catch(console.error);

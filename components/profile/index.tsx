@@ -73,7 +73,10 @@ const Profile: FunctionComponent = () => {
     setIsSubmittingRenameUser(false);
 
     if (usersError || profileError) toast.error("Something went wrong");
-    else toast.success("Name changed");
+    else {
+      setUser({ ...user, name: userName });
+      toast.success("Name changed");
+    }
   };
 
   // Effects

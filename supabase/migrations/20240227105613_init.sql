@@ -13,28 +13,33 @@ create table users (
   email text not null,
   avatar text not null,
   preferred_locale text not null,
-  fcm_token text,
   timezone text not null,
   is_emails_on boolean not null,
   is_push_notifications_on boolean not null,
   created_at timestamp not null default now()
 );
-alter table users enable row level security;
-create policy "Can view user's data." on users for select using (true);
-create policy "Can update own's data." on users for update using (auth.uid() = id);
+
+
+CREATE TABLE fcm_tokens (
+  id uuid not null primary key DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES public.users ON DELETE CASCADE NOT NULL,
+  fcm_token text NOT NULL,
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now()
+);
+alter table fcm_tokens enable row level security;
+
+create policy "Insert own" on fcm_tokens for insert to authenticated;
+create policy "Select own" on fcm_tokens for select using ( auth.uid() = user_id );
+create policy "Update own" on fcm_tokens for update using ( auth.uid() = user_id );
+create policy "Delete own" on fcm_tokens for delete using ( auth.uid() = user_id );
 
 create table courses (
-  -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
-  -- user_id uuid references auth.users on delete cascade not null,
+  creator_id text NOT NULL,
   title text not null,
   created_at timestamp not null default now()
 );
-alter table courses enable row level security;
-create policy "Can view course's data." on courses for select using (true);
-create policy "Can delete course's data." on courses for delete using (true);
-create policy "Can update course's data." on courses for update using (true);
-create policy "Can insert course's data." on courses for insert with check (true);
 
 /** 
 * Junction Table: User_Courses
@@ -51,18 +56,12 @@ create table lessons (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
   course_id uuid references public.courses on delete cascade,
+  creator_id uuid not null references public.users on delete cascade,
   created_at timestamp not null default now(),
   title text DEFAULT 'Quick lesson' not null,
   whiteboard_data text default '{}' not null,
   starts timestamp with time zone not null,
   ends timestamp with time zone not null
-);
-
-create table sent_notifications (
-  -- UUID from auth.users
-  id uuid not null primary key DEFAULT gen_random_uuid(),
-  user_id uuid references auth.users on delete cascade,
-  lesson_id uuid references public.lessons on delete cascade
 );
 
 create table assignments (
@@ -101,9 +100,7 @@ create table chat_messages (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   lesson_id uuid references public.lessons on delete cascade not null,
   reply_id uuid references public.chat_messages on delete cascade,
-  author text not null,
-  author_avatar text not null,
-  author_role Role not null,
+  creator_id uuid references public.users on delete cascade not null,
   text text
 );
 
@@ -114,6 +111,13 @@ create table chat_files (
   ext text not null,
   path text not null,
   size int not null
+);
+
+create table sent_announcements (
+  -- UUID from auth.users
+  id uuid not null primary key DEFAULT gen_random_uuid(),
+  user_id uuid references auth.users on delete cascade,
+  lesson_id uuid references public.lessons on delete cascade
 );
 
 /**
@@ -137,6 +141,7 @@ returns trigger as $$
 begin
     insert into user_courses (user_id, course_id)
     values (auth.uid(), new.id);
+    insert into priv (id) values(new.id);
     
     RETURN new;
 end;
@@ -146,6 +151,67 @@ $$ language plpgsql;
 create trigger on_course_created
 after insert on courses
 for each row execute function insert_user_course();
+
+
+CREATE OR REPLACE FUNCTION notify_on_submission()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Insert notification
+  INSERT INTO notifications (user_id, course_id, type, is_read)
+  SELECT 
+    auth.uid(),               -- Current user who created the submission
+    l.course_id,              -- Course ID
+    'Submission',             -- Type of notification
+    false                     -- Mark as unread
+  FROM assignments a
+  JOIN lessons l ON a.lesson_id = l.id
+  WHERE a.id = NEW.assignment_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER on_submission_created
+AFTER INSERT ON submissions
+FOR EACH ROW
+EXECUTE FUNCTION notify_on_submission();
+
+
+-- Function to create notifications after an assignment is created
+CREATE OR REPLACE FUNCTION notify_users_on_assignment()
+RETURNS TRIGGER AS $$
+DECLARE
+  course_id UUID;
+  current_user_id UUID := auth.uid();  -- Get the current authenticated user
+  assigned_user RECORD;
+BEGIN
+  -- Step 1: Find the course_id associated with the lesson the assignment belongs to
+  SELECT course_id INTO course_id
+  FROM lessons
+  WHERE id = NEW.lesson_id;
+
+  -- Step 2: Insert notifications for each user enrolled in the course, except the current user
+  FOR assigned_user IN 
+    SELECT user_id 
+    FROM user_courses 
+    WHERE course_id = course_id
+    AND user_id != current_user_id  -- Exclude the current user
+  LOOP
+    -- Step 3: Insert the notification
+    INSERT INTO notifications (user_id, course_id, lesson_id, assignment_id, created_at, type, is_read)
+    VALUES (assigned_user.user_id, course_id, NEW.lesson_id, NEW.id, NOW(), 'Assignment', FALSE);
+  END LOOP;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to call the function after an assignment is created
+CREATE TRIGGER after_assignment_created
+AFTER INSERT ON assignments
+FOR EACH ROW
+EXECUTE FUNCTION notify_users_on_assignment();
+
 
 create or replace function public.get_users_not_in_course(p_course_id uuid, p_user_name text)
 returns setof public.users as $$
@@ -195,15 +261,6 @@ begin
 end;
 $$ language plpgsql;
 
-create policy "Can delete users created by current user" on public.users
-for delete
-using (auth.uid()::text = creator_id);
-
-alter table auth.users enable row level security;
-create policy "Can delete users created by current user" on auth.users
-for delete
-using (auth.uid()::text = (select creator_id from public.users where id = auth.users.id));
-
 create or replace function public.delete_auth_users_by_ids(user_ids uuid[])
 returns void as $$
 begin
@@ -244,7 +301,7 @@ end;
 $$ language plpgsql;
 
 
-CREATE OR REPLACE FUNCTION get_upcoming_lessons_users()
+CREATE OR REPLACE FUNCTION public.get_upcoming_lessons_users()
 RETURNS TABLE (
   id text,
   email text,
@@ -258,20 +315,22 @@ AS $$
   SELECT
     u.id,
     u.email,
-    u.fcm_token,
+    COALESCE(ft.fcm_token, '') AS fcm_token,
     l.id AS lesson_id,
     u.is_emails_on,
     u.is_push_notifications_on
   FROM lessons l
   INNER JOIN user_courses uc ON l.course_id = uc.course_id
-  INNER JOIN users u ON uc.user_id = u.id
+  INNER JOIN public.users u ON uc.user_id = u.id
+  LEFT JOIN fcm_tokens ft ON u.id = ft.user_id
   WHERE l.starts BETWEEN NOW() AND NOW() + INTERVAL '5 minutes'
     AND l.id NOT IN (
       SELECT sn.lesson_id
-      FROM sent_notifications sn
+      FROM sent_announcements sn
       WHERE sn.user_id = u.id
     );
 $$;
+
 
 
 CREATE OR REPLACE FUNCTION enroll_all_users(p_course_id uuid)
@@ -385,3 +444,373 @@ BEGIN
   WHERE id = ANY(p_submissions_ids);
 END;
 $$ LANGUAGE plpgsql;
+
+alter table public.users enable row level security;
+create policy "Can insert user's data." on public.users for insert to authenticated;
+-- create policy "Can view user's data." on public.users for select to authenticated using (true);
+create policy "Can view user's data." on public.users
+for select to authenticated using (
+  auth.uid() = id
+  or auth.uid()::text = creator_id
+  or exists (
+    select 1
+    from public.user_courses uc
+    join public.user_courses uc2 on uc.course_id = uc2.course_id
+    where uc.user_id = auth.uid()
+      and uc2.user_id = id
+  )
+);
+create policy "Update own or creator's user" on public.users for update using ( auth.uid() = id or auth.uid()::text = creator_id );
+create policy "Delete own or creator's user" on public.users for delete using ( auth.uid() = id or auth.uid()::text = creator_id );
+
+
+-- Courses' policies
+ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Insert allowed for any authenticated user with the role 'Teacher'
+CREATE POLICY "Can insert for teachers" ON public.courses
+FOR INSERT
+TO authenticated
+WITH CHECK ((SELECT role FROM public.users WHERE id = auth.uid()) = 'Teacher');
+
+-- Policy: Select allowed for any authenticated user assigned to the course
+CREATE POLICY "Can select authenticated" ON public.courses
+FOR SELECT
+TO authenticated
+USING ( true );
+
+-- Policy: Update allowed only for the course creator
+CREATE POLICY "Can update own course" ON public.courses
+FOR UPDATE
+TO authenticated
+USING (creator_id = auth.uid()::text);
+
+-- Policy: Delete allowed only for the course creator
+CREATE POLICY "Can delete own course" ON public.courses
+FOR DELETE
+TO authenticated
+USING (creator_id = auth.uid()::text);
+
+-- User_courses' policies
+ALTER TABLE public.user_courses ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Insert allowed if the user is the creator of the course
+create policy "can insert if creator of the course" 
+on user_courses 
+for insert 
+TO authenticated
+WITH CHECK (
+  exists (
+    select 1 
+    from public.courses c
+    where c.id = course_id 
+    and c.creator_id = auth.uid()::text
+  )
+);
+
+-- Policy: Select allowed if the user is the creator of the course
+CREATE POLICY "Can select if assigned to course" 
+ON user_courses
+FOR SELECT
+USING ( user_id = auth.uid() );
+
+-- Policy: Update allowed if the user is the creator of the course
+CREATE POLICY "Can update for course creator" ON public.user_courses
+FOR UPDATE
+TO authenticated
+USING (
+    EXISTS (
+        SELECT 1
+        FROM public.courses
+        WHERE public.courses.id = course_id
+        AND public.courses.creator_id = auth.uid()::text
+    )
+);
+
+-- Policy: Delete allowed if the user is the creator of the course
+CREATE POLICY "Can delete for course creator" ON public.user_courses
+FOR DELETE
+TO authenticated
+USING (
+    EXISTS (
+        SELECT 1
+        FROM public.courses
+        WHERE courses.id = user_courses.course_id
+        AND courses.creator_id = auth.uid()::text
+    )
+);
+
+
+--  Lessons' policies
+ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
+
+-- Create a policy to allow insert if the user owns the course
+CREATE POLICY "Can insert if owns course"
+ON public.lessons
+FOR INSERT
+to authenticated
+with check (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN courses c ON uc.course_id = c.id
+    WHERE uc.user_id = auth.uid()
+      AND c.id = lessons.course_id
+      AND c.creator_id = auth.uid()::text
+  )
+);
+
+-- Create a policy to allow select if the user is assigned to the course
+CREATE POLICY "Can select if assigned to course"
+ON lessons
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    WHERE uc.user_id = auth.uid()
+      AND uc.course_id = lessons.course_id
+  )
+);
+-- Create a policy to allow update if the user is assigned to the course and is a Teacher
+CREATE POLICY "Can update if assigned and Teacher"
+ON lessons
+FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN users u ON uc.user_id = u.id
+    WHERE uc.user_id = auth.uid()
+      AND uc.course_id = lessons.course_id
+      AND u.role = 'Teacher'
+  )
+);
+-- Create a policy to allow delete if the user is assigned to the course and is a Teacher
+CREATE POLICY "Can delete if assigned and Teacher"
+ON lessons
+FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN users u ON uc.user_id = u.id
+    WHERE uc.user_id = auth.uid()
+      AND uc.course_id = lessons.course_id
+      AND u.role = 'Teacher'
+  )
+);
+
+-- Assignments' policies
+ALTER TABLE assignments ENABLE ROW LEVEL SECURITY;
+-- Create a policy to allow insert if the user is assigned to the course the lesson is assigned to and is a Teacher
+CREATE POLICY "Can insert if assigned to course and Teacher"
+ON assignments
+FOR INSERT
+with check (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    JOIN users u ON uc.user_id = u.id
+    WHERE uc.user_id = auth.uid()
+      AND l.id = assignments.lesson_id
+      AND u.role = 'Teacher'
+  )
+);
+-- Create a policy to allow select if the user is assigned to the course the lesson is assigned to
+CREATE POLICY "Can select if assigned to course"
+ON assignments
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    WHERE uc.user_id = auth.uid()
+      AND l.id = assignments.lesson_id
+  )
+);
+
+-- Create a policy to allow update if the user is assigned to the course the lesson is assigned to and is a Teacher
+CREATE POLICY "Can update if assigned to course and Teacher"
+ON assignments
+FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    JOIN users u ON uc.user_id = u.id
+    WHERE uc.user_id = auth.uid()
+      AND l.id = assignments.lesson_id
+      AND u.role = 'Teacher'
+  )
+);
+-- Create a policy to allow delete if the user is assigned to the course the lesson is assigned to and is a Teacher
+CREATE POLICY "Can delete if assigned to course and Teacher"
+ON assignments
+FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    JOIN users u ON uc.user_id = u.id
+    WHERE uc.user_id = auth.uid()
+      AND l.id = assignments.lesson_id
+      AND u.role = 'Teacher'
+  )
+);
+
+-- Submissions' policies
+-- Create a policy to allow insert if the user is assigned to the course the lesson is assigned to and is a Student
+CREATE POLICY "Can insert if assigned to course and Student"
+ON submissions
+FOR INSERT
+with check (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    JOIN assignments a ON a.lesson_id = l.id
+    JOIN users u ON uc.user_id = u.id
+    WHERE uc.user_id = auth.uid()
+      AND a.id = submissions.assignment_id
+      AND u.role = 'Student'
+  )
+);
+-- Create a policy to allow select if the user owns the submission or is assigned to the course the lesson is assigned to and is a Teacher
+CREATE POLICY "Can select if owns or assigned to course and Teacher"
+ON submissions
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    JOIN assignments a ON a.lesson_id = l.id
+    JOIN users u ON uc.user_id = u.id
+    WHERE (submissions.user_id = auth.uid()  -- Owns the submission
+           OR (uc.user_id = auth.uid() AND u.role = 'Teacher'))  -- Assigned to the course and is a Teacher
+      AND a.id = submissions.assignment_id
+  )
+);
+-- Create a policy to allow update if the user owns the submission
+CREATE POLICY "Can update if owns the submission"
+ON submissions
+FOR UPDATE
+USING (
+  submissions.user_id = auth.uid()  -- Owns the submission
+);
+-- Create a policy to allow delete if the user owns the submission
+CREATE POLICY "Can delete if owns the submission"
+ON submissions
+FOR DELETE
+USING (
+  submissions.user_id = auth.uid()  -- Owns the submission
+);
+
+-- Notifications' policies
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+-- Create a policy to allow insert if the user is assigned to the course
+CREATE POLICY "Can insert if assigned to course"
+ON public.notifications
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    WHERE uc.user_id = auth.uid()
+      AND uc.course_id = notifications.course_id
+  )
+);
+-- Create a policy to allow select if the user is assigned to the course
+CREATE POLICY "Can select if assigned to course"
+ON public.notifications
+FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    WHERE uc.user_id = auth.uid()
+      AND uc.course_id = course_id
+  )
+);
+
+-- Chat messagees' policies
+ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
+-- Policy to allow inserting chat messages if user is assigned to the course the lesson belongs to
+CREATE POLICY "Can insert if assigned to course"
+ON public.chat_messages
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    WHERE uc.user_id = auth.uid()
+      AND l.id = chat_messages.lesson_id
+  )
+);
+-- Policy to allow selecting chat messages if user is assigned to the course the lesson belongs to
+CREATE POLICY "Can select if assigned to course"
+ON public.chat_messages
+FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1
+    FROM user_courses uc
+    JOIN lessons l ON uc.course_id = l.course_id
+    WHERE uc.user_id = auth.uid()
+      AND l.id = lesson_id
+  )
+);
+
+-- Chat files' policies
+ALTER TABLE chat_files ENABLE ROW LEVEL SECURITY;
+-- Policy to allow inserting chat files if the user is the creator of the chat message
+CREATE POLICY "Can insert if creator of chat message"
+ON public.chat_files
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM chat_messages cm
+    WHERE cm.id = chat_files.message_id
+      AND cm.creator_id = auth.uid()
+  )
+);
+-- Policy to allow selecting chat files if the user is assigned to the course the lesson belongs to
+CREATE POLICY "Can select if assigned to course"
+ON public.chat_files
+FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1
+    FROM chat_messages cm
+    JOIN lessons l ON cm.lesson_id = l.id
+    JOIN user_courses uc ON l.course_id = uc.course_id
+    WHERE cm.id = message_id
+      AND uc.user_id = auth.uid()
+  )
+);
+
+-- 
+ALTER TABLE sent_announcements ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Can insert only with service role"
+ON public.sent_announcements
+FOR insert
+TO service_role;
+
+CREATE POLICY "Can select only with service role"
+ON public.sent_announcements
+FOR select
+TO service_role;

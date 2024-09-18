@@ -65,11 +65,9 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
     try {
       const createdChatMessage = await createChatMessage({
         text: chatMessageText,
-        author: user.name,
         lesson_id: lesson.id,
         reply_id: replyId,
-        author_avatar: user.avatar,
-        author_role: user.role,
+        creator_id: user.id,
       });
 
       setChatMessageText("");

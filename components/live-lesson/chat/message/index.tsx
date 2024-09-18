@@ -42,10 +42,10 @@ const Message: FunctionComponent<Props> = ({ chatMessage }) => {
 
   return (
     <div className="flex gap-2">
-      <Avatar avatar={chatMessage.author_avatar} />
+      <Avatar avatar={chatMessage.author.avatar} />
       <div className="rounded-[10px] p-2 w-full border border-gray-200 bg-neutral-50">
         <div className="text-sm font-bold text-neutral-600">
-          {chatMessage.author}
+          {chatMessage.author.name}
         </div>
         <div className="text-sm text-neutral-500">{chatMessage.text}</div>
         {!!chatMessage.chat_files.length && (

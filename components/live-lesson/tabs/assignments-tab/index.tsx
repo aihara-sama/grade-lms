@@ -17,10 +17,9 @@ import toast from "react-hot-toast";
 
 interface Props {
   lessonId: string;
-  courseId: string;
 }
 
-const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
+const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
   // States
   const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
     useState(false);
@@ -122,7 +121,6 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
         <CreateAssignmentModal
           onClose={onCreateAssignmentModalClose}
           lessonId={lessonId}
-          courseId={courseId}
         />
       )}
       {isEditAssignmentModalOpen && (
@@ -144,5 +142,4 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId, courseId }) => {
     </div>
   );
 };
-
 export default AssignmentsTab;

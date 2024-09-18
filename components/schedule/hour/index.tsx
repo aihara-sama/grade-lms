@@ -62,6 +62,7 @@ const Hour: FunctionComponent<Props> = ({
         course_id: null,
         whiteboard_data: "{}",
         created_at: undefined,
+        creator_id: user.id,
       });
   };
 

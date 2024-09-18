@@ -42,10 +42,8 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   // State
   const [chatMessage, setChatMessage] = useState<TablesInsert<"chat_messages">>(
     {
-      author: user.name,
-      author_avatar: user.avatar,
-      author_role: user.role,
       lesson_id: lessonId,
+      creator_id: user.id,
       text: "",
     }
   );

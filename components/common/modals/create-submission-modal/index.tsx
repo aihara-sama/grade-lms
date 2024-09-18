@@ -1,11 +1,9 @@
 import BaseModal from "@/components/common/modals/base-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
-import { createNotification } from "@/db/notification";
 import { createSubmission } from "@/db/submission";
 import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import { useUser } from "@/hooks/use-user";
-import { NotificationType } from "@/interfaces/notifications.interface";
 import { Event } from "@/types/events.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { OutputData } from "@editorjs/editorjs";
@@ -23,13 +21,9 @@ const Editor = dynamic(() => import("@/components/editor"), {
 
 interface Props {
   onClose: (mutated?: boolean) => void;
-  courseId: string;
-  lessonId: string;
   assignmentId: string;
 }
 const CreateSubmissionModal: FunctionComponent<Props> = ({
-  courseId,
-  lessonId,
   onClose,
   assignmentId,
 }) => {
@@ -58,17 +52,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
     setIsSubmitting(true);
 
     try {
-      const createdSubmission = await createSubmission(submission);
-
-      await createNotification({
-        user_id: user.creator_id,
-        submission_id: createdSubmission.id,
-        assignment_id: assignmentId,
-        course_id: courseId,
-        lesson_id: lessonId,
-        is_read: false,
-        type: NotificationType.Submission,
-      });
+      await createSubmission(submission);
 
       fireNotificationCreated();
       toast.success(t("submission_created"));
@@ -138,5 +122,4 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
     </BaseModal>
   );
 };
-
 export default CreateSubmissionModal;

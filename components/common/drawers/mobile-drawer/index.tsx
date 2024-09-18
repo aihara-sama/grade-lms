@@ -31,6 +31,7 @@ const MobileDrawer: FunctionComponent = () => {
         .insert({
           starts: new Date().toISOString(),
           ends: addMinutes(new Date(), 30).toISOString(),
+          creator_id: user.id,
         })
         .select("id")
         .single();

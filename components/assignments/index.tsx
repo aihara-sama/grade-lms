@@ -29,7 +29,6 @@ import {
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignments.type";
-import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle-fetch";
@@ -40,10 +39,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  course: Course;
   lesson: Lesson;
 }
-const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
+const Assignments: FunctionComponent<Props> = ({ lesson }) => {
   // States
   const [isDelAssignmentsModal, setIsDelAssignmentsModal] = useState(false);
   const [isEditAssignmentModal, setIsEditAssignmentModal] = useState(false);
@@ -272,7 +270,6 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
         />
         {user.role === Role.Teacher && (
           <CreateAssignment
-            courseId={course.id}
             lessonId={lesson.id}
             onCreated={() => fetchAssignmentsBySearch(searchText, true)}
           />
@@ -401,5 +398,4 @@ const Assignments: FunctionComponent<Props> = ({ course, lesson }) => {
     </>
   );
 };
-
 export default Assignments;

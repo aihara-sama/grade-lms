@@ -3,15 +3,10 @@ import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import { createAssignment } from "@/db/assignment";
-import { getAllCourseStudentsIds } from "@/db/user";
 import { useNotificationChannel } from "@/hooks/use-notification-channel";
-import { useUser } from "@/hooks/use-user";
-import { NotificationType } from "@/interfaces/notifications.interface";
 import { Event } from "@/types/events.type";
-import type { Notification } from "@/types/notifications";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/get-next-morning";
-import { db } from "@/utils/supabase/client";
 import type { OutputData } from "@editorjs/editorjs";
 import clsx from "clsx";
 import { format } from "date-fns";
@@ -27,11 +22,10 @@ const Editor = dynamic(() => import("@/components/editor"), {
 
 interface Props {
   onClose: (mutated?: boolean) => void;
-  courseId: string;
   lessonId: string;
 }
+
 const CreateAssignmentModal: FunctionComponent<Props> = ({
-  courseId,
   lessonId,
   onClose,
 }) => {
@@ -47,29 +41,12 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
   // Hooks
   const t = useTranslations();
   const notificationChannel = useNotificationChannel();
-  const { user } = useUser();
 
   // Handlers
   const submitCreateAssignment = async () => {
     setIsSubmitting(true);
     try {
-      const [createdAssignment, students] = await Promise.all([
-        createAssignment(assignment),
-        getAllCourseStudentsIds(user.id, courseId),
-      ]);
-
-      const { error } = await db.from("notifications").insert(
-        students.map(({ id }) => ({
-          user_id: id,
-          assignment_id: createdAssignment.id,
-          course_id: courseId,
-          lesson_id: lessonId,
-          is_read: false,
-          type: NotificationType.Assignment,
-        })) as Notification[]
-      );
-
-      if (error) console.error(error);
+      await createAssignment(assignment);
 
       notificationChannel.send({
         event: Event.NotificationCreated,
@@ -152,5 +129,4 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
     </BaseModal>
   );
 };
-
 export default CreateAssignmentModal;

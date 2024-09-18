@@ -8,6 +8,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Total from "@/components/total";
 import { Role } from "@/interfaces/user.interface";
 import { db } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import type { FunctionComponent } from "react";
@@ -35,7 +36,7 @@ interface Props {
 }
 
 const Page: FunctionComponent<Props> = async ({ params }) => {
-  const courseData = await db
+  const courseData = await createClient()
     .from("courses")
     .select("*, users(*), lessons(*)")
     .eq("id", params.courseId)

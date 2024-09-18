@@ -81,33 +81,34 @@ export type Database = {
       };
       chat_messages: {
         Row: {
-          author: string;
-          author_avatar: string;
-          author_role: Database["public"]["Enums"]["role"];
+          creator_id: string;
           id: string;
           lesson_id: string;
           reply_id: string | null;
           text: string | null;
         };
         Insert: {
-          author: string;
-          author_avatar: string;
-          author_role: Database["public"]["Enums"]["role"];
+          creator_id: string;
           id?: string;
           lesson_id: string;
           reply_id?: string | null;
           text?: string | null;
         };
         Update: {
-          author?: string;
-          author_avatar?: string;
-          author_role?: Database["public"]["Enums"]["role"];
+          creator_id?: string;
           id?: string;
           lesson_id?: string;
           reply_id?: string | null;
           text?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "chat_messages_creator_id_fkey";
+            columns: ["creator_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "chat_messages_lesson_id_fkey";
             columns: ["lesson_id"];
@@ -127,25 +128,61 @@ export type Database = {
       courses: {
         Row: {
           created_at: string;
+          creator_id: string;
           id: string;
           title: string;
         };
         Insert: {
           created_at?: string;
+          creator_id: string;
           id?: string;
           title: string;
         };
         Update: {
           created_at?: string;
+          creator_id?: string;
           id?: string;
           title?: string;
         };
         Relationships: [];
       };
+      fcm_tokens: {
+        Row: {
+          created_at: string;
+          fcm_token: string;
+          id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          fcm_token: string;
+          id?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          fcm_token?: string;
+          id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "fcm_tokens_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       lessons: {
         Row: {
           course_id: string | null;
           created_at: string;
+          creator_id: string;
           ends: string;
           id: string;
           starts: string;
@@ -155,6 +192,7 @@ export type Database = {
         Insert: {
           course_id?: string | null;
           created_at?: string;
+          creator_id: string;
           ends: string;
           id?: string;
           starts: string;
@@ -164,6 +202,7 @@ export type Database = {
         Update: {
           course_id?: string | null;
           created_at?: string;
+          creator_id?: string;
           ends?: string;
           id?: string;
           starts?: string;
@@ -176,6 +215,13 @@ export type Database = {
             columns: ["course_id"];
             isOneToOne: false;
             referencedRelation: "courses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lessons_creator_id_fkey";
+            columns: ["creator_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -252,7 +298,7 @@ export type Database = {
           },
         ];
       };
-      sent_notifications: {
+      sent_announcements: {
         Row: {
           id: string;
           lesson_id: string | null;
@@ -270,14 +316,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "sent_notifications_lesson_id_fkey";
+            foreignKeyName: "sent_announcements_lesson_id_fkey";
             columns: ["lesson_id"];
             isOneToOne: false;
             referencedRelation: "lessons";
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "sent_notifications_user_id_fkey";
+            foreignKeyName: "sent_announcements_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";
@@ -369,7 +415,6 @@ export type Database = {
           created_at: string;
           creator_id: string | null;
           email: string;
-          fcm_token: string | null;
           id: string;
           is_emails_on: boolean;
           is_push_notifications_on: boolean;
@@ -383,7 +428,6 @@ export type Database = {
           created_at?: string;
           creator_id?: string | null;
           email: string;
-          fcm_token?: string | null;
           id: string;
           is_emails_on: boolean;
           is_push_notifications_on: boolean;
@@ -397,7 +441,6 @@ export type Database = {
           created_at?: string;
           creator_id?: string | null;
           email?: string;
-          fcm_token?: string | null;
           id?: string;
           is_emails_on?: boolean;
           is_push_notifications_on?: boolean;
@@ -415,18 +458,6 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
-      };
-      visitors: {
-        Row: {
-          id: string;
-        };
-        Insert: {
-          id: string;
-        };
-        Update: {
-          id?: string;
-        };
-        Relationships: [];
       };
     };
     Views: {
@@ -509,6 +540,7 @@ export type Database = {
         };
         Returns: {
           created_at: string;
+          creator_id: string;
           id: string;
           title: string;
         }[];
@@ -523,6 +555,7 @@ export type Database = {
         Returns: {
           course_id: string | null;
           created_at: string;
+          creator_id: string;
           ends: string;
           id: string;
           starts: string;
@@ -551,7 +584,6 @@ export type Database = {
           created_at: string;
           creator_id: string | null;
           email: string;
-          fcm_token: string | null;
           id: string;
           is_emails_on: boolean;
           is_push_notifications_on: boolean;

@@ -94,12 +94,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   if (lesson.course_id) {
     tabs.push({
       title: "Assignments",
-      content: (
-        <AssignmentsTab
-          lessonId={currentLesson.id}
-          courseId={currentLesson.course_id}
-        />
-      ),
+      content: <AssignmentsTab lessonId={currentLesson.id} />,
       Icon: <AssignmentsIcon />,
       tier: [Role.Teacher],
     });

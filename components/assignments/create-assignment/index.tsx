@@ -6,13 +6,11 @@ import { useState, type FunctionComponent } from "react";
 
 interface Props {
   onCreated: () => void;
-  courseId: string;
   lessonId: string;
 }
 
 const CreateAssignment: FunctionComponent<Props> = ({
   onCreated,
-  courseId,
   lessonId,
 }) => {
   // States
@@ -38,7 +36,6 @@ const CreateAssignment: FunctionComponent<Props> = ({
       </button>
       {isCreateAssignmentModalOpen && (
         <CreateAssignmentModal
-          courseId={courseId}
           lessonId={lessonId}
           onClose={closeCreatessignmentModal}
         />

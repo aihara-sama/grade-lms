@@ -37,6 +37,11 @@ export const createClient = () => {
           }
         },
       },
+      global: {
+        headers: {
+          // Authorization: `Bearer ${JSON.parse(cookieStore.get("sb-127-auth-token").value).access_token}`,
+        },
+      },
     }
   );
 };
