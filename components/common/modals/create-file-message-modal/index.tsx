@@ -1,4 +1,5 @@
 import BaseModal from "@/components/common/modals/base-modal";
+import File from "@/components/file";
 import MessagesIcon from "@/components/icons/messages-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
@@ -19,16 +20,19 @@ import prettyBytes from "pretty-bytes";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { v4 as uuid } from "uuid";
 import videoExtensions from "video-extensions";
 
 interface Props {
   onClose: (mutated?: boolean) => void;
   lessonId: string;
+  courseId?: string;
   file: File | undefined;
 }
 
 const CreateFileMessageModal: FunctionComponent<Props> = ({
   lessonId,
+  courseId,
   file,
   onClose,
 }) => {
@@ -72,7 +76,8 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
       if (file.size >= MAX_CHAT_FILE_SIZE)
         throw new Error(t("file_size_too_big"));
 
-      const { path } = await uploadChatFile(file, ext);
+      const { path } = await uploadChatFile(courseId || uuid(), file, ext);
+      console.log({ path });
 
       setFileExt(ext);
       setFilePath(path);
@@ -129,11 +134,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
         <>
           <div className="flex gap-2 mb-2">
             {imgExtentions.includes(fileExt) ? (
-              <img
-                alt=""
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/chat-files/${filePath}`}
-                className="rounded-md size-12"
-              />
+              <File bucket="courses" path={filePath} />
             ) : (
               <div className="bg-indigo-700 text-white font-bold size-12 rounded-md flex justify-center items-center">
                 {fileExt}

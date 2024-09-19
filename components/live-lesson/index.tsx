@@ -222,5 +222,4 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     </div>
   );
 };
-
 export default LiveLesson;

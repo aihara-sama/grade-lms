@@ -1,4 +1,5 @@
 import Avatar from "@/components/avatar";
+import File from "@/components/file";
 import type { getChatMessages } from "@/db/message";
 import type { ResultOf } from "@/types";
 import type { ChatFile } from "@/types/chat-files.type";
@@ -57,11 +58,7 @@ const Message: FunctionComponent<Props> = ({ chatMessage }) => {
                 className="flex gap-2 cursor-pointer"
               >
                 {imgExtentions.includes(file.ext) ? (
-                  <img
-                    alt=""
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/chat-files/${file.path}`}
-                    className="rounded-md size-12"
-                  />
+                  <File bucket="courses" path={file.path} />
                 ) : (
                   <div className="bg-indigo-700 text-white font-bold size-12 rounded-md flex justify-center items-center">
                     {file.ext}

@@ -762,6 +762,11 @@ WITH CHECK (
     WHERE uc.user_id = auth.uid()
       AND l.id = chat_messages.lesson_id
   )
+  OR
+  (
+    -- If the lesson has no course_id, allow the insert
+    (SELECT l.course_id FROM lessons l WHERE l.id = chat_messages.lesson_id) IS NULL
+  )
 );
 -- Policy to allow selecting chat messages if user is assigned to the course the lesson belongs to
 CREATE POLICY "Can select if assigned to course"
@@ -775,6 +780,11 @@ USING (
     JOIN lessons l ON uc.course_id = l.course_id
     WHERE uc.user_id = auth.uid()
       AND l.id = lesson_id
+  )
+  OR
+  (
+    -- If the lesson has no course_id, allow the insert
+    (SELECT l.course_id FROM lessons l WHERE l.id = chat_messages.lesson_id) IS NULL
   )
 );
 
@@ -792,6 +802,13 @@ WITH CHECK (
     WHERE cm.id = chat_files.message_id
       AND cm.creator_id = auth.uid()
   )
+  OR
+  (
+    -- If the lesson has no course_id, allow the insert
+    (SELECT l.course_id FROM lessons l 
+      JOIN chat_messages cm ON cm.lesson_id = l.id 
+      WHERE cm.id = chat_files.message_id) IS NULL
+  )
 );
 -- Policy to allow selecting chat files if the user is assigned to the course the lesson belongs to
 CREATE POLICY "Can select if assigned to course"
@@ -807,6 +824,13 @@ USING (
     WHERE cm.id = message_id
       AND uc.user_id = auth.uid()
   )
+  OR
+  (
+    -- If the lesson has no course_id, allow the insert
+    (SELECT l.course_id FROM lessons l 
+      JOIN chat_messages cm ON cm.lesson_id = l.id 
+      WHERE cm.id = chat_files.message_id) IS NULL
+  )
 );
 
 -- 
@@ -821,3 +845,11 @@ CREATE POLICY "Can select only with service role"
 ON public.sent_announcements
 FOR select
 TO service_role;
+
+insert into storage.buckets (id, name, public) values ('courses', 'courses', false);
+insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true);
+
+
+create POLICY "Can insert" ON storage.objects for insert WITH CHECK (((bucket_id = 'courses'::text) AND (EXISTS ( SELECT 1 FROM user_courses WHERE ((user_courses.user_id = auth.uid()) AND ((user_courses.course_id)::text = (storage.foldername(objects.name))[1]))))));
+
+create POLICY "Can select" ON storage.objects for select using (((bucket_id = 'courses'::text) AND (EXISTS ( SELECT 1 FROM user_courses WHERE ((user_courses.user_id = auth.uid()) AND ((user_courses.course_id)::text = (storage.foldername(objects.name))[1]))))));

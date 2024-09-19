@@ -159,6 +159,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
         <CreateFileMessageModal
           file={file}
           lessonId={lesson.id}
+          courseId={lesson.course_id}
           onClose={onCreateFileMessageModalClose}
         />
       )}

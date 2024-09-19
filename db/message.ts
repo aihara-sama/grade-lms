@@ -30,12 +30,16 @@ export const getChatMessages = async (lessonId: string) => {
   return result.data;
 };
 
-export const uploadChatFile = async (file: File, ext: string) => {
+export const uploadChatFile = async (
+  courseId: string,
+  file: File,
+  ext: string
+) => {
   const t = await loadMessages();
 
   const result = await db.storage
-    .from("chat-files")
-    .upload(`${uuid()}.${ext}`, file);
+    .from("courses")
+    .upload(`${courseId}/${uuid()}.${ext}`, file);
 
   if (result.error) throw new Error(t("failed_to_upload_file"));
 
