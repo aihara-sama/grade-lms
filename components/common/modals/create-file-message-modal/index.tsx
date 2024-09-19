@@ -5,7 +5,7 @@ import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { MAX_CHAT_FILE_SIZE } from "@/constants";
 import { uploadChatFile } from "@/db/message";
-import { useLessonChannel } from "@/hooks/use-lesson-channel";
+import { useChatChannel } from "@/hooks/use-chat-channel";
 import { useUser } from "@/hooks/use-user";
 import type { ChatMessageWithFiles } from "@/types/chat-messages";
 import { Event } from "@/types/events.type";
@@ -41,7 +41,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   const { user } = useUser();
   const [isSubmittingCreateMessage, setIsSubmittingCreateMessage] =
     useState(false);
-  const channel = useLessonChannel();
+  const channel = useChatChannel();
 
   // State
   const [chatMessage, setChatMessage] = useState<TablesInsert<"chat_messages">>(
@@ -93,7 +93,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
       const createdChatMessage = await db
         .from("chat_messages")
         .insert(chatMessage)
-        .select("*, chat_files(*)")
+        .select("*, chat_files(*), author:users(*)")
         .single();
 
       if (createdChatMessage.error) throw new Error(t("something_went_wrong"));
@@ -154,7 +154,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
               startIcon={<MessagesIcon size="xs" />}
               value={chatMessage.text}
               onChange={onTextChange}
-              fullWIdth
+              fullWidth
               className="w-full mb-auto"
             />
             <button className="primary-button" onClick={submitCreateMessage}>

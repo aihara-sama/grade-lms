@@ -44,6 +44,8 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
 
   // Handlers
   const fireChatMessageCreate = (chatMessage: ChatMessage) => {
+    console.log("fireChatMessageCreate");
+
     channel.send({
       event: Event.ChatMessageCreated,
       type: "broadcast",
@@ -112,7 +114,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
       <hr />
       <div
         ref={messagesWrapperRef}
-        className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1 max-h-[calc(100vh-345px)]"
+        className="flex-1 flex flex-col overflow-y-auto mb-3 mt-3 pr-1 max-h-[calc(100vh-360px)]"
       >
         <div className="flex flex-1 flex-col gap-2">
           {messages.map((msg, idx) => (
@@ -125,7 +127,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
       <Input
         disabled={disabled}
         className="mt-auto"
-        fullWIdth
+        fullWidth
         onChange={(e) => setChatMessageText(e.target.value)}
         value={chatMessageText}
         startIcon={

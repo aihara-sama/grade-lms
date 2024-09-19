@@ -106,7 +106,7 @@ const Select: FunctionComponent<Props> = ({
           value={searchText}
           onChange={onSearchTextChange}
           startIcon={<SearchIcon />}
-          fullWIdth
+          fullWidth
           className="px-[14px]"
           autoFocus
         />

@@ -38,17 +38,19 @@ const GuestPrompt: FunctionComponent<Props> = () => {
 
   // View
   return (
-    <div className="flex flex-col justify-center items-center h-screen max-w-[400px] mx-auto my-0">
+    <div className="flex flex-col justify-center items-center h-screen max-w-64 mx-auto my-0">
       <Input
         value={userName}
         onChange={handleInputChange}
         startIcon={<AvatarIcon size="xs" />}
         label="Enter your name"
         autoFocus
+        fullWidth
+        className="w-full"
       />
       <button
         disabled={!userName}
-        className="primary-button"
+        className="primary-button w-full"
         onClick={createGuestUser}
       >
         Join

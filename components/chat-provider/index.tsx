@@ -5,7 +5,6 @@ import { useChat } from "@/hooks/use-chat";
 import { useChatChannel } from "@/hooks/use-chat-channel";
 import type { ResultOf } from "@/types";
 import { Event } from "@/types/events.type";
-import { REALTIME_CHANNEL_STATES } from "@supabase/supabase-js";
 import { useParams } from "next/navigation";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";
@@ -39,12 +38,16 @@ const ChatProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (channel.state === REALTIME_CHANNEL_STATES.joined)
+    if (!channel.joinedOnce)
       channel
         .on<
           ResultOf<typeof getChatMessages>[number]
         >("broadcast", { event: Event.ChatMessageCreated }, onNewChatMessage)
         .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   return children;

@@ -60,7 +60,7 @@ const SignIn: FunctionComponent = () => {
           type="email"
           placeholder="Email"
           startIcon={<EmailIcon />}
-          fullWIdth
+          fullWidth
         />
         <Input
           required
@@ -68,7 +68,7 @@ const SignIn: FunctionComponent = () => {
           type="password"
           placeholder="Password"
           startIcon={<SecurityIcon />}
-          fullWIdth
+          fullWidth
         />
         <button
           disabled={isSubmitting || isSuccess}

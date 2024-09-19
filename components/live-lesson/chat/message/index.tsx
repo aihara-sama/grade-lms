@@ -21,8 +21,8 @@ const Message: FunctionComponent<Props> = ({ chatMessage }) => {
   const submitDownloadFile = async (file: ChatFile) => {
     try {
       const { data, error } = await db.storage
-        .from("public")
-        .download(`chat-files/${file.path}`);
+        .from("courses")
+        .download(`${file.path}`);
 
       const a = document.createElement("a");
       const url = URL.createObjectURL(data);
@@ -80,5 +80,4 @@ const Message: FunctionComponent<Props> = ({ chatMessage }) => {
     </div>
   );
 };
-
 export default Message;

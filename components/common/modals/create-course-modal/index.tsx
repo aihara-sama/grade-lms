@@ -55,7 +55,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
       title="Create course"
     >
       <Input
-        fullWIdth
+        fullWidth
         name="title"
         label="Course name"
         value={course.title}

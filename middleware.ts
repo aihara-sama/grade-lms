@@ -4,11 +4,11 @@ import createMiddleware from "next-intl/middleware";
 import { type NextRequest } from "next/server";
 
 const publicPages = [
-  "/",
-  "/sign-in",
-  "/sign-up",
-  "/subscription",
-  "/dashboard/lessons/:*",
+  /\//,
+  /\/sign-in/,
+  /\/sign-up/,
+  /\/subscription/,
+  /\/dashboard\/lessons\/[\w-]+/,
 ];
 
 const intlMiddleware = createMiddleware({
@@ -18,8 +18,8 @@ const intlMiddleware = createMiddleware({
 });
 
 export async function middleware(request: NextRequest) {
-  const publicPathnameRegex = RegExp(
-    `^(/(${locales.join("|")}))?(${publicPages.join("|")})?/?$`,
+  const publicPathnameRegex = new RegExp(
+    `^(/(${locales.join("|")}))?(${publicPages.map((page) => page.source).join("|")})$`,
     "i"
   );
   const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
@@ -30,9 +30,9 @@ export async function middleware(request: NextRequest) {
   if (isPublicPage) {
     return response;
   }
+  return updateSession(request, response);
 
   // Update session with the response from intlMiddleware
-  return updateSession(request, response);
 }
 
 export const config = {

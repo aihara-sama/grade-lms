@@ -213,7 +213,7 @@ const LessonPreview: FunctionComponent = () => {
         <Input
           className="mt-3 mb-0"
           label="Duration"
-          fullWIdth
+          fullWidth
           type="number"
           startIcon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}

@@ -18,7 +18,13 @@ const File: FunctionComponent<IProps> = ({ bucket, path }) => {
       setBlob(data);
     })();
   }, []);
-  return <img src={!!blob && URL.createObjectURL(blob)} alt="" />;
+  return (
+    <img
+      src={!!blob && URL.createObjectURL(blob)}
+      alt=""
+      className="size-12 rounded-[50%]"
+    />
+  );
 };
 
 export default File;

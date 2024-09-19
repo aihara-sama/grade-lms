@@ -76,28 +76,30 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
       Icon: <CameraIcon />,
       tier: [Role.Teacher, Role.Student, Role.Guest],
     },
-    {
-      title: "Messages",
-      content: <Chat lesson={lesson} />,
-      Icon: (
-        <div className="relative">
-          <ChatIcon />
-          {isNewChatMessage && (
-            <div className="absolute right-[7px] top-[7px] w-[10px] h-[10px] bg-red-500 rounded-[50%] border border-white"></div>
-          )}
-        </div>
-      ),
-      tier: [Role.Teacher, Role.Student, Role.Guest],
-    },
   ];
 
   if (lesson.course_id) {
-    tabs.push({
-      title: "Assignments",
-      content: <AssignmentsTab lessonId={currentLesson.id} />,
-      Icon: <AssignmentsIcon />,
-      tier: [Role.Teacher],
-    });
+    tabs.push(
+      {
+        title: "Messages",
+        content: <Chat lesson={lesson} />,
+        Icon: (
+          <div className="relative">
+            <ChatIcon />
+            {isNewChatMessage && (
+              <div className="absolute right-[7px] top-[7px] w-[10px] h-[10px] bg-red-500 rounded-[50%] border border-white"></div>
+            )}
+          </div>
+        ),
+        tier: [Role.Teacher, Role.Student, Role.Guest],
+      },
+      {
+        title: "Assignments",
+        content: <AssignmentsTab lessonId={currentLesson.id} />,
+        Icon: <AssignmentsIcon />,
+        tier: [Role.Teacher],
+      }
+    );
   }
 
   const fetchLesson = async () => {

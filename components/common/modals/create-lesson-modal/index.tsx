@@ -163,7 +163,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
         )}
         <Input
           autoFocus
-          fullWIdth
+          fullWidth
           value={lesson.title}
           onChange={onInputChange}
           name="title"
@@ -177,7 +177,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           label="Starts at"
         />
         <Input
-          fullWIdth
+          fullWidth
           label="Duration"
           type="number"
           startIcon={<LessonsIcon />}

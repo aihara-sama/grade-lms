@@ -14,7 +14,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
   onClick?: React.MouseEventHandler<HTMLInputElement>;
   type?: InputHTMLAttributes<HTMLInputElement>["type"];
   className?: string;
-  fullWIdth?: boolean;
+  fullWidth?: boolean;
 }
 
 const Input: FunctionComponent<Props> = ({
@@ -23,7 +23,7 @@ const Input: FunctionComponent<Props> = ({
   type,
   label,
   value,
-  fullWIdth,
+  fullWidth,
   placeholder,
   className = "",
   onClick,
@@ -63,7 +63,7 @@ const Input: FunctionComponent<Props> = ({
           value={value}
           type={inputType}
           placeholder={placeholder}
-          className={`${fullWIdth ? "w-full" : "w-full sm:w-auto"} ${clsx(endIcon && "pr-10")}`}
+          className={`${fullWidth ? "w-full" : "w-full sm:w-auto"} ${clsx(endIcon && "pr-10")}`}
           {...inputProps}
         />
         {type === "password" && (

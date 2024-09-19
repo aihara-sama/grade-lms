@@ -98,7 +98,7 @@ const OverviewTab: FunctionComponent<Props> = ({
         <div>
           <Input
             disabled={user.role === Role.Student}
-            fullWIdth
+            fullWidth
             startIcon={<LessonsIcon size="xs" />}
             placeholder="Assignment name"
             name="title"

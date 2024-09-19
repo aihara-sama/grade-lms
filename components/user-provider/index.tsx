@@ -1,6 +1,6 @@
 "use client";
 
-import GuestPrompt from "@/components/live-lesson/user-name-prompt";
+import GuestPrompt from "@/components/live-lesson/guest-prompt";
 import { useUser } from "@/hooks/use-user";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { db } from "@/utils/supabase/client";

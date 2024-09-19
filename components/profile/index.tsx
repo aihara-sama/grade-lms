@@ -196,7 +196,7 @@ const Profile: FunctionComponent = () => {
             <Input
               onChange={(e) => setUserName(e.target.value)}
               value={userName}
-              fullWIdth
+              fullWidth
               name="name"
               startIcon={<AvatarIcon size="xs" />}
               label="Name"
@@ -273,7 +273,7 @@ const Profile: FunctionComponent = () => {
             <Input
               onChange={(e) => setPassword(e.target.value)}
               value={password}
-              fullWIdth
+              fullWidth
               name="password"
               startIcon={<SecurityIcon size="xs" />}
               label="Password"

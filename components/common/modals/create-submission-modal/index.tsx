@@ -83,7 +83,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
       <div>
         <Input
           autoFocus
-          fullWIdth
+          fullWidth
           startIcon={<LessonsIcon size="xs" />}
           placeholder="Submission name"
           name="title"
