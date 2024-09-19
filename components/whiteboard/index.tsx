@@ -17,6 +17,7 @@ import { Event } from "@/types/events.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
 import { db } from "@/utils/supabase/client";
+import { throttleFetch } from "@/utils/throttle-fetch";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
   AppState,
@@ -76,7 +77,7 @@ const Whiteboard: FunctionComponent<Props> = ({
       .catch(() => toast.error(t("something_went_wrong")));
   };
 
-  const submitUpdateWhiteboardData = async (data: string) => {
+  const submitUpdateWhiteboardData = throttleFetch(async (data: string) => {
     const { error } = await db
       .from("lessons")
       .update({
@@ -85,7 +86,7 @@ const Whiteboard: FunctionComponent<Props> = ({
       .eq("id", lesson.id);
 
     if (error) toast.error(t("failed_to_save_whiteboar_data"));
-  };
+  });
 
   const onPointerUpdate: ExcalidrawProps["onPointerUpdate"] = (event) => {
     pointerEventRef.current = event;
