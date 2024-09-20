@@ -18,6 +18,7 @@ import type {
 import type { ChangeEvent, FunctionComponent } from "react";
 
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
+import LoadingSpinner from "@/components/loading-spinner";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
 import { getOverlappingLessons } from "@/db/lesson";
 import { Role } from "@/enums/role.enum";
@@ -229,13 +230,7 @@ const LessonPreview: FunctionComponent = () => {
             className="primary-button"
             onClick={submitUpdateLessonDate}
           >
-            {isSubmittingUpdateLessonDate && (
-              <img
-                className="loading-spinner"
-                src="/assets/gifs/loading-spinner.gif"
-                alt=""
-              />
-            )}
+            {isSubmittingUpdateLessonDate && <LoadingSpinner />}
             <span
               className={`${clsx(isSubmittingUpdateLessonDate && "opacity-0")}`}
             >

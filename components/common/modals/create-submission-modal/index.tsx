@@ -1,6 +1,7 @@
 import BaseModal from "@/components/common/modals/base-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
+import LoadingSpinner from "@/components/loading-spinner";
 import { createSubmission } from "@/db/submission";
 import { Event } from "@/enums/event.enum";
 import { useNotificationChannel } from "@/hooks/use-notification-channel";
@@ -106,13 +107,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
             className="primary-button"
             onClick={submitCreateAssignment}
           >
-            {isSubmitting && (
-              <img
-                className="loading-spinner"
-                src="/assets/gifs/loading-spinner.gif"
-                alt=""
-              />
-            )}
+            {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>
               Create
             </span>

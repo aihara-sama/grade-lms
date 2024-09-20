@@ -41,32 +41,35 @@ import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 const Users: FunctionComponent = () => {
-  // State
-  const [isDeleteUsersModalOpen, setIsDeleteUsersModalOpen] = useState(false);
-  const [usersIds, setUsersIds] = useState<string[]>([]);
-  const [userId, setUserId] = useState<string>();
-  const [users, setUsers] = useState<User[]>([]);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [usersCount, setUsersCount] = useState(0);
-  const [searchText, setSearchText] = useState("");
-  const [isEnrollUsersInCoursesModalOpen, setIsEnrollUsersInCoursesModalOpen] =
-    useState(false);
-  const [isEnrollUserInCoursesModalOpen, setIsEnrollUserInCoursesModalOpen] =
-    useState(false);
-  const [isSelectedAll, setIsSelectedAll] = useState(false);
-  const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
-  const [isSubmittingDeleteUser, setIsSubmittingDeleteUser] = useState(false);
-  const [isSubmittingDeleteUsers, setIsSubmittingDeleteUsers] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isEditUserModal, setIsEditUserModal] = useState(false);
-
-  // Refs
-  const usersOffsetRef = useRef(0);
-
   // Hooks
   const t = useTranslations();
   const { user } = useUser();
+
+  // State
+  const [users, setUsers] = useState<User[]>([]);
+  const [userId, setUserId] = useState<string>();
+  const [usersIds, setUsersIds] = useState<string[]>([]);
+
+  const [usersCount, setUsersCount] = useState(0);
+  const [searchText, setSearchText] = useState("");
+
+  const [isEditUserModal, setIsEditUserModal] = useState(false);
+  const [isDeleteUserModal, setIsDeleteUserModal] = useState(false);
+  const [isDeleteUsersModal, setIsDeleteUsersModal] = useState(false);
+  const [isEnrollUserInCoursesModal, setIsEnrollUserInCoursesModal] =
+    useState(false);
+  const [isEnrollUsersInCoursesModal, setIsEnrollUsersInCoursesModal] =
+    useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSubmittingDeleteUser, setIsSubmittingDeleteUser] = useState(false);
+  const [isSubmittingDeleteUsers, setIsSubmittingDeleteUsers] = useState(false);
+
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
+
+  // Refs
+  const usersOffsetRef = useRef(0);
 
   // Vars
   const isData = !!users.length && !isLoading;
@@ -157,7 +160,7 @@ const Users: FunctionComponent = () => {
     try {
       await deleteUserById(userId);
 
-      setIsDeleteUserModalOpen(false);
+      setIsDeleteUserModal(false);
       setUsersIds((_) => _.filter((id) => id !== userId));
       fetchUsersBySearch(searchText, true);
 
@@ -177,7 +180,7 @@ const Users: FunctionComponent = () => {
         : deleteUsersByIds(usersIds));
 
       setUsersIds([]);
-      setIsDeleteUsersModalOpen(false);
+      setIsDeleteUsersModal(false);
       fetchUsersBySearch(searchText, true);
 
       toast.success(t("users_deleted"));
@@ -214,7 +217,7 @@ const Users: FunctionComponent = () => {
     }
   };
   const onEnrollUsersInCoursesModalClose = (mutated?: boolean) => {
-    setIsEnrollUsersInCoursesModalOpen(false);
+    setIsEnrollUsersInCoursesModal(false);
 
     if (mutated) {
       setUsersIds([]);
@@ -258,6 +261,8 @@ const Users: FunctionComponent = () => {
       }
     }
   }, [users, usersCount]);
+
+  // View
   return (
     <>
       <CardsContainer>
@@ -280,13 +285,13 @@ const Users: FunctionComponent = () => {
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
-            onClick={() => setIsEnrollUsersInCoursesModalOpen(true)}
+            onClick={() => setIsEnrollUsersInCoursesModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Enroll <CoursesIcon />
           </button>
           <button
-            onClick={() => setIsDeleteUsersModalOpen(true)}
+            onClick={() => setIsDeleteUsersModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Delete <DeleteIcon />
@@ -339,12 +344,12 @@ const Users: FunctionComponent = () => {
                   </li>
                   <li
                     className="popper-list-item"
-                    onClick={() => setIsEnrollUserInCoursesModalOpen(true)}
+                    onClick={() => setIsEnrollUserInCoursesModal(true)}
                   >
                     <UsersIcon /> Enroll
                   </li>
                   <li
-                    onClick={() => setIsDeleteUserModalOpen(true)}
+                    onClick={() => setIsDeleteUserModal(true)}
                     className="popper-list-item"
                   >
                     <DeleteIcon /> Delete
@@ -373,13 +378,13 @@ const Users: FunctionComponent = () => {
           </div>
         </div>
       )}
-      {isEnrollUserInCoursesModalOpen && (
+      {isEnrollUserInCoursesModal && (
         <EnrollUsersInCoursesModal
           usersIds={[userId]}
-          onClose={() => setIsEnrollUserInCoursesModalOpen(false)}
+          onClose={() => setIsEnrollUserInCoursesModal(false)}
         />
       )}
-      {isEnrollUsersInCoursesModalOpen && (
+      {isEnrollUsersInCoursesModal && (
         <EnrollUsersInCoursesModal
           usersIds={usersIds}
           onClose={onEnrollUsersInCoursesModalClose}
@@ -389,20 +394,20 @@ const Users: FunctionComponent = () => {
         <EditUserModal userId={userId} onClose={onEditUserModalClose} />
       )}
 
-      {isDeleteUserModalOpen && (
+      {isDeleteUserModal && (
         <PromptModal
           isSubmitting={isSubmittingDeleteUser}
-          onClose={() => setIsDeleteUsersModalOpen(false)}
+          onClose={() => setIsDeleteUsersModal(false)}
           title="Delete user"
           action="Delete"
           body="Are you sure you want to delete this user?"
           actionHandler={submitDeleteUser}
         />
       )}
-      {isDeleteUsersModalOpen && (
+      {isDeleteUsersModal && (
         <PromptModal
           isSubmitting={isSubmittingDeleteUsers}
-          onClose={() => setIsDeleteUsersModalOpen(false)}
+          onClose={() => setIsDeleteUsersModal(false)}
           title="Delete Users"
           action="Delete"
           actionHandler={submitDeleteUsers}

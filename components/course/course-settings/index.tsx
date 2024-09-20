@@ -2,6 +2,7 @@
 
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
+import LoadingSpinner from "@/components/loading-spinner";
 import { DB } from "@/lib/supabase/db";
 import type { Course } from "@/types/course.type";
 import clsx from "clsx";
@@ -65,13 +66,7 @@ const CourseSettings: FunctionComponent<Props> = ({
             className="primary-button w-[100px]"
             onClick={handleRenameCourse}
           >
-            {isSubmitting && (
-              <img
-                className="loading-spinner"
-                src="/assets/gifs/loading-spinner.gif"
-                alt=""
-              />
-            )}
+            {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
           </button>
         </div>

@@ -1,6 +1,7 @@
 import BaseModal from "@/components/common/modals/base-modal";
 import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
+import LoadingSpinner from "@/components/loading-spinner";
 import { extendLesson, getOverlappingLessons } from "@/db/lesson";
 import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
@@ -97,13 +98,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
             className="primary-button w-auto"
             onClick={submitExtendLesson}
           >
-            {isSubmitting && (
-              <img
-                className="loading-spinner"
-                src="/assets/gifs/loading-spinner.gif"
-                alt=""
-              />
-            )}
+            {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
           </button>
         </div>

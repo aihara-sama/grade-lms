@@ -3,6 +3,7 @@ import Select from "@/components/common/select";
 import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
+import LoadingSpinner from "@/components/loading-spinner";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/course";
 import { createLesson, getOverlappingLessons } from "@/db/lesson";
@@ -192,13 +193,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
             className="primary-button"
             type="submit"
           >
-            {isSubmitting && (
-              <img
-                className="loading-spinner"
-                src="/assets/gifs/loading-spinner.gif"
-                alt=""
-              />
-            )}
+            {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>
               Create
             </span>

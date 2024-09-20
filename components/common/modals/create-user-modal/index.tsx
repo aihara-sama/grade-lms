@@ -1,7 +1,5 @@
 "use client";
 
-import tz from "timezones-list";
-
 import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CameraIcon from "@/components/icons/camera-icon";
@@ -10,15 +8,16 @@ import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
 import Tabs from "@/components/tabs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 import type { InputType as UserInputType } from "@/actions/create-user-action/types";
 import BaseModal from "@/components/common/modals/base-modal";
-import Select from "@/components/common/select";
+import LoadingSpinner from "@/components/loading-spinner";
+import TimezoneSelect from "@/components/timezone-select";
+import { DEFAULT_AVATAR } from "@/constants";
 import { createUser } from "@/db/user";
 import { Role } from "@/enums/role.enum";
-import type { SelectItem } from "@/interfaces/select.interface";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -32,23 +31,27 @@ const initUserDetails: UserInputType = {
   name: "",
   email: "",
   password: "",
-  avatar: process.env.NEXT_PUBLIC_DEFAULT_AVATAR,
+  avatar: DEFAULT_AVATAR,
   timezone: getTimeZone(),
   is_emails_on: true,
   is_push_notifications_on: true,
 };
 
 const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
-  const [userDetails, setUserDetails] = useState(initUserDetails);
-  const [timezones, setTimezones] = useState<SelectItem[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  // Hooks
   const t = useTranslations();
 
+  // State
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userDetails, setUserDetails] = useState(initUserDetails);
+
+  // Handlers
   const submitCreateUser = async (createAnother?: boolean) => {
     setIsSubmitting(true);
+
     try {
       await createUser(userDetails);
+
       if (createAnother) {
         setUserDetails(initUserDetails);
       } else {
@@ -62,18 +65,17 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
     }
   };
 
-  const onTimezoneChange = (timezone: SelectItem) =>
-    setUserDetails((_) => ({ ..._, timezone: timezone.title }));
-
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
-
-  const onAvatarChange = (avatar: string) =>
+  const onAvatarChange = (avatar: string) => {
     setUserDetails((_) => ({ ..._, avatar }));
+  };
+  const onTimezoneChange = (timezone: string) => {
+    setUserDetails((_) => ({ ..._, timezone }));
+  };
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
+  };
 
-  useEffect(() => {
-    setTimezones(tz.map(({ tzCode }) => ({ id: tzCode, title: tzCode })));
-  }, []);
+  // View
   return (
     <BaseModal isExpanded={false} onClose={() => onClose()} title="Create user">
       <form noValidate>
@@ -115,19 +117,9 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     <p className="mb-1 text-sm font-bold text-neutral-500">
                       Timezone
                     </p>
-                    <Select
-                      popperProps={{
-                        placement: "top",
-                        popperClassName: "h-[251px]",
-                      }}
-                      label=""
-                      options={timezones}
-                      fullWidth
-                      defaultValue={{
-                        id: userDetails.timezone,
-                        title: userDetails.timezone,
-                      }}
+                    <TimezoneSelect
                       onChange={onTimezoneChange}
+                      defaultTimezone={userDetails.timezone}
                     />
                   </div>
                 </>
@@ -163,13 +155,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
             type="button"
             onClick={() => submitCreateUser()}
           >
-            {isSubmitting && (
-              <img
-                className="loading-spinner"
-                src="/assets/gifs/loading-spinner.gif"
-                alt=""
-              />
-            )}
+            {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>
               Create
             </span>

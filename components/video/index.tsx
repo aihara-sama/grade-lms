@@ -2,8 +2,8 @@ import type { FunctionComponent } from "react";
 import { memo } from "react";
 
 interface Props {
-  stream: MediaStream;
   isMuted: boolean;
+  stream: MediaStream;
 }
 
 const Video: FunctionComponent<Props> = memo(function Video({
