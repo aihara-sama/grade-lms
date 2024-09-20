@@ -25,6 +25,7 @@ import {
   getUsersByCourseId,
   getUsersByCourseIdCount,
 } from "@/db/user";
+import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
 import type { User } from "@/types/users";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
@@ -63,6 +64,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
 
   // Hooks
   const t = useTranslations();
+  const { user } = useUser();
 
   // Vars
   const isData = !!members.length && !isLoading;
@@ -261,10 +263,12 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
           total={totalMembersCount}
           title="Total members"
         />
-        <EnrollUsers
-          onUsersEnrolled={() => fetchMembersBySearch(searchText, true)}
-          courseId={courseId}
-        />
+        {user.role === Role.Teacher && (
+          <EnrollUsers
+            onUsersEnrolled={() => fetchMembersBySearch(searchText, true)}
+            courseId={courseId}
+          />
+        )}
       </CardsContainer>
       {selectedMembersIds.length ? (
         <div className="mb-3 gap-2 flex">
@@ -312,10 +316,14 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
                   title={name}
                   subtitle={role}
                   onClick={() => {}}
-                  onToggle={(checked) => onMemberToggle(checked, id)}
+                  onToggle={
+                    user.role === Role.Teacher
+                      ? (checked) => onMemberToggle(checked, id)
+                      : undefined
+                  }
                 />
               ),
-            "": role !== Role.Teacher && (
+            "": user.role === Role.Teacher && role !== Role.Teacher && (
               <BasePopper
                 placement={
                   members.length > 7 && members.length - idx < 4

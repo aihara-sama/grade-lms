@@ -42,7 +42,7 @@ const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = ({
       title: "Settings",
       href: `/dashboard/courses/${course.id}/settings`,
       Icon: <SettingsIcon />,
-      tier: [Role.Teacher, Role.Student],
+      tier: [Role.Teacher],
     },
   ];
 
