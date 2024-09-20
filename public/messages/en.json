@@ -95,6 +95,8 @@
     "delete_assignment": "Are you sure you want to delete this assignment?"
   },
   "auth": {
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
     "an_email_address_is_too_long": "An email address is too long",
     "user_not_found": "User not found",
     "name_is_required": "Name is required",

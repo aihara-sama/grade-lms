@@ -7,6 +7,7 @@ import { getServerDB } from "@/lib/supabase/db/get-server-db";
 
 const handler = async (usersIds: string[]): Promise<ReturnType> => {
   const currentUser = await getServerDB().auth.getUser();
+
   if (!currentUser.data.user) {
     return {
       error: "Unauthorized",

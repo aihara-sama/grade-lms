@@ -11,9 +11,11 @@ import { createSafeAction } from "@/utils/validation/create-safe-action";
 const handler = async (payload: InputType): Promise<ReturnType> => {
   const { password, ...restPayload } = payload;
 
+  const serverDB = getServerDB();
+
   const {
     data: { user },
-  } = await getServerDB().auth.getUser();
+  } = await serverDB.auth.getUser();
 
   if (!user) {
     return {
@@ -39,7 +41,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
         timezone: payload.timezone,
       } as UserMetadata,
     }),
-    adminDB.from("users").update(restPayload).eq("id", payload.id),
+    serverDB.from("users").update(restPayload).eq("id", payload.id),
   ]);
 
   return {

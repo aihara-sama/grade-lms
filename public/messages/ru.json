@@ -95,6 +95,8 @@
     "delete_assignment": "Вы уверены что хотите удалить это задание"
   },
   "auth": {
+    "unauthorized": "Неавторизован",
+    "forbidden": "Запрещено",
     "an_email_address_is_too_long": "Адрес электронной почты слишком длинный",
     "user_not_found": "Пользователь не найден",
     "name_is_required": "Имя пользователя обезательно",
