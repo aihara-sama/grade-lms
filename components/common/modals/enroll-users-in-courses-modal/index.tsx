@@ -17,8 +17,8 @@ import {
 } from "@/db/course";
 import { enrollAllUsersInCourses, enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
+import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/courses.type";
-import { db } from "@/utils/supabase/client";
 import { throttleFetch } from "@/utils/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle-search";
 import clsx from "clsx";
@@ -161,7 +161,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
         : enrollUsersInCourses(usersIds, selectedCoursesIds));
       onClose(true);
       setSelectedCoursesIds([]);
-      db.functions.invoke("check-events");
+      DB.functions.invoke("check-events");
       toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
     } catch (error: any) {
       toast.error(error.message);

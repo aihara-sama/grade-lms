@@ -3,8 +3,8 @@
 import Camera from "@/components/camera";
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
+import { DB } from "@/lib/supabase/db";
 import type { User } from "@/types/users";
-import { db } from "@/utils/supabase/client";
 import type { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import Peer from "peerjs";
 import React, { useEffect, useRef, useState } from "react";
@@ -16,7 +16,7 @@ const VideoMeetingPage: React.FC = () => {
   const [cameras, setCameras] = useState<ICamera[]>([]);
 
   const { user } = useUser();
-  const channel = db.channel("id", {
+  const channel = DB.channel("id", {
     config: {
       presence: {
         key: user.id,

@@ -18,11 +18,11 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { useChat } from "@/hooks/use-chat";
 import { useVideoChat } from "@/hooks/use-video-chat";
+import { DB } from "@/lib/supabase/db";
 import type { Course } from "@/types/courses.type";
 import type { Lesson } from "@/types/lessons.type";
 import { execAtStartOfMin } from "@/utils/interval-at-start-of-min";
 import { isLessonEnded } from "@/utils/is-lesson-ended";
-import { db } from "@/utils/supabase/client";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
@@ -104,8 +104,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
 
   const fetchLesson = async () => {
     try {
-      const { data, error } = await db
-        .from("lessons")
+      const { data, error } = await DB.from("lessons")
         .select("*, course:courses(*)")
         .eq("id", lesson.id)
         .single();
@@ -128,8 +127,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     if (!isLessonEnded(lesson)) {
       const stop = execAtStartOfMin(async () => {
         try {
-          const { data, error } = await db
-            .from("lessons")
+          const { data, error } = await DB.from("lessons")
             .select("ends")
             .eq("id", lesson.id)
             .single();

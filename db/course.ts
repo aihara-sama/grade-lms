@@ -1,8 +1,8 @@
 import { COURSES_GET_LIMIT } from "@/constants";
+import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
-import { db } from "@/utils/supabase/client";
 
 // Get
 export const getCourses = async (
@@ -12,8 +12,7 @@ export const getCourses = async (
   to = COURSES_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("users")
+  const result = await DB.from("users")
     .select("courses(*, lessons(count), users(count))")
     .eq("id", userId)
     .ilike("courses.title", `%${title}%`)
@@ -28,8 +27,7 @@ export const getCourses = async (
 };
 export const getCoursesCount = async (userId: string, title = "") => {
   const t = await loadMessages();
-  const result = await db
-    .from("users")
+  const result = await DB.from("users")
     .select("courses(count)")
     .eq("id", userId)
     .ilike("courses.title", `%${title}%`)
@@ -48,11 +46,10 @@ export const getUnenrolledCourses = async (
   to = COURSES_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .rpc("get_courses_not_assigned_to_user", {
-      p_user_id: userId,
-      p_course_title: title,
-    })
+  const result = await DB.rpc("get_courses_not_assigned_to_user", {
+    p_user_id: userId,
+    p_course_title: title,
+  })
     .range(from, to)
     .order("created_at", { ascending: true })
     .returns<CourseWithRefsCount[]>();
@@ -63,11 +60,10 @@ export const getUnenrolledCourses = async (
 };
 export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
   const t = await loadMessages();
-  const result = await db
-    .rpc("get_courses_not_assigned_to_user", {
-      p_user_id: userId,
-      p_course_title: title,
-    })
+  const result = await DB.rpc("get_courses_not_assigned_to_user", {
+    p_user_id: userId,
+    p_course_title: title,
+  })
     .select("count")
     .returns<{ count: number }[]>();
 
@@ -79,7 +75,7 @@ export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
 // Create
 export const createCourse = async (course: TablesInsert<"courses">) => {
   const t = await loadMessages();
-  const result = await db.from("courses").insert(course).select("id").single();
+  const result = await DB.from("courses").insert(course).select("id").single();
 
   if (result.error) throw new Error(t("failed_to_create_course"));
 
@@ -89,7 +85,7 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
 // Delete
 export const deleteCourseById = async (id: string) => {
   const t = await loadMessages();
-  const result = await db.from("courses").delete().eq("id", id);
+  const result = await DB.from("courses").delete().eq("id", id);
 
   if (result.error) throw new Error(t("failed_to_delete_course"));
 
@@ -97,7 +93,7 @@ export const deleteCourseById = async (id: string) => {
 };
 export const deleteCoursesByIds = async (ids: string[]) => {
   const t = await loadMessages();
-  const result = await db.rpc("delete_courses_by_ids", {
+  const result = await DB.rpc("delete_courses_by_ids", {
     p_courses_ids: ids,
   });
 
@@ -107,7 +103,7 @@ export const deleteCoursesByIds = async (ids: string[]) => {
 };
 export const deleteAllCourses = async (title = "") => {
   const t = await loadMessages();
-  const result = await db.rpc("delete_all_courses", {
+  const result = await DB.rpc("delete_all_courses", {
     p_title: title,
   });
 

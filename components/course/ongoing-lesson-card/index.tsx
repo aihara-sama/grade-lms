@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { format } from "date-fns";
 import Link from "next/link";
 import { type FunctionComponent } from "react";
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const OngoingLessonCard: FunctionComponent<Props> = async ({ courseId }) => {
-  const data = await createClient()
+  const data = await getServerDB()
     .from("courses")
     .select("lessons(*)")
     .eq("id", courseId)

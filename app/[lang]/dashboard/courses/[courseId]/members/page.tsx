@@ -1,6 +1,6 @@
 import CourseHeader from "@/components/course/course-header";
 import Members from "@/components/course/members";
-import { createClient } from "@/utils/supabase/server";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
@@ -11,15 +11,15 @@ interface Props {
   };
 }
 const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
+  const DB = getServerDB();
   const [
     {
       data: { user: currentUser },
     },
     currentCourseData,
   ] = await Promise.all([
-    createClient().auth.getUser(),
-    createClient()
-      .from("courses")
+    DB.auth.getUser(),
+    DB.from("courses")
       .select("*, users(*), lessons(*)")
       .eq("id", courseId)
       .single(),

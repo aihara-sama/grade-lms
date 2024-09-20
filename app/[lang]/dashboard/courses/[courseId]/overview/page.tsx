@@ -7,8 +7,8 @@ import AvatarIcon from "@/components/icons/avatar-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Total from "@/components/total";
 import { Role } from "@/interfaces/user.interface";
-import { db } from "@/utils/supabase/client";
-import { createClient } from "@/utils/supabase/server";
+import { DB } from "@/lib/supabase/db";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import type { FunctionComponent } from "react";
@@ -18,8 +18,7 @@ export async function generateMetadata({
 }: {
   params: { courseId: string };
 }): Promise<Metadata> {
-  const data = await db
-    .from("courses")
+  const data = await DB.from("courses")
     .select("title")
     .eq("id", params.courseId)
     .single();
@@ -36,7 +35,7 @@ interface Props {
 }
 
 const Page: FunctionComponent<Props> = async ({ params }) => {
-  const courseData = await createClient()
+  const courseData = await getServerDB()
     .from("courses")
     .select("*, users(*), lessons(*)")
     .eq("id", params.courseId)

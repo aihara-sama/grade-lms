@@ -2,7 +2,7 @@
 
 import LessonSettings from "@/components/lesson-settings";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { db } from "@/utils/supabase/client";
+import { DB } from "@/lib/supabase/db";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
@@ -27,13 +27,11 @@ const Page: FunctionComponent<Props> = ({ params }) => {
 
   useEffect(() => {
     (async () => {
-      const { data: courseData, error: courseError } = await db
-        .from("courses")
+      const { data: courseData, error: courseError } = await DB.from("courses")
         .select("*")
         .eq("id", params.courseId)
         .single();
-      const { data: lessonData, error: lessonError } = await db
-        .from("lessons")
+      const { data: lessonData, error: lessonError } = await DB.from("lessons")
         .select("*")
         .eq("id", params.lessonId)
         .single();

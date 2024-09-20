@@ -1,6 +1,6 @@
 import CourseHeader from "@/components/course/course-header";
 import Lessons from "@/components/course/lessons";
-import { createClient } from "@/utils/supabase/server";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
@@ -11,7 +11,7 @@ interface Props {
   };
 }
 const Page: FunctionComponent<Props> = async ({ params }) => {
-  const { data: course, error } = await createClient()
+  const { data: course, error } = await getServerDB()
     .from("courses")
     .select("*")
     .eq("id", params.courseId)

@@ -1,12 +1,11 @@
 import { ASSIGNMENTS_GET_LIMIT } from "@/constants";
+import { DB } from "@/lib/supabase/db";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/load-messages";
-import { db } from "@/utils/supabase/client";
 
 export const getAssignmentById = async (assignmentId: string) => {
   const t = await loadMessages();
-  const result = await db
-    .from("assignments")
+  const result = await DB.from("assignments")
     .select("*, lesson:lessons(course_id)")
     .eq("id", assignmentId)
     .single();
@@ -22,8 +21,7 @@ export const getAssignmentsByLessonId = async (
   to = ASSIGNMENTS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("assignments")
+  const result = await DB.from("assignments")
     .select("*")
     .eq("lesson_id", lessonId)
     .ilike("title", `%${title}%`)
@@ -40,8 +38,7 @@ export const getAssignmentsCountByLessonId = async (
   title = ""
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("assignments")
+  const result = await DB.from("assignments")
     .select("count")
     .ilike("title", `%${title}%`)
     .eq("lesson_id", lessonId)
@@ -56,8 +53,7 @@ export const createAssignment = async (
   assignment: TablesInsert<"assignments">
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("assignments")
+  const result = await DB.from("assignments")
     .insert(assignment)
     .select("id")
     .single();
@@ -70,8 +66,7 @@ export const updateAssignment = async (
   assignment: TablesUpdate<"assignments">
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("assignments")
+  const result = await DB.from("assignments")
     .update(assignment)
     .eq("id", assignment.id);
 
@@ -83,7 +78,7 @@ export const deleteLessonsAssignments = async (
   title: string
 ) => {
   const t = await loadMessages();
-  const result = await db.rpc("delete_lesson_assignments", {
+  const result = await DB.rpc("delete_lesson_assignments", {
     p_lesson_id: lessonId,
     p_title: title,
   });
@@ -93,7 +88,7 @@ export const deleteLessonsAssignments = async (
 
 export const deleteAssignmentById = async (assignmentId: string) => {
   const t = await loadMessages();
-  const result = await db.from("assignments").delete().eq("id", assignmentId);
+  const result = await DB.from("assignments").delete().eq("id", assignmentId);
 
   if (result.error) throw new Error(t("failed_to_delete_assignment"));
 
@@ -102,7 +97,7 @@ export const deleteAssignmentById = async (assignmentId: string) => {
 
 export const deleteAssignmentsByIds = async (ids: string[]) => {
   const t = await loadMessages();
-  const result = await db.rpc("delete_assignments_by_ids", {
+  const result = await DB.rpc("delete_assignments_by_ids", {
     p_assignments_ids: ids,
   });
 

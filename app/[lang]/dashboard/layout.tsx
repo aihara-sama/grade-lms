@@ -1,13 +1,13 @@
 import ContentWrapper from "@/components/content-wrapper";
 import Header from "@/components/header";
 import UserProvider from "@/components/user-provider";
-import { createClient } from "@/utils/supabase/server";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
   const {
     data: { user },
-  } = await createClient().auth.getUser();
+  } = await getServerDB().auth.getUser();
 
   return (
     <div className="h-full flex-col">

@@ -4,15 +4,15 @@ import { deleteUserAction } from "@/actions/delete-user-action";
 import { editUserAction } from "@/actions/edit-user-action";
 import type { InputType as EditUserInputType } from "@/actions/edit-user-action/types";
 import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
+import { DB } from "@/lib/supabase/db";
 import { loadMessages } from "@/utils/load-messages";
 import { parseUsersCoursesIds } from "@/utils/parse-users-courses-ids";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
-import { db } from "@/utils/supabase/client";
 
 // Get
 export const getUserById = async (id: string) => {
   const t = await loadMessages();
-  const result = await db.from("users").select("*").eq("id", id).single();
+  const result = await DB.from("users").select("*").eq("id", id).single();
 
   if (result.error || !result.data) throw new Error(t("failed_to_load_user"));
 
@@ -25,8 +25,7 @@ export const getUsersByCourseId = async (
   to = MEMBERS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("courses")
+  const result = await DB.from("courses")
     .select("users(*)")
     .eq("id", courseId)
     .ilike("users.name", `%${userName}%`)
@@ -43,8 +42,7 @@ export const getUsersByCourseIdCount = async (
   userName = ""
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("courses")
+  const result = await DB.from("courses")
     .select("users(count)")
     .eq("id", courseId)
     .ilike("users.name", `%${userName}%`)
@@ -62,8 +60,7 @@ export const getUsersByCeratorId = async (
   to = USERS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("users")
+  const result = await DB.from("users")
     .select("*")
     .eq("creator_id", creatorId)
     .ilike("name", `%${name}%`)
@@ -80,8 +77,7 @@ export const getUsersByCreatorIdCount = async (
   name = ""
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("users")
+  const result = await DB.from("users")
     .select("count")
     .eq("creator_id", creatorId)
     .ilike("name", `%${name}%`)
@@ -99,11 +95,10 @@ export const getUsersNotInCourse = async (
   to = USERS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .rpc("get_users_not_in_course", {
-      p_course_id: courseId,
-      p_user_name: userName,
-    })
+  const result = await DB.rpc("get_users_not_in_course", {
+    p_course_id: courseId,
+    p_user_name: userName,
+  })
     .range(from, to)
     .order("created_at", { ascending: true });
 
@@ -116,11 +111,10 @@ export const getUsersNotInCourseCount = async (
   userName = ""
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .rpc("get_users_not_in_course", {
-      p_course_id: courseId,
-      p_user_name: userName,
-    })
+  const result = await DB.rpc("get_users_not_in_course", {
+    p_course_id: courseId,
+    p_user_name: userName,
+  })
     .select("count")
     .returns<{ count: number }[]>();
 
@@ -133,8 +127,7 @@ export const getAllCourseStudentsIds = async (
   courseId: string
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("courses")
+  const result = await DB.from("courses")
     .select("users(id)")
     .eq("id", courseId)
     .neq("users.id", userId)
@@ -161,8 +154,7 @@ export const deleteUsersByIds = async (ids: string[]) => {
 export const deleteAllUsers = async (userId: string, name: string) => {
   const t = await loadMessages();
 
-  const usersIds = await db
-    .from("users")
+  const usersIds = await DB.from("users")
     .select("id")
     .eq("creator_id", userId)
     .ilike("name", `%${name}%`);
@@ -178,9 +170,9 @@ export const enrollUsersInCourses = async (
   coursesIds: string[]
 ) => {
   const t = await loadMessages();
-  const result = await db
-    .from("user_courses")
-    .upsert(parseUsersCoursesIds(usersIds, coursesIds));
+  const result = await DB.from("user_courses").upsert(
+    parseUsersCoursesIds(usersIds, coursesIds)
+  );
 
   if (result.error)
     throw new Error(
@@ -193,7 +185,7 @@ export const enrollUsersInCourses = async (
 };
 export const enrollAllUsersInCourses = async (coursesIds: string[]) => {
   const t = await loadMessages();
-  const result = await db.rpc("enroll_all_users_in_courses", {
+  const result = await DB.rpc("enroll_all_users_in_courses", {
     p_courses_ids: coursesIds,
   });
 
@@ -201,7 +193,7 @@ export const enrollAllUsersInCourses = async (coursesIds: string[]) => {
 };
 export const enrollAllUsers = async (courseId: string) => {
   const t = await loadMessages();
-  const result = await db.rpc("enroll_all_users", {
+  const result = await DB.rpc("enroll_all_users", {
     p_course_id: courseId,
   });
 
@@ -223,7 +215,7 @@ export const editUser = async (userDetails: EditUserInputType) => {
 
 export const dispelUsers = async (courseId: string, usersIds: string[]) => {
   const t = await loadMessages();
-  const result = await db.rpc("dispel_users_from_course", {
+  const result = await DB.rpc("dispel_users_from_course", {
     p_course_id: courseId,
     p_users_ids: usersIds,
   });
@@ -233,7 +225,7 @@ export const dispelUsers = async (courseId: string, usersIds: string[]) => {
 
 export const dispelAllUsers = async (courseId: string, userName = "") => {
   const t = await loadMessages();
-  const result = await db.rpc("dispel_all_users_from_course", {
+  const result = await DB.rpc("dispel_all_users_from_course", {
     p_course_id: courseId,
     p_user_name: userName,
   });

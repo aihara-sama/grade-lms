@@ -4,7 +4,7 @@ import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CrownIcon from "@/components/icons/crown-icon";
 import Input from "@/components/input";
-import { db } from "@/utils/supabase/client";
+import { DB } from "@/lib/supabase/db";
 import { toCapitalCase } from "@/utils/to-capital-case";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -57,14 +57,13 @@ const Profile: FunctionComponent = () => {
   const submitRenameUser = async () => {
     setIsSubmittingRenameUser(true);
 
-    const { error: usersError } = await db
-      .from("users")
+    const { error: usersError } = await DB.from("users")
       .update({
         name: userName,
       })
       .eq("id", user.id);
 
-    const { error: profileError } = await db.auth.updateUser({
+    const { error: profileError } = await DB.auth.updateUser({
       data: {
         name: userName,
       } as IUserMetadata,
@@ -83,14 +82,13 @@ const Profile: FunctionComponent = () => {
   useEffect(() => {
     (async () => {
       if (avatar !== user.avatar) {
-        const { error: usersError } = await db
-          .from("users")
+        const { error: usersError } = await DB.from("users")
           .update({
             avatar,
           })
           .eq("id", user.id);
 
-        const { error: profileError } = await db.auth.updateUser({
+        const { error: profileError } = await DB.auth.updateUser({
           data: {
             avatar,
           } as IUserMetadata,
@@ -107,13 +105,12 @@ const Profile: FunctionComponent = () => {
 
   useUpdateEffect(() => {
     Promise.all([
-      db
-        .from("users")
+      DB.from("users")
         .update({
           is_emails_on: isEmailsOn,
         })
         .eq("id", user.id),
-      db.auth.updateUser({
+      DB.auth.updateUser({
         data: {
           is_emails_on: isEmailsOn,
         },
@@ -122,13 +119,12 @@ const Profile: FunctionComponent = () => {
   }, [isEmailsOn]);
   useUpdateEffect(() => {
     Promise.all([
-      db
-        .from("users")
+      DB.from("users")
         .update({
           is_push_notifications_on: isPushNotificationsOn,
         })
         .eq("id", user.id),
-      db.auth.updateUser({
+      DB.auth.updateUser({
         data: {
           is_push_notifications_on: isPushNotificationsOn,
         },
@@ -140,13 +136,12 @@ const Profile: FunctionComponent = () => {
     try {
       const [{ error: userError }, { error: profileError }] = await Promise.all(
         [
-          db
-            .from("users")
+          DB.from("users")
             .update({
               preferred_locale: _locale,
             })
             .eq("id", user.id),
-          db.auth.updateUser({
+          DB.auth.updateUser({
             data: {
               preferred_locale: _locale,
             },
@@ -165,7 +160,7 @@ const Profile: FunctionComponent = () => {
     setIsSubmittingChangePassword(true);
 
     try {
-      const { error } = await db.auth.updateUser({
+      const { error } = await DB.auth.updateUser({
         password,
       });
       if (error) throw new Error(t(serverErrToIntlKey(error.message)));

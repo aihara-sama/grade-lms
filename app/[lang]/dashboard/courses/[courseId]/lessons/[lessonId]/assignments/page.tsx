@@ -1,7 +1,7 @@
 import Assignments from "@/components/assignments";
 import LessonProvider from "@/components/lesson-provider";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { createClient } from "@/utils/supabase/server";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 
 import { type FunctionComponent } from "react";
 
@@ -14,14 +14,14 @@ interface Props {
 const Page: FunctionComponent<Props> = async ({
   params: { lessonId, courseId },
 }) => {
-  const lesson = await createClient()
-    .from("lessons")
+  const DB = getServerDB();
+
+  const lesson = await DB.from("lessons")
     .select("*")
     .eq("id", lessonId)
     .single();
 
-  const course = await createClient()
-    .from("courses")
+  const course = await DB.from("courses")
     .select("*")
     .eq("id", courseId)
     .single();

@@ -5,9 +5,9 @@ import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
 import { Role, type IUserMetadata } from "@/interfaces/user.interface";
+import { DB } from "@/lib/supabase/db";
 import { getTimeZone } from "@/utils/get-time-zone";
 import { serverErrToIntlKey } from "@/utils/server-err-to-intl";
-import { db } from "@/utils/supabase/client";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -37,7 +37,7 @@ const SignUp: FunctionComponent = () => {
 
     setIsSubmitting(true);
 
-    const { error, data } = await db.auth.signUp({
+    const { error, data } = await DB.auth.signUp({
       email,
       password,
       options: {

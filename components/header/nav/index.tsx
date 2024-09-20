@@ -1,8 +1,8 @@
 import { menu } from "@/components/header/menu";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
+import { DB } from "@/lib/supabase/db";
 import type { PropsWithClassName } from "@/types";
-import { db } from "@/utils/supabase/client";
 import { addMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-nprogress-bar";
@@ -18,8 +18,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
 
   const submitCreateLesson = async () => {
     try {
-      const { error, data } = await db
-        .from("lessons")
+      const { error, data } = await DB.from("lessons")
         .insert({
           starts: new Date().toISOString(),
           ends: addMinutes(new Date(), 30).toISOString(),

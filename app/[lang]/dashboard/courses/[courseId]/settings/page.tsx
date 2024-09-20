@@ -2,8 +2,8 @@
 
 import CourseHeader from "@/components/course/course-header";
 import CourseSettings from "@/components/course/course-settings";
+import { DB } from "@/lib/supabase/db";
 import type { Course } from "@/types/courses.type";
-import { db } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
@@ -19,8 +19,7 @@ const Page: FunctionComponent<Props> = ({ params }) => {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await db
-        .from("courses")
+      const { data, error } = await DB.from("courses")
         .select("*")
         .eq("id", params.courseId)
         .single();

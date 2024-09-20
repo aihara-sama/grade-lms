@@ -2,8 +2,8 @@
 
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
+import { DB } from "@/lib/supabase/db";
 import type { Database } from "@/types/supabase.type";
-import { db } from "@/utils/supabase/client";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
@@ -27,8 +27,7 @@ const LessonSettings: FunctionComponent<Props> = ({
     setIsSubmitting(true);
 
     try {
-      const { error } = await db
-        .from("lessons")
+      const { error } = await DB.from("lessons")
         .update({
           title: lessonTitle,
         })

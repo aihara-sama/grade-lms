@@ -2,10 +2,10 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
+import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { getWeekNames } from "@/utils/get-week-names";
 import { parseInsights } from "@/utils/parse-insights";
-import { db } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
@@ -25,8 +25,7 @@ const DashboardInsights: FunctionComponent<Props> = ({ user, courses }) => {
 
   // Handlers
   const fetchCoursesInsights = () => {
-    return db
-      .from("users")
+    return DB.from("users")
       .select("courses(timestamp:created_at)")
       .eq("id", user.id)
       .gte(
@@ -37,8 +36,7 @@ const DashboardInsights: FunctionComponent<Props> = ({ user, courses }) => {
       .single();
   };
   const fetchUsersInsights = () => {
-    return db
-      .from("users")
+    return DB.from("users")
       .select("timestamp:created_at")
       .eq("creator_id", user.id)
       .gte(

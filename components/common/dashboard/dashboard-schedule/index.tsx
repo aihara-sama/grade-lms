@@ -6,9 +6,9 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { LESSONS_GET_LIMIT } from "@/constants";
 import { useUser } from "@/hooks/use-user";
+import { DB } from "@/lib/supabase/db";
 import type { Lesson } from "@/types/lessons.type";
 import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import { db } from "@/utils/supabase/client";
 import { throttleFetch } from "@/utils/throttle-fetch";
 import { toCapitalCase } from "@/utils/to-capital-case";
 import { addDays, format, formatDistanceToNow, startOfDay } from "date-fns";
@@ -40,8 +40,7 @@ const DashboardSchedule: FunctionComponent = () => {
   };
 
   const fetchLessonsByStartDate = (date: Date) =>
-    db
-      .from("users")
+    DB.from("users")
       .select("id, courses(id, lessons(*, course:courses(title)))")
       .eq("id", user.id)
       .range(schedule.length, schedule.length + LESSONS_GET_LIMIT - 1, {

@@ -4,16 +4,16 @@ import { EditUser } from "@/actions/edit-user-action/schema";
 import type { InputType, ReturnType } from "@/actions/edit-user-action/types";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { Role } from "@/interfaces/user.interface";
+import { adminDB } from "@/lib/supabase/db";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/create-safe-action";
-import { supabaseAdmin } from "@/utils/supabase/admin";
-import { createClient } from "@/utils/supabase/server";
 
 const handler = async (payload: InputType): Promise<ReturnType> => {
   const { password, ...restPayload } = payload;
 
   const {
     data: { user },
-  } = await createClient().auth.getUser();
+  } = await getServerDB().auth.getUser();
 
   if (!user) {
     return {
@@ -30,7 +30,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
   }
 
   const [{ error: userError }, { error: profileError }] = await Promise.all([
-    supabaseAdmin.auth.admin.updateUserById(payload.id, {
+    adminDB.auth.admin.updateUserById(payload.id, {
       email: payload.email,
       password,
       user_metadata: {
@@ -39,7 +39,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
         timezone: payload.timezone,
       } as IUserMetadata,
     }),
-    supabaseAdmin.from("users").update(restPayload).eq("id", payload.id),
+    adminDB.from("users").update(restPayload).eq("id", payload.id),
   ]);
 
   return {

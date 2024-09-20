@@ -2,13 +2,14 @@ import StudentrDashboard from "@/components/student-dashboard";
 import TeacherDashboard from "@/components/teacher-dashboard";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { Role } from "@/interfaces/user.interface";
-import { createClient } from "@/utils/supabase/server";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { ReactNode } from "react";
 
 const Page = async () => {
+  const DB = getServerDB();
   const {
     data: { user },
-  } = await createClient().auth.getUser();
+  } = await DB.auth.getUser();
 
   let Dashborad: ReactNode;
 
@@ -21,14 +22,12 @@ const Page = async () => {
         data: { count: usersCount },
       },
     ] = await Promise.all([
-      createClient()
-        .from("users")
+      DB.from("users")
         .select("courses(count)")
         .eq("id", user.id)
         .returns<Record<"courses", { count: number }[]>[]>()
         .single(),
-      createClient()
-        .from("users")
+      DB.from("users")
         .select("count")
         .eq("creator_id", user.id)
         .returns<Record<"count", number>[]>()
@@ -46,8 +45,7 @@ const Page = async () => {
   if ((user.user_metadata as IUserMetadata).role === Role.Student) {
     const [{ data: meWithAssignmentsCount }, { data: submissions }] =
       await Promise.all([
-        createClient()
-          .from("users")
+        DB.from("users")
           .select("courses(lessons(assignments(count)))")
           .eq("id", user.id)
           .returns<
@@ -57,8 +55,7 @@ const Page = async () => {
             >[]
           >()
           .single(),
-        createClient()
-          .from("submissions")
+        DB.from("submissions")
           .select("count")
           .eq("user_id", user.id)
           .returns<{ count: number }[]>(),

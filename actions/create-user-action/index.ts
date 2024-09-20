@@ -4,14 +4,14 @@ import { CreateUser } from "@/actions/create-user-action/schema";
 import type { InputType, ReturnType } from "@/actions/create-user-action/types";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { Role } from "@/interfaces/user.interface";
+import { adminDB } from "@/lib/supabase/db";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/create-safe-action";
-import { supabaseAdmin } from "@/utils/supabase/admin";
-import { createClient } from "@/utils/supabase/server";
 
 const handler = async (payload: InputType): Promise<ReturnType> => {
   const {
     data: { user },
-  } = await createClient().auth.getUser();
+  } = await getServerDB().auth.getUser();
 
   if (!user) {
     return {
@@ -27,7 +27,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { error } = await supabaseAdmin.auth.admin.createUser({
+  const { error } = await adminDB.auth.admin.createUser({
     email: payload.email,
     password: payload.password,
     user_metadata: {

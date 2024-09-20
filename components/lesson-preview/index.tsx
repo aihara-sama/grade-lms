@@ -5,7 +5,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import SaveIcon from "@/components/icons/save-icon";
 import Input from "@/components/input";
 import ResizeHandler from "@/components/resize-handler";
-import { db } from "@/utils/supabase/client";
+import { DB } from "@/lib/supabase/db";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { addMinutes, millisecondsToMinutes, subMinutes } from "date-fns";
 import { useEffect, useRef, useState } from "react";
@@ -98,8 +98,7 @@ const LessonPreview: FunctionComponent = () => {
 
       if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
 
-      const { error, data } = await db
-        .from("lessons")
+      const { error, data } = await DB.from("lessons")
         .update({
           starts: starts.toISOString(),
           ends: ends.toISOString(),
@@ -120,8 +119,7 @@ const LessonPreview: FunctionComponent = () => {
     }
   };
   const submitUpdateWhiteboardData = async () => {
-    const { error } = await db
-      .from("lessons")
+    const { error } = await DB.from("lessons")
       .update({
         whiteboard_data: JSON.stringify(whiteboardDataRef.current),
       })

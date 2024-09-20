@@ -1,7 +1,7 @@
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
+import { DB } from "@/lib/supabase/db";
 import type { User } from "@/types/users";
-import { db } from "@/utils/supabase/client";
 import type {
   REALTIME_SUBSCRIBE_STATES,
   RealtimePresenceJoinPayload,
@@ -18,7 +18,7 @@ export const useVideoChat = () => {
   // Hooks
   const { user } = useUser();
   const { lessonId } = useParams();
-  const channel = db.channel(lessonId as string, {
+  const channel = DB.channel(lessonId as string, {
     config: {
       presence: {
         key: user.id,

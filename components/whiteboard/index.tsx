@@ -13,10 +13,10 @@ import LessonStatus from "@/components/lesson-status";
 import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-template";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
+import { DB } from "@/lib/supabase/db";
 import { Event } from "@/types/events.type";
 import type { Lesson } from "@/types/lessons.type";
 import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
-import { db } from "@/utils/supabase/client";
 import { throttleFetch } from "@/utils/throttle-fetch";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
@@ -78,8 +78,7 @@ const Whiteboard: FunctionComponent<Props> = ({
   };
 
   const submitUpdateWhiteboardData = throttleFetch(async (data: string) => {
-    const { error } = await db
-      .from("lessons")
+    const { error } = await DB.from("lessons")
       .update({
         whiteboard_data: data,
       })

@@ -1,6 +1,6 @@
 "use client";
 
-import { db } from "@/utils/supabase/client";
+import { DB } from "@/lib/supabase/db";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 interface IProps {
@@ -13,7 +13,7 @@ const File: FunctionComponent<IProps> = ({ bucket, path }) => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await db.storage.from(bucket).download(path);
+      const { data } = await DB.storage.from(bucket).download(path);
 
       setBlob(data);
     })();

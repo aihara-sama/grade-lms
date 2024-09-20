@@ -7,9 +7,9 @@ import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
 import { useUser } from "@/hooks/use-user";
+import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/courses.type";
 import { messaging, vapidKey } from "@/utils/firebase";
-import { db } from "@/utils/supabase/client";
 import { getToken } from "firebase/messaging";
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
@@ -31,16 +31,14 @@ const TeacherDashboard: FunctionComponent<Props> = ({
   const { user } = useUser();
 
   const fetchCoursesCount = () =>
-    db
-      .from("users")
+    DB.from("users")
       .select("courses(count)")
       .eq("id", user.id)
       .returns<Record<"courses", { count: number }[]>[]>()
       .single();
 
   const fetchLatestCourses = () =>
-    db
-      .from("users")
+    DB.from("users")
       .select("courses(*, users(count), lessons(count))")
       .eq("id", user.id)
       .limit(10)
@@ -82,8 +80,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
 
   useEffect(() => {
     (async () => {
-      const { data } = await db
-        .from("fcm_tokens")
+      const { data } = await DB.from("fcm_tokens")
         .select("fcm_token")
         .eq("user_id", user.id)
         .maybeSingle();
@@ -103,8 +100,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
                 vapidKey,
               }).then((token) => {
                 Promise.all([
-                  db
-                    .from("fcm_tokens")
+                  DB.from("fcm_tokens")
                     .insert({
                       fcm_token: token,
                       user_id: user.id,

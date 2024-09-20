@@ -1,7 +1,7 @@
 import LessonPreview from "@/components/lesson-preview";
 import LessonProvider from "@/components/lesson-provider";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { createClient } from "@/utils/supabase/server";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
@@ -16,16 +16,16 @@ interface Props {
 const Page: FunctionComponent<Props> = async ({
   params: { lessonId, courseId },
 }) => {
-  const courseData = await createClient()
-    .from("courses")
+  const DB = getServerDB();
+
+  const courseData = await DB.from("courses")
     .select("*")
     .eq("id", courseId)
     .single();
 
   if (!courseData.data) return redirect("/dashboard/courses");
 
-  const lessonData = await createClient()
-    .from("lessons")
+  const lessonData = await DB.from("lessons")
     .select("*")
     .eq("id", lessonId)
     .single();

@@ -2,11 +2,11 @@
 
 import type { ReturnType } from "@/actions/delete-user-action/types";
 import { Role } from "@/interfaces/user.interface";
-import { supabaseAdmin } from "@/utils/supabase/admin";
-import { createClient } from "@/utils/supabase/server";
+import { adminDB } from "@/lib/supabase/db";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 
 const handler = async (usersIds: string[]): Promise<ReturnType> => {
-  const currentUser = await createClient().auth.getUser();
+  const currentUser = await getServerDB().auth.getUser();
   if (!currentUser.data.user) {
     return {
       error: "Unauthorized",
@@ -22,7 +22,7 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
   }
 
   const result = await Promise.all(
-    usersIds.map((userId) => supabaseAdmin.auth.admin.deleteUser(userId))
+    usersIds.map((userId) => adminDB.auth.admin.deleteUser(userId))
   );
 
   return {

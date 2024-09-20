@@ -25,7 +25,7 @@ require.extensions[".css"] = function (module, filename) {
 };
 
 const config: Config = {
-  content: ["./app/**/*.{tsx}", "./components/**/*.{tsx}"],
+  content: ["./app/**/*.tsx", "./components/**/*.tsx"],
   theme: {
     extend: {
       keyframes: {
