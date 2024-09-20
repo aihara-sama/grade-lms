@@ -35,7 +35,7 @@ const Event: FunctionComponent<Props> = ({
   const isBeforeMidnight = format(new Date(eventStarts), "HH:mm") === "23:45";
   const isQuarter = millisecondsToMinutes(duration) === 15;
   const isOngoing = isLessonOngoing(event);
-  const isEnded = isLessonEnded(new Date(event.ends));
+  const isEnded = isLessonEnded(event);
 
   // Hooks
   const draggingEvent = useSchedule((state) => state.draggingEvent);

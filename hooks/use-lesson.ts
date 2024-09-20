@@ -23,7 +23,7 @@ export const useLesson = create<Store>((set) => ({
       ...(lesson
         ? {
             isOngoing: isLessonOngoing(lesson),
-            isEnded: isLessonEnded(new Date(lesson.ends)),
+            isEnded: isLessonEnded(lesson),
           }
         : {}),
     }),

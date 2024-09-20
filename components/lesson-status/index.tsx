@@ -30,8 +30,7 @@ const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft }) => {
       setLiveDate(formatDistanceToNowStrict(lesson.ends));
 
       if (isLessonOngoing(lesson)) setisOngoing(isLessonOngoing(lesson));
-      if (isLessonEnded(new Date(lesson.ends)))
-        setisEnded(isLessonEnded(new Date(lesson.ends)));
+      if (isLessonEnded(lesson)) setisEnded(isLessonEnded(lesson));
     }, 1000);
 
     return () => {

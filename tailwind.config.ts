@@ -25,11 +25,7 @@ require.extensions[".css"] = function (module, filename) {
 };
 
 const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./app/**/*.{tsx}", "./components/**/*.{tsx}"],
   theme: {
     extend: {
       keyframes: {
@@ -77,7 +73,6 @@ const config: Config = {
       },
       screens: {
         "sm-h": { raw: "(min-height: 500px)" },
-        // => @media (min-height: 800px) { ... }
       },
     },
   },

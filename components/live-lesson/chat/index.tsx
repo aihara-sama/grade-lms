@@ -40,7 +40,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
   const { user } = useUser();
   const channel = useChatChannel();
 
-  const disabled = isLessonEnded(new Date(lesson.ends));
+  const disabled = isLessonEnded(lesson);
 
   // Handlers
   const fireChatMessageCreate = (chatMessage: ChatMessage) => {

@@ -55,7 +55,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
           })} overflow-auto`}
         >
           <div className="flex flex-col gap-3">
-            {isLessonEnded(new Date(lesson.ends)) ? (
+            {isLessonEnded(lesson) ? (
               <div className="mt-5 flex flex-col items-center gap-4 text-neutral-500">
                 <div> This session has ended</div>
                 <TimeIcon size="md" />
@@ -119,13 +119,13 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   };
 
   useEffect(() => {
-    if (!isLessonEnded(new Date(lesson.ends))) startSession();
+    if (!isLessonEnded(lesson)) startSession();
   }, []);
   useEffect(() => {
-    if (isLessonEnded(new Date(lesson.ends))) endSession();
+    if (isLessonEnded(lesson)) endSession();
   }, [lesson]);
   useEffect(() => {
-    if (!isLessonEnded(new Date(lesson.ends))) {
+    if (!isLessonEnded(lesson)) {
       const stop = execAtStartOfMin(async () => {
         try {
           const { data, error } = await db
@@ -138,7 +138,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
 
           const timeRemains = +new Date(data.ends) - +new Date();
 
-          if (isLessonEnded(new Date(data.ends))) {
+          if (isLessonEnded(lesson)) {
             endSession();
             setCurrentLesson((_) => ({ ..._ }));
             toast.success("The lesson has ended");
