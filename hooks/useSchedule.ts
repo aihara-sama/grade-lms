@@ -1,6 +1,6 @@
 "use client";
 
-import type { Lesson } from "@/types/lessons.type";
+import type { Lesson } from "@/types/lesson.type";
 import { create } from "zustand";
 
 export interface IPointerPosition {

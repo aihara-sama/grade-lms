@@ -30,11 +30,11 @@ import {
 } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { Lesson } from "@/types/lessons.type";
-import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
-import { throttleFetch } from "@/utils/throttle-fetch";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { Lesson } from "@/types/lesson.type";
+import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
+import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";

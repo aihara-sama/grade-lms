@@ -9,7 +9,7 @@ import SettingsIcon from "@/components/icons/settings-icon";
 import NavTabs from "@/components/nav-tabs";
 import type { TabItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
-import type { Course } from "@/types/courses.type";
+import type { Course } from "@/types/course.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 interface Props {

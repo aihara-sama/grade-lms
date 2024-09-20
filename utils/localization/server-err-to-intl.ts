@@ -1,4 +1,4 @@
-import type { loadMessages } from "@/utils/load-messages";
+import type { loadMessages } from "@/utils/localization/load-messages";
 
 type ServerErr = Record<
   string,

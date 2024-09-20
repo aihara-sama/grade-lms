@@ -7,7 +7,7 @@ import Nav from "@/components/header/nav";
 import Logo from "@/components/logo";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { messaging } from "@/utils/firebase";
+import { messaging } from "@/lib/firebase/messaging";
 import { onMessage } from "firebase/messaging";
 import { useEffect, type FunctionComponent } from "react";
 

@@ -27,10 +27,10 @@ import {
 } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { User } from "@/types/users";
-import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import { throttleFetch } from "@/utils/throttle-fetch";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { User } from "@/types/user.type";
+import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import type { User as AuthUser } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";

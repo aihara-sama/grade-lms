@@ -25,9 +25,9 @@ import {
 } from "@/db/submission";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { SubmissionWithAuthor } from "@/types/submissions.type";
-import { throttleFetch } from "@/utils/throttle-fetch";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { SubmissionWithAuthor } from "@/types/submission.type";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";

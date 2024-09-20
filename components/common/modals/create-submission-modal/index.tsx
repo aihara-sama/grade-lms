@@ -4,7 +4,7 @@ import Input from "@/components/input";
 import { createSubmission } from "@/db/submission";
 import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import { useUser } from "@/hooks/use-user";
-import { Event } from "@/types/events.type";
+import { Event } from "@/types/event.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { OutputData } from "@editorjs/editorjs";
 import clsx from "clsx";

@@ -21,11 +21,11 @@ import { deleteLessonsByds, getLessonById, updateLesson } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
-import { getLessonDuration } from "@/utils/get-lesson-duration";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { Course } from "@/types/course.type";
+import type { Lesson } from "@/types/lesson.type";
+import { getLessonDuration } from "@/utils/lesson/get-lesson-duration";
+import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 

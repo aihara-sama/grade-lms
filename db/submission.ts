@@ -1,7 +1,7 @@
 import { SUBMISSIONS_GET_LIMIT } from "@/constants";
 import { DB } from "@/lib/supabase/db";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
-import { loadMessages } from "@/utils/load-messages";
+import { loadMessages } from "@/utils/localization/load-messages";
 
 export const getAssignmentSubmissions = async (
   assignmentId: string,

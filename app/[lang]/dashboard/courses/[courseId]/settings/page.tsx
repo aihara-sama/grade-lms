@@ -3,7 +3,7 @@
 import CourseHeader from "@/components/course/course-header";
 import CourseSettings from "@/components/course/course-settings";
 import { DB } from "@/lib/supabase/db";
-import type { Course } from "@/types/courses.type";
+import type { Course } from "@/types/course.type";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 

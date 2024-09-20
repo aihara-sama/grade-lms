@@ -1,4 +1,4 @@
-import type { ChatFile } from "@/types/chat-files.type";
+import type { ChatFile } from "@/types/chat-file.type";
 import type { Database } from "@/types/supabase.type";
 
 export type ChatMessage = Database["public"]["Tables"]["chat_messages"]["Row"];

@@ -4,7 +4,7 @@ import Input from "@/components/input";
 import { extendLesson, getOverlappingLessons } from "@/db/lesson";
 import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
-import type { Lesson } from "@/types/lessons.type";
+import type { Lesson } from "@/types/lesson.type";
 import clsx from "clsx";
 import { minutesToMilliseconds } from "date-fns";
 import { useTranslations } from "next-intl";

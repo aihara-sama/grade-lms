@@ -19,9 +19,9 @@ import {
   getUsersNotInCourseCount,
 } from "@/db/user";
 import { DB } from "@/lib/supabase/db";
-import type { User } from "@/types/users";
-import { throttleFetch } from "@/utils/throttle-fetch";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { User } from "@/types/user.type";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";

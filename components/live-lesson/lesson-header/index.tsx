@@ -9,8 +9,8 @@ import LessonStatus from "@/components/lesson-status";
 import NavTabs from "@/components/nav-tabs";
 import type { TabItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
+import type { Course } from "@/types/course.type";
+import type { Lesson } from "@/types/lesson.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 interface Props {

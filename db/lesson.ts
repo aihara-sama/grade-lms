@@ -1,8 +1,8 @@
 import { LESSONS_GET_LIMIT } from "@/constants";
 import { DB } from "@/lib/supabase/db";
-import type { Lesson } from "@/types/lessons.type";
+import type { Lesson } from "@/types/lesson.type";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
-import { loadMessages } from "@/utils/load-messages";
+import { loadMessages } from "@/utils/localization/load-messages";
 import { format } from "date-fns";
 
 export const getWeekLessons = async (days: string[], courseId?: string) => {

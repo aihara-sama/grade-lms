@@ -19,7 +19,7 @@ import Select from "@/components/common/select";
 import { createUser } from "@/db/user";
 import type { SelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
-import { getTimeZone } from "@/utils/get-time-zone";
+import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";

@@ -1,7 +1,7 @@
 import CreateCourseModal from "@/components/common/modals/create-course-modal";
 import CourseCard from "@/components/course-card";
 import PlusIcon from "@/components/icons/plus-icon";
-import type { CourseWithRefsCount } from "@/types/courses.type";
+import type { CourseWithRefsCount } from "@/types/course.type";
 import { useState, type FunctionComponent } from "react";
 
 interface Props {

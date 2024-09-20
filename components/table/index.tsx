@@ -1,4 +1,4 @@
-import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import clsx from "clsx";
 import type { FunctionComponent, ReactNode, UIEventHandler } from "react";
 import { memo } from "react";

@@ -3,7 +3,7 @@ import ArrowIcon from "@/components/icons/arrow-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import type { SelectItem } from "@/interfaces/menu.interface";
-import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
+import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import clsx from "clsx";
 import throttle from "lodash.throttle";
 import type {

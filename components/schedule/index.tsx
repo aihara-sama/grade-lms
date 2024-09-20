@@ -6,7 +6,6 @@ import ArrowRightIcon from "@/components/icons/arrow-right-icon";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
 import Hour from "@/components/schedule/hour";
 import { useSchedule } from "@/hooks/useSchedule";
-import { getEventWidth } from "@/utils/get-event-width";
 import {
   addDays,
   addHours,
@@ -29,12 +28,13 @@ import { getWeekLessons, upsertLesson } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/menu.interface";
 import { Role } from "@/interfaces/user.interface";
-import type { Lesson } from "@/types/lessons.type";
-import { getEventElFromPoints } from "@/utils/get-event-el-from-points";
-import { getEventPlaceholderElFromPoints } from "@/utils/get-event-placeholder-el-from-points";
-import { getWeekDays } from "@/utils/get-week-days";
-import { execAtStartOfMin } from "@/utils/interval-at-start-of-min";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { Lesson } from "@/types/lesson.type";
+import { getEventElFromPoints } from "@/utils/DOM/get-event-el-from-points";
+import { getEventPlaceholderElFromPoints } from "@/utils/DOM/get-event-placeholder-el-from-points";
+import { getEventWidth } from "@/utils/DOM/get-event-width";
+import { getWeekDays } from "@/utils/date/get-week-days";
+import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
@@ -46,7 +46,6 @@ const Schedule: FunctionComponent = () => {
   const [courses, setCourses] = useState<SelectItem[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
   const [value, setValue] = useState(0);
-  console.log({ value });
 
   // Refs
   const isDraggingEventRef = useRef(false);

@@ -28,11 +28,11 @@ import {
 } from "@/db/assignment";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import type { Assignment } from "@/types/assignments.type";
-import type { Lesson } from "@/types/lessons.type";
-import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import { throttleFetch } from "@/utils/throttle-fetch";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { Assignment } from "@/types/assignment.type";
+import type { Lesson } from "@/types/lesson.type";
+import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useLesson } from "@/hooks/use-lesson";
-import { isLessonEnded } from "@/utils/is-lesson-ended";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
+import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
+import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 

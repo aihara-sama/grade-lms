@@ -1,7 +1,7 @@
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
 import { DB } from "@/lib/supabase/db";
-import type { User } from "@/types/users";
+import type { User } from "@/types/user.type";
 import type {
   REALTIME_SUBSCRIBE_STATES,
   RealtimePresenceJoinPayload,

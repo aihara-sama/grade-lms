@@ -1,6 +1,6 @@
 import { DB } from "@/lib/supabase/db";
 import type { TablesInsert } from "@/types/supabase.type";
-import { loadMessages } from "@/utils/load-messages";
+import { loadMessages } from "@/utils/localization/load-messages";
 import { v4 as uuid } from "uuid";
 
 export const createChatMessage = async (

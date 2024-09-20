@@ -1,5 +1,5 @@
 import { DB } from "@/lib/supabase/db";
-import { loadMessages } from "@/utils/load-messages";
+import { loadMessages } from "@/utils/localization/load-messages";
 
 export const createBucket = async (name: string) => {
   const t = await loadMessages();

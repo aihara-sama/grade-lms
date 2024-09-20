@@ -6,7 +6,7 @@ import type { IUserMetadata } from "@/interfaces/user.interface";
 import { Role } from "@/interfaces/user.interface";
 import { adminDB } from "@/lib/supabase/db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
-import { createSafeAction } from "@/utils/create-safe-action";
+import { createSafeAction } from "@/utils/validation/create-safe-action";
 
 const handler = async (payload: InputType): Promise<ReturnType> => {
   const {

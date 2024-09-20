@@ -3,7 +3,7 @@
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import { DB } from "@/lib/supabase/db";
-import type { Course } from "@/types/courses.type";
+import type { Course } from "@/types/course.type";
 import clsx from "clsx";
 // import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";

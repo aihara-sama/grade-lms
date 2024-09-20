@@ -4,7 +4,7 @@ import { getChatMessages } from "@/db/message";
 import { useChat } from "@/hooks/use-chat";
 import { useChatChannel } from "@/hooks/use-chat-channel";
 import type { ResultOf } from "@/types";
-import { Event } from "@/types/events.type";
+import { Event } from "@/types/event.type";
 import { useParams } from "next/navigation";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";

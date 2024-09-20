@@ -18,9 +18,9 @@ import {
 import { enrollAllUsersInCourses, enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
-import type { CourseWithRefsCount } from "@/types/courses.type";
-import { throttleFetch } from "@/utils/throttle-fetch";
-import { throttleSearch } from "@/utils/throttle-search";
+import type { CourseWithRefsCount } from "@/types/course.type";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";

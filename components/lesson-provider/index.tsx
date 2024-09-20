@@ -1,7 +1,7 @@
 "use client";
 
 import { useLesson } from "@/hooks/use-lesson";
-import type { Lesson } from "@/types/lessons.type";
+import type { Lesson } from "@/types/lesson.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";
 

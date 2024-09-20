@@ -3,11 +3,11 @@ import { HOUR } from "@/constants";
 import { useUser } from "@/hooks/use-user";
 import { useSchedule } from "@/hooks/useSchedule";
 import { Role } from "@/interfaces/user.interface";
-import type { Lesson } from "@/types/lessons.type";
-import { getLessonDuration } from "@/utils/get-lesson-duration";
-import { isFirstDateFromYesterdayOrMore } from "@/utils/is-first-date-from-yesterday-or-more";
-import { isSummerDaylight } from "@/utils/is-summer-daylight";
-import { minToPx } from "@/utils/min-to-px";
+import type { Lesson } from "@/types/lesson.type";
+import { isFirstDateFromYesterdayOrMore } from "@/utils/date/is-first-date-from-yesterday-or-more";
+import { isSummerDaylight } from "@/utils/date/is-summer-daylight";
+import { minToPx } from "@/utils/date/min-to-px";
+import { getLessonDuration } from "@/utils/lesson/get-lesson-duration";
 import clsx from "clsx";
 import {
   addHours,

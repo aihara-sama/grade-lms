@@ -1,7 +1,7 @@
 import Avatar from "@/components/avatar";
 import IconTitle from "@/components/icon-title";
 import { Role } from "@/interfaces/user.interface";
-import type { User } from "@/types/users";
+import type { User } from "@/types/user.type";
 import type { FunctionComponent } from "react";
 
 interface Props {

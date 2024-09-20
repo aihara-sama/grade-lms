@@ -1,8 +1,8 @@
 "use client";
 
-import type { Lesson } from "@/types/lessons.type";
-import { isLessonEnded } from "@/utils/is-lesson-ended";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
+import type { Lesson } from "@/types/lesson.type";
+import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
+import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import { create } from "zustand";
 
 interface Store {

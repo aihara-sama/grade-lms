@@ -1,5 +1,5 @@
 import CourseIcon from "@/components/icons/course-icon";
-import type { Assignment } from "@/types/assignments.type";
+import type { Assignment } from "@/types/assignment.type";
 import type { FunctionComponent } from "react";
 
 interface Props {

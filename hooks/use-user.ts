@@ -1,6 +1,6 @@
 "use client";
 
-import type { User } from "@/types/users";
+import type { User } from "@/types/user.type";
 import { create } from "zustand";
 
 interface Store {

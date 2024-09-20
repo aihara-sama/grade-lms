@@ -6,7 +6,7 @@ import StarIcon from "@/components/icons/star-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { getSubmissionById, updateSubmissionGrade } from "@/db/submission";
-import type { SubmissionWithAuthor } from "@/types/submissions.type";
+import type { SubmissionWithAuthor } from "@/types/submission.type";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";

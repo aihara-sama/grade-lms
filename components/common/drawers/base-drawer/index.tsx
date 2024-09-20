@@ -2,7 +2,7 @@
 
 import Mask from "@/components/common/mask";
 import CloseIcon from "@/components/icons/close-icon";
-import { hasVerticalScrollbar } from "@/utils/has-vertical-scrollbar";
+import { hasVerticalScrollbar } from "@/utils/DOM/has-vertical-scrollbar";
 import clsx from "clsx";
 import {
   useEffect,

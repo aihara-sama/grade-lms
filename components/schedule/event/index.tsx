@@ -1,8 +1,8 @@
 import { useSchedule } from "@/hooks/useSchedule";
-import type { Lesson } from "@/types/lessons.type";
-import { isLessonEnded } from "@/utils/is-lesson-ended";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
-import { minToPx } from "@/utils/min-to-px";
+import type { Lesson } from "@/types/lesson.type";
+import { minToPx } from "@/utils/date/min-to-px";
+import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
+import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import clsx from "clsx";
 import {
   format,

@@ -1,8 +1,8 @@
 import { COURSES_GET_LIMIT } from "@/constants";
 import { DB } from "@/lib/supabase/db";
-import type { CourseWithRefsCount } from "@/types/courses.type";
+import type { CourseWithRefsCount } from "@/types/course.type";
 import type { TablesInsert } from "@/types/supabase.type";
-import { loadMessages } from "@/utils/load-messages";
+import { loadMessages } from "@/utils/localization/load-messages";
 
 // Get
 export const getCourses = async (

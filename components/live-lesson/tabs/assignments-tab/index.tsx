@@ -10,7 +10,7 @@ import CreateAssignmentModal from "@/components/common/modals/create-assignment-
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import { deleteAssignmentById } from "@/db/assignment";
-import type { Assignment } from "@/types/assignments.type";
+import type { Assignment } from "@/types/assignment.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";

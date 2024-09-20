@@ -1,4 +1,4 @@
-import type { User } from "@/types/users";
+import type { User } from "@/types/user.type";
 
 export interface ICamera {
   stream: MediaStream;

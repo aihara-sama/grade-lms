@@ -1,4 +1,4 @@
-import { getWeekDays } from "@/utils/get-week-days";
+import { getWeekDays } from "@/utils/date/get-week-days";
 import { addDays, format, subWeeks } from "date-fns";
 
 export const getWeekNames = () => {

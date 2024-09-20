@@ -19,10 +19,10 @@ import TimeIcon from "@/components/icons/time-icon";
 import { useChat } from "@/hooks/use-chat";
 import { useVideoChat } from "@/hooks/use-video-chat";
 import { DB } from "@/lib/supabase/db";
-import type { Course } from "@/types/courses.type";
-import type { Lesson } from "@/types/lessons.type";
-import { execAtStartOfMin } from "@/utils/interval-at-start-of-min";
-import { isLessonEnded } from "@/utils/is-lesson-ended";
+import type { Course } from "@/types/course.type";
+import type { Lesson } from "@/types/lesson.type";
+import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";
+import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 

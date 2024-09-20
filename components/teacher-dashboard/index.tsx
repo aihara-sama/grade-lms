@@ -7,9 +7,9 @@ import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
 import { useUser } from "@/hooks/use-user";
+import { messaging } from "@/lib/firebase/messaging";
 import { DB } from "@/lib/supabase/db";
-import type { CourseWithRefsCount } from "@/types/courses.type";
-import { messaging, vapidKey } from "@/utils/firebase";
+import type { CourseWithRefsCount } from "@/types/course.type";
 import { getToken } from "firebase/messaging";
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
@@ -97,7 +97,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
 
             if (permission === "granted") {
               getToken(messaging, {
-                vapidKey,
+                vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
               }).then((token) => {
                 Promise.all([
                   DB.from("fcm_tokens")

@@ -12,7 +12,7 @@ import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
-import type { CourseWithRefsCount } from "@/types/courses.type";
+import type { CourseWithRefsCount } from "@/types/course.type";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -34,9 +34,9 @@ import {
 } from "@/db/course";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { isCloseToBottom } from "@/utils/is-document-close-to-bottom";
-import { throttleFetch } from "@/utils/throttle-fetch";
-import { throttleSearch } from "@/utils/throttle-search";
+import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
+import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 

@@ -1,7 +1,7 @@
 import CourseIcon from "@/components/icons/course-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import UsersIcon from "@/components/icons/users-icon";
-import type { CourseWithRefsCount } from "@/types/courses.type";
+import type { CourseWithRefsCount } from "@/types/course.type";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 

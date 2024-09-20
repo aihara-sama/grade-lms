@@ -7,7 +7,7 @@ import LatestAssignments from "@/components/student-dashboard/latest-assignments
 import StudentInsights from "@/components/student-dashboard/student-insights";
 import Total from "@/components/total";
 import { DB } from "@/lib/supabase/db";
-import type { Assignment } from "@/types/assignments.type";
+import type { Assignment } from "@/types/assignment.type";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";

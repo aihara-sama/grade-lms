@@ -1,4 +1,4 @@
-import { getWeekNames } from "@/utils/get-week-names";
+import { getWeekNames } from "@/utils/date/get-week-names";
 import { format } from "date-fns";
 
 export const parseInsights = (arr: { timestamp: string }[]) => {

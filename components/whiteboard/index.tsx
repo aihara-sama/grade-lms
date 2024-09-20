@@ -14,10 +14,10 @@ import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-tem
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
-import { Event } from "@/types/events.type";
-import type { Lesson } from "@/types/lessons.type";
-import { isLessonOngoing } from "@/utils/is-lesson-ongoing";
-import { throttleFetch } from "@/utils/throttle-fetch";
+import { Event } from "@/types/event.type";
+import type { Lesson } from "@/types/lesson.type";
+import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
   AppState,

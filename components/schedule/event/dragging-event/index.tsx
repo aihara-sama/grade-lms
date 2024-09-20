@@ -1,6 +1,6 @@
-import type { Lesson } from "@/types/lessons.type";
-import { getEventWidth } from "@/utils/get-event-width";
-import { minToPx } from "@/utils/min-to-px";
+import type { Lesson } from "@/types/lesson.type";
+import { minToPx } from "@/utils/date/min-to-px";
+import { getEventWidth } from "@/utils/DOM/get-event-width";
 import clsx from "clsx";
 import { forwardRef, memo } from "react";
 
