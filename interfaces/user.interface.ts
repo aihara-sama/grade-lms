@@ -1,5 +1,4 @@
 import type { Locale } from "@/i18n";
-import type { User } from "@supabase/supabase-js";
 
 export enum Role {
   Teacher = "Teacher",
@@ -17,8 +16,4 @@ export interface IUserMetadata {
   timezone: string;
   is_push_notifications_on: boolean;
   is_emails_on: boolean;
-}
-
-export interface AuthUser extends User {
-  user_metadata: IUserMetadata;
 }
