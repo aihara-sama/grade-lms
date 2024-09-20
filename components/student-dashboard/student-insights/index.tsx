@@ -2,7 +2,7 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
 import type { User } from "@supabase/supabase-js";
@@ -23,7 +23,8 @@ const StudentInsights: FunctionComponent<Props> = ({ user }) => {
 
   // Handlers
   const fetchAssignmentsInsights = () => {
-    return DB.from("users")
+    return browserDB
+      .from("users")
       .select("courses(lessons(assignments(timestamp:created_at)))")
       .eq("id", user.id)
       .gte(
@@ -37,7 +38,8 @@ const StudentInsights: FunctionComponent<Props> = ({ user }) => {
       .single();
   };
   const fetchSubmissionsInsights = () => {
-    return DB.from("submissions")
+    return browserDB
+      .from("submissions")
       .select("timestamp:created_at")
       .eq("user_id", user.id)
       .gte(

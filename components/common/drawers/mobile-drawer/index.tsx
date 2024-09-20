@@ -6,7 +6,7 @@ import { menu } from "@/components/header/menu";
 import Logo from "@/components/logo";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import { addMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-nprogress-bar";
@@ -26,7 +26,8 @@ const MobileDrawer: FunctionComponent = () => {
   // Handlers
   const submitCreateLesson = async () => {
     try {
-      const { error, data } = await DB.from("lessons")
+      const { error, data } = await browserDB
+        .from("lessons")
         .insert({
           starts: new Date().toISOString(),
           ends: addMinutes(new Date(), 30).toISOString(),

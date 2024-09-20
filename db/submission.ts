@@ -1,5 +1,5 @@
 import { SUBMISSIONS_GET_LIMIT } from "@/constants";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
 
@@ -10,7 +10,8 @@ export const getAssignmentSubmissions = async (
   to = SUBMISSIONS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .select("*, author:users(*)")
     .eq("assignment_id", assignmentId)
     .ilike("title", `%${title}%`)
@@ -26,7 +27,8 @@ export const getAssignmentSubmissionsCount = async (
   title = ""
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .select("count")
     .eq("assignment_id", assignmentId)
     .ilike("title", `%${title}%`)
@@ -44,7 +46,8 @@ export const getUserSubmissions = async (
   to = SUBMISSIONS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .select("*, author:users(*)")
     .eq("assignment_id", assignmentId)
     .eq("user_id", userId)
@@ -61,7 +64,8 @@ export const getUserSubmissionsCount = async (
   title = ""
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .select("count")
     .eq("assignment_id", assignmentId)
     .eq("user_id", userId)
@@ -74,7 +78,8 @@ export const getUserSubmissionsCount = async (
 };
 export const getSubmissionById = async (id: string) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .select("*, author:users(*), assignment:assignments(due_date)")
     .eq("id", id)
     .single();
@@ -88,7 +93,8 @@ export const createSubmission = async (
   submission: TablesInsert<"submissions">
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .insert(submission)
     .select("id")
     .single();
@@ -102,7 +108,8 @@ export const updateSubmission = async (
   submission: TablesUpdate<"submissions">
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .update(submission)
     .eq("id", submission.id);
 
@@ -114,7 +121,8 @@ export const updateSubmissionGrade = async (
   grade: number
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .update({ grade })
     .eq("id", submissionId);
 
@@ -123,7 +131,7 @@ export const updateSubmissionGrade = async (
 
 export const deleteSubmissionById = async (id: string) => {
   const t = await loadMessages();
-  const result = await DB.from("submissions").delete().eq("id", id);
+  const result = await browserDB.from("submissions").delete().eq("id", id);
 
   if (result.error) throw new Error(t("failed_to_delete_submission"));
 
@@ -131,7 +139,7 @@ export const deleteSubmissionById = async (id: string) => {
 };
 export const deleteSubmissionsByIds = async (ids: string[]) => {
   const t = await loadMessages();
-  const result = await DB.rpc("delete_submissions_by_ids", {
+  const result = await browserDB.rpc("delete_submissions_by_ids", {
     p_submissions_ids: ids,
   });
 
@@ -141,7 +149,8 @@ export const deleteSubmissionsByIds = async (ids: string[]) => {
 };
 export const deleteAllMySubmissions = async (meId: string, title = "") => {
   const t = await loadMessages();
-  const result = await DB.from("submissions")
+  const result = await browserDB
+    .from("submissions")
     .delete()
     .eq("user_id", meId)
     .ilike("title", `%${title}%`);

@@ -6,10 +6,11 @@ import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { ReactNode } from "react";
 
 const Page = async () => {
-  const DB = getServerDB();
+  const serverDB = getServerDB();
+
   const {
     data: { user },
-  } = await DB.auth.getUser();
+  } = await serverDB.auth.getUser();
 
   let Dashborad: ReactNode;
 
@@ -22,12 +23,14 @@ const Page = async () => {
         data: { count: usersCount },
       },
     ] = await Promise.all([
-      DB.from("users")
+      serverDB
+        .from("users")
         .select("courses(count)")
         .eq("id", user.id)
         .returns<Record<"courses", { count: number }[]>[]>()
         .single(),
-      DB.from("users")
+      serverDB
+        .from("users")
         .select("count")
         .eq("creator_id", user.id)
         .returns<Record<"count", number>[]>()
@@ -45,7 +48,8 @@ const Page = async () => {
   if ((user.user_metadata as IUserMetadata).role === Role.Student) {
     const [{ data: meWithAssignmentsCount }, { data: submissions }] =
       await Promise.all([
-        DB.from("users")
+        serverDB
+          .from("users")
           .select("courses(lessons(assignments(count)))")
           .eq("id", user.id)
           .returns<
@@ -55,7 +59,8 @@ const Page = async () => {
             >[]
           >()
           .single(),
-        DB.from("submissions")
+        serverDB
+          .from("submissions")
           .select("count")
           .eq("user_id", user.id)
           .returns<{ count: number }[]>(),

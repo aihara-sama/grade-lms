@@ -5,7 +5,7 @@ import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
 import { Role, type IUserMetadata } from "@/interfaces/user.interface";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import clsx from "clsx";
@@ -37,7 +37,7 @@ const SignUp: FunctionComponent = () => {
 
     setIsSubmitting(true);
 
-    const { error, data } = await DB.auth.signUp({
+    const { error, data } = await browserDB.auth.signUp({
       email,
       password,
       options: {

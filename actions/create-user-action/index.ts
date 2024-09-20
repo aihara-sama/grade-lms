@@ -4,7 +4,7 @@ import { CreateUser } from "@/actions/create-user-action/schema";
 import type { InputType, ReturnType } from "@/actions/create-user-action/types";
 import type { IUserMetadata } from "@/interfaces/user.interface";
 import { Role } from "@/interfaces/user.interface";
-import { adminDB } from "@/lib/supabase/db";
+import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/validation/create-safe-action";
 

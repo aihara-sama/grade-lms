@@ -1,7 +1,7 @@
 import Avatar from "@/components/avatar";
 import File from "@/components/file";
 import type { getChatMessages } from "@/db/message";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import type { ResultOf } from "@/types";
 import type { ChatFile } from "@/types/chat-file.type";
 import { shortenFileName } from "@/utils/file/shorten-file-name";
@@ -20,7 +20,7 @@ const Message: FunctionComponent<Props> = ({ chatMessage }) => {
 
   const submitDownloadFile = async (file: ChatFile) => {
     try {
-      const { data, error } = await DB.storage
+      const { data, error } = await browserDB.storage
         .from("courses")
         .download(`${file.path}`);
 

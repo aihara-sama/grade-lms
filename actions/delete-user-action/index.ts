@@ -2,7 +2,7 @@
 
 import type { ReturnType } from "@/actions/delete-user-action/types";
 import { Role } from "@/interfaces/user.interface";
-import { adminDB } from "@/lib/supabase/db";
+import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 
 const handler = async (usersIds: string[]): Promise<ReturnType> => {

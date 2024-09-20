@@ -16,16 +16,18 @@ interface Props {
 const Page: FunctionComponent<Props> = async ({
   params: { lessonId, courseId },
 }) => {
-  const DB = getServerDB();
+  const serverDB = getServerDB();
 
-  const courseData = await DB.from("courses")
+  const courseData = await serverDB
+    .from("courses")
     .select("*")
     .eq("id", courseId)
     .single();
 
   if (!courseData.data) return redirect("/dashboard/courses");
 
-  const lessonData = await DB.from("lessons")
+  const lessonData = await serverDB
+    .from("lessons")
     .select("*")
     .eq("id", lessonId)
     .single();

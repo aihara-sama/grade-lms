@@ -4,7 +4,6 @@ import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CrownIcon from "@/components/icons/crown-icon";
 import Input from "@/components/input";
-import { DB } from "@/lib/supabase/db";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +17,7 @@ import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
 import { type IUserMetadata } from "@/interfaces/user.interface";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -57,13 +57,14 @@ const Profile: FunctionComponent = () => {
   const submitRenameUser = async () => {
     setIsSubmittingRenameUser(true);
 
-    const { error: usersError } = await DB.from("users")
+    const { error: usersError } = await browserDB
+      .from("users")
       .update({
         name: userName,
       })
       .eq("id", user.id);
 
-    const { error: profileError } = await DB.auth.updateUser({
+    const { error: profileError } = await browserDB.auth.updateUser({
       data: {
         name: userName,
       } as IUserMetadata,
@@ -82,13 +83,14 @@ const Profile: FunctionComponent = () => {
   useEffect(() => {
     (async () => {
       if (avatar !== user.avatar) {
-        const { error: usersError } = await DB.from("users")
+        const { error: usersError } = await browserDB
+          .from("users")
           .update({
             avatar,
           })
           .eq("id", user.id);
 
-        const { error: profileError } = await DB.auth.updateUser({
+        const { error: profileError } = await browserDB.auth.updateUser({
           data: {
             avatar,
           } as IUserMetadata,
@@ -105,12 +107,13 @@ const Profile: FunctionComponent = () => {
 
   useUpdateEffect(() => {
     Promise.all([
-      DB.from("users")
+      browserDB
+        .from("users")
         .update({
           is_emails_on: isEmailsOn,
         })
         .eq("id", user.id),
-      DB.auth.updateUser({
+      browserDB.auth.updateUser({
         data: {
           is_emails_on: isEmailsOn,
         },
@@ -119,12 +122,13 @@ const Profile: FunctionComponent = () => {
   }, [isEmailsOn]);
   useUpdateEffect(() => {
     Promise.all([
-      DB.from("users")
+      browserDB
+        .from("users")
         .update({
           is_push_notifications_on: isPushNotificationsOn,
         })
         .eq("id", user.id),
-      DB.auth.updateUser({
+      browserDB.auth.updateUser({
         data: {
           is_push_notifications_on: isPushNotificationsOn,
         },
@@ -136,12 +140,13 @@ const Profile: FunctionComponent = () => {
     try {
       const [{ error: userError }, { error: profileError }] = await Promise.all(
         [
-          DB.from("users")
+          browserDB
+            .from("users")
             .update({
               preferred_locale: _locale,
             })
             .eq("id", user.id),
-          DB.auth.updateUser({
+          browserDB.auth.updateUser({
             data: {
               preferred_locale: _locale,
             },
@@ -160,7 +165,7 @@ const Profile: FunctionComponent = () => {
     setIsSubmittingChangePassword(true);
 
     try {
-      const { error } = await DB.auth.updateUser({
+      const { error } = await browserDB.auth.updateUser({
         password,
       });
       if (error) throw new Error(t(serverErrToIntlKey(error.message)));

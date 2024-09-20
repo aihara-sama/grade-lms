@@ -2,12 +2,12 @@
 
 import LessonSettings from "@/components/lesson-settings";
 import LessonHeader from "@/components/live-lesson/lesson-header";
-import { DB } from "@/lib/supabase/db";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 import LessonProvider from "@/components/lesson-provider";
 import { useUser } from "@/hooks/use-user";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import type { Database } from "@/types/supabase.type";
 
 interface Props {
@@ -27,11 +27,13 @@ const Page: FunctionComponent<Props> = ({ params }) => {
 
   useEffect(() => {
     (async () => {
-      const { data: courseData, error: courseError } = await DB.from("courses")
+      const { data: courseData, error: courseError } = await browserDB
+        .from("courses")
         .select("*")
         .eq("id", params.courseId)
         .single();
-      const { data: lessonData, error: lessonError } = await DB.from("lessons")
+      const { data: lessonData, error: lessonError } = await browserDB
+        .from("lessons")
         .select("*")
         .eq("id", params.lessonId)
         .single();

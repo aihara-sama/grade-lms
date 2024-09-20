@@ -3,7 +3,7 @@
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -33,7 +33,7 @@ const SignIn: FunctionComponent = () => {
 
     setIsSubmitting(true);
 
-    const { error, data } = await DB.auth.signInWithPassword({
+    const { error, data } = await browserDB.auth.signInWithPassword({
       email,
       password,
     });

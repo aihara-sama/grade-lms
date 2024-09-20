@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
@@ -15,7 +15,7 @@ export const useLessonChannel = () => {
 
   lessonChannel =
     lessonChannel ||
-    DB.channel(params.lessonId || uuid(), {
+    browserDB.channel(params.lessonId || uuid(), {
       config: {
         presence: {
           key: user.id,

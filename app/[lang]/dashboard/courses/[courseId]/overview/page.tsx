@@ -7,7 +7,6 @@ import AvatarIcon from "@/components/icons/avatar-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Total from "@/components/total";
 import { Role } from "@/interfaces/user.interface";
-import { DB } from "@/lib/supabase/db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -18,7 +17,8 @@ export async function generateMetadata({
 }: {
   params: { courseId: string };
 }): Promise<Metadata> {
-  const data = await DB.from("courses")
+  const data = await getServerDB()
+    .from("courses")
     .select("title")
     .eq("id", params.courseId)
     .single();

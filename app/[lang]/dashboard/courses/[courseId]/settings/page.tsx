@@ -2,7 +2,7 @@
 
 import CourseHeader from "@/components/course/course-header";
 import CourseSettings from "@/components/course/course-settings";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import type { Course } from "@/types/course.type";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";
@@ -19,7 +19,8 @@ const Page: FunctionComponent<Props> = ({ params }) => {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await DB.from("courses")
+      const { data, error } = await browserDB
+        .from("courses")
         .select("*")
         .eq("id", params.courseId)
         .single();

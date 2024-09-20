@@ -2,13 +2,13 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
-import { DB } from "@/lib/supabase/db";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
 import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
@@ -26,7 +26,8 @@ const CourseInsights: FunctionComponent<Props> = ({ courseId }) => {
 
   // Handlers
   const getLessonsInsights = async () => {
-    const result = await DB.from("courses")
+    const result = await browserDB
+      .from("courses")
       .select("lessons(timestamp:ends)")
       .eq("id", courseId)
       .gte(
@@ -41,7 +42,8 @@ const CourseInsights: FunctionComponent<Props> = ({ courseId }) => {
     return result.data.lessons;
   };
   const getUsersInsights = async () => {
-    const result = await DB.from("user_courses")
+    const result = await browserDB
+      .from("user_courses")
       .select("timestamp:created_at")
       .eq("course_id", courseId)
       .gte(

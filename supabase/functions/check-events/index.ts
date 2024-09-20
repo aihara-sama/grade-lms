@@ -1,6 +1,6 @@
 import admin from "npm:firebase-admin";
+import { adminDB } from "../_shared/admin-db";
 import { corsHeaders } from "../_shared/cors.ts";
-import { db } from "../_shared/db.ts";
 import { firebaseAdminApp } from "../_shared/firebase-admin-app.ts";
 
 Deno.serve(async (req) => {
@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
   try {
-    const { data: users, error: usersError } = await db.rpc(
+    const { data: users, error: usersError } = await adminDB.rpc(
       "get_upcoming_lessons_users"
     );
 
@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
           });
         }
 
-        const { error } = await db.from("sent_announcements").insert({
+        const { error } = await browserDB.from("sent_announcements").insert({
           user_id: user.id,
           lesson_id: user.lesson_id,
         });

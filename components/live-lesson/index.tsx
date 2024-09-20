@@ -18,7 +18,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { useChat } from "@/hooks/use-chat";
 import { useVideoChat } from "@/hooks/use-video-chat";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import type { Course } from "@/types/course.type";
 import type { Lesson } from "@/types/lesson.type";
 import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";
@@ -104,7 +104,8 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
 
   const fetchLesson = async () => {
     try {
-      const { data, error } = await DB.from("lessons")
+      const { data, error } = await browserDB
+        .from("lessons")
         .select("*, course:courses(*)")
         .eq("id", lesson.id)
         .single();
@@ -127,7 +128,8 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
     if (!isLessonEnded(lesson)) {
       const stop = execAtStartOfMin(async () => {
         try {
-          const { data, error } = await DB.from("lessons")
+          const { data, error } = await browserDB
+            .from("lessons")
             .select("ends")
             .eq("id", lesson.id)
             .single();

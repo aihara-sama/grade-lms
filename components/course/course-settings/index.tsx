@@ -2,7 +2,7 @@
 
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
-import { DB } from "@/lib/supabase/db";
+import { browserDB } from "@/lib/supabase/db/browser-db";
 import type { Course } from "@/types/course.type";
 import clsx from "clsx";
 // import { revalidatePath } from "next/cache";
@@ -28,7 +28,8 @@ const CourseSettings: FunctionComponent<Props> = ({
     setIsSubmitting(true);
 
     try {
-      const { error } = await DB.from("courses")
+      const { error } = await browserDB
+        .from("courses")
         .update({
           title: courseTitle,
         })
