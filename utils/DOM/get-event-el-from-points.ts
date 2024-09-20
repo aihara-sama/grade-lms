@@ -1,4 +1,4 @@
-import type { EventElement } from "@/interfaces/schedule.interface";
+import type { EventElement } from "@/interfaces/element.interface";
 
 export const getEventElFromPoints = (x: number, y: number) =>
   document

@@ -1,5 +1,5 @@
 import Users from "@/components/users";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { redirect } from "next/navigation";
 

@@ -1,8 +1,8 @@
-import type { TabItem } from "@/interfaces/menu.interface";
+import type { MenuItem } from "@/interfaces/menu.interface";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 
-interface Props extends TabItem {
+interface Props extends MenuItem {
   isActive: boolean;
 }
 

@@ -1,5 +1,5 @@
 import { useUser } from "@/hooks/use-user";
-import type { ICamera } from "@/interfaces/camera.interface";
+import type { Camera } from "@/interfaces/camera.interface";
 import { DB } from "@/lib/supabase/db";
 import type { User } from "@/types/user.type";
 import type {
@@ -13,7 +13,7 @@ import type { MediaConnection } from "peerjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useVideoChat = () => {
-  const [cameras, setCameras] = useState<ICamera[]>([]);
+  const [cameras, setCameras] = useState<Camera[]>([]);
 
   // Hooks
   const { user } = useUser();

@@ -3,7 +3,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { getSubmissionById, updateSubmission } from "@/db/submission";
-import type { ResultOf } from "@/types";
+import type { ResultOf } from "@/types/utils.type";
 import type { OutputData } from "@editorjs/editorjs";
 import clsx from "clsx";
 import { isAfter } from "date-fns";

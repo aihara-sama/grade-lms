@@ -1,8 +1,8 @@
 import Event from "@/components/schedule/event";
 import { HOUR } from "@/constants";
+import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import { useSchedule } from "@/hooks/useSchedule";
-import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lesson.type";
 import { isFirstDateFromYesterdayOrMore } from "@/utils/date/is-first-date-from-yesterday-or-more";
 import { isSummerDaylight } from "@/utils/date/is-summer-daylight";

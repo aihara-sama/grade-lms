@@ -1,6 +1,6 @@
 import type { getNotifications } from "@/db/notification";
-import { NotificationType } from "@/interfaces/notifications.interface";
-import type { ResultOf } from "@/types";
+import { NotificationType } from "@/interfaces/notification-type.interface";
+import type { ResultOf } from "@/types/utils.type";
 
 export const parseNotification = (
   notification: ResultOf<typeof getNotifications>[number]

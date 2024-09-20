@@ -3,14 +3,14 @@
 import ArrowRightIcon from "@/components/icons/arrow-right-icon";
 import Link from "next/link";
 
-import type { IBreadcrumb } from "@/interfaces/breadcrumbs.interface";
+import type { Breadcrumb } from "@/interfaces/breadcrumbs.interface";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import type { FunctionComponent } from "react";
 
 interface Props {
   Icon: JSX.Element;
-  items: IBreadcrumb[];
+  items: Breadcrumb[];
 }
 
 const Breadcrumbs: FunctionComponent<Props> = ({ Icon, items }) => {

@@ -1,4 +1,4 @@
-import type { PropsWithClassName } from "@/types";
+import type { PropsWithClassName } from "@/types/props.type";
 import type { FunctionComponent } from "react";
 
 interface Props {

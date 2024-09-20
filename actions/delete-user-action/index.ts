@@ -1,7 +1,7 @@
 "use server";
 
 import type { ReturnType } from "@/actions/delete-user-action/types";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 

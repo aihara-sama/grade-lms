@@ -28,8 +28,8 @@ import {
   getLessonsByCourseId,
   getLessonsCountByCourseId,
 } from "@/db/lesson";
+import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
-import { Role } from "@/interfaces/user.interface";
 import type { Lesson } from "@/types/lesson.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";

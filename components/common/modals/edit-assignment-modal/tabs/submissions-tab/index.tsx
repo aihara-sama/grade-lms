@@ -23,8 +23,8 @@ import {
   getUserSubmissions,
   getUserSubmissionsCount,
 } from "@/db/submission";
+import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
-import { Role } from "@/interfaces/user.interface";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";

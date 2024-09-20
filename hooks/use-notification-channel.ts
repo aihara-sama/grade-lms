@@ -1,7 +1,7 @@
 "use client";
 
+import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
-import { Role } from "@/interfaces/user.interface";
 import { DB } from "@/lib/supabase/db";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useParams } from "next/navigation";

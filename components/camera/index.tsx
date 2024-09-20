@@ -6,7 +6,7 @@ import VideoDisabledIcon from "@/components/icons/video-disabled-icon";
 import VideoIcon from "@/components/icons/video-icon";
 import Video from "@/components/video";
 import { useUser } from "@/hooks/use-user";
-import type { ICamera } from "@/interfaces/camera.interface";
+import type { Camera as ICamera } from "@/interfaces/camera.interface";
 import { type FunctionComponent } from "react";
 
 interface Props {

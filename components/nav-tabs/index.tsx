@@ -2,13 +2,13 @@
 
 import Tab from "@/components/nav-tabs/tab";
 import { useUser } from "@/hooks/use-user";
-import type { TabItem } from "@/interfaces/menu.interface";
+import type { MenuItem } from "@/interfaces/menu.interface";
 import { usePathname } from "next/navigation";
 
 import type { FunctionComponent } from "react";
 
 interface Props {
-  tabs: TabItem[];
+  tabs: MenuItem[];
 }
 
 const NavTabs: FunctionComponent<Props> = ({ tabs }) => {

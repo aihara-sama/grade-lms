@@ -2,8 +2,8 @@
 
 import { EditUser } from "@/actions/edit-user-action/schema";
 import type { InputType, ReturnType } from "@/actions/edit-user-action/types";
-import type { IUserMetadata } from "@/interfaces/user.interface";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
+import type { UserMetadata } from "@/interfaces/user.interface";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/validation/create-safe-action";
@@ -37,7 +37,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
         name: payload.name,
         avatar: payload.avatar,
         timezone: payload.timezone,
-      } as IUserMetadata,
+      } as UserMetadata,
     }),
     adminDB.from("users").update(restPayload).eq("id", payload.id),
   ]);

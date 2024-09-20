@@ -16,7 +16,7 @@ import useUpdateEffect from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
-import { type IUserMetadata } from "@/interfaces/user.interface";
+import type { UserMetadata } from "@/interfaces/user.interface";
 import { DB } from "@/lib/supabase/db";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import clsx from "clsx";
@@ -66,7 +66,7 @@ const Profile: FunctionComponent = () => {
     const { error: profileError } = await DB.auth.updateUser({
       data: {
         name: userName,
-      } as IUserMetadata,
+      } as UserMetadata,
     });
 
     setIsSubmittingRenameUser(false);
@@ -91,7 +91,7 @@ const Profile: FunctionComponent = () => {
         const { error: profileError } = await DB.auth.updateUser({
           data: {
             avatar,
-          } as IUserMetadata,
+          } as UserMetadata,
         });
 
         if (usersError || profileError) toast.error("Something went wrong");

@@ -2,7 +2,7 @@ import BasePopper from "@/components/common/poppers/base-popper";
 import ArrowIcon from "@/components/icons/arrow-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
-import type { SelectItem } from "@/interfaces/menu.interface";
+import type { SelectItem } from "@/interfaces/select.interface";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import clsx from "clsx";
 import throttle from "lodash.throttle";

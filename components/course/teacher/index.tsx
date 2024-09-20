@@ -1,6 +1,6 @@
 import Avatar from "@/components/avatar";
 import IconTitle from "@/components/icon-title";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
 import type { User } from "@/types/user.type";
 import type { FunctionComponent } from "react";
 

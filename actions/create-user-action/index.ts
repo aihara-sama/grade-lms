@@ -2,8 +2,8 @@
 
 import { CreateUser } from "@/actions/create-user-action/schema";
 import type { InputType, ReturnType } from "@/actions/create-user-action/types";
-import type { IUserMetadata } from "@/interfaces/user.interface";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
+import type { UserMetadata } from "@/interfaces/user.interface";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/validation/create-safe-action";
@@ -35,11 +35,11 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       creator_id: user.id,
       role: Role.Student,
       avatar: payload.avatar,
-      preferred_locale: (user.user_metadata as IUserMetadata).preferred_locale,
+      preferred_locale: (user.user_metadata as UserMetadata).preferred_locale,
       timezone: payload.timezone,
       is_emails_on: payload.is_emails_on,
       is_push_notifications_on: payload.is_push_notifications_on,
-    } as IUserMetadata,
+    } as UserMetadata,
     email_confirm: true,
   });
 

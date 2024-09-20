@@ -7,8 +7,8 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import MembersIcon from "@/components/icons/members-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import NavTabs from "@/components/nav-tabs";
-import type { TabItem } from "@/interfaces/menu.interface";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
+import type { MenuItem } from "@/interfaces/menu.interface";
 import type { Course } from "@/types/course.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
@@ -19,7 +19,7 @@ interface Props {
 const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = ({
   course,
 }) => {
-  const tabs: TabItem[] = [
+  const tabs: MenuItem[] = [
     {
       title: "Overview",
       href: `/dashboard/courses/${course.id}/overview`,

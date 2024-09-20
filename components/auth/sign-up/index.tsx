@@ -4,7 +4,8 @@ import AvatarIcon from "@/components/icons/avatar-icon";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
 import Input from "@/components/input";
-import { Role, type IUserMetadata } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
+import type { UserMetadata } from "@/interfaces/user.interface";
 import { DB } from "@/lib/supabase/db";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
@@ -49,7 +50,7 @@ const SignUp: FunctionComponent = () => {
           timezone: getTimeZone(),
           is_emails_on: true,
           is_push_notifications_on: true,
-        } as IUserMetadata,
+        } as UserMetadata,
       },
     });
     setIsSubmitting(false);

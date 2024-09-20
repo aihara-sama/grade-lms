@@ -1,10 +1,10 @@
 "use client";
 
 import { getChatMessages } from "@/db/message";
+import { Event } from "@/enums/event.enum";
 import { useChat } from "@/hooks/use-chat";
 import { useChatChannel } from "@/hooks/use-chat-channel";
-import type { ResultOf } from "@/types";
-import { Event } from "@/types/event.type";
+import type { ResultOf } from "@/types/utils.type";
 import { useParams } from "next/navigation";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";

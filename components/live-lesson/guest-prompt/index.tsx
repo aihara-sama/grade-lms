@@ -4,7 +4,7 @@ import { useUser } from "@/hooks/use-user";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import type { ChangeEvent, FunctionComponent } from "react";
 

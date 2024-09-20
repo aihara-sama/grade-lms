@@ -1,6 +1,6 @@
 "use client";
 
-import type { PropsWithClassName } from "@/types";
+import type { PropsWithClassName } from "@/types/props.type";
 import clsx from "clsx";
 import type {
   ForwardRefRenderFunction,

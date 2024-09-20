@@ -1,12 +1,7 @@
+import type { Role } from "@/enums/role.enum";
 import type { Locale } from "@/i18n";
 
-export enum Role {
-  Teacher = "Teacher",
-  Student = "Student",
-  Guest = "Guest",
-}
-
-export interface IUserMetadata {
+export interface UserMetadata {
   name: string;
   role: Role;
   avatar: string;

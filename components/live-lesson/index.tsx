@@ -8,7 +8,7 @@ import Chat from "@/components/live-lesson/chat";
 import AssignmentsTab from "@/components/live-lesson/tabs/assignments-tab";
 import Tabs from "@/components/tabs";
 import Whiteboard from "@/components/whiteboard";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
 import clsx from "clsx";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 

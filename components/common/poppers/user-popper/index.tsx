@@ -9,7 +9,7 @@ import { menu } from "@/components/common/poppers/user-popper/menu";
 import LogoutIcon from "@/components/icons/logout-icon";
 import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
-import type { PropsWithClassName } from "@/types";
+import type { PropsWithClassName } from "@/types/props.type";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";

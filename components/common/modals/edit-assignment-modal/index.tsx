@@ -7,7 +7,7 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Tabs from "@/components/tabs";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
 import type { FunctionComponent } from "react";
 
 interface Props {

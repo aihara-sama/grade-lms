@@ -26,8 +26,8 @@ import {
   getAssignmentsByLessonId,
   getAssignmentsCountByLessonId,
 } from "@/db/assignment";
+import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
-import { Role } from "@/interfaces/user.interface";
 import type { Assignment } from "@/types/assignment.type";
 import type { Lesson } from "@/types/lesson.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";

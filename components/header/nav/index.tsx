@@ -1,8 +1,8 @@
 import { menu } from "@/components/header/menu";
+import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
-import { Role } from "@/interfaces/user.interface";
 import { DB } from "@/lib/supabase/db";
-import type { PropsWithClassName } from "@/types";
+import type { PropsWithClassName } from "@/types/props.type";
 import { addMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-nprogress-bar";

@@ -1,4 +1,4 @@
-import type { EventPlaceholderElement } from "@/interfaces/schedule.interface";
+import type { EventPlaceholderElement } from "@/interfaces/element.interface";
 
 export const getEventPlaceholderElFromPoints = (x: number, y: number) =>
   document

@@ -1,8 +1,8 @@
 "use client";
 
 import ResizeHandler from "@/components/resize-handler";
+import { Role } from "@/enums/role.enum";
 import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
-import { Role } from "@/interfaces/user.interface";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 // import toast from "react-hot-toast";
@@ -11,10 +11,10 @@ import InviteIcon from "@/components/icons/invite-icon";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import LessonStatus from "@/components/lesson-status";
 import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-template";
+import { Event } from "@/enums/event.enum";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
-import { Event } from "@/types/event.type";
 import type { Lesson } from "@/types/lesson.type";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";

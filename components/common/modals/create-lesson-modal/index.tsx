@@ -7,7 +7,7 @@ import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/course";
 import { createLesson, getOverlappingLessons } from "@/db/lesson";
 import { useUser } from "@/hooks/use-user";
-import type { SelectItem } from "@/interfaces/menu.interface";
+import type { SelectItem } from "@/interfaces/select.interface";
 import type { Course } from "@/types/course.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/date/get-next-morning";

@@ -17,8 +17,8 @@ import type { InputType as UserInputType } from "@/actions/create-user-action/ty
 import BaseModal from "@/components/common/modals/base-modal";
 import Select from "@/components/common/select";
 import { createUser } from "@/db/user";
-import type { SelectItem } from "@/interfaces/menu.interface";
-import { Role } from "@/interfaces/user.interface";
+import { Role } from "@/enums/role.enum";
+import type { SelectItem } from "@/interfaces/select.interface";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";

@@ -32,8 +32,8 @@ import {
   getCourses,
   getCoursesCount,
 } from "@/db/course";
+import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
-import { Role } from "@/interfaces/user.interface";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
