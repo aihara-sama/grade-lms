@@ -8,7 +8,7 @@ import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 

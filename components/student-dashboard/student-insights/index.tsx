@@ -2,7 +2,7 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
 import type { User } from "@supabase/supabase-js";

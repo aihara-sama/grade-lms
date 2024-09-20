@@ -7,7 +7,7 @@ import { useEffect, useState, type FunctionComponent } from "react";
 
 import LessonProvider from "@/components/lesson-provider";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { Database } from "@/types/supabase.type";
 
 interface Props {

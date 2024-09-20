@@ -13,7 +13,7 @@ import LessonStatus from "@/components/lesson-status";
 import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-template";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import { Event } from "@/types/event.type";
 import type { Lesson } from "@/types/lesson.type";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";

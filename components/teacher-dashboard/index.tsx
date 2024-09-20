@@ -8,7 +8,7 @@ import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
 import { useUser } from "@/hooks/use-user";
 import { messaging } from "@/lib/firebase/messaging";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import { getToken } from "firebase/messaging";
 import type { FunctionComponent } from "react";

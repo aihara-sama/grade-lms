@@ -2,7 +2,7 @@
 
 import CourseHeader from "@/components/course/course-header";
 import CourseSettings from "@/components/course/course-settings";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { Course } from "@/types/course.type";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FunctionComponent } from "react";

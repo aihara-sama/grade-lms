@@ -1,7 +1,7 @@
 import Avatar from "@/components/avatar";
 import File from "@/components/file";
 import type { getChatMessages } from "@/db/message";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { ResultOf } from "@/types";
 import type { ChatFile } from "@/types/chat-file.type";
 import { shortenFileName } from "@/utils/file/shorten-file-name";

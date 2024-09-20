@@ -4,7 +4,7 @@ import { deleteUserAction } from "@/actions/delete-user-action";
 import { editUserAction } from "@/actions/edit-user-action";
 import type { InputType as EditUserInputType } from "@/actions/edit-user-action/types";
 import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import { loadMessages } from "@/utils/localization/load-messages";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import { parseUsersCoursesIds } from "@/utils/parse/parse-users-courses-ids";

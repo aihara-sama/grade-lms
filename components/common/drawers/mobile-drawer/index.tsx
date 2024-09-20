@@ -6,7 +6,7 @@ import { menu } from "@/components/header/menu";
 import Logo from "@/components/logo";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import { addMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-nprogress-bar";

@@ -8,7 +8,7 @@ import BasePopper from "@/components/common/poppers/base-popper";
 import { menu } from "@/components/common/poppers/user-popper/menu";
 import LogoutIcon from "@/components/icons/logout-icon";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { PropsWithClassName } from "@/types";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

@@ -3,7 +3,7 @@
 import GuestPrompt from "@/components/live-lesson/guest-prompt";
 import { useUser } from "@/hooks/use-user";
 import type { IUserMetadata } from "@/interfaces/user.interface";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";

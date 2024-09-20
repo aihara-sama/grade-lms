@@ -18,7 +18,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { useChat } from "@/hooks/use-chat";
 import { useVideoChat } from "@/hooks/use-video-chat";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { Course } from "@/types/course.type";
 import type { Lesson } from "@/types/lesson.type";
 import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";

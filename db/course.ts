@@ -1,5 +1,5 @@
 import { COURSES_GET_LIMIT } from "@/constants";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";

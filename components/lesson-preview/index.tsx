@@ -23,7 +23,7 @@ import { getOverlappingLessons } from "@/db/lesson";
 import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";

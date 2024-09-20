@@ -1,7 +1,7 @@
 import { menu } from "@/components/header/menu";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { PropsWithClassName } from "@/types";
 import { addMinutes } from "date-fns";
 import { useTranslations } from "next-intl";

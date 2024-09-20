@@ -1,4 +1,4 @@
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
 

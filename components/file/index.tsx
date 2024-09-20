@@ -1,6 +1,6 @@
 "use client";
 
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import { useEffect, useState, type FunctionComponent } from "react";
 
 interface IProps {

@@ -9,7 +9,7 @@ import CreateAssignmentModal from "@/components/common/modals/create-assignment-
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import { deleteAssignmentById } from "@/db/assignment";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { Assignment } from "@/types/assignment.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";

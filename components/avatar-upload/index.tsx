@@ -2,7 +2,7 @@
 
 import CameraIcon from "@/components/icons/camera-icon";
 import { MAX_AVATAR_SIZE } from "@/constants";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FunctionComponent } from "react";

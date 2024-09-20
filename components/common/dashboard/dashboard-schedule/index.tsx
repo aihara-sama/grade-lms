@@ -6,7 +6,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { LESSONS_GET_LIMIT } from "@/constants";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { Lesson } from "@/types/lesson.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { toCapitalCase } from "@/utils/string/to-capital-case";

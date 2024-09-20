@@ -17,7 +17,7 @@ import {
 } from "@/db/course";
 import { enrollAllUsersInCourses, enrollUsersInCourses } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";

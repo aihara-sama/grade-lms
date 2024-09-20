@@ -1,5 +1,5 @@
 import { LESSONS_GET_LIMIT } from "@/constants";
-import { DB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db";
 import type { Lesson } from "@/types/lesson.type";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
