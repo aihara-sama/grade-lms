@@ -15,8 +15,8 @@ import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
-import NoDataIcon from "@/components/icons/no-data-icon";
-import NotFoundIcon from "@/components/icons/not-found-icon";
+import NoData from "@/components/no-data";
+import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
@@ -350,24 +350,8 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
           }))}
         />
       )}
-      {isNoData && (
-        <div className="flex justify-center mt-12">
-          <div className="flex flex-col items-center">
-            <NoDataIcon />
-            <p className="mt-4 font-bold">View your work in a list</p>
-          </div>
-        </div>
-      )}
-      {isNotFound && (
-        <div className="flex justify-center mt-12">
-          <div className="flex flex-col items-center">
-            <NotFoundIcon />
-            <p className="mt-4 font-bold">
-              It looks like we can&apos;t find any results for that match
-            </p>
-          </div>
-        </div>
-      )}
+      {isNoData && <NoData />}
+      {isNotFound && <NotFound />}
       {isEditAssignmentModal && (
         <EditAssignmentModal
           assignmentId={assignmentId}
