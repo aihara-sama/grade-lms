@@ -59,7 +59,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
         name="title"
         label="Course name"
         value={course.title}
-        startIcon={<CoursesIcon />}
+        StartIcon={<CoursesIcon />}
         placeholder="My course..."
         onChange={onInputChange}
         autoFocus

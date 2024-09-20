@@ -52,14 +52,16 @@ const Page: FunctionComponent = () => {
   };
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
-      <p className="page-title mb-6 text-center">Login</p>
+      <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
+        Login
+      </p>
       <form onSubmit={handleSubmit}>
         <Input
           required
           name="email"
           type="email"
           placeholder="Email"
-          startIcon={<EmailIcon />}
+          StartIcon={<EmailIcon />}
           fullWidth
         />
         <Input
@@ -67,7 +69,7 @@ const Page: FunctionComponent = () => {
           name="password"
           type="password"
           placeholder="Password"
-          startIcon={<SecurityIcon />}
+          StartIcon={<SecurityIcon />}
           fullWidth
         />
         <button

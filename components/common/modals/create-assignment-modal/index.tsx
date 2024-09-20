@@ -83,7 +83,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
         <Input
           autoFocus
           fullWidth
-          startIcon={<LessonsIcon size="xs" />}
+          StartIcon={<LessonsIcon size="xs" />}
           placeholder="Assignment name"
           name="title"
           onChange={onInputChange}

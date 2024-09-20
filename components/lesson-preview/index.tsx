@@ -213,7 +213,7 @@ const LessonPreview: FunctionComponent = () => {
           label="Duration"
           fullWidth
           type="number"
-          startIcon={<LessonsIcon />}
+          StartIcon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={changeDateDuration}
           disabled={user.role !== Role.Teacher || isOngoing || isEnded}

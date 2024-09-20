@@ -2,24 +2,29 @@
 
 import CrossEyeIcon from "@/components/icons/cross-eye-icon";
 import EyeIcon from "@/components/icons/eye-icon";
+import type { PropsWithClassName } from "@/types/props.type";
 import clsx from "clsx";
-import type { FunctionComponent, InputHTMLAttributes } from "react";
+import type {
+  FunctionComponent,
+  InputHTMLAttributes,
+  MouseEventHandler,
+} from "react";
 import { useEffect, useRef, useState } from "react";
+import { setTimeout } from "timers";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
-  startIcon: JSX.Element;
-  endIcon?: JSX.Element;
+  type?: InputHTMLAttributes<HTMLInputElement>["type"];
   label?: string;
   value?: string;
-  onClick?: React.MouseEventHandler<HTMLInputElement>;
-  type?: InputHTMLAttributes<HTMLInputElement>["type"];
-  className?: string;
+  EndIcon?: JSX.Element;
+  StartIcon: JSX.Element;
   fullWidth?: boolean;
+  onClick?: MouseEventHandler<HTMLInputElement>;
 }
 
-const Input: FunctionComponent<Props> = ({
-  startIcon: Icon,
-  endIcon,
+const Input: FunctionComponent<PropsWithClassName<Props>> = ({
+  StartIcon,
+  EndIcon,
   type,
   label,
   value,
@@ -32,9 +37,8 @@ const Input: FunctionComponent<Props> = ({
   const [inputType, setInputType] = useState(type);
   const inputRef = useRef<HTMLInputElement>();
 
-  const handleToggleVisibility = () => {
+  const onEyeIconClick = () =>
     setInputType((prevType) => (prevType === "password" ? "text" : "password"));
-  };
 
   useEffect(() => {
     if (inputProps.autoFocus) {
@@ -51,11 +55,11 @@ const Input: FunctionComponent<Props> = ({
       )}
       <div className="relative">
         <div className="absolute top-2/4 flex *:translate-y-[-50%] left-3 text-neutral-600">
-          {Icon}
+          {StartIcon}
         </div>
-        {endIcon && (
+        {EndIcon && (
           <div className="absolute top-2/4 flex *:translate-y-[-50%] right-3 text-neutral-600">
-            {endIcon}
+            {EndIcon}
           </div>
         )}
         <input
@@ -63,7 +67,7 @@ const Input: FunctionComponent<Props> = ({
           value={value}
           type={inputType}
           placeholder={placeholder}
-          className={`${fullWidth ? "w-full" : "w-full sm:w-auto"} ${clsx(endIcon && "pr-10")}`}
+          className={`${fullWidth ? "w-full" : "w-full sm:w-auto"} ${clsx(EndIcon && "pr-10")}`}
           {...inputProps}
         />
         {type === "password" && (
@@ -71,7 +75,7 @@ const Input: FunctionComponent<Props> = ({
             <button
               type="button"
               className="icon-button"
-              onClick={handleToggleVisibility}
+              onClick={onEyeIconClick}
             >
               {inputType === "password" ? <EyeIcon /> : <CrossEyeIcon />}
             </button>

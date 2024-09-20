@@ -71,7 +71,9 @@ const Page: FunctionComponent = () => {
   // View
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
-      <p className="page-title mb-6 text-center">Create account</p>
+      <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
+        Create account
+      </p>
       <form onSubmit={handleSubmit}>
         <Input
           autoFocus
@@ -79,7 +81,7 @@ const Page: FunctionComponent = () => {
           name="name"
           type="text"
           placeholder="Name"
-          startIcon={<AvatarIcon size="xs" />}
+          StartIcon={<AvatarIcon size="xs" />}
           fullWidth
           maxLength={76}
           minLength={1}
@@ -89,7 +91,7 @@ const Page: FunctionComponent = () => {
           name="email"
           type="email"
           placeholder="Email"
-          startIcon={<EmailIcon />}
+          StartIcon={<EmailIcon />}
           fullWidth
         />
         <Input
@@ -97,7 +99,7 @@ const Page: FunctionComponent = () => {
           name="password"
           type="password"
           placeholder="Password"
-          startIcon={<SecurityIcon />}
+          StartIcon={<SecurityIcon />}
           fullWidth
           minLength={6}
         />

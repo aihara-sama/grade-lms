@@ -167,7 +167,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           value={lesson.title}
           onChange={onInputChange}
           name="title"
-          startIcon={<LessonsIcon size="xs" />}
+          StartIcon={<LessonsIcon size="xs" />}
           placeholder="Lesson name"
           className="mb-4"
         />
@@ -180,7 +180,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           fullWidth
           label="Duration"
           type="number"
-          startIcon={<LessonsIcon />}
+          StartIcon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
           onChange={changeDuration}
           className="mt-2"

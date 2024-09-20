@@ -223,7 +223,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
             <Input
               name="title"
               fullWidth
-              startIcon={<LessonsIcon size="xs" />}
+              StartIcon={<LessonsIcon size="xs" />}
               placeholder="Lesson name"
               onChange={onInputChange}
               value={lesson.title}
@@ -240,7 +240,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
               fullWidth
               label="Duration:"
               type="number"
-              startIcon={<TimeIcon />}
+              StartIcon={<TimeIcon />}
               value={`${millisecondsToMinutes(getLessonDuration(lesson))}`}
               onChange={onChangeDuration}
               disabled={isLessonOngoing(lesson) || user.role !== Role.Teacher}

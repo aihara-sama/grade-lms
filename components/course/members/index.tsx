@@ -288,7 +288,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
         </div>
       ) : (
         <Input
-          startIcon={<SearchIcon size="xs" />}
+          StartIcon={<SearchIcon size="xs" />}
           placeholder={t("search")}
           onChange={(e) => setSearchText(e.target.value)}
           className="w-auto"

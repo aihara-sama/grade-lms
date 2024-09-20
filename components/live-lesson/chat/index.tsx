@@ -130,7 +130,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
         fullWidth
         onChange={(e) => setChatMessageText(e.target.value)}
         value={chatMessageText}
-        startIcon={
+        StartIcon={
           <label>
             <AttachIcon className={`${clsx(disabled || "inter-active")}`} />
             {!disabled && (
@@ -138,7 +138,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
             )}
           </label>
         }
-        endIcon={
+        EndIcon={
           <button
             disabled={!chatMessageText.length}
             className={`p-1 rounded-md bg-blue-200  ${clsx({

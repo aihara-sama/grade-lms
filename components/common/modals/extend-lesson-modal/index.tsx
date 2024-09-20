@@ -81,7 +81,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
             onChange={onExtendLessonInputChange}
             autoFocus
             fullWidth
-            startIcon={<TimeIcon />}
+            StartIcon={<TimeIcon />}
             type="number"
             label="Add minutes"
           />

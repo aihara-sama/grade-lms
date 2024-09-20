@@ -55,7 +55,7 @@ const CourseSettings: FunctionComponent<Props> = ({
         <div className="flex items-end gap-[4px]">
           <Input
             label="Course name"
-            startIcon={<CoursesIcon size="xs" />}
+            StartIcon={<CoursesIcon size="xs" />}
             value={courseTitle}
             onChange={(e) => setCourseTitle(e.target.value)}
             className="mb-auto"

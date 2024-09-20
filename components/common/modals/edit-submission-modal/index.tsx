@@ -83,7 +83,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
         <div>
           <Input
             fullWidth
-            startIcon={<LessonsIcon size="xs" />}
+            StartIcon={<LessonsIcon size="xs" />}
             placeholder="Submission name"
             name="title"
             value={submission.title}
