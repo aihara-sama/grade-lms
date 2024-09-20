@@ -20,7 +20,7 @@ const OngoingLessonCard: FunctionComponent<Props> = async ({ courseId }) => {
   return (
     <div className="relative flex-1 p-6 flex flex-col items-center justify-center">
       <img
-        src="/current-lesson-frame.svg"
+        src="/assets/svg/current-lesson-frame.svg"
         alt=""
         className="absolute top-0 left-0 w-full h-full z-[-1]"
       />

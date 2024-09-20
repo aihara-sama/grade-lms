@@ -18,7 +18,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
-import File from "@/components/file";
 import DotsIcon from "@/components/icons/dots-icon";
 import NoDataIcon from "@/components/icons/no-data-icon";
 import NotFoundIcon from "@/components/icons/not-found-icon";
@@ -251,10 +250,6 @@ const Courses: FunctionComponent = () => {
   // View
   return (
     <div className="pb-8 flex-1 flex flex-col">
-      <File
-        bucket="courses"
-        path="b2d60b21-64af-46eb-9237-59038c3dfdb6/4c682649-85ef-4c3c-ab35-35f8ac1a0309.ico"
-      />
       <CardsContainer>
         <Total
           Icon={<CoursesIcon size="lg" />}

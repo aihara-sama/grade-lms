@@ -174,7 +174,7 @@ const Profile: FunctionComponent = () => {
   };
   return (
     <div className="-mt-6">
-      <div className="absolute left-0 right-0 h-40 bg-[url(/bubbled-bg.svg)] bg-cover bg-no-repeat bg-center">
+      <div className="absolute left-0 right-0 h-40 bg-[url(/assets/svg/bubbled-bg.svg)] bg-cover bg-no-repeat bg-center">
         <div className="absolute top-[80px] sm:left-96 left-1/2 transform -translate-x-1/2 flex items-end gap-8 md:flex-row flex-col">
           <AvatarUpload avatar={avatar} onChange={setAvatar} />
           <div>
@@ -210,7 +210,7 @@ const Profile: FunctionComponent = () => {
               {isSubmittingRenameUser && (
                 <img
                   className="loading-spinner"
-                  src="/gifs/loading-spinner.gif"
+                  src="/assets/gifs/loading-spinner.gif"
                   alt=""
                 />
               )}
@@ -283,7 +283,7 @@ const Profile: FunctionComponent = () => {
               {isSubmittingChangePassword && (
                 <img
                   className="loading-spinner"
-                  src="/gifs/loading-spinner.gif"
+                  src="/assets/gifs/loading-spinner.gif"
                   alt=""
                 />
               )}

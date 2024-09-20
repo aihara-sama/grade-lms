@@ -20,7 +20,7 @@ const File: FunctionComponent<IProps> = ({ bucket, path }) => {
   }, []);
   return (
     <img
-      src={!!blob && URL.createObjectURL(blob)}
+      src={blob ? URL.createObjectURL(blob) : ""}
       alt=""
       className="size-12 rounded-[50%]"
     />

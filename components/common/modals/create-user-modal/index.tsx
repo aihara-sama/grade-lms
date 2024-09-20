@@ -166,7 +166,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
             {isSubmitting && (
               <img
                 className="loading-spinner"
-                src="/gifs/loading-spinner.gif"
+                src="/assets/gifs/loading-spinner.gif"
                 alt=""
               />
             )}
