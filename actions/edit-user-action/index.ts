@@ -31,8 +31,30 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
-  const [{ error: userError }, { error: profileError }] = await Promise.all([
-    adminDB.auth.admin.updateUserById(payload.id, {
+  const { error: profileError, data } = await serverDB
+    .from("users")
+    .update(restPayload)
+    .eq("id", payload.id)
+    .select("id")
+    .maybeSingle();
+
+  if (profileError) {
+    return {
+      error: profileError.message,
+      data: null,
+    };
+  }
+
+  if (!data) {
+    return {
+      error: "Something went wrong",
+      data: null,
+    };
+  }
+
+  const { error: userError } = await adminDB.auth.admin.updateUserById(
+    payload.id,
+    {
       email: payload.email,
       password,
       user_metadata: {
@@ -40,12 +62,10 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
         avatar: payload.avatar,
         timezone: payload.timezone,
       } as UserMetadata,
-    }),
-    serverDB.from("users").update(restPayload).eq("id", payload.id),
-  ]);
-
+    }
+  );
   return {
-    error: userError?.message || profileError?.message || null,
+    error: userError ? userError.message : null,
     data: null,
   };
 };
