@@ -7,9 +7,7 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
     data: { user },
   } = await getServerDB().auth.getUser();
 
-  if (user) {
-    return redirect("/dashboard");
-  }
+  if (user) return redirect("/dashboard");
   return <>{children}</>;
 };
 

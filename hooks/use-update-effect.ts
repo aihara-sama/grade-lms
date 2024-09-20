@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 
-function useUpdateEffect(
+export const useUpdateEffect = (
   effect: React.EffectCallback,
   deps: React.DependencyList
-) {
+) => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -13,6 +13,4 @@ function useUpdateEffect(
     }
     return effect();
   }, deps);
-}
-
-export default useUpdateEffect;
+};

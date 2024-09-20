@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import Select from "@/components/common/select";
 import SecurityIcon from "@/components/icons/security-icon";
 import Switch from "@/components/switch";
-import useUpdateEffect from "@/hooks/use-update-effect";
+import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
