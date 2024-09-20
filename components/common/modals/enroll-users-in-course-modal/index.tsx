@@ -18,7 +18,7 @@ import {
   getUsersNotInCourse,
   getUsersNotInCourseCount,
 } from "@/db/user";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { User } from "@/types/user.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
@@ -146,7 +146,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
         : enrollUsersInCourses(usersIds, [courseId]));
       onClose(true);
       toast(t("users_enrolled"));
-      browserDB.functions.invoke("check-events");
+      DB.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
     } finally {

@@ -3,7 +3,7 @@
 import GuestPrompt from "@/components/live-lesson/guest-prompt";
 import { useUser } from "@/hooks/use-user";
 import type { IUserMetadata } from "@/interfaces/user.interface";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect } from "react";
@@ -39,7 +39,7 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
           .is_push_notifications_on,
       });
 
-    browserDB.auth.onAuthStateChange((event) => {
+    DB.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") userStore.setUser(null);
     });
   }, []);

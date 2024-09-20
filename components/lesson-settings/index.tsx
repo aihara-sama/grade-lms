@@ -2,7 +2,7 @@
 
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { Database } from "@/types/supabase.type";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
@@ -27,8 +27,7 @@ const LessonSettings: FunctionComponent<Props> = ({
     setIsSubmitting(true);
 
     try {
-      const { error } = await browserDB
-        .from("lessons")
+      const { error } = await DB.from("lessons")
         .update({
           title: lessonTitle,
         })

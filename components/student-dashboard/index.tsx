@@ -6,7 +6,7 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 import LatestAssignments from "@/components/student-dashboard/latest-assignments";
 import StudentInsights from "@/components/student-dashboard/student-insights";
 import Total from "@/components/total";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { Assignment } from "@/types/assignment.type";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState, type FunctionComponent } from "react";
@@ -28,8 +28,7 @@ const StudentrDashboard: FunctionComponent<Props> = ({
   const [latestAssignments, setLatestAssignments] = useState<Assignment[]>([]);
 
   const fetchLatestAssignments = () =>
-    browserDB
-      .from("users")
+    DB.from("users")
       .select("courses(lessons(assignments(*)))")
       .eq("id", user.id)
       .limit(10)

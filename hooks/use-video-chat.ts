@@ -1,6 +1,6 @@
 import { useUser } from "@/hooks/use-user";
 import type { ICamera } from "@/interfaces/camera.interface";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { User } from "@/types/user.type";
 import type {
   REALTIME_SUBSCRIBE_STATES,
@@ -18,7 +18,7 @@ export const useVideoChat = () => {
   // Hooks
   const { user } = useUser();
   const { lessonId } = useParams();
-  const channel = browserDB.channel(lessonId as string, {
+  const channel = DB.channel(lessonId as string, {
     config: {
       presence: {
         key: user.id,

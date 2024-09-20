@@ -1,4 +1,4 @@
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
 import { v4 as uuid } from "uuid";
@@ -7,8 +7,7 @@ export const createChatMessage = async (
   chatMessage: TablesInsert<"chat_messages">
 ) => {
   const t = await loadMessages();
-  const result = await browserDB
-    .from("chat_messages")
+  const result = await DB.from("chat_messages")
     .insert(chatMessage)
     .select("*, chat_files(*), author:users(*)")
     .single();
@@ -20,8 +19,7 @@ export const createChatMessage = async (
 
 export const getChatMessages = async (lessonId: string) => {
   const t = await loadMessages();
-  const result = await browserDB
-    .from("chat_messages")
+  const result = await DB.from("chat_messages")
     .select("*, chat_files(*), author:users(*)")
     .eq("lesson_id", lessonId);
 
@@ -37,7 +35,7 @@ export const uploadChatFile = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await browserDB.storage
+  const result = await DB.storage
     .from("courses")
     .upload(`${courseId}/${uuid()}.${ext}`, file);
 

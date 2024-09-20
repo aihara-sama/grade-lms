@@ -23,7 +23,7 @@ import { getOverlappingLessons } from "@/db/lesson";
 import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
 import { Role } from "@/interfaces/user.interface";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -98,8 +98,7 @@ const LessonPreview: FunctionComponent = () => {
 
       if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
 
-      const { error, data } = await browserDB
-        .from("lessons")
+      const { error, data } = await DB.from("lessons")
         .update({
           starts: starts.toISOString(),
           ends: ends.toISOString(),
@@ -120,8 +119,7 @@ const LessonPreview: FunctionComponent = () => {
     }
   };
   const submitUpdateWhiteboardData = async () => {
-    const { error } = await browserDB
-      .from("lessons")
+    const { error } = await DB.from("lessons")
       .update({
         whiteboard_data: JSON.stringify(whiteboardDataRef.current),
       })

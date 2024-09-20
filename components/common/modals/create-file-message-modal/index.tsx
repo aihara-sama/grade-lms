@@ -7,7 +7,7 @@ import { MAX_CHAT_FILE_SIZE } from "@/constants";
 import { uploadChatFile } from "@/db/message";
 import { useChatChannel } from "@/hooks/use-chat-channel";
 import { useUser } from "@/hooks/use-user";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { ChatMessageWithFiles } from "@/types/chat-message";
 import { Event } from "@/types/event.type";
 import type { TablesInsert } from "@/types/supabase.type";
@@ -90,16 +90,14 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   const submitCreateMessage = async () => {
     setIsSubmittingCreateMessage(true);
     try {
-      const createdChatMessage = await browserDB
-        .from("chat_messages")
+      const createdChatMessage = await DB.from("chat_messages")
         .insert(chatMessage)
         .select("*, chat_files(*), author:users(*)")
         .single();
 
       if (createdChatMessage.error) throw new Error(t("something_went_wrong"));
 
-      const createdChatFile = await browserDB
-        .from("chat_files")
+      const createdChatFile = await DB.from("chat_files")
         .insert({
           ext: fileExt,
           name: file.name,

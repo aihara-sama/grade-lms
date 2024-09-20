@@ -13,7 +13,7 @@ import LessonStatus from "@/components/lesson-status";
 import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-template";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import { Event } from "@/types/event.type";
 import type { Lesson } from "@/types/lesson.type";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
@@ -78,8 +78,7 @@ const Whiteboard: FunctionComponent<Props> = ({
   };
 
   const submitUpdateWhiteboardData = throttleFetch(async (data: string) => {
-    const { error } = await browserDB
-      .from("lessons")
+    const { error } = await DB.from("lessons")
       .update({
         whiteboard_data: data,
       })

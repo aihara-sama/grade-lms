@@ -9,7 +9,7 @@ import CreateAssignmentModal from "@/components/common/modals/create-assignment-
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import { deleteAssignmentById } from "@/db/assignment";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { Assignment } from "@/types/assignment.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -44,8 +44,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
   };
 
   const fetchAssignments = async () => {
-    const data = await browserDB
-      .from("assignments")
+    const data = await DB.from("assignments")
       .select("*")
       .eq("lesson_id", lessonId);
 

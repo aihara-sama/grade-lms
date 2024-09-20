@@ -2,7 +2,7 @@
 
 import CameraIcon from "@/components/icons/camera-icon";
 import { MAX_AVATAR_SIZE } from "@/constants";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FunctionComponent } from "react";
@@ -32,7 +32,7 @@ const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
           throw new Error(t("file_size_too_big"));
 
         setIsSubmitting(true);
-        const { data, error } = await browserDB.storage
+        const { data, error } = await DB.storage
           .from("avatars")
           .upload(uuid(), file);
 

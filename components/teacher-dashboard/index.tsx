@@ -8,7 +8,7 @@ import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
 import { useUser } from "@/hooks/use-user";
 import { messaging } from "@/lib/firebase/messaging";
-import { browserDB } from "@/lib/supabase/db/browser-db";
+import { DB } from "@/lib/supabase/db/browser-db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import { getToken } from "firebase/messaging";
 import type { FunctionComponent } from "react";
@@ -31,16 +31,14 @@ const TeacherDashboard: FunctionComponent<Props> = ({
   const { user } = useUser();
 
   const fetchCoursesCount = () =>
-    browserDB
-      .from("users")
+    DB.from("users")
       .select("courses(count)")
       .eq("id", user.id)
       .returns<Record<"courses", { count: number }[]>[]>()
       .single();
 
   const fetchLatestCourses = () =>
-    browserDB
-      .from("users")
+    DB.from("users")
       .select("courses(*, users(count), lessons(count))")
       .eq("id", user.id)
       .limit(10)
@@ -82,8 +80,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
 
   useEffect(() => {
     (async () => {
-      const { data } = await browserDB
-        .from("fcm_tokens")
+      const { data } = await DB.from("fcm_tokens")
         .select("fcm_token")
         .eq("user_id", user.id)
         .maybeSingle();
@@ -103,8 +100,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
                 vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
               }).then((token) => {
                 Promise.all([
-                  browserDB
-                    .from("fcm_tokens")
+                  DB.from("fcm_tokens")
                     .insert({
                       fcm_token: token,
                       user_id: user.id,
