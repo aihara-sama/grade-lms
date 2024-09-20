@@ -67,7 +67,7 @@ const Input: FunctionComponent<PropsWithClassName<Props>> = ({
           value={value}
           type={inputType}
           placeholder={placeholder}
-          className={`${fullWidth ? "w-full" : "w-full sm:w-auto"} ${clsx(EndIcon && "pr-10")}`}
+          className={` w-full ${clsx({ "pr-10": EndIcon, "sm:w-auto": !fullWidth })}`}
           {...inputProps}
         />
         {type === "password" && (
