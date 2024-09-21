@@ -67,7 +67,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   };
   const fetchCourses = async () => {
     try {
-      setCourses(await getCourses(user.id));
+      setCourses(await getCourses());
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -76,7 +76,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   const fetchCoursesBySearch = useCallback(
     throttleSearch(async (search: string) => {
       try {
-        setCourses(await getCourses(user.id, search));
+        setCourses(await getCourses(search));
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -118,7 +118,6 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
   const onCoursesScrollEnd = async (search: string) => {
     const rangeCourses = await getCourses(
-      user.id,
       search,
       coursesOffsetRef.current,
       coursesOffsetRef.current + COURSES_GET_LIMIT - 1

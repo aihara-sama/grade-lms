@@ -74,7 +74,6 @@ const Courses: FunctionComponent = () => {
     !isLoading && !isSearching && !courses.length && !!searchText.length;
 
   // Handdlers
-
   const selectAllCourses = () => {
     setSelectedCoursesIds(courses.map(({ id }) => id));
     setIsSelectedAll(true);
@@ -89,8 +88,8 @@ const Courses: FunctionComponent = () => {
 
     try {
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCourses(user.id),
-        getCoursesCount(user.id),
+        getCourses(),
+        getCoursesCount(),
       ]);
 
       setCourses(fetchedCourses);
@@ -108,8 +107,8 @@ const Courses: FunctionComponent = () => {
 
     try {
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCourses(user.id, search),
-        getCoursesCount(user.id, search),
+        getCourses(search),
+        getCoursesCount(search),
       ]);
 
       setCourses(fetchedCourses);
@@ -130,7 +129,7 @@ const Courses: FunctionComponent = () => {
       const from = coursesOffsetRef.current;
       const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
 
-      const fetchedCourses = await getCourses(user.id, searchText, from, to);
+      const fetchedCourses = await getCourses(searchText, from, to);
 
       setCourses((prev) => [...prev, ...fetchedCourses]);
 

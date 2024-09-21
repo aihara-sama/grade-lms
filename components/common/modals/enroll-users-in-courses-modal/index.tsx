@@ -15,8 +15,12 @@ import {
   getUnenrolledCourses,
   getUnenrolledCoursesCount,
 } from "@/db/course";
-import { enrollAllUsersInCourses, enrollUsersInCourses } from "@/db/user";
-import { useUser } from "@/hooks/use-user";
+import {
+  enrollAllUsersInAllCourses,
+  enrollAllUsersInCourses,
+  enrollUsersInAllCourses,
+  enrollUsersInCourses,
+} from "@/db/user";
 import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
@@ -30,10 +34,12 @@ import toast from "react-hot-toast";
 interface Props {
   onClose: (mutated?: boolean) => void;
   usersIds: string[];
+  shouldEnrollAll?: boolean;
 }
 
 const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   usersIds,
+  shouldEnrollAll,
   onClose,
 }) => {
   // State
@@ -48,9 +54,10 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
   const isSingleUser = usersIds.length === 1;
 
+  console.log({ isSelectedAll });
+
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
 
   // Refs
   const coursesOffsetRef = useRef(0);
@@ -78,10 +85,10 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
     try {
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        isSingleUser ? getUnenrolledCourses(usersIds[0]) : getCourses(user.id),
+        isSingleUser ? getUnenrolledCourses(usersIds[0]) : getCourses(),
         isSingleUser
           ? getUnenrolledCoursesCount(usersIds[0])
-          : getCoursesCount(user.id),
+          : getCoursesCount(),
       ]);
 
       setCourses(fetchedCourses);
@@ -108,10 +115,10 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
         isSingleUser
           ? getUnenrolledCourses(usersIds[0], search)
-          : getCourses(user.id, search),
+          : getCourses(search),
         isSingleUser
           ? getUnenrolledCoursesCount(usersIds[0], search)
-          : getCoursesCount(user.id, search),
+          : getCoursesCount(search),
       ]);
 
       setCourses(fetchedCourses);
@@ -135,7 +142,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
       const fetchedCourses = await (isSingleUser
         ? getUnenrolledCourses(usersIds[0], searchText, from, to)
-        : getCourses(user.id, searchText, from, to));
+        : getCourses(searchText, from, to));
 
       setCourses((prev) => [...prev, ...fetchedCourses]);
 
@@ -156,9 +163,15 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     setIsSubmitting(true);
 
     try {
-      await (isSelectedAll
-        ? enrollAllUsersInCourses(selectedCoursesIds)
-        : enrollUsersInCourses(usersIds, selectedCoursesIds));
+      if (shouldEnrollAll) {
+        if (isSelectedAll) await enrollAllUsersInAllCourses();
+        else await enrollAllUsersInCourses(selectedCoursesIds);
+      }
+      if (!shouldEnrollAll) {
+        if (isSelectedAll) await enrollUsersInAllCourses(usersIds);
+        else await enrollUsersInCourses(usersIds, selectedCoursesIds);
+      }
+
       onClose(true);
       setSelectedCoursesIds([]);
       DB.functions.invoke("check-events");

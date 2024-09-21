@@ -229,7 +229,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function get_courses_not_assigned_to_user(p_user_id uuid, p_course_title text)
+create or replace function get_unenrolled_courses(p_user_id uuid, p_course_title text)
 returns setof public.courses as $$
 begin
     return query
@@ -244,22 +244,6 @@ begin
         join public.users u on u.creator_id = auth.uid()::text
         where u.id = p_user_id
     );
-end;
-$$ language plpgsql;
-
-
-
-create or replace function delete_all_courses(p_title text)
-returns void as $$
-begin
-  delete from courses
-  where id in (
-    select course_id
-    from user_courses
-    join courses on user_courses.course_id = courses.id
-    where user_courses.user_id = auth.uid()
-      and (courses.title ILIKE '%' || p_title || '%')
-  );
 end;
 $$ language plpgsql;
 
@@ -365,20 +349,6 @@ begin
 end;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION public.delete_courses_by_ids(p_courses_ids uuid[])
-RETURNS void AS $$
-BEGIN
-  DELETE FROM public.courses
-  WHERE id = ANY(p_courses_ids)
-  AND id IN (
-    SELECT uc.course_id
-    FROM public.user_courses uc
-    WHERE uc.user_id = auth.uid()
-  );
-END;
-$$ LANGUAGE plpgsql;
-
-
 CREATE OR REPLACE FUNCTION public.enroll_all_users_in_courses(
     p_courses_ids uuid[]
 )
@@ -445,6 +415,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Function to enroll all users in all courses
+create or replace function enroll_all_users_in_all_courses()
+returns void language plpgsql as $$
+begin
+  -- Insert all users into all courses
+  insert into user_courses (user_id, course_id, created_at)
+  select u.id as user_id, c.id as course_id, now() as created_at
+  from users u, courses c
+  on conflict (user_id, course_id) do nothing;
+end;
+$$;
+
+
+create or replace function enroll_users_in_all_courses(users_ids uuid[])
+returns void language plpgsql as $$
+begin
+  -- Insert given users into all courses
+  insert into user_courses (user_id, course_id, created_at)
+  select unnest(users_ids) as user_id, c.id as course_id, now() as created_at
+  from courses c
+  on conflict (user_id, course_id) do nothing;
+end;
+$$;
+
+
 alter table public.users enable row level security;
 create policy "Can insert user's data." on public.users for insert to authenticated;
 -- create policy "Can view user's data." on public.users for select to authenticated using (true);
@@ -477,7 +472,17 @@ WITH CHECK ((SELECT role FROM public.users WHERE id = auth.uid()) = 'Teacher');
 CREATE POLICY "Can select authenticated" ON public.courses
 FOR SELECT
 TO authenticated
-USING ( true );
+USING ( 
+    -- Allow selection if the course was created by the user
+    courses.creator_id = auth.uid()::text
+    -- Or if the user is assigned to the course in user_courses
+    OR exists (
+        select 1
+        from user_courses uc
+        where uc.course_id = courses.id
+        and uc.user_id = auth.uid()
+    )
+ );
 
 -- Policy: Update allowed only for the course creator
 CREATE POLICY "Can update own course" ON public.courses
@@ -508,13 +513,23 @@ WITH CHECK (
   )
 );
 
+CREATE OR REPLACE FUNCTION is_in_course(p_course_id uuid, p_user_id uuid)
+            returns boolean AS
+        $$
+        select p_course_id IN (
+        select course_id 
+        from user_courses 
+        where user_id = p_user_id
+    )
+        $$ stable language sql security definer;
+
 -- Policy: Select allowed if the user is the creator of the course
 CREATE POLICY "Can select if user is assigned to the course"
 ON public.user_courses
 FOR SELECT
 TO authenticated
 USING (
-  true
+  is_in_course(user_courses.course_id, auth.uid())
 );
 
 -- Policy: Update allowed if the user is the creator of the course

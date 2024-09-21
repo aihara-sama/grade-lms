@@ -191,6 +191,20 @@ export const enrollAllUsersInCourses = async (coursesIds: string[]) => {
 
   if (result.error) throw new Error(t("failed_to_enroll_users"));
 };
+export const enrollUsersInAllCourses = async (usersIds: string[]) => {
+  const t = await loadMessages();
+  const result = await DB.rpc("enroll_users_in_all_courses", {
+    users_ids: usersIds,
+  });
+
+  if (result.error) throw new Error(t("failed_to_enroll_users"));
+};
+export const enrollAllUsersInAllCourses = async () => {
+  const t = await loadMessages();
+  const result = await DB.rpc("enroll_all_users_in_all_courses");
+
+  if (result.error) throw new Error(t("failed_to_enroll_users"));
+};
 export const enrollAllUsers = async (courseId: string) => {
   const t = await loadMessages();
   const result = await DB.rpc("enroll_all_users", {

@@ -527,23 +527,21 @@ export type Database = {
         };
         Returns: undefined;
       };
+      enroll_all_users_in_all_courses: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
       enroll_all_users_in_courses: {
         Args: {
           p_courses_ids: string[];
         };
         Returns: undefined;
       };
-      get_courses_not_assigned_to_user: {
+      enroll_users_in_all_courses: {
         Args: {
-          p_user_id: string;
-          p_course_title: string;
+          users_ids: string[];
         };
-        Returns: {
-          created_at: string;
-          creator_id: string;
-          id: string;
-          title: string;
-        }[];
+        Returns: undefined;
       };
       get_overlapping_lesson: {
         Args: {
@@ -561,6 +559,18 @@ export type Database = {
           starts: string;
           title: string;
           whiteboard_data: string;
+        }[];
+      };
+      get_unenrolled_courses: {
+        Args: {
+          p_user_id: string;
+          p_course_title: string;
+        };
+        Returns: {
+          created_at: string;
+          creator_id: string;
+          id: string;
+          title: string;
         }[];
       };
       get_upcoming_lessons_users: {
@@ -592,6 +602,13 @@ export type Database = {
           role: Database["public"]["Enums"]["role"];
           timezone: string;
         }[];
+      };
+      is_in_course: {
+        Args: {
+          p_course_id: string;
+          p_user_id: string;
+        };
+        Returns: boolean;
       };
     };
     Enums: {

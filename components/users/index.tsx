@@ -216,6 +216,13 @@ const Users: FunctionComponent = () => {
       fetchMoreUsers();
     }
   };
+  const onEnrollUserInCoursesModalClose = (mutated?: boolean) => {
+    setIsEnrollUserInCoursesModal(false);
+
+    if (mutated) {
+      setUserId(undefined);
+    }
+  };
   const onEnrollUsersInCoursesModalClose = (mutated?: boolean) => {
     setIsEnrollUsersInCoursesModal(false);
 
@@ -366,13 +373,14 @@ const Users: FunctionComponent = () => {
       {isEnrollUserInCoursesModal && (
         <EnrollUsersInCoursesModal
           usersIds={[userId]}
-          onClose={() => setIsEnrollUserInCoursesModal(false)}
+          onClose={onEnrollUserInCoursesModalClose}
         />
       )}
       {isEnrollUsersInCoursesModal && (
         <EnrollUsersInCoursesModal
           usersIds={usersIds}
           onClose={onEnrollUsersInCoursesModalClose}
+          shouldEnrollAll={isSelectedAll}
         />
       )}
       {isEditUserModal && (
