@@ -6,27 +6,28 @@ import CrownIcon from "@/components/icons/crown-icon";
 import Input from "@/components/input";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 import Select from "@/components/common/select";
 import SecurityIcon from "@/components/icons/security-icon";
 import Switch from "@/components/switch";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
-import { messaging } from "@/lib/firebase/messaging";
 import { DB } from "@/lib/supabase/db";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import type { UserMetadata } from "@supabase/supabase-js";
 import clsx from "clsx";
-import { getToken } from "firebase/messaging";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 const Profile: FunctionComponent = () => {
   const router = useRouter();
+  const { enablePushNotifications } = usePushNotifications();
+
   const pathName = usePathname();
   const t = useTranslations();
   const [isSubmittingRenameUser, setIsSubmittingRenameUser] = useState(false);
@@ -81,81 +82,58 @@ const Profile: FunctionComponent = () => {
   };
 
   // Effects
-  useEffect(() => {
+  useUpdateEffect(() => {
     (async () => {
-      if (avatar !== user.avatar) {
-        const { error: usersError } = await DB.from("users")
-          .update({
-            avatar,
-          })
-          .eq("id", user.id);
-
-        const { error: profileError } = await DB.auth.updateUser({
+      try {
+        await DB.auth.updateUser({
           data: {
             avatar,
           } as UserMetadata,
         });
 
-        if (usersError || profileError) toast.error("Something went wrong");
-        else {
-          setUser({ ...user, avatar });
-          toast.success("Avatar changed");
-        }
+        setUser({ ...user, avatar });
+
+        toast.success("Avatar changed");
+      } catch (error: any) {
+        toast.error(error.message);
       }
     })();
   }, [avatar]);
 
   useUpdateEffect(() => {
-    Promise.all([
-      DB.from("users")
-        .update({
-          is_emails_on: isEmailsOn,
-        })
-        .eq("id", user.id),
-      DB.auth.updateUser({
-        data: {
-          is_emails_on: isEmailsOn,
-        },
-      }),
-    ]);
+    (async () => {
+      try {
+        await DB.auth.updateUser({
+          data: {
+            is_emails_on: isEmailsOn,
+          },
+        });
+        setUser({ ...user, is_emails_on: true });
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    })();
   }, [isEmailsOn]);
   useUpdateEffect(() => {
-    if (isPushNotificationsOn) {
-      Notification.requestPermission().then(async (permission) => {
-        if (permission === "granted") {
-          const { data } = await DB.from("fcm_tokens")
-            .select("fcm_token")
-            .maybeSingle();
+    (async () => {
+      try {
+        if (isPushNotificationsOn) {
+          const permission = await Notification.requestPermission();
 
-          if (!data)
-            getToken(messaging, {
-              vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
-            }).then((token) => {
-              Promise.all([
-                DB.from("fcm_tokens").insert({
-                  fcm_token: token,
-                  user_id: user.id,
-                }),
-              ])
-                .then(() => toast.success("Notifications enabled!"))
-                .catch(console.error);
-            });
-
-          Promise.all([
-            DB.from("users")
-              .update({
-                is_push_notifications_on: isPushNotificationsOn,
-              })
-              .eq("id", user.id),
-            DB.auth.updateUser({
-              data: {
-                is_push_notifications_on: isPushNotificationsOn,
-              },
-            }),
-          ]);
+          if (permission === "granted") enablePushNotifications();
+        } else {
+          await DB.auth.updateUser({
+            data: {
+              is_push_notifications_on: false,
+            } as UserMetadata,
+          });
         }
-      });
-    }
+
+        setUser({ ...user, is_push_notifications_on: isPushNotificationsOn });
+      } catch (err: any) {
+        console.error(err.message);
+      }
+    })();
   }, [isPushNotificationsOn]);
 
   const submitChangePreferredLocale = async (_locale: Locale) => {

@@ -8,9 +8,10 @@ import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
 import { getCoursesCount, getLatestCourses } from "@/db/course";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import type { FunctionComponent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -20,6 +21,9 @@ interface Props {
 }
 
 const TeacherDashboard: FunctionComponent<Props> = (props) => {
+  const { enablePushNotifications } = usePushNotifications();
+  const { user } = useUser();
+
   const [usersCount] = useState(props.usersCount);
   const [coursesCount, setCoursesCount] = useState(props.coursesCount);
   const [latestCourses, setLatestCourses] = useState<CourseWithRefsCount[]>(
@@ -40,7 +44,21 @@ const TeacherDashboard: FunctionComponent<Props> = (props) => {
     }
   };
 
-  usePushNotifications();
+  useEffect(() => {
+    (async () => {
+      if (!user.is_push_notifications_on) {
+        try {
+          const permission = await Notification.requestPermission();
+
+          if (permission === "granted") await enablePushNotifications();
+
+          toast.success("Notifications enabled!");
+        } catch (err: any) {
+          console.error(err.message);
+        }
+      }
+    })();
+  }, []);
 
   return (
     <div className="sm:flex-row flex gap-8 flex-col">
