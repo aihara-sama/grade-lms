@@ -5,8 +5,20 @@ import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
 import { format } from "date-fns";
 
+// GET
+export const getLesson = async (id: string) => {
+  const t = await loadMessages();
+
+  const result = await DB.from("lessons").select("*").eq("id", id).single();
+
+  if (result.error) throw new Error(t("failed_to_load_lesson"));
+
+  return result.data;
+};
+
 export const getWeekLessons = async (days: string[], courseId?: string) => {
   const t = await loadMessages();
+
   const builder = DB.from("lessons")
     .select("*")
     .filter("course_id", "not.is", null)
@@ -23,54 +35,47 @@ export const getWeekLessons = async (days: string[], courseId?: string) => {
 
   return result.data;
 };
-
-export const getLessonsCountByCourseId = async (
-  courseId: string,
-  title = ""
-) => {
-  const t = await loadMessages();
-  const result = await DB.from("courses")
-    .select("lessons(count)")
-    .ilike("lessons.title", `%${title}%`)
-    .eq("id", courseId)
-    .returns<Record<"lessons", { count: number }[]>[]>()
-    .single();
-
-  if (result.error) throw new Error(t("failed_to_load_lessons_count"));
-
-  return result.data.lessons[0].count;
-};
-
-export const getLessonsByCourseId = async (
+export const getCourseLessons = async (
   courseId: string,
   title = "",
   from = 0,
   to = LESSONS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
-  const result = await DB.from("courses")
-    .select("lessons(*)")
-    .eq("id", courseId)
-    .ilike("lessons.title", `%${title}%`)
-    .range(from, to, { foreignTable: "lessons" })
-    .order("title", { foreignTable: "lessons", ascending: true })
-    .single();
+
+  const result = await DB.from("lessons")
+    .select("*")
+    .eq("course_id", courseId)
+    .ilike("title", `%${title}%`)
+    .range(from, to)
+    .order("created_at", { ascending: true });
 
   if (result.error) throw new Error(t("failed_to_load_lessons"));
 
-  return result.data.lessons;
+  return result.data;
+};
+export const getCourseLessonsCount = async (courseId: string, title = "") => {
+  const t = await loadMessages();
+
+  const result = await DB.from("lessons")
+    .select("count")
+    .ilike("title", `%${title}%`)
+    .eq("course_id", courseId)
+    .returns<{ count: number }[]>();
+
+  if (result.error) throw new Error(t("failed_to_load_lessons_count"));
+
+  return result.data[0].count;
 };
 
 export const getOverlappingLessons = async (
   starts: string,
   ends: string,
-  userId: string,
   lessonId?: string
 ) => {
   const t = await loadMessages();
 
   const result = await DB.rpc("get_overlapping_lesson", {
-    p_user_id: userId,
     p_lesson_id: lessonId,
     p_ends: ends,
     p_starts: starts,
@@ -80,25 +85,7 @@ export const getOverlappingLessons = async (
   return result.data;
 };
 
-export const deleteLessonById = async (id: string) => {
-  const t = await loadMessages();
-  const result = await DB.from("lessons").delete().eq("id", id);
-
-  if (result.error) throw new Error(t("failed_to_delete_lessons"));
-
-  return result;
-};
-export const deleteLessonsByds = async (ids: string[]) => {
-  const t = await loadMessages();
-  const result = await DB.rpc("delete_lessons_by_ids", {
-    p_lessons_ids: ids,
-  });
-
-  if (result.error) throw new Error(t("failed_to_delete_lessons"));
-
-  return result;
-};
-
+// CREATE
 export const createLesson = async (lesson: TablesInsert<"lessons">) => {
   const t = await loadMessages();
 
@@ -107,25 +94,7 @@ export const createLesson = async (lesson: TablesInsert<"lessons">) => {
   if (result.error) throw new Error(t("failed_to_create_lesson"));
 };
 
-export const upsertLesson = async (lesson: Lesson) => {
-  const t = await loadMessages();
-  const result = await DB.from("lessons").upsert(lesson).eq("id", lesson.id);
-
-  if (result.error) throw new Error(t("failed_to_save_lesson"));
-};
-
-export const deleteAllLessons = async (courseId: string, title = "") => {
-  const t = await loadMessages();
-  const result = await DB.from("lessons")
-    .delete()
-    .eq("course_id", courseId)
-    .ilike("title", `%${title}%`);
-
-  if (result.error) throw new Error(t("failed_to_delete_lessons"));
-
-  return result;
-};
-
+// UPDATE
 export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
   const t = await loadMessages();
 
@@ -143,18 +112,54 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
 };
 export const updateLesson = async (lesson: TablesUpdate<"lessons">) => {
   const t = await loadMessages();
+
   const result = await DB.from("lessons").update(lesson).eq("id", lesson.id);
 
   if (result.error) throw new Error(t("failed_to_update_lesson"));
 
   return result.data;
 };
-
-export const getLessonById = async (id: string) => {
+export const upsertLesson = async (lesson: Lesson) => {
   const t = await loadMessages();
-  const result = await DB.from("lessons").select("*").eq("id", id).single();
 
-  if (result.error) throw new Error(t("failed_to_load_lesson"));
+  const result = await DB.from("lessons").upsert(lesson).eq("id", lesson.id);
 
-  return result.data;
+  if (result.error) throw new Error(t("failed_to_save_lesson"));
+};
+
+// DELETE
+export const deleteLesson = async (id: string) => {
+  const t = await loadMessages();
+
+  const result = await DB.from("lessons").delete().eq("id", id);
+
+  if (result.error) throw new Error(t("failed_to_delete_lesson"));
+
+  return result;
+};
+export const deleteLessons = async (ids: string[]) => {
+  const t = await loadMessages();
+
+  const result = await DB.rpc("delete_lessons_by_ids", {
+    p_lessons_ids: ids,
+  });
+
+  if (result.error) throw new Error(t("failed_to_delete_lessons"));
+
+  return result;
+};
+export const deleteAllLessonsFromCourse = async (
+  courseId: string,
+  title = ""
+) => {
+  const t = await loadMessages();
+
+  const result = await DB.from("lessons")
+    .delete()
+    .eq("course_id", courseId)
+    .ilike("title", `%${title}%`);
+
+  if (result.error) throw new Error(t("failed_to_delete_lessons"));
+
+  return result;
 };

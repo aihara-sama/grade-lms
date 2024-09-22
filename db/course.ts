@@ -11,6 +11,7 @@ export const getCourses = async (
   to = COURSES_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
+
   const result = await DB.from("courses")
     .select("*, lessons(count), users(count)")
     .ilike("title", `%${title}%`)
@@ -24,6 +25,7 @@ export const getCourses = async (
 };
 export const getCoursesCount = async (title = "") => {
   const t = await loadMessages();
+
   const result = await DB.from("courses")
     .select("count")
     .ilike("title", `%${title}%`)
@@ -55,6 +57,7 @@ export const getUnenrolledCourses = async (
 };
 export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
   const t = await loadMessages();
+
   const result = await DB.rpc("get_unenrolled_courses", {
     p_user_id: userId,
     p_course_title: title,
@@ -77,17 +80,17 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
 };
 
 // Delete
-export const deleteCourseById = async (id: string) => {
+export const deleteCourse = async (id: string) => {
   const t = await loadMessages();
 
   const result = await DB.from("courses").delete().eq("id", id);
 
   if (result.error) throw new Error(t("failed_to_delete_course"));
 };
-export const deleteCoursesByIds = async (ids: string[]) => {
+export const deleteCourses = async (ids: string[]) => {
   const t = await loadMessages();
 
-  const result = await DB.from("courses").delete().in("id", ids);
+  const result = await DB.rpc("delete_courses_by_ids", { p_courses_ids: ids });
 
   if (result.error) throw new Error(t("failed_to_delete_courses"));
 };

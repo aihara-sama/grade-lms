@@ -7,6 +7,7 @@ export const createChatMessage = async (
   chatMessage: TablesInsert<"chat_messages">
 ) => {
   const t = await loadMessages();
+
   const result = await DB.from("chat_messages")
     .insert(chatMessage)
     .select("*, chat_files(*), author:users(*)")
@@ -19,6 +20,7 @@ export const createChatMessage = async (
 
 export const getChatMessages = async (lessonId: string) => {
   const t = await loadMessages();
+
   const result = await DB.from("chat_messages")
     .select("*, chat_files(*), author:users(*)")
     .eq("lesson_id", lessonId);

@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 import BaseModal from "@/components/common/modals/base-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
-import { getUserById, updateUser } from "@/db/user";
+import { getUser, updateUser } from "@/db/user";
 import { Role } from "@/enums/role.enum";
 import type { SelectItem } from "@/interfaces/select.interface";
 import clsx from "clsx";
@@ -41,7 +41,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
     setIsLoading(true);
 
     try {
-      setUserDetails(await getUserById(userId));
+      setUserDetails(await getUser(userId));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

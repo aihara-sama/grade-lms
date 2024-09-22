@@ -476,6 +476,12 @@ export type Database = {
         };
         Returns: undefined;
       };
+      delete_courses_by_ids: {
+        Args: {
+          p_courses_ids: string[];
+        };
+        Returns: undefined;
+      };
       delete_lesson_assignments: {
         Args: {
           p_lesson_id: string;
@@ -529,7 +535,6 @@ export type Database = {
         Args: {
           p_starts: string;
           p_ends: string;
-          p_user_id: string;
           p_lesson_id?: string;
         };
         Returns: {

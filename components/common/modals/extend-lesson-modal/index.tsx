@@ -4,7 +4,6 @@ import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
 import { extendLesson, getOverlappingLessons } from "@/db/lesson";
 import { useLesson } from "@/hooks/use-lesson";
-import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lesson.type";
 import clsx from "clsx";
 import { minutesToMilliseconds } from "date-fns";
@@ -24,7 +23,6 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useTranslations();
-  const { user } = useUser();
   const { setLesson } = useLesson();
 
   // Handlers
@@ -39,7 +37,6 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
           new Date(
             +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin)
           ).toISOString(),
-          user.id,
           lesson.id
         );
 

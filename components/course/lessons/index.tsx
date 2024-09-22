@@ -22,11 +22,11 @@ import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { LESSONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
-  deleteAllLessons,
-  deleteLessonById,
-  deleteLessonsByds as deleteLessonsByIds,
-  getLessonsByCourseId,
-  getLessonsCountByCourseId,
+  deleteAllLessonsFromCourse,
+  deleteLesson,
+  deleteLessons as deleteLessonsByIds,
+  getCourseLessons,
+  getCourseLessonsCount,
 } from "@/db/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
@@ -89,8 +89,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
     try {
       const [fetchedLessons, fetchedLessonsCount] = await Promise.all([
-        getLessonsByCourseId(courseId),
-        getLessonsCountByCourseId(courseId),
+        getCourseLessons(courseId),
+        getCourseLessonsCount(courseId),
       ]);
 
       setLessons(fetchedLessons);
@@ -108,8 +108,8 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
     try {
       const [fetchedLessons, fetchedLessonsCount] = await Promise.all([
-        getLessonsByCourseId(courseId, search),
-        getLessonsCountByCourseId(courseId, search),
+        getCourseLessons(courseId, search),
+        getCourseLessonsCount(courseId, search),
       ]);
 
       setLessons(fetchedLessons);
@@ -130,7 +130,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       const from = lessonsOffsetRef.current;
       const to = lessonsOffsetRef.current + LESSONS_GET_LIMIT - 1;
 
-      const fetchedLessons = await getLessonsByCourseId(
+      const fetchedLessons = await getCourseLessons(
         courseId,
         searchText,
         from,
@@ -156,7 +156,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
     setIsSubmittingDeleteLesson(true);
 
     try {
-      await deleteLessonById(selectedLessonId);
+      await deleteLesson(selectedLessonId);
 
       setIsDeleteLessonModalOpen(false);
       setSelectedLessonsIds((_) => _.filter((id) => id !== selectedLessonId));
@@ -174,7 +174,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
 
     try {
       await (isSelectedAll
-        ? deleteAllLessons(courseId, searchText)
+        ? deleteAllLessonsFromCourse(courseId, searchText)
         : deleteLessonsByIds(selectedLessonsIds));
 
       setSelectedLessonsIds([]);

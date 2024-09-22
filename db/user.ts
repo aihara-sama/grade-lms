@@ -11,7 +11,7 @@ import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import { parseUsersCoursesIds } from "@/utils/parse/parse-users-courses-ids";
 
 // Get
-export const getUserById = async (id: string) => {
+export const getUser = async (id: string) => {
   const t = await loadMessages();
 
   const result = await DB.from("users").select("*").eq("id", id).single();

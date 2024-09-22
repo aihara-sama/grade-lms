@@ -91,8 +91,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     try {
       const overlappingLesson = await getOverlappingLessons(
         lesson.starts,
-        lesson.ends,
-        user.id
+        lesson.ends
       );
 
       if (overlappingLesson.length) throw new Error(t("lesson_overlaps"));

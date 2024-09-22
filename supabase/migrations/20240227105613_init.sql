@@ -286,7 +286,6 @@ $$ language plpgsql;
 create or replace function get_overlapping_lesson(
     p_starts timestamp, 
     p_ends timestamp,
-    p_user_id uuid, 
     p_lesson_id uuid DEFAULT NULL
 )
 returns setof lessons as $$
@@ -295,7 +294,7 @@ begin
     select l.*
     from lessons l
     join user_courses uc on l.course_id = uc.course_id
-    where uc.user_id = p_user_id
+    where uc.user_id = auth.uid()
       and (
           (l.starts <= p_starts and l.ends > p_starts) -- Case 1: Existing lesson overlaps at the start
           or
@@ -373,6 +372,17 @@ BEGIN
   ON CONFLICT DO NOTHING;  -- In case the user is already enrolled in the course, avoid errors
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION public.delete_courses_by_ids(p_courses_ids uuid[])
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.courses
+  WHERE id = ANY(p_courses_ids);
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 CREATE OR REPLACE FUNCTION public.delete_lessons_by_ids(p_lessons_ids uuid[])
 RETURNS void AS $$

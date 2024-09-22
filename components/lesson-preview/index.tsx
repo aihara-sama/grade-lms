@@ -93,7 +93,6 @@ const LessonPreview: FunctionComponent = () => {
       const overlappingLessons = await getOverlappingLessons(
         starts.toISOString(),
         ends.toISOString(),
-        user.id,
         lesson.id
       );
 

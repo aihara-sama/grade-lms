@@ -26,8 +26,8 @@ import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllCourses,
-  deleteCourseById,
-  deleteCoursesByIds,
+  deleteCourse,
+  deleteCourses,
   getCourses,
   getCoursesCount,
 } from "@/db/course";
@@ -150,7 +150,7 @@ const Courses: FunctionComponent = () => {
     setIsSubmittingDeleteCourse(true);
 
     try {
-      await deleteCourseById(selectedCourseId);
+      await deleteCourse(selectedCourseId);
 
       setIsDeleteCourseModalOpen(false);
       setSelectedCoursesIds((_) => _.filter((id) => id !== selectedCourseId));
@@ -169,7 +169,7 @@ const Courses: FunctionComponent = () => {
     try {
       await (isSelectedAll
         ? deleteAllCourses(searchText)
-        : deleteCoursesByIds(selectedCoursesIds));
+        : deleteCourses(selectedCoursesIds));
 
       setSelectedCoursesIds([]);
       setIsDeleteCoursesModalOpen(false);
