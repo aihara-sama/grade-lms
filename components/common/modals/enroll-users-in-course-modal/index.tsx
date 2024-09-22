@@ -13,7 +13,7 @@ import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
 import {
-  enrollAllUsers,
+  enrollAllUsersInCourses,
   enrollUsersInCourses,
   getUsersNotInCourse,
   getUsersNotInCourseCount,
@@ -142,7 +142,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     setIsSubmiotting(true);
     try {
       await (isSelectedAll
-        ? enrollAllUsers(courseId)
+        ? enrollAllUsersInCourses([courseId])
         : enrollUsersInCourses(usersIds, [courseId]));
       onClose(true);
       toast(t("users_enrolled"));

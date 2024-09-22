@@ -20,10 +20,10 @@ import Total from "@/components/total";
 import EnrollUsers from "@/components/users/enroll-users";
 import { MEMBERS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
-  dispelAllUsers,
-  dispelUsers,
-  getUsersByCourseId,
-  getUsersByCourseIdCount,
+  deleteAllUsersFromCourse,
+  deleteUsersFromCourse,
+  getCourseUsers,
+  getCourseUsersCount,
 } from "@/db/user";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
@@ -89,8 +89,8 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
 
     try {
       const [fetchedMembers, fetchedMembersCount] = await Promise.all([
-        getUsersByCourseId(courseId),
-        getUsersByCourseIdCount(courseId),
+        getCourseUsers(courseId),
+        getCourseUsersCount(courseId),
       ]);
 
       setMembers(fetchedMembers);
@@ -109,8 +109,8 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
 
     try {
       const [fetchedMembers, fetchedUsersMembers] = await Promise.all([
-        getUsersByCourseId(courseId, search),
-        getUsersByCourseIdCount(courseId, search),
+        getCourseUsers(courseId, search),
+        getCourseUsersCount(courseId, search),
       ]);
 
       setMembers(fetchedMembers);
@@ -131,7 +131,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       const from = membersOffsetRef.current;
       const to = membersOffsetRef.current + MEMBERS_GET_LIMIT - 1;
 
-      const fetchedMembers = await getUsersByCourseId(
+      const fetchedMembers = await getCourseUsers(
         courseId,
         searchText,
         from,
@@ -157,7 +157,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
     setIsSubmittingDispelMember(true);
 
     try {
-      await dispelUsers(courseId, [selectedMemberId]);
+      await deleteUsersFromCourse(courseId, [selectedMemberId]);
 
       setIsDispelMemberModalOpen(false);
       setSelectedMembersIds((_) => _.filter((id) => id !== selectedMemberId));
@@ -175,8 +175,8 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
 
     try {
       await (isSelectedAll
-        ? dispelAllUsers(courseId, searchText)
-        : dispelUsers(courseId, selectedMembersIds));
+        ? deleteAllUsersFromCourse(courseId, searchText)
+        : deleteUsersFromCourse(courseId, selectedMembersIds));
 
       setSelectedMembersIds([]);
       setIsDispelMembersModalOpen(false);

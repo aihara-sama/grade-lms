@@ -27,10 +27,10 @@ import Skeleton from "@/components/skeleton";
 import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
 import {
   deleteAllUsers,
-  deleteUserById,
-  deleteUsersByIds,
-  getUsersByCeratorId,
-  getUsersByCreatorIdCount,
+  deleteUser,
+  deleteUsers,
+  getUsers,
+  getUsersCount,
 } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/user.type";
@@ -43,7 +43,6 @@ import type { FunctionComponent } from "react";
 const Users: FunctionComponent = () => {
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
 
   // State
   const [users, setUsers] = useState<User[]>([]);
@@ -70,6 +69,7 @@ const Users: FunctionComponent = () => {
 
   // Refs
   const usersOffsetRef = useRef(0);
+  const { user } = useUser();
 
   // Vars
   const isData = !!users.length && !isLoading;
@@ -94,12 +94,12 @@ const Users: FunctionComponent = () => {
 
     try {
       const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsersByCeratorId(user.id),
-        getUsersByCreatorIdCount(user.id),
+        getUsers(),
+        getUsersCount(),
       ]);
 
-      setUsers(fetchedUsers);
-      setUsersCount(fetchedUsersCount);
+      setUsers(fetchedUsers.filter(({ id }) => id !== user.id));
+      setUsersCount(fetchedUsersCount - 1);
 
       usersOffsetRef.current = fetchedUsers.length;
     } catch (error: any) {
@@ -113,12 +113,12 @@ const Users: FunctionComponent = () => {
 
     try {
       const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsersByCeratorId(user.id, search),
-        getUsersByCreatorIdCount(user.id, search),
+        getUsers(search),
+        getUsersCount(search),
       ]);
 
-      setUsers(fetchedUsers);
-      setUsersCount(fetchedUsersCount);
+      setUsers(fetchedUsers.filter(({ id }) => id !== user.id));
+      setUsersCount(fetchedUsersCount - 1);
 
       setIsSelectedAll(false);
       setUsersIds([]);
@@ -135,12 +135,7 @@ const Users: FunctionComponent = () => {
       const from = usersOffsetRef.current;
       const to = usersOffsetRef.current + USERS_GET_LIMIT - 1;
 
-      const fetchedUsers = await getUsersByCeratorId(
-        user.id,
-        searchText,
-        from,
-        to
-      );
+      const fetchedUsers = await getUsers(searchText, from, to);
 
       setUsers((prev) => [...prev, ...fetchedUsers]);
 
@@ -158,7 +153,7 @@ const Users: FunctionComponent = () => {
     setIsSubmittingDeleteUser(true);
 
     try {
-      await deleteUserById(userId);
+      await deleteUser(userId);
 
       setIsDeleteUserModal(false);
       setUsersIds((_) => _.filter((id) => id !== userId));
@@ -176,8 +171,8 @@ const Users: FunctionComponent = () => {
 
     try {
       await (isSelectedAll
-        ? deleteAllUsers(user.id, searchText)
-        : deleteUsersByIds(usersIds));
+        ? deleteAllUsers(searchText)
+        : deleteUsers(usersIds));
 
       setUsersIds([]);
       setIsDeleteUsersModal(false);

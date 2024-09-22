@@ -1,11 +1,16 @@
 "use server";
 
-import type { ReturnType } from "@/actions/delete-user-action/types";
+import { DeleteUsers } from "@/actions/delete-all-users-action/schema";
+import type {
+  InputType,
+  ReturnType,
+} from "@/actions/delete-all-users-action/types";
 import { Role } from "@/enums/role.enum";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import { createSafeAction } from "@/utils/validation/create-safe-action";
 
-const handler = async (usersIds: string[]): Promise<ReturnType> => {
+const handler = async (payload: InputType): Promise<ReturnType> => {
   const serverDB = getServerDB();
 
   const user = await serverDB.auth.getUser();
@@ -25,7 +30,10 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
   }
 
   // Ensure user is authorized
-  const users = await serverDB.from("users").select("id").in("id", usersIds);
+  const users = await serverDB
+    .from("users")
+    .select("id")
+    .ilike("name", `%${payload.userName}%`);
 
   const result = await Promise.all(
     users.data.map(({ id }) => adminDB.auth.admin.deleteUser(id))
@@ -39,4 +47,4 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
   };
 };
 
-export const deleteUserAction = handler;
+export const deleteAllUsersAction = createSafeAction(DeleteUsers, handler);

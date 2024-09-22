@@ -464,12 +464,6 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      delete_all_courses: {
-        Args: {
-          p_title: string;
-        };
-        Returns: undefined;
-      };
       delete_assignments_by_ids: {
         Args: {
           p_assignments_ids: string[];
@@ -479,12 +473,6 @@ export type Database = {
       delete_auth_users_by_ids: {
         Args: {
           user_ids: string[];
-        };
-        Returns: undefined;
-      };
-      delete_courses_by_ids: {
-        Args: {
-          p_courses_ids: string[];
         };
         Returns: undefined;
       };
@@ -518,12 +506,6 @@ export type Database = {
         Args: {
           p_course_id: string;
           p_users_ids: string[];
-        };
-        Returns: undefined;
-      };
-      enroll_all_users: {
-        Args: {
-          p_course_id: string;
         };
         Returns: undefined;
       };

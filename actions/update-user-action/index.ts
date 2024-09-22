@@ -1,7 +1,7 @@
 "use server";
 
-import { EditUser } from "@/actions/edit-user-action/schema";
-import type { InputType, ReturnType } from "@/actions/edit-user-action/types";
+import { UpdateUser } from "@/actions/update-user-action/schema";
+import type { InputType, ReturnType } from "@/actions/update-user-action/types";
 import { Role } from "@/enums/role.enum";
 import type { UserMetadata } from "@/interfaces/user.interface";
 import { adminDB } from "@/lib/supabase/db/admin-db";
@@ -9,7 +9,7 @@ import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/validation/create-safe-action";
 
 const handler = async (payload: InputType): Promise<ReturnType> => {
-  const { password, ...restPayload } = payload;
+  const { password } = payload;
 
   const serverDB = getServerDB();
 
@@ -33,9 +33,8 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
 
   const { error: profileError, data } = await serverDB
     .from("users")
-    .update(restPayload)
-    .eq("id", payload.id)
     .select("id")
+    .eq("id", payload.id)
     .maybeSingle();
 
   if (profileError) {
@@ -45,9 +44,10 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
+  // Did not pass RLS
   if (!data) {
     return {
-      error: "Something went wrong",
+      error: "Forbidden",
       data: null,
     };
   }
@@ -70,4 +70,4 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
   };
 };
 
-export const editUserAction = createSafeAction(EditUser, handler);
+export const updateUserAction = createSafeAction(UpdateUser, handler);

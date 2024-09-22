@@ -2,7 +2,7 @@
 
 import tz from "timezones-list";
 
-import type { InputType as UserInputType } from "@/actions/edit-user-action/types";
+import type { InputType as UserInputType } from "@/actions/update-user-action/types";
 import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CameraIcon from "@/components/icons/camera-icon";
@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 import BaseModal from "@/components/common/modals/base-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
-import { editUser, getUserById } from "@/db/user";
+import { getUserById, updateUser } from "@/db/user";
 import { Role } from "@/enums/role.enum";
 import type { SelectItem } from "@/interfaces/select.interface";
 import clsx from "clsx";
@@ -52,7 +52,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
   const submitEditUser = async () => {
     setIsSubmitting(true);
     try {
-      await editUser({
+      await updateUser({
         avatar: userDetails.avatar,
         email: userDetails.email,
         id: userDetails.id,

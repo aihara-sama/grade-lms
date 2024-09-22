@@ -135,6 +135,29 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+
+/**
+* This trigger automatically update a user entry when a user updates via Supabase Auth.
+*/ 
+create function public.handle_update_user() 
+returns trigger as $$
+begin
+  update public.users
+  set
+    name = new.raw_user_meta_data->>'name',
+    avatar = new.raw_user_meta_data->>'avatar',
+    preferred_locale = new.raw_user_meta_data->>'preferred_locale',
+    timezone = new.raw_user_meta_data->>'timezone',
+    is_emails_on = (new.raw_user_meta_data->>'is_emails_on')::boolean,
+    is_push_notifications_on = (new.raw_user_meta_data->>'is_push_notifications_on')::boolean
+  where id = new.id;
+  return new;
+end;
+$$ language plpgsql security definer;
+create trigger on_auth_user_updated
+  after update on auth.users
+  for each row execute procedure public.handle_update_user();
+
 -- Create a trigger function to insert into user_courses table
 create function insert_user_course()
 returns trigger as $$
@@ -316,19 +339,6 @@ AS $$
       WHERE sn.user_id = u.id
     );
 $$;
-
-CREATE OR REPLACE FUNCTION enroll_all_users(p_course_id uuid)
-RETURNS void AS $$
-BEGIN
-  -- Insert all users with the same creator_id as auth.uid() into user_courses table
-  INSERT INTO public.user_courses (user_id, course_id, created_at)
-  SELECT u.id, p_course_id, NOW()
-  FROM public.users u
-  WHERE u.creator_id = auth.uid()::text
-  ON CONFLICT DO NOTHING;  -- In case the user is already enrolled in the course, avoid errors
-END;
-$$ LANGUAGE plpgsql;
-
 
 create function public.dispel_all_users_from_course(
     p_course_id uuid,
