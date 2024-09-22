@@ -80,7 +80,7 @@ create table submissions (
 create table notifications (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
-  recipient_id uuid references public.users on delete SET NULL,
+  recipient_id text not null,
   user_id uuid references public.users on delete SET NULL,
   course_id uuid references public.courses on delete SET NULL,
   lesson_id uuid references public.lessons on delete SET NULL,
@@ -184,7 +184,7 @@ BEGIN
   FROM assignments a
   JOIN lessons l ON a.lesson_id = l.id
   JOIN courses c ON l.course_id = c.id
-  JOIN users u ON u.id = c.creator_id  -- Get the creator of the course
+  JOIN users u ON u.id::text = c.creator_id  -- Get the creator of the course
   WHERE a.id = NEW.assignment_id;
 
   RETURN NEW;
@@ -227,8 +227,8 @@ BEGIN
     RAISE NOTICE 'Creating notification for user: %', assigned_user.user_id;
 
     -- Insert the notification
-    INSERT INTO notifications (user_id, course_id, lesson_id, assignment_id, created_at, type, is_read)
-    VALUES (assigned_user.user_id, lesson_course_id, NEW.lesson_id, NEW.id, NOW(), 'Assignment', FALSE);
+    INSERT INTO notifications (recipient_id, user_id, course_id, lesson_id, assignment_id, created_at, type, is_read)
+    VALUES (assigned_user.user_id::text, assigned_user.user_id, lesson_course_id, NEW.lesson_id, NEW.id, NOW(), 'Assignment', FALSE);
   END LOOP;
 
   RETURN NEW;
@@ -768,7 +768,7 @@ ON public.notifications
 FOR SELECT
 TO authenticated
 USING (
- recipient_id = auth.uid()
+ recipient_id = auth.uid()::text
 );
 
 -- Chat messagees' policies

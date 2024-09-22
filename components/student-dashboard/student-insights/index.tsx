@@ -2,21 +2,18 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
+import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
-import type { User } from "@supabase/supabase-js";
 import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface Props {
-  user: User;
-}
-
-const StudentInsights: FunctionComponent<Props> = ({ user }) => {
+const StudentInsights: FunctionComponent = () => {
+  const { user } = useUser();
   // State
   const [assignmentsInsights, setAssignmentsInsights] = useState<number[]>([]);
   const [submissionsInsights, setSubmissionsInsights] = useState<number[]>([]);

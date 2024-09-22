@@ -1,10 +1,14 @@
 import StudentrDashboard from "@/components/student-dashboard";
 import TeacherDashboard from "@/components/teacher-dashboard";
+import {
+  getAssignmentsCount,
+  getLatestAssignments,
+} from "@/db/server/assignment";
 import { getCoursesCount, getLatestCourses } from "@/db/server/course";
+import { getSubmissionsCount } from "@/db/server/submission";
 import { getMyUsersCount } from "@/db/server/user";
 import { Role } from "@/enums/role.enum";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
-import { extractAssignmentsCount } from "@/utils/parse/extract-assignments-count";
 import type { ReactNode } from "react";
 
 const Page = async () => {
@@ -33,22 +37,18 @@ const Page = async () => {
   }
 
   if (user.user_metadata.role === Role.Student) {
-    const [{ data: courses }, { data: submissions }] = await Promise.all([
-      serverDB
-        .from("courses")
-        .select("lessons(assignments(count))")
-        .returns<Record<"lessons", { assignments: { count: number }[] }[]>[]>(),
-      serverDB
-        .from("submissions")
-        .select("count")
-        .returns<{ count: number }[]>(),
-    ]);
+    const [assignmentsCount, submissionsCount, latestAssignments] =
+      await Promise.all([
+        getAssignmentsCount(),
+        getSubmissionsCount(),
+        getLatestAssignments(),
+      ]);
 
     Dashborad = (
       <StudentrDashboard
-        user={user}
-        totalAssignmentsCount={extractAssignmentsCount(courses)}
-        totalSubmissionsCount={submissions[0].count}
+        assignmentsCount={assignmentsCount}
+        submissionsCount={submissionsCount}
+        latestAssignments={latestAssignments}
       />
     );
   }

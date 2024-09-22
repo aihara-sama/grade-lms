@@ -53,6 +53,19 @@ export const getLessonAssignmentsCount = async (
   return result.data.count;
 };
 
+export const getLatestAssignments = async () => {
+  const t = await loadMessages();
+
+  const result = await DB.from("courses")
+    .select("lessons(assignments(*))")
+    .limit(ASSIGNMENTS_GET_LIMIT)
+    .order("created_at", { ascending: false });
+
+  if (result.error) throw new Error(t("failed_to_load_assignments"));
+
+  return result.data;
+};
+
 // CREATE
 export const createAssignment = async (
   assignment: TablesInsert<"assignments">
