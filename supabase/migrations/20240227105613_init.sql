@@ -86,6 +86,7 @@ create table submissions (
 create table notifications (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
+  recipient_id uuid references public.users on delete SET NULL,
   user_id uuid references public.users on delete SET NULL,
   course_id uuid references public.courses on delete SET NULL,
   lesson_id uuid references public.lessons on delete SET NULL,
@@ -175,31 +176,35 @@ after insert on courses
 for each row execute function insert_user_course();
 
 
-CREATE OR REPLACE FUNCTION notify_on_submission()
+CREATE OR REPLACE FUNCTION create_submission_notification()
 RETURNS TRIGGER AS $$
 BEGIN
   -- Insert notification
-  INSERT INTO notifications (user_id, course_id, type, is_read)
+  INSERT INTO notifications (recipient_id, user_id, course_id, type, is_read)
   SELECT 
+    u.id,                     -- Recipient ID (user_id of the course creator)
     auth.uid(),               -- Current user who created the submission
     l.course_id,              -- Course ID
     'Submission',             -- Type of notification
     false                     -- Mark as unread
   FROM assignments a
   JOIN lessons l ON a.lesson_id = l.id
+  JOIN courses c ON l.course_id = c.id
+  JOIN users u ON u.id = c.creator_id  -- Get the creator of the course
   WHERE a.id = NEW.assignment_id;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+
 CREATE TRIGGER on_submission_created
 AFTER INSERT ON submissions
 FOR EACH ROW
-EXECUTE FUNCTION notify_on_submission();
+EXECUTE FUNCTION create_submission_notification();
 
 -- Function to create notifications after an assignment is created
-CREATE OR REPLACE FUNCTION notify_users_on_assignment()
+CREATE OR REPLACE FUNCTION create_assignment_notification()
 RETURNS TRIGGER AS $$
 DECLARE
   lesson_course_id UUID;  -- Renamed to avoid ambiguity
@@ -236,7 +241,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
+CREATE TRIGGER on_assignment_created
+AFTER INSERT ON assignments
+FOR EACH ROW
+EXECUTE FUNCTION create_assignment_notification();
 
 create or replace function public.get_users_not_in_course(p_course_id uuid, p_user_name text)
 returns setof public.users as $$
@@ -760,12 +768,7 @@ ON public.notifications
 FOR SELECT
 TO authenticated
 USING (
-  EXISTS (
-    SELECT 1
-    FROM user_courses uc
-    WHERE uc.user_id = auth.uid()
-      AND uc.course_id = course_id
-  )
+ recipient_id = auth.uid()
 );
 
 -- Chat messagees' policies

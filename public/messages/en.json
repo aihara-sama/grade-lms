@@ -24,6 +24,7 @@
   "failed_to_save_lesson": "Failed to save lesson",
   "failed_to_load_lessons": "Failed to load lessons",
   "failed_to_load_lesson": "Failed to load lesson",
+  "failed_to_load_submission": "Failed to load submission",
   "failed_to_load_user": "Failed to load user",
   "failed_to_upload_file": "Failed to upload file",
   "failed_to_extend_lesson": "Failed to extend lesson",

@@ -8,7 +8,6 @@ import { NOTIFICATIONS_GET_LIMIT } from "@/constants";
 import { getNotifications } from "@/db/notification";
 import { Event } from "@/enums/event.enum";
 import { useNotificationChannel } from "@/hooks/use-notification-channel";
-import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
@@ -33,7 +32,6 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
 
   // Hooks
   const notificationChannel = useNotificationChannel();
-  const { user } = useUser();
 
   // Refs
   const notificationsOffsetRef = useRef(0);
@@ -51,7 +49,6 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
   const fetchNotifications = async () => {
     try {
       const fetchedNotifications = await getNotifications(
-        user.id,
         notificationsOffsetRef.current,
         notificationsOffsetRef.current + NOTIFICATIONS_GET_LIMIT - 1
       );

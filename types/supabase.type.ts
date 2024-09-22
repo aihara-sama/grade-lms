@@ -234,6 +234,7 @@ export type Database = {
           id: string;
           is_read: boolean;
           lesson_id: string | null;
+          recipient_id: string | null;
           submission_id: string | null;
           type: string;
           user_id: string | null;
@@ -245,6 +246,7 @@ export type Database = {
           id?: string;
           is_read: boolean;
           lesson_id?: string | null;
+          recipient_id?: string | null;
           submission_id?: string | null;
           type: string;
           user_id?: string | null;
@@ -256,6 +258,7 @@ export type Database = {
           id?: string;
           is_read?: boolean;
           lesson_id?: string | null;
+          recipient_id?: string | null;
           submission_id?: string | null;
           type?: string;
           user_id?: string | null;
@@ -280,6 +283,13 @@ export type Database = {
             columns: ["lesson_id"];
             isOneToOne: false;
             referencedRelation: "lessons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey";
+            columns: ["recipient_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
           {

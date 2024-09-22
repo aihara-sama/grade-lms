@@ -2,7 +2,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { getSubmissionById, updateSubmission } from "@/db/submission";
+import { getSubmission, updateSubmission } from "@/db/submission";
 import type { ResultOf } from "@/types/utils.type";
 import type { OutputData } from "@editorjs/editorjs";
 import clsx from "clsx";
@@ -25,7 +25,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
   onClose,
 }) => {
   const [submission, setSubmission] =
-    useState<ResultOf<typeof getSubmissionById>>();
+    useState<ResultOf<typeof getSubmission>>();
   const [isSubmitting, setIsSUbmitting] = useState(false);
 
   const t = useTranslations();
@@ -35,7 +35,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
 
   const fetchSubmission = async () => {
     try {
-      const submissionData = await getSubmissionById(submissionId);
+      const submissionData = await getSubmission(submissionId);
       setSubmission(submissionData);
     } catch (error: any) {
       toast.error(error.message);

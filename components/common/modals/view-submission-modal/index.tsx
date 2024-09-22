@@ -5,7 +5,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import StarIcon from "@/components/icons/star-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { getSubmissionById, updateSubmissionGrade } from "@/db/submission";
+import { getSubmission, updateSubmission } from "@/db/submission";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -35,7 +35,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
   const submitUpdateGrade = async () => {
     setIsSubmitting(true);
     try {
-      await updateSubmissionGrade(submissionId, grade);
+      await updateSubmission({ ...submission, grade });
 
       onClose(true);
       toast.success(t("grade_updated"));
@@ -48,7 +48,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
 
   const fetchSubmission = async () => {
     try {
-      const submissionData = await getSubmissionById(submissionId);
+      const submissionData = await getSubmission(submissionId);
       setSubmission(submissionData);
       setGrade(submissionData.grade);
     } catch (error: any) {

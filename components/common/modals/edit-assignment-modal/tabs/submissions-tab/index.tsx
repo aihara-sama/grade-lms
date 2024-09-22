@@ -15,13 +15,11 @@ import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import { SUBMISSIONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
-  deleteAllMySubmissions,
-  deleteSubmissionById,
-  deleteSubmissionsByIds,
+  deleteAllSubmissions,
+  deleteSubmission,
+  deleteSubmissions,
   getAssignmentSubmissions,
   getAssignmentSubmissionsCount,
-  getUserSubmissions,
-  getUserSubmissionsCount,
 } from "@/db/submission";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
@@ -101,11 +99,11 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       const [fetchedSubmissions, fetchedSubmissionsCount] = await Promise.all([
         user.role === Role.Teacher
           ? getAssignmentSubmissions(assignmentId)
-          : getUserSubmissions(user.id, assignmentId),
+          : getAssignmentSubmissions(assignmentId),
 
         user.role === Role.Teacher
           ? getAssignmentSubmissionsCount(assignmentId)
-          : getUserSubmissionsCount(user.id, assignmentId),
+          : getAssignmentSubmissionsCount(assignmentId),
       ]);
 
       setSubmissions(fetchedSubmissions);
@@ -128,11 +126,11 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       const [fetchedSubmissions, fetchedSubmissionsCount] = await Promise.all([
         user.role === Role.Teacher
           ? getAssignmentSubmissions(assignmentId, search)
-          : getUserSubmissions(user.id, assignmentId, search),
+          : getAssignmentSubmissions(assignmentId, search),
 
         user.role === Role.Teacher
           ? getAssignmentSubmissionsCount(assignmentId, search)
-          : getUserSubmissionsCount(user.id, assignmentId, search),
+          : getAssignmentSubmissionsCount(assignmentId, search),
       ]);
 
       setSubmissions(fetchedSubmissions);
@@ -155,7 +153,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
       const fetchedSubmissions = await (user.role === Role.Teacher
         ? getAssignmentSubmissions(assignmentId, searchText, from, to)
-        : getUserSubmissions(user.id, assignmentId, searchText, from, to));
+        : getAssignmentSubmissions(assignmentId, searchText, from, to));
 
       setSubmissions((prev) => [...prev, ...fetchedSubmissions]);
 
@@ -176,7 +174,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsSubmittingDelSubmission(true);
 
     try {
-      await deleteSubmissionById(submissionId);
+      await deleteSubmission(submissionId);
 
       setIsDelSubmissionModal(false);
       setSubmissionsIds((_) => _.filter((id) => id !== submissionId));
@@ -194,8 +192,8 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
     try {
       await (isSelectedAll
-        ? deleteAllMySubmissions(user.id, searchText)
-        : deleteSubmissionsByIds(submissionsIds));
+        ? deleteAllSubmissions(searchText)
+        : deleteSubmissions(submissionsIds));
 
       setSubmissionsIds([]);
       setIsDelSubmissionsModal(false);
