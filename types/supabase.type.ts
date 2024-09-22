@@ -159,7 +159,7 @@ export type Database = {
           fcm_token: string;
           id?: string;
           updated_at?: string;
-          user_id: string;
+          user_id?: string;
         };
         Update: {
           created_at?: string;

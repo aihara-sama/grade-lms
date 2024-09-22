@@ -9,6 +9,8 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
     data: { user },
   } = await getServerDB().auth.getUser();
 
+  console.log({ user });
+
   return (
     <div className="h-full flex-col">
       <UserProvider user={user}>

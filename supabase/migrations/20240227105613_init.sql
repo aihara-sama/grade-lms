@@ -22,7 +22,7 @@ create table users (
 
 CREATE TABLE fcm_tokens (
   id uuid not null primary key DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES public.users ON DELETE CASCADE NOT NULL,
+  user_id uuid REFERENCES public.users ON DELETE CASCADE NOT NULL default auth.uid(),
   fcm_token text NOT NULL,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()
@@ -121,7 +121,7 @@ create table sent_announcements (
 create function public.handle_new_user() 
 returns trigger as $$
 begin
-  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone, is_emails_on, is_push_notifications_on)
+  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone)
   values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone');
   return new;
 end;
@@ -152,26 +152,6 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_updated
   after update on auth.users
   for each row execute procedure public.handle_update_user();
-
-CREATE OR REPLACE FUNCTION public.enable_push_notifications()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Update the corresponding user's is_push_notifications_on to true
-  UPDATE public.users
-  SET is_push_notifications_on = true
-  WHERE id = NEW.user_id;
-
-  -- Return the newly inserted row for fcm_tokens table
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER on_fcm_token_created
-AFTER INSERT ON public.fcm_tokens
-FOR EACH ROW
-EXECUTE FUNCTION public.enable_push_notifications();
-
-
 
 -- Create a trigger function to insert into user_courses table
 create function insert_user_course()

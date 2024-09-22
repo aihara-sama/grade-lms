@@ -16,10 +16,12 @@ import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { Locale } from "@/i18n";
 import { DEFAULT_LOCALE, locales } from "@/i18n";
+import { messaging } from "@/lib/firebase/messaging";
 import { DB } from "@/lib/supabase/db";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import type { UserMetadata } from "@supabase/supabase-js";
 import clsx from "clsx";
+import { getToken } from "firebase/messaging";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
@@ -118,18 +120,42 @@ const Profile: FunctionComponent = () => {
     ]);
   }, [isEmailsOn]);
   useUpdateEffect(() => {
-    Promise.all([
-      DB.from("users")
-        .update({
-          is_push_notifications_on: isPushNotificationsOn,
-        })
-        .eq("id", user.id),
-      DB.auth.updateUser({
-        data: {
-          is_push_notifications_on: isPushNotificationsOn,
-        },
-      }),
-    ]);
+    if (isPushNotificationsOn) {
+      Notification.requestPermission().then(async (permission) => {
+        if (permission === "granted") {
+          const { data } = await DB.from("fcm_tokens")
+            .select("fcm_token")
+            .maybeSingle();
+
+          if (!data)
+            getToken(messaging, {
+              vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
+            }).then((token) => {
+              Promise.all([
+                DB.from("fcm_tokens").insert({
+                  fcm_token: token,
+                  user_id: user.id,
+                }),
+              ])
+                .then(() => toast.success("Notifications enabled!"))
+                .catch(console.error);
+            });
+
+          Promise.all([
+            DB.from("users")
+              .update({
+                is_push_notifications_on: isPushNotificationsOn,
+              })
+              .eq("id", user.id),
+            DB.auth.updateUser({
+              data: {
+                is_push_notifications_on: isPushNotificationsOn,
+              },
+            }),
+          ]);
+        }
+      });
+    }
   }, [isPushNotificationsOn]);
 
   const submitChangePreferredLocale = async (_locale: Locale) => {

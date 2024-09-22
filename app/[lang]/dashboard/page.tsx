@@ -1,7 +1,7 @@
 import StudentrDashboard from "@/components/student-dashboard";
 import TeacherDashboard from "@/components/teacher-dashboard";
 import { getCoursesCount, getLatestCourses } from "@/db/server/course";
-import { getUsersCount } from "@/db/server/user";
+import { getMyUsersCount } from "@/db/server/user";
 import { Role } from "@/enums/role.enum";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { extractAssignmentsCount } from "@/utils/parse/extract-assignments-count";
@@ -18,14 +18,14 @@ const Page = async () => {
 
   if (user.user_metadata.role === Role.Teacher) {
     const [usersCount, coursesCount, latestCourses] = await Promise.all([
-      getUsersCount(),
+      getMyUsersCount(user.id),
       getCoursesCount(),
       getLatestCourses(),
     ]);
 
     Dashborad = (
       <TeacherDashboard
-        usersCount={usersCount - 1}
+        usersCount={usersCount}
         coursesCount={coursesCount}
         latestCourses={latestCourses}
       />
