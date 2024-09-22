@@ -1,6 +1,6 @@
 import Avatar from "@/components/avatar";
 import File from "@/components/file";
-import type { getChatMessages } from "@/db/message";
+import type { getChatMessages } from "@/db/chat-message";
 import { DB } from "@/lib/supabase/db";
 import type { ChatFile } from "@/types/chat-file.type";
 import type { ResultOf } from "@/types/utils.type";

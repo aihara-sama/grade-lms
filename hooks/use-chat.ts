@@ -1,6 +1,6 @@
 "use client";
 
-import type { getChatMessages } from "@/db/message";
+import type { getChatMessages } from "@/db/chat-message";
 import type { ResultOf } from "@/types/utils.type";
 import { create } from "zustand";
 

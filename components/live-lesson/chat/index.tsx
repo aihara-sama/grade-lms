@@ -7,7 +7,7 @@ import CreateFileMessageModal from "@/components/common/modals/create-file-messa
 import ChatIcon from "@/components/icons/chat-icon";
 import SendMessageIcon from "@/components/icons/send-message-icon";
 import Message from "@/components/live-lesson/chat/message";
-import { createChatMessage, getChatMessages } from "@/db/message";
+import { createChatMessage, getChatMessages } from "@/db/chat-message";
 import { Event } from "@/enums/event.enum";
 import { useChat } from "@/hooks/use-chat";
 import { useChatChannel } from "@/hooks/use-chat-channel";

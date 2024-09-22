@@ -1,6 +1,6 @@
 "use client";
 
-import { getChatMessages } from "@/db/message";
+import { getChatMessages } from "@/db/chat-message";
 import { Event } from "@/enums/event.enum";
 import { useChat } from "@/hooks/use-chat";
 import { useChatChannel } from "@/hooks/use-chat-channel";

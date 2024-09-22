@@ -4,7 +4,7 @@ import type { CourseWithRefsCount } from "@/types/course.type";
 import type { TablesInsert } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
 
-// Get
+// GET
 export const getCourses = async (
   title = "",
   from = 0,
@@ -70,7 +70,7 @@ export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
   return result.data[0].count;
 };
 
-// Create
+// CREATE
 export const createCourse = async (course: TablesInsert<"courses">) => {
   const t = await loadMessages();
 
@@ -79,7 +79,7 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
   if (result.error) throw new Error(t("failed_to_create_course"));
 };
 
-// Delete
+// DELTE
 export const deleteCourse = async (id: string) => {
   const t = await loadMessages();
 

@@ -10,7 +10,7 @@ import { loadMessages } from "@/utils/localization/load-messages";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import { parseUsersCoursesIds } from "@/utils/parse/parse-users-courses-ids";
 
-// Get
+// GET
 export const getUser = async (id: string) => {
   const t = await loadMessages();
 
@@ -123,7 +123,7 @@ export const getUsersNotInCourseCount = async (
   return result.data[0].count;
 };
 
-// Create
+// CREATE
 export const createUser = async (userDetails: CreateUserInputType) => {
   const t = await loadMessages();
 
@@ -132,7 +132,7 @@ export const createUser = async (userDetails: CreateUserInputType) => {
   if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
 };
 
-// Update
+// UPDATE
 export const updateUser = async (userDetails: UpdateUserInputType) => {
   const t = await loadMessages();
 
@@ -186,7 +186,7 @@ export const enrollAllUsersInAllCourses = async () => {
   if (result.error) throw new Error(t("failed_to_enroll_users"));
 };
 
-// Delete
+// DELETE
 export const deleteUser = async (id: string) => {
   const t = await loadMessages();
 
