@@ -4,7 +4,7 @@ import MessagesIcon from "@/components/icons/messages-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { MAX_CHAT_FILE_SIZE } from "@/constants";
-import { uploadChatFile } from "@/db/message";
+import { uploadChatFile } from "@/db/storage";
 import { Event } from "@/enums/event.enum";
 import { useChatChannel } from "@/hooks/use-chat-channel";
 import { useUser } from "@/hooks/use-user";
@@ -77,7 +77,6 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
         throw new Error(t("file_size_too_big"));
 
       const { path } = await uploadChatFile(courseId || uuid(), file, ext);
-      console.log({ path });
 
       setFileExt(ext);
       setFilePath(path);
