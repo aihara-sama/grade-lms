@@ -29,11 +29,28 @@ export const getCoursesCount = async (title = "") => {
   const result = await DB.from("courses")
     .select("count")
     .ilike("title", `%${title}%`)
-    .returns<{ count: number }[]>();
+    .returns<{ count: number }[]>()
+    .single();
 
   if (result.error) throw new Error(t("failed_to_load_courses_count"));
 
-  return result.data[0].count;
+  return result.data.count;
+};
+export const getLatestCourses = async (
+  from = 0,
+  to = COURSES_GET_LIMIT - 1
+) => {
+  const t = await loadMessages();
+
+  const result = await DB.from("courses")
+    .select("*, users(count), lessons(count)")
+    .range(from, to)
+    .order("created_at", { ascending: false })
+    .returns<CourseWithRefsCount[]>();
+
+  if (result.error) throw new Error(t("failed_to_load_courses"));
+
+  return result.data;
 };
 export const getUnenrolledCourses = async (
   userId: string,
@@ -63,11 +80,12 @@ export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
     p_course_title: title,
   })
     .select("count")
-    .returns<{ count: number }[]>();
+    .returns<{ count: number }[]>()
+    .single();
 
   if (result.error) throw new Error(t("failed_to_load_courses_count"));
 
-  return result.data[0].count;
+  return result.data.count;
 };
 
 // CREATE

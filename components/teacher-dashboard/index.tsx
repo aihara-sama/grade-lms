@@ -6,6 +6,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
+import { getCoursesCount, getLatestCourses } from "@/db/course";
 import { useUser } from "@/hooks/use-user";
 import { messaging } from "@/lib/firebase/messaging";
 import { DB } from "@/lib/supabase/db";
@@ -16,78 +17,41 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  totalCoursesCount: number;
-  totalUsersCount: number;
+  coursesCount: number;
+  usersCount: number;
+  latestCourses: CourseWithRefsCount[];
 }
 
-const TeacherDashboard: FunctionComponent<Props> = ({
-  totalUsersCount,
-  totalCoursesCount,
-}) => {
-  const [usersCount] = useState(totalUsersCount);
-  const [coursesCount, setCoursesCount] = useState(totalCoursesCount);
-  const [latestCourses, setLatestCourses] = useState<CourseWithRefsCount[]>([]);
+const TeacherDashboard: FunctionComponent<Props> = (props) => {
+  const [usersCount] = useState(props.usersCount);
+  const [coursesCount, setCoursesCount] = useState(props.coursesCount);
+  const [latestCourses, setLatestCourses] = useState<CourseWithRefsCount[]>(
+    props.latestCourses
+  );
 
   const { user } = useUser();
 
-  const fetchCoursesCount = () =>
-    DB.from("users")
-      .select("courses(count)")
-      .eq("id", user.id)
-      .returns<Record<"courses", { count: number }[]>[]>()
-      .single();
+  const fetchLatestourses = async () => {
+    try {
+      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
+        getLatestCourses(),
+        getCoursesCount(),
+      ]);
 
-  const fetchLatestCourses = () =>
-    DB.from("users")
-      .select("courses(*, users(count), lessons(count))")
-      .eq("id", user.id)
-      .limit(10)
-      .order("created_at", { ascending: false, referencedTable: "courses" })
-      .returns<Record<"courses", CourseWithRefsCount[]>[]>()
-      .single();
-
-  const handleGetCourses = async () => {
-    const [
-      {
-        data: { courses },
-        error: latestCoursesError,
-      },
-      {
-        data: { courses: newCoursesCount },
-        error: coursesCountError,
-      },
-    ] = await Promise.all([fetchLatestCourses(), fetchCoursesCount()]);
-
-    if (latestCoursesError || coursesCountError) {
-      toast.error("Something went wrong");
-    } else {
-      setLatestCourses(courses);
-      setCoursesCount(newCoursesCount[0].count);
+      setLatestCourses(fetchedCourses);
+      setCoursesCount(fetchedCoursesCount);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await fetchLatestCourses();
-
-      if (error) {
-        toast.error("Something went wrong");
-      } else {
-        setLatestCourses(data.courses);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const { data } = await DB.from("fcm_tokens")
-        .select("fcm_token")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const { data } = await DB.from("fcm_tokens").select("fcm_token");
 
       if (
         Notification.permission !== "granted" ||
-        (Notification.permission === "granted" && !data)
+        (Notification.permission === "granted" && !data.length)
       ) {
         console.log("should ask permission");
 
@@ -139,7 +103,7 @@ const TeacherDashboard: FunctionComponent<Props> = ({
         <hr className="my-4" />
         <LatestCourses
           courses={latestCourses}
-          onCourseCreated={handleGetCourses}
+          onCourseCreated={fetchLatestourses}
         />
         <TeacherInsights courses={latestCourses} />
       </div>

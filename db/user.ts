@@ -44,11 +44,12 @@ export const getUsersCount = async (userName = "") => {
   const result = await DB.from("users")
     .select("count")
     .ilike("name", `%${userName}%`)
-    .returns<{ count: number }[]>();
+    .returns<{ count: number }[]>()
+    .single();
 
   if (result.error) throw new Error(t("failed_to_load_users_count"));
 
-  return result.data[0].count;
+  return result.data.count;
 };
 
 export const getCourseUsers = async (
@@ -116,11 +117,12 @@ export const getUsersNotInCourseCount = async (
     p_user_name: userName,
   })
     .select("count")
-    .returns<{ count: number }[]>();
+    .returns<{ count: number }[]>()
+    .single();
 
   if (result.error) throw new Error(t("failed_to_load_users"));
 
-  return result.data[0].count;
+  return result.data.count;
 };
 
 // CREATE

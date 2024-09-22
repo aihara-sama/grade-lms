@@ -439,8 +439,8 @@ export type Database = {
           creator_id?: string | null;
           email: string;
           id: string;
-          is_emails_on: boolean;
-          is_push_notifications_on: boolean;
+          is_emails_on?: boolean;
+          is_push_notifications_on?: boolean;
           name: string;
           preferred_locale: string;
           role: Database["public"]["Enums"]["role"];

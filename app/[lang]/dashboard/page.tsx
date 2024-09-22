@@ -1,7 +1,10 @@
 import StudentrDashboard from "@/components/student-dashboard";
 import TeacherDashboard from "@/components/teacher-dashboard";
+import { getCoursesCount, getLatestCourses } from "@/db/server/course";
+import { getUsersCount } from "@/db/server/user";
 import { Role } from "@/enums/role.enum";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import { extractAssignmentsCount } from "@/utils/parse/extract-assignments-count";
 import type { ReactNode } from "react";
 
 const Page = async () => {
@@ -14,64 +17,37 @@ const Page = async () => {
   let Dashborad: ReactNode;
 
   if (user.user_metadata.role === Role.Teacher) {
-    const [
-      {
-        data: { courses },
-      },
-      {
-        data: { count: usersCount },
-      },
-    ] = await Promise.all([
-      serverDB
-        .from("users")
-        .select("courses(count)")
-        .eq("id", user.id)
-        .returns<Record<"courses", { count: number }[]>[]>()
-        .single(),
-      serverDB
-        .from("users")
-        .select("count")
-        .eq("creator_id", user.id)
-        .returns<Record<"count", number>[]>()
-        .single(),
+    const [usersCount, coursesCount, latestCourses] = await Promise.all([
+      getUsersCount(),
+      getCoursesCount(),
+      getLatestCourses(),
     ]);
 
     Dashborad = (
       <TeacherDashboard
-        totalUsersCount={usersCount}
-        totalCoursesCount={courses[0].count}
+        usersCount={usersCount - 1}
+        coursesCount={coursesCount}
+        latestCourses={latestCourses}
       />
     );
   }
 
   if (user.user_metadata.role === Role.Student) {
-    const [{ data: meWithAssignmentsCount }, { data: submissions }] =
-      await Promise.all([
-        serverDB
-          .from("users")
-          .select("courses(lessons(assignments(count)))")
-          .eq("id", user.id)
-          .returns<
-            Record<
-              "courses",
-              { lessons: { assignments: { count: number }[] }[] }[]
-            >[]
-          >()
-          .single(),
-        serverDB
-          .from("submissions")
-          .select("count")
-          .eq("user_id", user.id)
-          .returns<{ count: number }[]>(),
-      ]);
+    const [{ data: courses }, { data: submissions }] = await Promise.all([
+      serverDB
+        .from("courses")
+        .select("lessons(assignments(count))")
+        .returns<Record<"lessons", { assignments: { count: number }[] }[]>[]>(),
+      serverDB
+        .from("submissions")
+        .select("count")
+        .returns<{ count: number }[]>(),
+    ]);
 
     Dashborad = (
       <StudentrDashboard
         user={user}
-        totalAssignmentsCount={
-          meWithAssignmentsCount.courses[0]?.lessons[0]?.assignments[0]
-            ?.count || 0
-        }
+        totalAssignmentsCount={extractAssignmentsCount(courses)}
         totalSubmissionsCount={submissions[0].count}
       />
     );

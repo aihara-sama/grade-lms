@@ -45,11 +45,12 @@ export const getAssignmentSubmissionsCount = async (
     .select("count")
     .eq("assignment_id", assignmentId)
     .ilike("title", `%${title}%`)
-    .returns<{ count: number }[]>();
+    .returns<{ count: number }[]>()
+    .single();
 
   if (result.error) throw new Error(t("failed_to_load_submissions"));
 
-  return result.data[0].count;
+  return result.data.count;
 };
 
 // CREATE

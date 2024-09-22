@@ -14,8 +14,8 @@ create table users (
   avatar text not null,
   preferred_locale text not null,
   timezone text not null,
-  is_emails_on boolean not null,
-  is_push_notifications_on boolean not null,
+  is_emails_on boolean not null default true,
+  is_push_notifications_on boolean not null default false,
   created_at timestamp not null default now()
 );
 
@@ -27,12 +27,6 @@ CREATE TABLE fcm_tokens (
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()
 );
-alter table fcm_tokens enable row level security;
-
-create policy "Insert own" on fcm_tokens for insert to authenticated;
-create policy "Select own" on fcm_tokens for select using ( auth.uid() = user_id );
-create policy "Update own" on fcm_tokens for update using ( auth.uid() = user_id );
-create policy "Delete own" on fcm_tokens for delete using ( auth.uid() = user_id );
 
 create table courses (
   id uuid not null primary key DEFAULT gen_random_uuid(),
@@ -128,7 +122,7 @@ create function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone, is_emails_on, is_push_notifications_on)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone', (new.raw_user_meta_data->>'is_emails_on')::boolean, (new.raw_user_meta_data->>'is_push_notifications_on')::boolean);
+  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone');
   return new;
 end;
 $$ language plpgsql security definer;
@@ -158,6 +152,26 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_updated
   after update on auth.users
   for each row execute procedure public.handle_update_user();
+
+CREATE OR REPLACE FUNCTION public.enable_push_notifications()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Update the corresponding user's is_push_notifications_on to true
+  UPDATE public.users
+  SET is_push_notifications_on = true
+  WHERE id = NEW.user_id;
+
+  -- Return the newly inserted row for fcm_tokens table
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER on_fcm_token_created
+AFTER INSERT ON public.fcm_tokens
+FOR EACH ROW
+EXECUTE FUNCTION public.enable_push_notifications();
+
+
 
 -- Create a trigger function to insert into user_courses table
 create function insert_user_course()
@@ -472,6 +486,12 @@ for select to authenticated using (
 create policy "Update own or creator's user" on public.users for update using ( auth.uid() = id or auth.uid()::text = creator_id );
 create policy "Delete own or creator's user" on public.users for delete using ( auth.uid() = id or auth.uid()::text = creator_id );
 
+
+alter table fcm_tokens enable row level security;
+
+create policy "Insert own" on fcm_tokens for insert to authenticated with check ( user_id = auth.uid() );
+create policy "Select own" on fcm_tokens for select using ( auth.uid() = user_id );
+create policy "Update own" on fcm_tokens for update using ( auth.uid() = user_id );
 
 -- Courses' policies
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;

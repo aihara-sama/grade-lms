@@ -37,10 +37,4 @@ export const CreateUser = z.object({
       invalid_type_error: "Password is required",
     })
     .min(6, "Password too short"),
-  is_emails_on: z.boolean({
-    required_error: "Email preference is required",
-  }),
-  is_push_notifications_on: z.boolean({
-    required_error: "Notifications preference is required",
-  }),
 });

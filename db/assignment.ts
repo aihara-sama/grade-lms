@@ -45,11 +45,12 @@ export const getLessonAssignmentsCount = async (
     .select("count")
     .ilike("title", `%${title}%`)
     .eq("lesson_id", lessonId)
-    .returns<{ count: number }[]>();
+    .returns<{ count: number }[]>()
+    .single();
 
   if (result.error) throw new Error(t("failed_to_load_assignments_count"));
 
-  return result.data[0].count;
+  return result.data.count;
 };
 
 // CREATE

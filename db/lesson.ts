@@ -61,11 +61,12 @@ export const getCourseLessonsCount = async (courseId: string, title = "") => {
     .select("count")
     .ilike("title", `%${title}%`)
     .eq("course_id", courseId)
-    .returns<{ count: number }[]>();
+    .returns<{ count: number }[]>()
+    .single();
 
   if (result.error) throw new Error(t("failed_to_load_lessons_count"));
 
-  return result.data[0].count;
+  return result.data.count;
 };
 
 export const getOverlappingLessons = async (
