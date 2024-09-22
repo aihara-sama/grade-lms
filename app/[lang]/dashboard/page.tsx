@@ -1,7 +1,6 @@
 import StudentrDashboard from "@/components/student-dashboard";
 import TeacherDashboard from "@/components/teacher-dashboard";
 import { Role } from "@/enums/role.enum";
-import type { UserMetadata } from "@/interfaces/user.interface";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { ReactNode } from "react";
 
@@ -14,7 +13,7 @@ const Page = async () => {
 
   let Dashborad: ReactNode;
 
-  if ((user.user_metadata as UserMetadata).role === Role.Teacher) {
+  if (user.user_metadata.role === Role.Teacher) {
     const [
       {
         data: { courses },
@@ -45,7 +44,7 @@ const Page = async () => {
     );
   }
 
-  if ((user.user_metadata as UserMetadata).role === Role.Student) {
+  if (user.user_metadata.role === Role.Student) {
     const [{ data: meWithAssignmentsCount }, { data: submissions }] =
       await Promise.all([
         serverDB

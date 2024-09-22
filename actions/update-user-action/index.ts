@@ -3,10 +3,10 @@
 import { UpdateUser } from "@/actions/update-user-action/schema";
 import type { InputType, ReturnType } from "@/actions/update-user-action/types";
 import { Role } from "@/enums/role.enum";
-import type { UserMetadata } from "@/interfaces/user.interface";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/validation/create-safe-action";
+import type { UserMetadata } from "@supabase/supabase-js";
 
 const handler = async (payload: InputType): Promise<ReturnType> => {
   const { password } = payload;

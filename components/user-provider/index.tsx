@@ -2,7 +2,6 @@
 
 import GuestPrompt from "@/components/live-lesson/guest-prompt";
 import { useUser } from "@/hooks/use-user";
-import type { UserMetadata } from "@/interfaces/user.interface";
 import { DB } from "@/lib/supabase/db";
 import type { User } from "@supabase/supabase-js";
 import type { FunctionComponent, PropsWithChildren } from "react";
@@ -25,17 +24,16 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
     else if (user)
       userStore.setUser({
         id: user.id,
-        avatar: (user.user_metadata as UserMetadata).avatar,
+        avatar: user.user_metadata.avatar,
         created_at: user.created_at,
-        creator_id: (user.user_metadata as UserMetadata).creator_id,
+        creator_id: user.user_metadata.creator_id,
         email: user.email,
-        name: (user.user_metadata as UserMetadata).name,
-        role: (user.user_metadata as UserMetadata).role,
-        preferred_locale: (user.user_metadata as UserMetadata).preferred_locale,
-        timezone: (user.user_metadata as UserMetadata).timezone,
-        is_emails_on: (user.user_metadata as UserMetadata).is_emails_on,
-        is_push_notifications_on: (user.user_metadata as UserMetadata)
-          .is_push_notifications_on,
+        name: user.user_metadata.name,
+        role: user.user_metadata.role,
+        preferred_locale: user.user_metadata.preferred_locale,
+        timezone: user.user_metadata.timezone,
+        is_emails_on: user.user_metadata.is_emails_on,
+        is_push_notifications_on: user.user_metadata.is_push_notifications_on,
       });
 
     DB.auth.onAuthStateChange((event) => {
