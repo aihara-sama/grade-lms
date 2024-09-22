@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
-import { deleteAssignmentById } from "@/db/assignment";
+import { deleteAssignment } from "@/db/assignment";
 import { DB } from "@/lib/supabase/db";
 import type { Assignment } from "@/types/assignment.type";
 import { useTranslations } from "next-intl";
@@ -54,7 +54,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
   const submitDeleteAssignment = async () => {
     setIsSubmittingDeleteAssignments(true);
     try {
-      await deleteAssignmentById(selectedAssignmentId);
+      await deleteAssignment(selectedAssignmentId);
       setIsDeleteAssignmentModalOpen(false);
       fetchAssignments();
     } catch (error: any) {

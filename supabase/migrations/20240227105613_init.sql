@@ -405,20 +405,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-CREATE OR REPLACE FUNCTION public.delete_lesson_assignments(
-  p_lesson_id uuid,
-  p_title text
-)
-RETURNS void AS $$
-BEGIN
-  DELETE FROM public.assignments
-  WHERE lesson_id = p_lesson_id
-  AND title ILIKE '%' || p_title || '%';
-END;
-$$ LANGUAGE plpgsql;
-
-
 CREATE OR REPLACE FUNCTION public.delete_assignments_by_ids(p_assignments_ids uuid[])
 RETURNS void AS $$
 BEGIN

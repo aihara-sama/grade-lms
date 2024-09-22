@@ -482,13 +482,6 @@ export type Database = {
         };
         Returns: undefined;
       };
-      delete_lesson_assignments: {
-        Args: {
-          p_lesson_id: string;
-          p_title: string;
-        };
-        Returns: undefined;
-      };
       delete_lessons_by_ids: {
         Args: {
           p_lessons_ids: string[];

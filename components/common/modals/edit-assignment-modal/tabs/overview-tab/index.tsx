@@ -4,7 +4,7 @@ import Editor from "@/components/editor";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { getAssignmentById, updateAssignment } from "@/db/assignment";
+import { getAssignment, updateAssignment } from "@/db/assignment";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
@@ -28,7 +28,7 @@ const OverviewTab: FunctionComponent<Props> = ({
 }) => {
   // States
   const [assignment, setAssignment] =
-    useState<ResultOf<typeof getAssignmentById>>();
+    useState<ResultOf<typeof getAssignment>>();
   const [isCreateSubmissionModal, setIsCreateSubmissionModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,7 +43,7 @@ const OverviewTab: FunctionComponent<Props> = ({
   // Handlers
   const fetchAssignment = async () => {
     try {
-      setAssignment(await getAssignmentById(assignmentId));
+      setAssignment(await getAssignment(assignmentId));
     } catch (error: any) {
       toast.error(error.message);
     }

@@ -20,11 +20,11 @@ import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
-  deleteAssignmentById,
-  deleteAssignmentsByIds,
-  deleteLessonsAssignments,
-  getAssignmentsByLessonId,
-  getAssignmentsCountByLessonId,
+  deleteAllAssignmentsFromLesson,
+  deleteAssignment,
+  deleteAssignments,
+  getLessonAssignments,
+  getLessonAssignmentsCount,
 } from "@/db/assignment";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
@@ -92,8 +92,8 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
 
     try {
       const [fetchedAssignments, fetchedAssginemtnsCount] = await Promise.all([
-        getAssignmentsByLessonId(lesson.id),
-        getAssignmentsCountByLessonId(lesson.id),
+        getLessonAssignments(lesson.id),
+        getLessonAssignmentsCount(lesson.id),
       ]);
 
       setAssignments(fetchedAssignments);
@@ -114,8 +114,8 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
 
     try {
       const [fetchedAssignments, fetchedAssignmentsCount] = await Promise.all([
-        getAssignmentsByLessonId(lesson.id, search),
-        getAssignmentsCountByLessonId(lesson.id, search),
+        getLessonAssignments(lesson.id, search),
+        getLessonAssignmentsCount(lesson.id, search),
       ]);
 
       setAssignments(fetchedAssignments);
@@ -136,7 +136,7 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
       const from = assignmentsOffsetRef.current;
       const to = assignmentsOffsetRef.current + ASSIGNMENTS_GET_LIMIT - 1;
 
-      const fetchedAssignments = await getAssignmentsByLessonId(
+      const fetchedAssignments = await getLessonAssignments(
         lesson.id,
         searchText,
         from,
@@ -162,7 +162,7 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
     setIsSubmittingDelAssign(true);
 
     try {
-      await deleteAssignmentById(assignmentId);
+      await deleteAssignment(assignmentId);
 
       setIsDelAssignmentModal(false);
       setAssignmentsIds((_) => _.filter((id) => id !== assignmentId));
@@ -180,8 +180,8 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
 
     try {
       await (isSelectedAll
-        ? deleteLessonsAssignments(lesson.id, searchText)
-        : deleteAssignmentsByIds(assignmentsIds));
+        ? deleteAllAssignmentsFromLesson(lesson.id, searchText)
+        : deleteAssignments(assignmentsIds));
 
       setAssignmentsIds([]);
       setIsDelAssignmentsModal(false);
