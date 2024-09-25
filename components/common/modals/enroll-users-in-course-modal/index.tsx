@@ -27,7 +27,7 @@ import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
 interface Props {
-  onClose: (mutated?: boolean) => void;
+  onClose: (usersIds: string[]) => void;
   courseId: string;
 }
 
@@ -144,7 +144,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       await (isSelectedAll
         ? enrollAllUsersInCourses([courseId])
         : enrollUsersInCourses(usersIds, [courseId]));
-      onClose(true);
+      onClose(usersIds);
       toast(t("users_enrolled"));
       DB.functions.invoke("check-events");
     } catch (error: any) {
@@ -184,7 +184,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
   // View
   return (
-    <BaseModal onClose={() => onClose()} title="Enrollment">
+    <BaseModal onClose={() => onClose([])} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select users to enroll</p>
       {usersIds.length ? (
         <div className="mb-3 flex gap-3">
@@ -246,7 +246,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
         </div>
       )}
       <div className="flex justify-end gap-3 mt-auto">
-        <button className="outline-button" onClick={() => onClose()}>
+        <button className="outline-button" onClick={() => onClose([])}>
           Cancel
         </button>
         <button

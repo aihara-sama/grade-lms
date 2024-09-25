@@ -12,7 +12,6 @@ import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
-import type { CourseWithRefsCount } from "@/types/course.type";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -32,29 +31,35 @@ import {
   getCourses,
   getCoursesCount,
 } from "@/db/course";
-import { Role } from "@/enums/role.enum";
-import { useUser } from "@/hooks/use-user";
-import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
+import useFetchLock from "@/hooks/use-fetch-lock";
+import type { ResultOf } from "@/types/utils.type";
+import type { View } from "@/types/view.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
+import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
-const Courses: FunctionComponent = () => {
+interface Props {
+  view: View;
+}
+
+const Courses: FunctionComponent<Props> = ({ view }) => {
   // State
+
+  const [courses, setCourses] = useState<ResultOf<typeof getCourses>>([]);
+  const [courseId, setCourseId] = useState<string>();
+  const [coursesIds, setCoursesIds] = useState<string[]>([]);
+
   const [isEnrollUsersModal, setIsEnrollUsersModal] = useState(false);
   const [isDeleteCourseModal, setIsDeleteCourseModal] = useState(false);
   const [isDeleteCoursesModal, setIsDeleteCoursesModal] = useState(false);
 
-  const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
-  const [courseId, setSelectedCourseId] = useState<string>();
-  const [coursesIds, setSelectedCoursesIds] = useState<string[]>([]);
-
-  const [searchText, setSearchText] = useState("");
-  const [coursesCount, setTotalCoursesCount] = useState(0);
-
   const [isSubmittingDelCourse, setIsSubmittingDelCourse] = useState(false);
   const [isSubmittingDelCourses, setIsSubmittingDelCourses] = useState(false);
+
+  const [searchText, setSearchText] = useState("");
+  const [coursesCount, setCoursesCount] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -63,10 +68,11 @@ const Courses: FunctionComponent = () => {
 
   // Refs
   const coursesOffsetRef = useRef(0);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
+  const fetchLock = useFetchLock();
 
   // Vars
   const isData = !!courses.length && !isLoading;
@@ -78,11 +84,11 @@ const Courses: FunctionComponent = () => {
 
   // Handdlers
   const selectAllCourses = () => {
-    setSelectedCoursesIds(courses.map(({ id }) => id));
+    setCoursesIds(courses.map(({ id }) => id));
     setIsSelectedAll(true);
   };
   const deselectAllCourses = () => {
-    setSelectedCoursesIds([]);
+    setCoursesIds([]);
     setIsSelectedAll(false);
   };
 
@@ -96,7 +102,7 @@ const Courses: FunctionComponent = () => {
       ]);
 
       setCourses(fetchedCourses);
-      setTotalCoursesCount(fetchedCoursesCount);
+      setCoursesCount(fetchedCoursesCount);
 
       coursesOffsetRef.current = fetchedCourses.length;
     } catch (error: any) {
@@ -105,7 +111,7 @@ const Courses: FunctionComponent = () => {
       setIsLoading(false);
     }
   };
-  const fetchCoursesBySearch = async (search: string, refetch?: boolean) => {
+  const fetchCoursesBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
@@ -115,12 +121,9 @@ const Courses: FunctionComponent = () => {
       ]);
 
       setCourses(fetchedCourses);
-      setTotalCoursesCount(fetchedCoursesCount);
+      setCoursesCount(fetchedCoursesCount);
 
-      setIsSelectedAll(false);
-      setSelectedCoursesIds([]);
-
-      coursesOffsetRef.current += refetch ? fetchedCourses.length : 0;
+      coursesOffsetRef.current = fetchedCourses.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -137,7 +140,7 @@ const Courses: FunctionComponent = () => {
       setCourses((prev) => [...prev, ...fetchedCourses]);
 
       if (isSelectedAll) {
-        setSelectedCoursesIds((prev) => [
+        setCoursesIds((prev) => [
           ...prev,
           ...fetchedCourses.map(({ id }) => id),
         ]);
@@ -156,8 +159,9 @@ const Courses: FunctionComponent = () => {
       await deleteCourse(courseId);
 
       setIsDeleteCourseModal(false);
-      setSelectedCoursesIds((_) => _.filter((id) => id !== courseId));
-      fetchCoursesBySearch(searchText, true);
+      setCoursesIds((_) => _.filter((id) => id !== courseId));
+      setCourses((prev) => prev.filter(({ id }) => id !== courseId));
+      setCoursesCount((prev) => prev - 1);
 
       toast.success("Success");
     } catch (error: any) {
@@ -170,19 +174,50 @@ const Courses: FunctionComponent = () => {
     setIsSubmittingDelCourses(true);
 
     try {
-      await (isSelectedAll
-        ? deleteAllCourses(searchText)
-        : deleteCourses(coursesIds));
+      if (isSelectedAll) {
+        await deleteAllCourses(searchText);
+        setCourses([]);
+        setCoursesCount(0);
+      } else {
+        await deleteCourses(coursesIds);
+        setCourses((prev) => prev.filter(({ id }) => !coursesIds.includes(id)));
+        setCoursesCount((prev) => prev - coursesIds.length);
+      }
 
-      setSelectedCoursesIds([]);
+      setCoursesIds([]);
       setIsDeleteCoursesModal(false);
-      fetchCoursesBySearch(searchText, true);
+
       toast.success("success");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSubmittingDelCourses(false);
     }
+  };
+
+  const onCourseToggle = (checked: boolean, _course_id: string) => {
+    if (checked) {
+      setCoursesIds((prev) => [...prev, _course_id]);
+      setIsSelectedAll(coursesCount === coursesIds.length + 1);
+    } else {
+      setCoursesIds((prev) => prev.filter((id) => id !== _course_id));
+      setIsSelectedAll(coursesCount === coursesIds.length - 1);
+    }
+  };
+  const onEnrollUsersInCourseModalClose = (usersIds: string[]) => {
+    setCourses((prev) =>
+      prev.map((course) => {
+        if (course.id === courseId) {
+          const membersCount = course.users[0].count;
+
+          course.users = [{ count: membersCount + usersIds.length }];
+        }
+
+        return course;
+      })
+    );
+
+    setIsEnrollUsersModal(false);
   };
 
   const throttledSearch = useCallback(
@@ -196,62 +231,44 @@ const Courses: FunctionComponent = () => {
     []
   );
 
-  const onCourseToggle = (checked: boolean, _courseId: string) => {
-    if (checked) {
-      setSelectedCoursesIds((prev) => [...prev, _courseId]);
-      setIsSelectedAll(coursesCount === coursesIds.length + 1);
-    } else {
-      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== _courseId));
-      setIsSelectedAll(coursesCount === coursesIds.length - 1);
-    }
-  };
-  const onCoursesScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      fetchMoreCourses();
-    }
-  };
-
-  const onEnrollUsersInCourseModalClose = (mutated?: boolean) => {
-    setIsEnrollUsersModal(false);
-
-    if (mutated) {
-      fetchCoursesBySearch(searchText, true);
-    }
-  };
-
   // Effects
-  useEffect(() => {
-    const throttled = throttleFetch(onCoursesScroll);
-    document
-      .getElementById("content-wrapper")
-      .addEventListener("scroll", throttled);
-
-    return () => {
-      document
-        .getElementById("content-wrapper")
-        ?.removeEventListener("scroll", throttled);
-    };
-  }, [isSelectedAll, searchText]);
-
   useEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
-    setIsSelectedAll(coursesCount === coursesIds.length);
+    if (coursesCount) setIsSelectedAll(coursesCount === coursesIds.length);
   }, [coursesCount]);
 
   useEffect(() => {
-    // Tall screens may fit more than 20 records. This will fit the screen
-    if (courses.length && coursesCount !== courses.length) {
-      const contentWrapper = document.getElementById("content-wrapper");
-      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
-        fetchMoreCourses();
+    // Tall screens may fit more than 20 records
+    // This will fit the screen with records
+    const fn = throttle(() => {
+      if (courses.length && coursesCount !== courses.length) {
+        if (
+          contentWrapperRef.current.scrollHeight ===
+          contentWrapperRef.current.clientHeight
+        ) {
+          fetchLock("courses", fetchMoreCourses)();
+        }
       }
-    }
+    }, 300);
+    fn();
+
+    window.addEventListener("resize", fn);
+
+    return () => {
+      window.removeEventListener("resize", fn);
+    };
   }, [courses, coursesCount]);
 
   // View
   return (
-    <ContentWrapper>
+    <ContentWrapper
+      ref={contentWrapperRef}
+      onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreCourses))}
+    >
+      <p className="text-3xl font-bold text-neutral-600">{t("courses")}</p>
+      <p className="text-neutral-500">View and manage courses</p>
+      <hr className="my-2 mb-4" />
       <div className="pb-8 flex-1 flex flex-col">
         <CardsContainer>
           <Total
@@ -259,10 +276,8 @@ const Courses: FunctionComponent = () => {
             total={coursesCount}
             title="Total courses"
           />
-          {user.role === Role.Teacher && (
-            <CreateCourse
-              onCreated={() => fetchCoursesBySearch(searchText, true)}
-            />
+          {view === "Teacher" && (
+            <CreateCourse onCreated={() => fetchCoursesBySearch(searchText)} />
           )}
         </CardsContainer>
         {coursesIds.length ? (
@@ -304,7 +319,7 @@ const Courses: FunctionComponent = () => {
                     title={title}
                     subtitle="Active"
                     onToggle={
-                      user.role === Role.Teacher
+                      view === "Teacher"
                         ? (checked) => onCourseToggle(checked, id)
                         : undefined
                     }
@@ -312,7 +327,7 @@ const Courses: FunctionComponent = () => {
                 ),
                 Lessons: lessons[0].count,
                 Members: members[0].count,
-                "": user.role === Role.Teacher && (
+                "": view === "Teacher" && (
                   <BasePopper
                     placement={
                       courses.length > 7 && courses.length - idx < 4
@@ -323,7 +338,7 @@ const Courses: FunctionComponent = () => {
                     trigger={
                       <button
                         className="icon-button text-neutral-500"
-                        onClick={() => setSelectedCourseId(id)}
+                        onClick={() => setCourseId(id)}
                       >
                         <DotsIcon />
                       </button>

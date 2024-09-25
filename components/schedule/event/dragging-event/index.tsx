@@ -30,5 +30,4 @@ const DraggingEvent = forwardRef<HTMLDivElement, Props>(function DraggingEvent(
     </div>
   );
 });
-
 export default memo(DraggingEvent);

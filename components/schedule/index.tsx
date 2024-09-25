@@ -389,7 +389,6 @@ const Schedule: FunctionComponent = () => {
             })}
             {draggingEvent && (
               <DraggingEvent
-                ref={draggingEventRef}
                 event={draggingEvent}
                 canDropEvent={canDropEvent}
                 initEventPosition={initEventPosition}

@@ -92,9 +92,14 @@ export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
 export const createCourse = async (course: TablesInsert<"courses">) => {
   const t = await loadMessages();
 
-  const result = await DB.from("courses").insert(course);
+  const result = await DB.from("courses")
+    .insert(course)
+    .select("*, lessons(count), users(count)")
+    .single();
 
   if (result.error) throw new Error(t("failed_to_create_course"));
+
+  return result.data;
 };
 
 // DELTE

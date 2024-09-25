@@ -5,7 +5,7 @@ import AddUserIcon from "@/components/icons/add-user-icon";
 import { useState, type FunctionComponent } from "react";
 
 interface Props {
-  onUsersEnrolled: () => void;
+  onUsersEnrolled: (usersIds: string[]) => void;
   courseId: string;
 }
 
@@ -17,12 +17,10 @@ const EnrollUsers: FunctionComponent<Props> = ({
 
   // Handlers
   const openEnrollUserModal = () => setIsEnrollUsersModalOpen(true);
-  const onEnrollUsersInCourseModalClose = (mutated?: boolean) => {
+  const onEnrollUsersInCourseModalClose = (usersIds: string[]) => {
     setIsEnrollUsersModalOpen(false);
 
-    if (mutated) {
-      onUsersEnrolled();
-    }
+    onUsersEnrolled(usersIds);
   };
 
   return (
