@@ -9,9 +9,10 @@ import { getSubmissionsCount } from "@/db/server/submission";
 import { getMyUsersCount } from "@/db/server/user";
 import { Role } from "@/enums/role.enum";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
-const Page = async () => {
+const Page: NextPage = async () => {
   const serverDB = getServerDB();
 
   const {

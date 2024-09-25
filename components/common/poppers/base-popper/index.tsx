@@ -74,7 +74,7 @@ const BasePopper: ForwardRefRenderFunction<
 
   const handleChildrenClick = (e: MouseEvent) => {
     const { tagName } = e.target as Element;
-    if (tagName === "LI" || tagName === "A") {
+    if (tagName === "LI" || tagName === "A" || tagName === "BUTTON") {
       setIsOpen(false);
     }
   };

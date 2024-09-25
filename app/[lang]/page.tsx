@@ -1,4 +1,4 @@
-const Page: React.FC = () => {
+const Page = () => {
   return <></>;
 };
 

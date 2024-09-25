@@ -18,6 +18,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
+import ContentWrapper from "@/components/content-wrapper";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import NoData from "@/components/no-data";
@@ -41,22 +42,24 @@ import toast from "react-hot-toast";
 
 const Courses: FunctionComponent = () => {
   // State
-  const [isDeleteCoursesModalOpen, setIsDeleteCoursesModalOpen] =
-    useState(false);
-  const [isDeleteCourseModalOpen, setIsDeleteCourseModalOpen] = useState(false);
-  const [isEnrollUsersModalOpen, setIsEnrollUsersModalOpen] = useState(false);
-  const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
-  const [selectedCourseId, setSelectedCourseId] = useState<string>();
+  const [isEnrollUsersModal, setIsEnrollUsersModal] = useState(false);
+  const [isDeleteCourseModal, setIsDeleteCourseModal] = useState(false);
+  const [isDeleteCoursesModal, setIsDeleteCoursesModal] = useState(false);
+
   const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalCoursesCount, setTotalCoursesCount] = useState(0);
+  const [courseId, setSelectedCourseId] = useState<string>();
+  const [coursesIds, setSelectedCoursesIds] = useState<string[]>([]);
+
   const [searchText, setSearchText] = useState("");
-  const [isSelectedAll, setIsSelectedAll] = useState(false);
-  const [isSubmittingDeleteCourse, setIsSubmittingDeleteCourse] =
-    useState(false);
-  const [isSubmittingDeleteCourses, setIsSubmittingDeleteCourses] =
-    useState(false);
+  const [coursesCount, setTotalCoursesCount] = useState(0);
+
+  const [isSubmittingDelCourse, setIsSubmittingDelCourse] = useState(false);
+  const [isSubmittingDelCourses, setIsSubmittingDelCourses] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const coursesOffsetRef = useRef(0);
@@ -68,7 +71,7 @@ const Courses: FunctionComponent = () => {
   // Vars
   const isData = !!courses.length && !isLoading;
   const isNoData =
-    !isLoading && !isSearching && !totalCoursesCount && !searchText.length;
+    !isLoading && !isSearching && !coursesCount && !searchText.length;
 
   const isNotFound =
     !isLoading && !isSearching && !courses.length && !!searchText.length;
@@ -147,38 +150,38 @@ const Courses: FunctionComponent = () => {
   };
 
   const submitDeleteCourse = async () => {
-    setIsSubmittingDeleteCourse(true);
+    setIsSubmittingDelCourse(true);
 
     try {
-      await deleteCourse(selectedCourseId);
+      await deleteCourse(courseId);
 
-      setIsDeleteCourseModalOpen(false);
-      setSelectedCoursesIds((_) => _.filter((id) => id !== selectedCourseId));
+      setIsDeleteCourseModal(false);
+      setSelectedCoursesIds((_) => _.filter((id) => id !== courseId));
       fetchCoursesBySearch(searchText, true);
 
       toast.success("Success");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDeleteCourse(false);
+      setIsSubmittingDelCourse(false);
     }
   };
   const submitDeleteCourses = async () => {
-    setIsSubmittingDeleteCourses(true);
+    setIsSubmittingDelCourses(true);
 
     try {
       await (isSelectedAll
         ? deleteAllCourses(searchText)
-        : deleteCourses(selectedCoursesIds));
+        : deleteCourses(coursesIds));
 
       setSelectedCoursesIds([]);
-      setIsDeleteCoursesModalOpen(false);
+      setIsDeleteCoursesModal(false);
       fetchCoursesBySearch(searchText, true);
       toast.success("success");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDeleteCourses(false);
+      setIsSubmittingDelCourses(false);
     }
   };
 
@@ -193,13 +196,13 @@ const Courses: FunctionComponent = () => {
     []
   );
 
-  const onCourseToggle = (checked: boolean, courseId: string) => {
+  const onCourseToggle = (checked: boolean, _courseId: string) => {
     if (checked) {
-      setSelectedCoursesIds((prev) => [...prev, courseId]);
-      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length + 1);
+      setSelectedCoursesIds((prev) => [...prev, _courseId]);
+      setIsSelectedAll(coursesCount === coursesIds.length + 1);
     } else {
-      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
-      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
+      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== _courseId));
+      setIsSelectedAll(coursesCount === coursesIds.length - 1);
     }
   };
   const onCoursesScroll = async (e: Event) => {
@@ -209,7 +212,7 @@ const Courses: FunctionComponent = () => {
   };
 
   const onEnrollUsersInCourseModalClose = (mutated?: boolean) => {
-    setIsEnrollUsersModalOpen(false);
+    setIsEnrollUsersModal(false);
 
     if (mutated) {
       fetchCoursesBySearch(searchText, true);
@@ -233,145 +236,150 @@ const Courses: FunctionComponent = () => {
   useEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
-    setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length);
-  }, [totalCoursesCount]);
+    setIsSelectedAll(coursesCount === coursesIds.length);
+  }, [coursesCount]);
 
   useEffect(() => {
     // Tall screens may fit more than 20 records. This will fit the screen
-    if (courses.length && totalCoursesCount !== courses.length) {
+    if (courses.length && coursesCount !== courses.length) {
       const contentWrapper = document.getElementById("content-wrapper");
       if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
         fetchMoreCourses();
       }
     }
-  }, [courses, totalCoursesCount]);
+  }, [courses, coursesCount]);
 
   // View
   return (
-    <div className="pb-8 flex-1 flex flex-col">
-      <CardsContainer>
-        <Total
-          Icon={<CoursesIcon size="lg" />}
-          total={totalCoursesCount}
-          title="Total courses"
-        />
-        {user.role === Role.Teacher && (
-          <CreateCourse
-            onCreated={() => fetchCoursesBySearch(searchText, true)}
+    <ContentWrapper>
+      <div className="pb-8 flex-1 flex flex-col">
+        <CardsContainer>
+          <Total
+            Icon={<CoursesIcon size="lg" />}
+            total={coursesCount}
+            title="Total courses"
+          />
+          {user.role === Role.Teacher && (
+            <CreateCourse
+              onCreated={() => fetchCoursesBySearch(searchText, true)}
+            />
+          )}
+        </CardsContainer>
+        {coursesIds.length ? (
+          <div className="mb-3 flex gap-3">
+            <button
+              onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
+              className="outline-button flex font-semibold gap-2 items-center"
+            >
+              {isSelectedAll ? coursesCount : coursesIds.length}{" "}
+              {isSelectedAll ? `Deselect` : "Select all"}{" "}
+              <CheckIcon size="xs" />
+            </button>
+            <button
+              onClick={() => setIsDeleteCoursesModal(true)}
+              className="outline-button flex font-semibold gap-2 items-center"
+            >
+              Delete <DeleteIcon />
+            </button>
+          </div>
+        ) : (
+          <Input
+            StartIcon={<SearchIcon size="xs" />}
+            placeholder={t("search")}
+            className="w-auto"
+            onChange={(e) => setSearchText(e.target.value)}
+            value={searchText}
           />
         )}
-      </CardsContainer>
-      {selectedCoursesIds.length ? (
-        <div className="mb-3 flex gap-3">
-          <button
-            onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
-            className="outline-button flex font-semibold gap-2 items-center"
-          >
-            {isSelectedAll ? totalCoursesCount : selectedCoursesIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
-          </button>
-          <button
-            onClick={() => setIsDeleteCoursesModalOpen(true)}
-            className="outline-button flex font-semibold gap-2 items-center"
-          >
-            Delete <DeleteIcon />
-          </button>
-        </div>
-      ) : (
-        <Input
-          StartIcon={<SearchIcon size="xs" />}
-          placeholder={t("search")}
-          className="w-auto"
-          onChange={(e) => setSearchText(e.target.value)}
-          value={searchText}
-        />
-      )}
-      {isLoading && <Skeleton />}
-      {isData && (
-        <Table
-          data={courses.map(({ id, title, lessons, users: members }, idx) => ({
-            Name: (
-              <CardTitle
-                href={`/dashboard/courses/${id}/overview`}
-                checked={selectedCoursesIds.includes(id)}
-                Icon={<CourseIcon />}
-                title={title}
-                subtitle="Active"
-                onToggle={
-                  user.role === Role.Teacher
-                    ? (checked) => onCourseToggle(checked, id)
-                    : undefined
-                }
-              />
-            ),
-            Lessons: lessons[0].count,
-            Members: members[0].count,
-            "": user.role === Role.Teacher && (
-              <BasePopper
-                placement={
-                  courses.length > 7 && courses.length - idx < 4
-                    ? "top"
-                    : "bottom"
-                }
-                width="sm"
-                trigger={
-                  <button
-                    className="icon-button text-neutral-500"
-                    onClick={() => setSelectedCourseId(id)}
+        {isLoading && <Skeleton />}
+        {isData && (
+          <Table
+            data={courses.map(
+              ({ id, title, lessons, users: members }, idx) => ({
+                Name: (
+                  <CardTitle
+                    href={`/dashboard/courses/${id}/overview`}
+                    checked={coursesIds.includes(id)}
+                    Icon={<CourseIcon />}
+                    title={title}
+                    subtitle="Active"
+                    onToggle={
+                      user.role === Role.Teacher
+                        ? (checked) => onCourseToggle(checked, id)
+                        : undefined
+                    }
+                  />
+                ),
+                Lessons: lessons[0].count,
+                Members: members[0].count,
+                "": user.role === Role.Teacher && (
+                  <BasePopper
+                    placement={
+                      courses.length > 7 && courses.length - idx < 4
+                        ? "top"
+                        : "bottom"
+                    }
+                    width="sm"
+                    trigger={
+                      <button
+                        className="icon-button text-neutral-500"
+                        onClick={() => setSelectedCourseId(id)}
+                      >
+                        <DotsIcon />
+                      </button>
+                    }
                   >
-                    <DotsIcon />
-                  </button>
-                }
-              >
-                <ul className="flex flex-col">
-                  <li
-                    className="popper-list-item"
-                    onClick={() => setIsEnrollUsersModalOpen(true)}
-                  >
-                    <UsersIcon /> Enroll
-                  </li>
-                  <li
-                    className="popper-list-item"
-                    onClick={() => setIsDeleteCourseModalOpen(true)}
-                  >
-                    <DeleteIcon /> Delete
-                  </li>
-                </ul>
-              </BasePopper>
-            ),
-          }))}
-        />
-      )}
-      {isNoData && <NoData />}
-      {isNotFound && <NotFound />}
+                    <ul className="flex flex-col">
+                      <li
+                        className="popper-list-item"
+                        onClick={() => setIsEnrollUsersModal(true)}
+                      >
+                        <UsersIcon /> Enroll
+                      </li>
+                      <li
+                        className="popper-list-item"
+                        onClick={() => setIsDeleteCourseModal(true)}
+                      >
+                        <DeleteIcon /> Delete
+                      </li>
+                    </ul>
+                  </BasePopper>
+                ),
+              })
+            )}
+          />
+        )}
+        {isNoData && <NoData />}
+        {isNotFound && <NotFound />}
 
-      {isDeleteCoursesModalOpen && (
-        <PromptModal
-          isSubmitting={isSubmittingDeleteCourses}
-          onClose={() => setIsDeleteCoursesModalOpen(false)}
-          title="Delete courses"
-          action="Delete"
-          body="Are you sure you want to delete selected courses?"
-          actionHandler={submitDeleteCourses}
-        />
-      )}
-      {isDeleteCourseModalOpen && (
-        <PromptModal
-          isSubmitting={isSubmittingDeleteCourse}
-          onClose={() => setIsDeleteCourseModalOpen(false)}
-          title="Delete course"
-          action="Delete"
-          body="Are you sure you want to delete this course?"
-          actionHandler={submitDeleteCourse}
-        />
-      )}
-      {isEnrollUsersModalOpen && (
-        <EnrollUsersInCourseModal
-          courseId={selectedCourseId}
-          onClose={onEnrollUsersInCourseModalClose}
-        />
-      )}
-    </div>
+        {isDeleteCoursesModal && (
+          <PromptModal
+            isSubmitting={isSubmittingDelCourses}
+            onClose={() => setIsDeleteCoursesModal(false)}
+            title="Delete courses"
+            action="Delete"
+            body="Are you sure you want to delete selected courses?"
+            actionHandler={submitDeleteCourses}
+          />
+        )}
+        {isDeleteCourseModal && (
+          <PromptModal
+            isSubmitting={isSubmittingDelCourse}
+            onClose={() => setIsDeleteCourseModal(false)}
+            title="Delete course"
+            action="Delete"
+            body="Are you sure you want to delete this course?"
+            actionHandler={submitDeleteCourse}
+          />
+        )}
+        {isEnrollUsersModal && (
+          <EnrollUsersInCourseModal
+            courseId={courseId}
+            onClose={onEnrollUsersInCourseModalClose}
+          />
+        )}
+      </div>
+    </ContentWrapper>
   );
 };
 

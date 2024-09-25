@@ -27,19 +27,19 @@ const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = ({
       title: "Overview",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
       Icon: <OverviewIcon />,
-      tier: [Role.Teacher, Role.Student],
+      views: [Role.Teacher, Role.Student],
     },
     {
       title: "Assignments",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
       Icon: <AssignmentsIcon />,
-      tier: [Role.Teacher, Role.Student],
+      views: [Role.Teacher, Role.Student],
     },
     {
       title: "Settings",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
       Icon: <SettingsIcon />,
-      tier: [Role.Teacher],
+      views: [Role.Teacher],
     },
   ];
 

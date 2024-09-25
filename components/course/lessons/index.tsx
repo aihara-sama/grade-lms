@@ -31,9 +31,7 @@ import {
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lesson.type";
-import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
-import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -209,24 +207,23 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length - 1);
     }
   };
-  const onLessonsScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      fetchMoreLessons();
-    }
-  };
+  // const onLessonsScroll = async (e: Event) => {
+  //   if (isCloseToBottom(e.target as HTMLElement)) {
+  //     fetchMoreLessons();
+  //   }
+  // };
 
   // Effects
   useEffect(() => {
-    const throttled = throttleFetch(onLessonsScroll);
-    document
-      .getElementById("content-wrapper")
-      .addEventListener("scroll", throttled);
-
-    return () => {
-      document
-        .getElementById("content-wrapper")
-        ?.removeEventListener("scroll", throttled);
-    };
+    // const throttled = throttleFetch(onLessonsScroll);
+    // document
+    //   .getElementById("content-wrapper")
+    //   .addEventListener("scroll", throttled);
+    // return () => {
+    //   document
+    //     .getElementById("content-wrapper")
+    //     ?.removeEventListener("scroll", throttled);
+    // };
   }, [isSelectedAll, searchText]);
   useEffect(() => throttledSearch(searchText), [searchText]);
   useEffect(() => {

@@ -30,7 +30,7 @@ CREATE TABLE fcm_tokens (
 
 create table courses (
   id uuid not null primary key DEFAULT gen_random_uuid(),
-  creator_id text NOT NULL,
+  creator_id text NOT NULL default auth.uid()::text,
   title text not null,
   created_at timestamp not null default now()
 );
@@ -50,7 +50,7 @@ create table lessons (
   -- UUID from auth.users
   id uuid not null primary key DEFAULT gen_random_uuid(),
   course_id uuid references public.courses on delete cascade,
-  creator_id uuid not null references public.users on delete cascade,
+  creator_id uuid not null references public.users on delete cascade default auth.uid(),
   created_at timestamp not null default now(),
   title text DEFAULT 'Quick lesson' not null,
   whiteboard_data text default '{}' not null,
@@ -70,7 +70,7 @@ create table assignments (
 create table submissions (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   assignment_id uuid references public.assignments on delete cascade not null,
-  user_id uuid references public.users on delete cascade not null,
+  user_id uuid references public.users on delete cascade not null default auth.uid(),
   body text not null,
   title text not null,
   grade int,
@@ -95,7 +95,7 @@ create table chat_messages (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   lesson_id uuid references public.lessons on delete cascade not null,
   reply_id uuid references public.chat_messages on delete cascade,
-  creator_id uuid references public.users on delete cascade not null,
+  creator_id uuid references public.users on delete cascade not null default auth.uid(),
   text text
 );
 
@@ -766,6 +766,13 @@ WITH CHECK (
 CREATE POLICY "Can select if assigned to course"
 ON public.notifications
 FOR SELECT
+TO authenticated
+USING (
+ recipient_id = auth.uid()::text
+);
+CREATE POLICY "Can update if assigned to course"
+ON public.notifications
+FOR UPDATE
 TO authenticated
 USING (
  recipient_id = auth.uid()::text

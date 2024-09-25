@@ -1,43 +1,23 @@
+import QuickLessonButton from "@/components/buttons/quick-lesson-button";
 import { menu } from "@/components/header/menu";
-import { Role } from "@/enums/role.enum";
-import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { PropsWithClassName } from "@/types/props.type";
-import { addMinutes } from "date-fns";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next-nprogress-bar";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
-import toast from "react-hot-toast";
 
-const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
-  // Hooks
-  const t = useTranslations();
-  const router = useRouter();
-  const { user } = useUser();
+const Nav: FunctionComponent<PropsWithClassName> = async ({
+  className = "",
+}) => {
+  const {
+    data: { user },
+  } = await getServerDB().auth.getUser();
 
-  const submitCreateLesson = async () => {
-    try {
-      const { error, data } = await DB.from("lessons")
-        .insert({
-          starts: new Date().toISOString(),
-          ends: addMinutes(new Date(), 30).toISOString(),
-          creator_id: user.id,
-        })
-        .select("id")
-        .single();
-
-      if (error) throw new Error(t("failed_to_create_lesson"));
-      router.push(`/dashboard/lessons/${data.id}`);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+  const view = user.user_metadata.role;
 
   return (
     <div className={`hidden md:flex items-center gap-6 ml-9 ${className}`}>
       {menu
-        .filter(({ tier }) => tier.includes(user.role))
+        .filter(({ views }) => views.includes(view))
         .map(({ title, href, Icon }, idx) => (
           <Link href={`${href}`} key={idx} className="flex items-center gap-2">
             {Icon}
@@ -45,11 +25,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
           </Link>
         ))}
 
-      {user.role === Role.Teacher && (
-        <button className="primary-button" onClick={submitCreateLesson}>
-          Quick lesson
-        </button>
-      )}
+      {view === "Teacher" && <QuickLessonButton />}
     </div>
   );
 };

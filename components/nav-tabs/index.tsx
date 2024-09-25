@@ -18,10 +18,10 @@ const NavTabs: FunctionComponent<Props> = ({ tabs }) => {
   return (
     <div className="flex gap-[6px] border-t-2 border-b-2 border-gray-200 overflow-x-auto overflow-y-hidden">
       {tabs
-        .filter(({ tier }) => tier.includes(user.role))
+        .filter(({ views: tier }) => tier.includes(user.role))
         .map((tab, idx) => (
           <Tab
-            tier={tab.tier}
+            views={tab.views}
             href={tab.href}
             Icon={tab.Icon}
             title={tab.title}

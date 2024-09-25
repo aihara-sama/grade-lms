@@ -88,7 +88,7 @@ export type Database = {
           text: string | null;
         };
         Insert: {
-          creator_id: string;
+          creator_id?: string;
           id?: string;
           lesson_id: string;
           reply_id?: string | null;
@@ -134,7 +134,7 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
-          creator_id: string;
+          creator_id?: string;
           id?: string;
           title: string;
         };
@@ -192,7 +192,7 @@ export type Database = {
         Insert: {
           course_id?: string | null;
           created_at?: string;
-          creator_id: string;
+          creator_id?: string;
           ends: string;
           id?: string;
           starts: string;
@@ -351,7 +351,7 @@ export type Database = {
           grade?: number | null;
           id?: string;
           title: string;
-          user_id: string;
+          user_id?: string;
         };
         Update: {
           assignment_id?: string;

@@ -5,5 +5,5 @@ export interface MenuItem {
   title: string;
   href: string;
   Icon: ReactNode;
-  tier: Database["public"]["Enums"]["role"][];
+  views: Database["public"]["Enums"]["role"][];
 }

@@ -62,6 +62,7 @@ const TeacherDashboard: FunctionComponent<Props> = (props) => {
 
   return (
     <div className="sm:flex-row flex gap-8 flex-col">
+      expected
       <div className="flex-1 overflow-hidden">
         <div className="mb-6">
           <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">

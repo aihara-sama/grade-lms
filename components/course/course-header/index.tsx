@@ -24,25 +24,25 @@ const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = ({
       title: "Overview",
       href: `/dashboard/courses/${course.id}/overview`,
       Icon: <OverviewIcon />,
-      tier: [Role.Teacher, Role.Student],
+      views: [Role.Teacher, Role.Student],
     },
     {
       title: "Lessons",
       href: `/dashboard/courses/${course.id}/lessons`,
       Icon: <LessonsIcon />,
-      tier: [Role.Teacher, Role.Student],
+      views: [Role.Teacher, Role.Student],
     },
     {
       title: "Members",
       href: `/dashboard/courses/${course.id}/members`,
       Icon: <MembersIcon />,
-      tier: [Role.Teacher, Role.Student],
+      views: [Role.Teacher, Role.Student],
     },
     {
       title: "Settings",
       href: `/dashboard/courses/${course.id}/settings`,
       Icon: <SettingsIcon />,
-      tier: [Role.Teacher],
+      views: [Role.Teacher],
     },
   ];
 

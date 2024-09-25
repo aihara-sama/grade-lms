@@ -4,8 +4,6 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
 import { createAssignment } from "@/db/assignment";
-import { Event } from "@/enums/event.enum";
-import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/date/get-next-morning";
 import type { OutputData } from "@editorjs/editorjs";
@@ -41,18 +39,12 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
 
   // Hooks
   const t = useTranslations();
-  const notificationChannel = useNotificationChannel();
 
   // Handlers
   const submitCreateAssignment = async () => {
     setIsSubmitting(true);
     try {
       await createAssignment(assignment);
-
-      notificationChannel.send({
-        event: Event.NotificationCreated,
-        type: "broadcast",
-      });
 
       toast.success(t("assignment_created"));
       onClose(true);

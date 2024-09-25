@@ -1,6 +1,6 @@
 export const COURSES_GET_LIMIT = 20;
 export const USERS_GET_LIMIT = 20;
-export const NOTIFICATIONS_GET_LIMIT = 10;
+export const NOTIFICATIONS_GET_LIMIT = 20;
 export const LESSONS_GET_LIMIT = 20;
 export const MEMBERS_GET_LIMIT = 20;
 export const ASSIGNMENTS_GET_LIMIT = 20;

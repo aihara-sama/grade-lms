@@ -18,7 +18,7 @@ import DotsIcon from "@/components/icons/dots-icon";
 import NoData from "@/components/no-data";
 import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
-import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
+import { THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllAssignmentsFromLesson,
   deleteAssignment,
@@ -30,8 +30,6 @@ import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import type { Assignment } from "@/types/assignment.type";
 import type { Lesson } from "@/types/lesson.type";
-import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
-import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -131,32 +129,32 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
       setIsSearching(false);
     }
   };
-  const fetchMoreAssignments = async () => {
-    try {
-      const from = assignmentsOffsetRef.current;
-      const to = assignmentsOffsetRef.current + ASSIGNMENTS_GET_LIMIT - 1;
+  // const fetchMoreAssignments = async () => {
+  //   try {
+  //     const from = assignmentsOffsetRef.current;
+  //     const to = assignmentsOffsetRef.current + ASSIGNMENTS_GET_LIMIT - 1;
 
-      const fetchedAssignments = await getLessonAssignments(
-        lesson.id,
-        searchText,
-        from,
-        to
-      );
+  //     const fetchedAssignments = await getLessonAssignments(
+  //       lesson.id,
+  //       searchText,
+  //       from,
+  //       to
+  //     );
 
-      setAssignments((prev) => [...prev, ...fetchedAssignments]);
+  //     setAssignments((prev) => [...prev, ...fetchedAssignments]);
 
-      if (isSelectedAll) {
-        setAssignmentsIds((prev) => [
-          ...prev,
-          ...fetchedAssignments.map(({ id }) => id),
-        ]);
-      }
+  //     if (isSelectedAll) {
+  //       setAssignmentsIds((prev) => [
+  //         ...prev,
+  //         ...fetchedAssignments.map(({ id }) => id),
+  //       ]);
+  //     }
 
-      assignmentsOffsetRef.current += fetchedAssignments.length;
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+  //     assignmentsOffsetRef.current += fetchedAssignments.length;
+  //   } catch (error: any) {
+  //     toast.error(error.message);
+  //   }
+  // };
 
   const submitDeleteAssignment = async () => {
     setIsSubmittingDelAssign(true);
@@ -215,11 +213,11 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
       setIsSelectedAll(assignmentsCount === assignmentsIds.length - 1);
     }
   };
-  const onAssignmentsScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      fetchMoreAssignments();
-    }
-  };
+  // const onAssignmentsScroll = async (e: Event) => {
+  //   if (isCloseToBottom(e.target as HTMLElement)) {
+  //     fetchMoreAssignments();
+  //   }
+  // };
   const onAssignmentClick = (_assignmentId: string) => {
     setAssignmentId(_assignmentId);
     setIsEditAssignmentModal(true);
@@ -232,18 +230,19 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
     }
   };
 
+  useEffect(() => {}, []);
+
   // Effects
   useEffect(() => {
-    const throttled = throttleFetch(onAssignmentsScroll);
-    document
-      .getElementById("content-wrapper")
-      .addEventListener("scroll", throttled);
-
-    return () => {
-      document
-        .getElementById("content-wrapper")
-        ?.removeEventListener("scroll", throttled);
-    };
+    // const throttled = throttleFetch(onAssignmentsScroll);
+    // document
+    //   .getElementById("content-wrapper")
+    //   .addEventListener("scroll", throttled);
+    // return () => {
+    //   document
+    //     .getElementById("content-wrapper")
+    //     ?.removeEventListener("scroll", throttled);
+    // };
   }, [isSelectedAll, searchText]);
   useEffect(() => throttledSearch(searchText), [searchText]);
   useEffect(() => {
@@ -251,12 +250,12 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
   }, [assignmentsCount]);
   useEffect(() => {
     // Tall screens may fit more than 20 records. This will fit the screen
-    if (assignments.length && assignmentsCount !== assignments.length) {
-      const contentWrapper = document.getElementById("content-wrapper");
-      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
-        fetchMoreAssignments();
-      }
-    }
+    // if (assignments.length && assignmentsCount !== assignments.length) {
+    //   const contentWrapper = document.getElementById("content-wrapper");
+    //   if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
+    //     fetchMoreAssignments();
+    //   }
+    // }
   }, [assignments, assignmentsCount]);
 
   return (

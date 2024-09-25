@@ -1,7 +1,9 @@
+import type { Database } from "@/types/supabase.type";
+
 export declare module "@supabase/auth-js" {
   interface UserMetadata {
     name: string;
-    role: Role;
+    role: Database["public"]["Enums"]["role"];
     avatar: string;
     email: string;
     preferred_locale: Locale;

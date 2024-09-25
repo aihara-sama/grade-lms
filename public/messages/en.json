@@ -17,6 +17,7 @@
   "failed_to_change_language": "Failed to change language",
   "failed_to_update_lesson": "Failed to update lesson",
   "failed_to_load_courses": "Failed to load course",
+  "failed_to_get_new_notifications_count": "Failed to get new notifications count",
   "failed_to_save_whiteboar_data": "Failed to save whiteboard data",
   "video_format_is_not_allowed": "Video format is not allowed",
   "file_size_too_big": "File size too big",

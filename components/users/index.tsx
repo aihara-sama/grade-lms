@@ -34,8 +34,6 @@ import {
 } from "@/db/user";
 import { useUser } from "@/hooks/use-user";
 import type { User } from "@/types/user.type";
-import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
-import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -206,11 +204,11 @@ const Users: FunctionComponent = () => {
       setIsSelectedAll(usersCount === usersIds.length - 1);
     }
   };
-  const onCoursesScroll = (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      fetchMoreUsers();
-    }
-  };
+  // const onCoursesScroll = (e: Event) => {
+  //   if (isCloseToBottom(e.target as HTMLElement)) {
+  //     fetchMoreUsers();
+  //   }
+  // };
   const onEnrollUserInCoursesModalClose = (mutated?: boolean) => {
     setIsEnrollUserInCoursesModal(false);
 
@@ -235,16 +233,15 @@ const Users: FunctionComponent = () => {
 
   // Effects
   useEffect(() => {
-    const throttled = throttleFetch(onCoursesScroll);
-    document
-      .getElementById("content-wrapper")
-      .addEventListener("scroll", throttled);
-
-    return () => {
-      document
-        .getElementById("content-wrapper")
-        ?.removeEventListener("scroll", throttled);
-    };
+    // const throttled = throttleFetch(onCoursesScroll);
+    // document
+    //   .getElementById("content-wrapper")
+    //   .addEventListener("scroll", throttled);
+    // return () => {
+    //   document
+    //     .getElementById("content-wrapper")
+    //     ?.removeEventListener("scroll", throttled);
+    // };
   }, [isSelectedAll, searchText]);
 
   useEffect(() => throttledSearch(searchText), [searchText]);

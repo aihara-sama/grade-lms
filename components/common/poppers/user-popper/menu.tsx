@@ -7,6 +7,6 @@ export const menu: MenuItem[] = [
     title: "Profile",
     href: "/dashboard/profile",
     Icon: <ProfileIcon />,
-    tier: [Role.Teacher, Role.Student],
+    views: [Role.Teacher, Role.Student],
   },
 ];

@@ -2,7 +2,6 @@ import BaseModal from "@/components/common/modals/base-modal";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import { createCourse } from "@/db/course";
-import { useUser } from "@/hooks/use-user";
 import type { TablesInsert } from "@/types/supabase.type";
 import clsx from "clsx";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -14,13 +13,9 @@ interface Props {
 }
 
 const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
-  // Hooks
-  const { user } = useUser();
-
   // State
   const [course, setCourse] = useState<TablesInsert<"courses">>({
     title: "",
-    creator_id: user.id,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);

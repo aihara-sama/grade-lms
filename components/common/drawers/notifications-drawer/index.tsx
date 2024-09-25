@@ -5,13 +5,16 @@ import Notification from "@/components/common/drawers/notifications-drawer/notif
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import Skeleton from "@/components/skeleton";
 import { NOTIFICATIONS_GET_LIMIT } from "@/constants";
-import { getNotifications } from "@/db/notification";
-import { Event } from "@/enums/event.enum";
-import { useNotificationChannel } from "@/hooks/use-notification-channel";
+import {
+  getNewNotificationsCount,
+  getNotification,
+  getNotifications,
+} from "@/db/notification";
+import { DB } from "@/lib/supabase/db";
 import type { ResultOf } from "@/types/utils.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
-import { REALTIME_CHANNEL_STATES } from "@supabase/supabase-js";
+import type { RealtimePostgresInsertPayload } from "@supabase/supabase-js";
 import type { FunctionComponent, UIEventHandler } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -24,21 +27,21 @@ interface Props {
 const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
   // State
   const [isOpen, setIsOpen] = useState(false);
-  const [isNewNotification, setIsNewNotification] = useState(false);
-  const [notifications, setNotifications] = useState<
-    ResultOf<typeof getNotifications>
-  >([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Hooks
-  const notificationChannel = useNotificationChannel();
+  const [newNotificationsCount, setNewNotificationsCount] = useState(0);
+
+  const [notifications, setNotifications] = useState<
+    ResultOf<typeof getNotifications>["data"]
+  >([]);
+
+  const isNewNotifications = newNotificationsCount !== 0;
 
   // Refs
   const notificationsOffsetRef = useRef(0);
 
   // Handlers
-  const onNewNotification = () => setIsNewNotification(true);
-  const onReadNotification = (notificationId: string) =>
+  const onReadNotification = (notificationId: string) => {
     setNotifications((prev) =>
       prev.map((notification) =>
         notification.id === notificationId
@@ -46,13 +49,23 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
           : notification
       )
     );
+
+    setNewNotificationsCount((prev) => prev - 1);
+  };
   const fetchNotifications = async () => {
     try {
-      const fetchedNotifications = await getNotifications(
-        notificationsOffsetRef.current,
-        notificationsOffsetRef.current + NOTIFICATIONS_GET_LIMIT - 1
-      );
+      const [{ data: fetchedNotifications }, fetchedNewNotificationsCount] =
+        await Promise.all([
+          getNotifications(
+            notificationsOffsetRef.current,
+            notificationsOffsetRef.current + NOTIFICATIONS_GET_LIMIT - 1
+          ),
+          getNewNotificationsCount(),
+        ]);
+
+      setNewNotificationsCount(fetchedNewNotificationsCount);
       setNotifications((prev) => [...prev, ...fetchedNotifications]);
+
       notificationsOffsetRef.current += fetchedNotifications.length;
     } catch (error: any) {
       toast.error(error.message);
@@ -65,32 +78,45 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
     if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd();
   };
 
+  const onNewNotification = async (
+    payload: RealtimePostgresInsertPayload<(typeof notifications)[number]>
+  ) => {
+    try {
+      const { data: fetchedNotification } = await getNotification(
+        payload.new.id
+      );
+
+      setNotifications((prev) => [fetchedNotification, ...prev]);
+      setNewNotificationsCount((prev) => prev + 1);
+
+      notificationsOffsetRef.current += 1;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   // Effects
   useEffect(() => {
-    if (notificationChannel.state === REALTIME_CHANNEL_STATES.joined) {
-      notificationChannel
-        .on(
-          "broadcast",
-          { event: Event.NotificationCreated },
-          onNewNotification
-        )
-        .subscribe();
-    }
+    DB.channel("changes")
+      .on<(typeof notifications)[number]>(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+        },
+        onNewNotification
+      )
+      .subscribe();
   }, []);
 
   useEffect(() => {
     (async () => {
-      if (isOpen) {
-        setIsLoading(true);
-        await fetchNotifications();
-        setIsLoading(false);
-      }
+      setIsLoading(true);
+      await fetchNotifications();
+      setIsLoading(false);
     })();
-  }, [isOpen]);
-
-  useEffect(() => {
-    setIsNewNotification(notifications.some(({ is_read }) => !is_read));
-  }, [notifications]);
+  }, []);
 
   return (
     <>
@@ -99,7 +125,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
         className={`icon-button relative ${className}`}
       >
         <NotificationsIcon size="sm" />
-        {isNewNotification && (
+        {isNewNotifications && (
           <div className="absolute right-[7px] top-[7px] w-[10px] h-[10px] bg-red-500 rounded-[50%] border border-white"></div>
         )}
       </button>

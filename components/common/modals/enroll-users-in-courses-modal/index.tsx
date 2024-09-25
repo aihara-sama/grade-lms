@@ -54,8 +54,6 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
   const isSingleUser = usersIds.length === 1;
 
-  console.log({ isSelectedAll });
-
   // Hooks
   const t = useTranslations();
 

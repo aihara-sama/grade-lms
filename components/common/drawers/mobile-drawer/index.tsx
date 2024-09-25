@@ -56,7 +56,7 @@ const MobileDrawer: FunctionComponent = () => {
           <div className="px-7">
             <ul className="flex flex-col gap-4 mt-4">
               {menu
-                .filter(({ tier }) => tier.includes(user.role))
+                .filter(({ views: tier }) => tier.includes(user.role))
                 .map(({ title, href, Icon }, idx) => (
                   <li key={idx}>
                     <Link

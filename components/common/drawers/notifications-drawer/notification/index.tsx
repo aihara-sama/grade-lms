@@ -9,7 +9,7 @@ import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  notification: ResultOf<typeof getNotifications>[number];
+  notification: ResultOf<typeof getNotifications>["data"][number];
   onReadNotification: () => void;
   onNavigateAway: () => void;
 }
@@ -21,7 +21,7 @@ const Notification: FunctionComponent<Props> = ({
 }) => {
   const { body, href, textHref, title } = parseNotification(notification);
 
-  const handleReadNotification = async () => {
+  const submitReadNotification = async () => {
     try {
       await readNotification(notification.id);
       onReadNotification();
@@ -30,12 +30,12 @@ const Notification: FunctionComponent<Props> = ({
     }
   };
 
-  const handleMouseEnter = () => {
-    if (!notification.is_read) handleReadNotification();
+  const onMouseEnter = () => {
+    if (!notification.is_read) submitReadNotification();
   };
 
   return (
-    <div onMouseEnter={handleMouseEnter} className="flex flex-col pb-4 px-7 ">
+    <div onMouseEnter={onMouseEnter} className="flex flex-col pb-4 px-7 ">
       <div className="flex items-start gap-2">
         <button className="relative icon-button border border-neutral-300">
           <NotificationsIcon className="" size="xs" />

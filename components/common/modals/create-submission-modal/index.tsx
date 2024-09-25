@@ -3,8 +3,6 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
 import { createSubmission } from "@/db/submission";
-import { Event } from "@/enums/event.enum";
-import { useNotificationChannel } from "@/hooks/use-notification-channel";
 import { useUser } from "@/hooks/use-user";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { OutputData } from "@editorjs/editorjs";
@@ -30,7 +28,6 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
 }) => {
   // Hooks
   const t = useTranslations();
-  const notificationChannel = useNotificationChannel();
   const { user } = useUser();
 
   // States
@@ -43,19 +40,12 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handlers
-  const fireNotificationCreated = () => {
-    notificationChannel.send({
-      event: Event.NotificationCreated,
-      type: "broadcast",
-    });
-  };
   const submitCreateAssignment = async () => {
     setIsSubmitting(true);
 
     try {
       await createSubmission(submission);
 
-      fireNotificationCreated();
       toast.success(t("submission_created"));
       onClose(false);
     } catch (error: any) {
