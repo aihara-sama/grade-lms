@@ -21,6 +21,7 @@ import {
   enrollUsersInAllCourses,
   enrollUsersInCourses,
 } from "@/db/user";
+import useFetchLock from "@/hooks/use-fetch-lock";
 import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
@@ -42,39 +43,42 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
   shouldEnrollAll,
   onClose,
 }) => {
-  // State
-  const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
-  const [selectedCoursesIds, setSelectedCoursesIds] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [isSelectedAll, setIsSelectedAll] = useState(false);
-  const [totalCoursesCount, setTotalCoursesCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const isSingleUser = usersIds.length === 1;
-
   // Hooks
   const t = useTranslations();
+  const fetchLock = useFetchLock();
 
+  // State
+  const [courses, setCourses] = useState<CourseWithRefsCount[]>([]);
+  const [coursesIds, setCoursesIds] = useState<string[]>([]);
+
+  const [searchText, setSearchText] = useState("");
+  const [coursesCount, setCoursesCount] = useState(0);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
+
+  const isSingleUser = usersIds.length === 1;
   // Refs
   const coursesOffsetRef = useRef(0);
 
   // Vars
   const isData = !!courses.length && !isLoading;
   const isNoData =
-    !isLoading && !isSearching && !totalCoursesCount && !searchText.length;
+    !isLoading && !isSearching && !coursesCount && !searchText.length;
 
   const isNotFound =
     !isLoading && !isSearching && !courses.length && !!searchText.length;
 
   // Handlers
   const selectAllCourses = () => {
-    setSelectedCoursesIds(courses.map(({ id }) => id));
+    setCoursesIds(courses.map(({ id }) => id));
     setIsSelectedAll(true);
   };
   const deselectAllCourses = () => {
-    setSelectedCoursesIds([]);
+    setCoursesIds([]);
     setIsSelectedAll(false);
   };
 
@@ -90,14 +94,8 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       ]);
 
       setCourses(fetchedCourses);
-      setTotalCoursesCount(fetchedCoursesCount);
+      setCoursesCount(fetchedCoursesCount);
 
-      if (isSelectedAll) {
-        setSelectedCoursesIds((prev) => [
-          ...prev,
-          ...fetchedCourses.map(({ id }) => id),
-        ]);
-      }
       coursesOffsetRef.current = fetchedCourses.length;
     } catch (error: any) {
       toast.error(error.message);
@@ -106,7 +104,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     }
   };
 
-  const fetchCoursesBySearch = async (search: string, refetch?: boolean) => {
+  const fetchCoursesBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
@@ -120,12 +118,9 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       ]);
 
       setCourses(fetchedCourses);
-      setTotalCoursesCount(fetchedCoursesCount);
+      setCoursesCount(fetchedCoursesCount);
 
-      setIsSelectedAll(false);
-      setSelectedCoursesIds([]);
-
-      coursesOffsetRef.current += refetch ? fetchedCourses.length : 0;
+      coursesOffsetRef.current = fetchedCourses.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -145,7 +140,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       setCourses((prev) => [...prev, ...fetchedCourses]);
 
       if (isSelectedAll) {
-        setSelectedCoursesIds((prev) => [
+        setCoursesIds((prev) => [
           ...prev,
           ...fetchedCourses.map(({ id }) => id),
         ]);
@@ -163,21 +158,33 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     try {
       if (shouldEnrollAll) {
         if (isSelectedAll) await enrollAllUsersInAllCourses();
-        else await enrollAllUsersInCourses(selectedCoursesIds);
+        else await enrollAllUsersInCourses(coursesIds);
       }
       if (!shouldEnrollAll) {
         if (isSelectedAll) await enrollUsersInAllCourses(usersIds);
-        else await enrollUsersInCourses(usersIds, selectedCoursesIds);
+        else await enrollUsersInCourses(usersIds, coursesIds);
       }
 
       onClose(true);
-      setSelectedCoursesIds([]);
-      DB.functions.invoke("check-events");
+      setCoursesIds([]);
+
       toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
+
+      DB.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const onCourseToggle = (checked: boolean, courseId: string) => {
+    if (checked) {
+      setCoursesIds((prev) => [...prev, courseId]);
+      setIsSelectedAll(coursesCount === coursesIds.length + 1);
+    } else {
+      setCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
+      setIsSelectedAll(coursesCount === coursesIds.length - 1);
     }
   };
 
@@ -192,35 +199,24 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     []
   );
 
-  const onCourseToggle = (checked: boolean, courseId: string) => {
-    if (checked) {
-      setSelectedCoursesIds((prev) => [...prev, courseId]);
-      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length + 1);
-    } else {
-      setSelectedCoursesIds((prev) => prev.filter((_id) => _id !== courseId));
-      setIsSelectedAll(totalCoursesCount === selectedCoursesIds.length - 1);
-    }
-  };
-
-  const onScrollEnd = useCallback(throttleFetch(fetchMoreCourses), [
-    searchText,
-    isSelectedAll,
-  ]);
-
   // Effects
   useEffect(() => throttledSearch(searchText), [searchText]);
+
+  useEffect(() => {
+    if (coursesCount) setIsSelectedAll(coursesCount === coursesIds.length);
+  }, [coursesCount]);
 
   // View
   return (
     <BaseModal onClose={() => onClose()} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select courses to enroll</p>
-      {selectedCoursesIds.length ? (
+      {coursesIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
             onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAll ? totalCoursesCount : selectedCoursesIds.length}{" "}
+            {isSelectedAll ? coursesCount : coursesIds.length}{" "}
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
         </div>
@@ -238,12 +234,12 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       {isData && (
         <Table
           compact
-          onScrollEnd={onScrollEnd}
+          onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreCourses))}
           data={courses.map(({ id, title }) => ({
             Name: (
               <CardTitle
                 href={`/dashboard/courses/${id}/overview`}
-                checked={selectedCoursesIds.includes(id)}
+                checked={coursesIds.includes(id)}
                 Icon={<CourseIcon />}
                 title={title}
                 subtitle="Active"
@@ -279,7 +275,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           Cancel
         </button>
         <button
-          disabled={!selectedCoursesIds.length}
+          disabled={!coursesIds.length}
           className="primary-button"
           onClick={submitEnrollUsers}
         >

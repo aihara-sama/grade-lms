@@ -17,7 +17,6 @@ import LoadingSpinner from "@/components/loading-spinner";
 import TimezoneSelect from "@/components/timezone-select";
 import { DEFAULT_AVATAR } from "@/constants";
 import { createUser } from "@/db/user";
-import { Role } from "@/enums/role.enum";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -27,7 +26,7 @@ interface Props {
   onClose: (mutated?: boolean) => void;
 }
 
-const initUserDetails: UserInputType = {
+const initUser: UserInputType = {
   name: "",
   email: "",
   password: "",
@@ -40,21 +39,18 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
   const t = useTranslations();
 
   // State
+  const [user, setUser] = useState(initUser);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userDetails, setUserDetails] = useState(initUserDetails);
 
   // Handlers
-  const submitCreateUser = async (createAnother?: boolean) => {
+  const submitCreateUser = async () => {
     setIsSubmitting(true);
 
     try {
-      await createUser(userDetails);
+      await createUser(user);
+      onClose(true);
 
-      if (createAnother) {
-        setUserDetails(initUserDetails);
-      } else {
-        onClose(true);
-      }
       toast.success(t("user_created"));
     } catch (error: any) {
       toast.error(error.message);
@@ -64,13 +60,13 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
   };
 
   const onAvatarChange = (avatar: string) => {
-    setUserDetails((_) => ({ ..._, avatar }));
+    setUser((_) => ({ ..._, avatar }));
   };
   const onTimezoneChange = (timezone: string) => {
-    setUserDetails((_) => ({ ..._, timezone }));
+    setUser((_) => ({ ..._, timezone }));
   };
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
+    setUser((_) => ({ ..._, [e.target.name]: e.target.value }));
   };
 
   // View
@@ -86,7 +82,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                 <>
                   <Input
                     onChange={onInputChange}
-                    value={userDetails.name}
+                    value={user.name}
                     fullWidth
                     name="name"
                     StartIcon={<AvatarIcon size="xs" />}
@@ -95,7 +91,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                   />
                   <Input
                     onChange={onInputChange}
-                    value={userDetails.email}
+                    value={user.email}
                     StartIcon={<EmailIcon size="xs" />}
                     label="Email"
                     type="email"
@@ -104,7 +100,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                   />
                   <Input
                     onChange={onInputChange}
-                    value={userDetails.password}
+                    value={user.password}
                     name="password"
                     StartIcon={<SecurityIcon size="xs" />}
                     label="Password"
@@ -117,12 +113,11 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     </p>
                     <TimezoneSelect
                       onChange={onTimezoneChange}
-                      defaultTimezone={userDetails.timezone}
+                      defaultTimezone={user.timezone}
                     />
                   </div>
                 </>
               ),
-              tier: [Role.Teacher],
             },
             {
               title: "Avatar",
@@ -131,22 +126,17 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                 <div className="flex justify-center mx-[0] my-[23.5px]">
                   <AvatarUpload
                     onChange={onAvatarChange}
-                    avatar={userDetails.avatar}
+                    avatar={user.avatar}
                   />
                 </div>
               ),
-              tier: [Role.Teacher],
             },
           ]}
         />
         <hr className="mb-4" />
         <div className="flex justify-end gap-3">
-          <button
-            onClick={() => submitCreateUser(true)}
-            className="outline-button"
-            type="button"
-          >
-            Create & add another
+          <button className="outline-button" onClick={() => onClose()}>
+            Cancel
           </button>
           <button
             className="primary-button"

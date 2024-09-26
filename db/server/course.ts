@@ -2,6 +2,16 @@ import { COURSES_GET_LIMIT } from "@/constants";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 
+export const getCourse = async (id: string) => {
+  const result = await getServerDB()
+    .from("courses")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  return result.data;
+};
+
 export const getLatestCourses = async () => {
   const result = await getServerDB()
     .from("courses")

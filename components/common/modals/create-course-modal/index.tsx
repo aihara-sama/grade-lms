@@ -27,6 +27,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
     try {
       await createCourse(course);
       onClose(true);
+
       toast.success("Course created");
     } catch (error: any) {
       toast.error(error.message);
@@ -59,21 +60,26 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
         onChange={onInputChange}
         autoFocus
       />
-      <button
-        type="button"
-        onClick={submitCreateCourse}
-        disabled={!course.title || isSubmitting}
-        className="primary-button w-full"
-      >
-        {isSubmitting && (
-          <img
-            className="loading-spinner"
-            src="/assets/gifs/loading-spinner.gif"
-            alt=""
-          />
-        )}
-        <span className={`${clsx(isSubmitting && "opacity-0")}`}>Create</span>
-      </button>
+      <div className="flex justify-end gap-3">
+        <button className="outline-button" onClick={() => onClose()}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={submitCreateCourse}
+          disabled={!course.title || isSubmitting}
+          className="primary-button"
+        >
+          {isSubmitting && (
+            <img
+              className="loading-spinner"
+              src="/assets/gifs/loading-spinner.gif"
+              alt=""
+            />
+          )}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Create</span>
+        </button>
+      </div>
     </BaseModal>
   );
 };

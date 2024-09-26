@@ -18,6 +18,7 @@ import EditUserModal from "@/components/common/modals/edit-user-modal";
 import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
+import ContentWrapper from "@/components/content-wrapper";
 import CheckIcon from "@/components/icons/check-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
@@ -32,23 +33,25 @@ import {
   getUsers,
   getUsersCount,
 } from "@/db/user";
-import { useUser } from "@/hooks/use-user";
-import type { User } from "@/types/user.type";
+import useFetchLock from "@/hooks/use-fetch-lock";
+import type { ResultOf } from "@/types/utils.type";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
+import type { User } from "@supabase/supabase-js";
+import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
-const Users: FunctionComponent = () => {
+interface Props {
+  user: User;
+}
+
+const Users: FunctionComponent<Props> = ({ user }) => {
   // Hooks
   const t = useTranslations();
+  const fetchLock = useFetchLock();
 
   // State
-  const [users, setUsers] = useState<User[]>([]);
-  const [userId, setUserId] = useState<string>();
-  const [usersIds, setUsersIds] = useState<string[]>([]);
-
-  const [usersCount, setUsersCount] = useState(0);
-  const [searchText, setSearchText] = useState("");
 
   const [isEditUserModal, setIsEditUserModal] = useState(false);
   const [isDeleteUserModal, setIsDeleteUserModal] = useState(false);
@@ -58,16 +61,25 @@ const Users: FunctionComponent = () => {
   const [isEnrollUsersInCoursesModal, setIsEnrollUsersInCoursesModal] =
     useState(false);
 
+  const [users, setUsers] = useState<ResultOf<typeof getUsers>>([]);
+  const [usersCount, setUsersCount] = useState(0);
+
+  const [userId, setUserId] = useState<string>();
+  const [usersIds, setUsersIds] = useState<string[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+
   const [isSubmittingDeleteUser, setIsSubmittingDeleteUser] = useState(false);
   const [isSubmittingDeleteUsers, setIsSubmittingDeleteUsers] = useState(false);
+
+  const [searchText, setSearchText] = useState("");
 
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const usersOffsetRef = useRef(0);
-  const { user } = useUser();
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Vars
   const isData = !!users.length && !isLoading;
@@ -96,8 +108,9 @@ const Users: FunctionComponent = () => {
         getUsersCount(),
       ]);
 
+      // Dont show current user
       setUsers(fetchedUsers.filter(({ id }) => id !== user.id));
-      setUsersCount(fetchedUsersCount - 1);
+      setUsersCount(Math.max(fetchedUsersCount - 1, 0));
 
       usersOffsetRef.current = fetchedUsers.length;
     } catch (error: any) {
@@ -106,7 +119,7 @@ const Users: FunctionComponent = () => {
       setIsLoading(false);
     }
   };
-  const fetchUsersBySearch = async (search: string, refetch?: boolean) => {
+  const fetchUsersBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
@@ -115,13 +128,11 @@ const Users: FunctionComponent = () => {
         getUsersCount(search),
       ]);
 
+      // Dont show current user
       setUsers(fetchedUsers.filter(({ id }) => id !== user.id));
-      setUsersCount(fetchedUsersCount - 1);
+      setUsersCount(Math.max(fetchedUsersCount - 1, 0));
 
-      setIsSelectedAll(false);
-      setUsersIds([]);
-
-      usersOffsetRef.current += refetch ? fetchedUsers.length : 0;
+      usersOffsetRef.current = fetchedUsers.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -135,11 +146,10 @@ const Users: FunctionComponent = () => {
 
       const fetchedUsers = await getUsers(searchText, from, to);
 
-      setUsers((prev) => [...prev, ...fetchedUsers]);
-
-      if (isSelectedAll) {
-        setUsersIds((prev) => [...prev, ...fetchedUsers.map(({ id }) => id)]);
-      }
+      setUsers((prev) => [
+        ...prev,
+        ...fetchedUsers.filter(({ id }) => id !== user.id),
+      ]);
 
       usersOffsetRef.current += fetchedUsers.length;
     } catch (error: any) {
@@ -153,9 +163,11 @@ const Users: FunctionComponent = () => {
     try {
       await deleteUser(userId);
 
-      setIsDeleteUserModal(false);
+      setUsers((prev) => prev.filter(({ id }) => id !== userId));
       setUsersIds((_) => _.filter((id) => id !== userId));
-      fetchUsersBySearch(searchText, true);
+      setUsersCount((prev) => prev - 1);
+
+      setIsDeleteUserModal(false);
 
       toast.success(t("user_deleted"));
     } catch (error: any) {
@@ -168,13 +180,18 @@ const Users: FunctionComponent = () => {
     setIsSubmittingDeleteUsers(true);
 
     try {
-      await (isSelectedAll
-        ? deleteAllUsers(searchText)
-        : deleteUsers(usersIds));
+      if (isSelectedAll) {
+        await deleteAllUsers(searchText);
+        setUsers([]);
+        setUsersCount(0);
+      } else {
+        await deleteUsers(usersIds);
+        setUsers((prev) => prev.filter(({ id }) => !usersIds.includes(id)));
+        setUsersCount((prev) => prev - usersIds.length);
+      }
 
       setUsersIds([]);
       setIsDeleteUsersModal(false);
-      fetchUsersBySearch(searchText, true);
 
       toast.success(t("users_deleted"));
     } catch (error: any) {
@@ -183,17 +200,6 @@ const Users: FunctionComponent = () => {
       setIsSubmittingDeleteUsers(false);
     }
   };
-
-  const throttledSearch = useCallback(
-    throttleSearch((search) => {
-      if (search) {
-        fetchUsersBySearch(search);
-      } else {
-        fetchInitialUsers();
-      }
-    }, THROTTLE_SEARCH_WAIT),
-    []
-  );
 
   const onUserToggle = (checked: boolean, _userId: string) => {
     if (checked) {
@@ -204,11 +210,7 @@ const Users: FunctionComponent = () => {
       setIsSelectedAll(usersCount === usersIds.length - 1);
     }
   };
-  // const onCoursesScroll = (e: Event) => {
-  //   if (isCloseToBottom(e.target as HTMLElement)) {
-  //     fetchMoreUsers();
-  //   }
-  // };
+
   const onEnrollUserInCoursesModalClose = (mutated?: boolean) => {
     setIsEnrollUserInCoursesModal(false);
 
@@ -223,56 +225,78 @@ const Users: FunctionComponent = () => {
       setUsersIds([]);
     }
   };
-  const onEditUserModalClose = (mutated?: boolean) => {
+  const onEditUserModalClose = (
+    updatedUser?: ResultOf<typeof getUsers>[number]
+  ) => {
     setIsEditUserModal(false);
 
-    if (mutated) {
-      fetchInitialUsers();
+    if (updatedUser) {
+      setUsers((prev) => {
+        return prev.map(({ id, ...rest }) => {
+          if (id === updatedUser.id) return updatedUser;
+
+          return { id, ...rest };
+        });
+      });
     }
   };
 
-  // Effects
-  useEffect(() => {
-    // const throttled = throttleFetch(onCoursesScroll);
-    // document
-    //   .getElementById("content-wrapper")
-    //   .addEventListener("scroll", throttled);
-    // return () => {
-    //   document
-    //     .getElementById("content-wrapper")
-    //     ?.removeEventListener("scroll", throttled);
-    // };
-  }, [isSelectedAll, searchText]);
-
-  useEffect(() => throttledSearch(searchText), [searchText]);
-
-  useEffect(
-    () => setIsSelectedAll(usersCount === usersIds.length),
-    [usersCount]
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchUsersBySearch(search);
+      } else {
+        fetchInitialUsers();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
   );
 
+  // Effects
+  useEffect(() => throttledSearch(searchText), [searchText]);
+
   useEffect(() => {
-    // Tall screens may fit more than 20 records. This will fit the screen
-    if (users.length && usersCount !== users.length) {
-      const contentWrapper = document.getElementById("content-wrapper");
-      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
-        fetchMoreUsers();
+    // Tall screens may fit more than 20 records
+    // This will fit the screen with records
+    const fn = throttle(() => {
+      if (users.length && usersCount !== users.length) {
+        if (
+          contentWrapperRef.current.scrollHeight ===
+          contentWrapperRef.current.clientHeight
+        ) {
+          fetchLock("users", fetchMoreUsers)();
+        }
       }
-    }
+    }, 300);
+    fn();
+
+    window.addEventListener("resize", fn);
+
+    return () => {
+      window.removeEventListener("resize", fn);
+    };
   }, [users, usersCount]);
+
+  useEffect(() => {
+    if (usersCount) setIsSelectedAll(usersCount === usersIds.length);
+  }, [usersCount]);
 
   // View
   return (
-    <>
+    <ContentWrapper
+      ref={contentWrapperRef}
+      onScrollEnd={throttleFetch(fetchLock("users", fetchMoreUsers))}
+    >
+      <p className="text-3xl font-bold text-neutral-600">Users</p>
+      <p className="text-neutral-500">View and manage users</p>
+      <hr className="my-2 mb-4" />
       <CardsContainer>
         <Total
           Icon={<AvatarIcon size="lg" />}
           total={usersCount}
           title="Total users"
         />
-        <CreateUser
-          onUserCreated={() => fetchUsersBySearch(searchText, true)}
-        />
+        <CreateUser onUserCreated={() => fetchUsersBySearch(searchText)} />
       </CardsContainer>
       {usersIds.length ? (
         <div className="mb-3 gap-2 flex">
@@ -399,7 +423,7 @@ const Users: FunctionComponent = () => {
           body={t("prompts.delete_users")}
         />
       )}
-    </>
+    </ContentWrapper>
   );
 };
 export default Users;

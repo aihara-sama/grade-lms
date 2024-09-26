@@ -7,16 +7,18 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Tabs from "@/components/tabs";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import { Role } from "@/enums/role.enum";
+import type { View } from "@/types/view.type";
 import type { FunctionComponent } from "react";
 
 interface Props {
   assignmentId: string;
   onClose: (mutated?: boolean) => void;
   onSubmissionCreated?: () => void;
+  view: View;
 }
 
 const EditAssignmentModal: FunctionComponent<Props> = ({
+  view,
   assignmentId,
   onClose,
   onSubmissionCreated,
@@ -31,18 +33,19 @@ const EditAssignmentModal: FunctionComponent<Props> = ({
               Icon: <OverviewIcon />,
               content: (
                 <OverviewTab
+                  view={view}
                   assignmentId={assignmentId}
                   onSubmissionCreated={onSubmissionCreated}
                   onAssignmentUpdated={() => onClose(true)}
                 />
               ),
-              tier: [Role.Teacher, Role.Student],
             },
             {
               title: "Submissions",
               Icon: <SubmissionsIcon />,
-              content: <SubmissionsTab assignmentId={assignmentId} />,
-              tier: [Role.Teacher, Role.Student],
+              content: (
+                <SubmissionsTab view={view} assignmentId={assignmentId} />
+              ),
             },
           ]}
         />

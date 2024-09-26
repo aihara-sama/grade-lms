@@ -25,7 +25,11 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
   }
 
   // Check RLS
-  const users = await serverDB.from("users").select("id").in("id", usersIds);
+  const users = await serverDB
+    .from("users")
+    .select("id")
+    .in("id", usersIds)
+    .neq("id", user.data.user.id);
 
   const result = await Promise.all(
     users.data.map(({ id }) => adminDB.auth.admin.deleteUser(id))

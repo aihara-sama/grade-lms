@@ -46,23 +46,23 @@ interface Props {
 
 const Courses: FunctionComponent<Props> = ({ view }) => {
   // State
-
-  const [courses, setCourses] = useState<ResultOf<typeof getCourses>>([]);
-  const [courseId, setCourseId] = useState<string>();
-  const [coursesIds, setCoursesIds] = useState<string[]>([]);
-
   const [isEnrollUsersModal, setIsEnrollUsersModal] = useState(false);
   const [isDeleteCourseModal, setIsDeleteCourseModal] = useState(false);
   const [isDeleteCoursesModal, setIsDeleteCoursesModal] = useState(false);
+
+  const [courses, setCourses] = useState<ResultOf<typeof getCourses>>([]);
+  const [coursesCount, setCoursesCount] = useState(0);
+
+  const [courseId, setCourseId] = useState<string>();
+  const [coursesIds, setCoursesIds] = useState<string[]>([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
 
   const [isSubmittingDelCourse, setIsSubmittingDelCourse] = useState(false);
   const [isSubmittingDelCourses, setIsSubmittingDelCourses] = useState(false);
 
   const [searchText, setSearchText] = useState("");
-  const [coursesCount, setCoursesCount] = useState(0);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSearching, setIsSearching] = useState(false);
 
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
@@ -158,10 +158,12 @@ const Courses: FunctionComponent<Props> = ({ view }) => {
     try {
       await deleteCourse(courseId);
 
-      setIsDeleteCourseModal(false);
-      setCoursesIds((_) => _.filter((id) => id !== courseId));
       setCourses((prev) => prev.filter(({ id }) => id !== courseId));
       setCoursesCount((prev) => prev - 1);
+
+      setCoursesIds((_) => _.filter((id) => id !== courseId));
+
+      setIsDeleteCourseModal(false);
 
       toast.success("Success");
     } catch (error: any) {

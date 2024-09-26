@@ -5,6 +5,7 @@ import CardTitle from "@/components/card-title";
 import CardsContainer from "@/components/cards-container";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
+import ContentWrapper from "@/components/content-wrapper";
 import IconTitle from "@/components/icon-title";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CheckIcon from "@/components/icons/check-icon";
@@ -26,61 +27,68 @@ import {
   getCourseUsersCount,
 } from "@/db/user";
 import { Role } from "@/enums/role.enum";
-import { useUser } from "@/hooks/use-user";
-import type { User } from "@/types/user.type";
-import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
+import useFetchLock from "@/hooks/use-fetch-lock";
+import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import type { User as AuthUser } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
+import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import toast from "react-hot-toast";
 
 interface Props {
-  courseId: string;
-  currentUser: AuthUser;
+  user: User;
 }
-const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
-  const [isDispelMembersModalOpen, setIsDispelMembersModalOpen] =
-    useState(false);
-  const [isDispelMemberModalOpen, setIsDispelMemberModalOpen] = useState(false);
-  const [selectedMembersIds, setSelectedMembersIds] = useState<string[]>([]);
-  const [selectedMemberId, setSelectedMemberId] = useState<string>();
-  const [members, setMembers] = useState<User[]>([]);
-  const [totalMembersCount, setTotalMembersCount] = useState(0);
-  const [searchText, setSearchText] = useState("");
+const Members: FunctionComponent<Props> = ({ user }) => {
+  // Hooks
+  const t = useTranslations();
+  const { courseId } = useParams<{ courseId: string }>();
+
+  const fetchLock = useFetchLock();
+
+  // State
+  const [isDispelMemberModal, setIsDispelMemberModal] = useState(false);
+  const [isDispelMembersModal, setIsDispelMembersModal] = useState(false);
+
+  const [members, setMembers] = useState<ResultOf<typeof getCourseUsers>>([]);
+  const [membersCount, setMembersCount] = useState(0);
+
+  const [memberId, setMemberId] = useState<string>();
+  const [membersIds, setMembersIds] = useState<string[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
-  const [isSelectedAll, setIsSelectedAll] = useState(false);
-  const [isSubmittingDispelMember, setIsSubmittingDispelMember] =
-    useState(false);
-  const [isSubmittingDispelMembers, setIsSubmittingDispelMembers] =
-    useState(false);
   const [isSearching, setIsSearching] = useState(false);
+
+  const [isSubmitDispelMember, setIsSubmitDispelMember] = useState(false);
+  const [isSubmitDispelMembers, setIsSubmitDispelMembers] = useState(false);
+
+  const [searchText, setSearchText] = useState("");
+
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const membersOffsetRef = useRef(0);
-
-  // Hooks
-  const t = useTranslations();
-  const { user } = useUser();
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Vars
   const isData = !!members.length && !isLoading;
   const isNoData =
-    !isLoading && !isSearching && !totalMembersCount && !searchText.length;
+    !isLoading && !isSearching && !membersCount && !searchText.length;
 
   const isNotFound =
     !isLoading && !isSearching && !members.length && !!searchText.length;
 
   // Handlers
   const selectAllMembers = () => {
-    setSelectedMembersIds(members.map(({ id }) => id));
+    setMembersIds(members.map(({ id }) => id));
     setIsSelectedAll(true);
   };
   const deselectAllMembers = () => {
-    setSelectedMembersIds([]);
+    setMembersIds([]);
     setIsSelectedAll(false);
   };
 
@@ -94,7 +102,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       ]);
 
       setMembers(fetchedMembers);
-      setTotalMembersCount(fetchedMembersCount);
+      setMembersCount(fetchedMembersCount);
 
       membersOffsetRef.current = fetchedMembers.length;
     } catch (error: any) {
@@ -104,7 +112,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
     }
   };
 
-  const fetchMembersBySearch = async (search: string, refetch?: boolean) => {
+  const fetchMembersBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
@@ -114,12 +122,12 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       ]);
 
       setMembers(fetchedMembers);
-      setTotalMembersCount(fetchedUsersMembers);
+      setMembersCount(fetchedUsersMembers);
 
       setIsSelectedAll(false);
-      setSelectedMembersIds([]);
+      setMembersIds([]);
 
-      membersOffsetRef.current += refetch ? fetchedMembers.length : 0;
+      membersOffsetRef.current = fetchedMembers.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -141,7 +149,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       setMembers((prev) => [...prev, ...fetchedMembers]);
 
       if (isSelectedAll) {
-        setSelectedMembersIds((prev) => [
+        setMembersIds((prev) => [
           ...prev,
           ...fetchedMembers.map(({ id }) => id),
         ]);
@@ -154,40 +162,66 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
   };
 
   const submitDispelMember = async () => {
-    setIsSubmittingDispelMember(true);
+    setIsSubmitDispelMember(true);
 
     try {
-      await deleteUsersFromCourse(courseId, [selectedMemberId]);
+      await deleteUsersFromCourse(courseId, [memberId]);
 
-      setIsDispelMemberModalOpen(false);
-      setSelectedMembersIds((_) => _.filter((id) => id !== selectedMemberId));
-      fetchMembersBySearch(searchText, true);
+      setMembers((prev) => prev.filter(({ id }) => id !== memberId));
+      setMembersCount((prev) => prev - 1);
+
+      setMembersIds((_) => _.filter((id) => id !== memberId));
+
+      setIsDispelMemberModal(false);
 
       toast.success(t("student_dispelled"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDispelMember(false);
+      setIsSubmitDispelMember(false);
     }
   };
   const submitDispelCourseMembers = async () => {
-    setIsSubmittingDispelMembers(true);
+    setIsSubmitDispelMembers(true);
 
     try {
-      await (isSelectedAll
-        ? deleteAllUsersFromCourse(courseId, searchText)
-        : deleteUsersFromCourse(courseId, selectedMembersIds));
+      if (isSelectedAll) {
+        await deleteAllUsersFromCourse(courseId, searchText);
+        setMembers([]);
+        setMembersCount(0);
+      } else {
+        await deleteUsersFromCourse(courseId, membersIds);
+        setMembers((prev) => prev.filter(({ id }) => !membersIds.includes(id)));
+        setMembersCount((prev) => prev - membersIds.length);
+      }
 
-      setSelectedMembersIds([]);
-      setIsDispelMembersModalOpen(false);
-      fetchMembersBySearch(searchText, true);
+      setMembersIds([]);
+      setIsDispelMembersModal(false);
 
       toast.success(t("users_dispelled"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDispelMembers(false);
+      setIsSubmitDispelMembers(false);
     }
+  };
+
+  const onMemberToggle = (checked: boolean, _memberId: string) => {
+    if (checked) {
+      setMembersIds((prev) => [...prev, _memberId]);
+      setIsSelectedAll(membersCount === membersIds.length + 1);
+    } else {
+      setMembersIds((prev) => prev.filter((_id) => _id !== _memberId));
+      setIsSelectedAll(membersCount === membersIds.length - 1);
+    }
+  };
+
+  const onDispelMembersModalClose = () => {
+    setIsDispelMembersModal(false);
+  };
+
+  const onDispelMemberModalClose = () => {
+    setIsDispelMemberModal(false);
   };
 
   const throttledSearch = useCallback(
@@ -201,86 +235,66 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
     []
   );
 
-  const onMemberToggle = (checked: boolean, memberId: string) => {
-    if (checked) {
-      setSelectedMembersIds((prev) => [...prev, memberId]);
-      setIsSelectedAll(totalMembersCount === selectedMembersIds.length + 1);
-    } else {
-      setSelectedMembersIds((prev) => prev.filter((_id) => _id !== memberId));
-      setIsSelectedAll(totalMembersCount === selectedMembersIds.length - 1);
-    }
-  };
-
-  const onCoursesScroll = async (e: Event) => {
-    if (isCloseToBottom(e.target as HTMLElement)) {
-      fetchMoreMembers();
-    }
-  };
-
-  const onDispelMembersModalClose = () => {
-    setIsDispelMembersModalOpen(false);
-  };
-
-  const onDispelMemberModalClose = () => {
-    setIsDispelMemberModalOpen(false);
-  };
-
   // Effects
-  useEffect(() => {
-    const throttled = throttleFetch(onCoursesScroll);
-    document
-      .getElementById("content-wrapper")
-      .addEventListener("scroll", throttled);
-
-    return () => {
-      document
-        .getElementById("content-wrapper")
-        ?.removeEventListener("scroll", throttled);
-    };
-  }, [isSelectedAll, searchText]);
   useEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
-    setIsSelectedAll(totalMembersCount === selectedMembersIds.length);
-  }, [totalMembersCount]);
+    if (membersCount) setIsSelectedAll(membersCount === membersIds.length);
+  }, [membersCount]);
 
   useEffect(() => {
-    // Tall screens may fit more than 20 records. This will fit the screen
-    if (members.length && totalMembersCount !== members.length) {
-      const contentWrapper = document.getElementById("content-wrapper");
-      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
-        fetchMoreMembers();
+    // Tall screens may fit more than 20 records
+    // This will fit the screen with records
+    const fn = throttle(() => {
+      if (Members.length && membersCount !== Members.length) {
+        if (
+          contentWrapperRef.current.scrollHeight ===
+          contentWrapperRef.current.clientHeight
+        ) {
+          fetchLock("members", fetchMoreMembers)();
+        }
       }
-    }
-  }, [members, totalMembersCount]);
+    }, 300);
+    fn();
 
+    window.addEventListener("resize", fn);
+
+    return () => {
+      window.removeEventListener("resize", fn);
+    };
+  }, [Members, membersCount]);
+
+  // View
   return (
-    <>
+    <ContentWrapper
+      ref={contentWrapperRef}
+      onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreMembers))}
+    >
       <p className="section-title">Members</p>
       <CardsContainer>
         <Total
           Icon={<AvatarIcon size="lg" />}
-          total={totalMembersCount}
+          total={membersCount}
           title="Total members"
         />
         {user.role === Role.Teacher && (
           <EnrollUsers
-            onUsersEnrolled={() => fetchMembersBySearch(searchText, true)}
+            onUsersEnrolled={() => fetchMembersBySearch(searchText)}
             courseId={courseId}
           />
         )}
       </CardsContainer>
-      {selectedMembersIds.length ? (
+      {membersIds.length ? (
         <div className="mb-3 gap-2 flex">
           <button
             onClick={isSelectedAll ? deselectAllMembers : selectAllMembers}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAll ? totalMembersCount : selectedMembersIds.length}{" "}
+            {isSelectedAll ? membersCount : membersIds.length}{" "}
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
-            onClick={() => setIsDispelMembersModalOpen(true)}
+            onClick={() => setIsDispelMembersModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Dispel <DeleteIcon />
@@ -300,7 +314,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
         <Table
           data={members.map(({ name, role, id, avatar }, idx) => ({
             Name:
-              currentUser.id === id ? (
+              user.id === id ? (
                 <IconTitle
                   Icon={<Avatar avatar={avatar} />}
                   key={id}
@@ -311,7 +325,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
               ) : (
                 <CardTitle
                   href={`/users/${id}`}
-                  checked={selectedMembersIds.includes(id)}
+                  checked={membersIds.includes(id)}
                   Icon={<Avatar avatar={avatar} />}
                   title={name}
                   subtitle={role}
@@ -334,7 +348,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
                 trigger={
                   <button
                     className="icon-button text-neutral-500"
-                    onClick={() => setSelectedMemberId(id)}
+                    onClick={() => setMemberId(id)}
                   >
                     <DotsIcon />
                   </button>
@@ -343,7 +357,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
                 <ul className="flex flex-col">
                   <li
                     className="popper-list-item"
-                    onClick={() => setIsDispelMemberModalOpen(true)}
+                    onClick={() => setIsDispelMemberModal(true)}
                   >
                     <DeleteIcon /> Dispel
                   </li>
@@ -356,9 +370,9 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
       {isNoData && <NoData />}
       {isNotFound && <NotFound />}
 
-      {isDispelMembersModalOpen && (
+      {isDispelMembersModal && (
         <PromptModal
-          isSubmitting={isSubmittingDispelMembers}
+          isSubmitting={isSubmitDispelMembers}
           onClose={onDispelMembersModalClose}
           title="Dispel Members"
           action="Dispel"
@@ -366,9 +380,9 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
           body={t("prompts.dispel_users")}
         />
       )}
-      {isDispelMemberModalOpen && (
+      {isDispelMemberModal && (
         <PromptModal
-          isSubmitting={isSubmittingDispelMember}
+          isSubmitting={isSubmitDispelMember}
           onClose={onDispelMemberModalClose}
           title="Dispel member"
           action="Dispel"
@@ -376,7 +390,7 @@ const Members: FunctionComponent<Props> = ({ courseId, currentUser }) => {
           actionHandler={submitDispelMember}
         />
       )}
-    </>
+    </ContentWrapper>
   );
 };
 

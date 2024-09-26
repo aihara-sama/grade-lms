@@ -1,8 +1,5 @@
 "use client";
 
-import tz from "timezones-list";
-
-import type { InputType as UserInputType } from "@/actions/update-user-action/types";
 import AvatarUpload from "@/components/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CameraIcon from "@/components/icons/camera-icon";
@@ -15,33 +12,36 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
+import TimezoneSelect from "@/components/timezone-select";
+import type { getUsers } from "@/db/user";
 import { getUser, updateUser } from "@/db/user";
-import { Role } from "@/enums/role.enum";
-import type { SelectItem } from "@/interfaces/select.interface";
+import type { ResultOf } from "@/types/utils.type";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 interface Props {
   userId: string;
-  onClose: (mutated?: boolean) => void;
+  onClose: (updatedUser?: ResultOf<typeof getUsers>[number]) => void;
 }
 
 const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
-  const [userDetails, setUserDetails] = useState<UserInputType>();
-  const [timezones, setTimezones] = useState<SelectItem[]>([]);
+  // Hooks
+  const t = useTranslations();
+
+  // State
+  const [user, setUser] = useState<ResultOf<typeof getUsers>[number]>();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const t = useTranslations();
-
+  // Handlers
   const fetchUser = async () => {
     setIsLoading(true);
 
     try {
-      setUserDetails(await getUser(userId));
+      setUser(await getUser(userId));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -49,20 +49,18 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
     }
   };
 
-  const submitEditUser = async () => {
+  const submitUpdateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
     try {
+      const payload = new FormData(e.currentTarget);
+      const password = String(payload.get("password"));
+
       await updateUser({
-        avatar: userDetails.avatar,
-        email: userDetails.email,
-        id: userDetails.id,
-        name: userDetails.name,
-        timezone: userDetails.timezone,
-        ...(userDetails.password?.length
-          ? { password: userDetails.password }
-          : {}),
+        ...user,
+        ...(password.length ? { password } : {}),
       });
-      onClose(true);
+      onClose(user);
+
       toast.success(t("user_updated"));
     } catch (error: any) {
       toast.error(error.message);
@@ -71,18 +69,14 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
     }
   };
 
-  const onTimezoneChange = (timezone: SelectItem) =>
-    setUserDetails((_) => ({ ..._, timezone: timezone.title }));
-
+  const onTimezoneChange = (timezone: string) => {
+    setUser((_) => ({ ..._, timezone }));
+  };
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setUserDetails((_) => ({ ..._, [e.target.name]: e.target.value }));
+    setUser((_) => ({ ..._, [e.target.name]: e.target.value }));
 
-  const onAvatarChange = (avatar: string) =>
-    setUserDetails((_) => ({ ..._, avatar }));
+  const onAvatarChange = (avatar: string) => setUser((_) => ({ ..._, avatar }));
 
-  useEffect(() => {
-    setTimezones(tz.map(({ tzCode }) => ({ id: tzCode, title: tzCode })));
-  }, []);
   useEffect(() => {
     fetchUser();
   }, []);
@@ -91,7 +85,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
       {isLoading ? (
         <Skeleton />
       ) : (
-        <form noValidate>
+        <form noValidate onSubmit={submitUpdateUser}>
           <Tabs
             tabs={[
               {
@@ -101,7 +95,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                   <>
                     <Input
                       onChange={onInputChange}
-                      value={userDetails.name}
+                      value={user.name}
                       fullWidth
                       name="name"
                       StartIcon={<AvatarIcon size="xs" />}
@@ -110,7 +104,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                     />
                     <Input
                       onChange={onInputChange}
-                      value={userDetails.email}
+                      value={user.email}
                       StartIcon={<EmailIcon size="xs" />}
                       label="Email"
                       type="email"
@@ -118,8 +112,6 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                       fullWidth
                     />
                     <Input
-                      onChange={onInputChange}
-                      value={userDetails.password}
                       name="password"
                       StartIcon={<SecurityIcon size="xs" />}
                       label="Password"
@@ -130,24 +122,13 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                       <p className="mb-1 text-sm font-bold text-neutral-500">
                         Timezone
                       </p>
-                      <Select
-                        popperProps={{
-                          placement: "top",
-                          popperClassName: "h-[251px]",
-                        }}
-                        label=""
-                        options={timezones}
-                        fullWidth
-                        defaultValue={{
-                          id: userDetails.timezone,
-                          title: userDetails.timezone,
-                        }}
+                      <TimezoneSelect
                         onChange={onTimezoneChange}
+                        defaultTimezone={user.timezone}
                       />
                     </div>
                   </>
                 ),
-                tier: [Role.Teacher],
               },
               {
                 title: "Avatar",
@@ -156,21 +137,16 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                   <div className="flex justify-center mx-[0] my-[23.5px]">
                     <AvatarUpload
                       onChange={onAvatarChange}
-                      avatar={userDetails.avatar}
+                      avatar={user.avatar}
                     />
                   </div>
                 ),
-                tier: [Role.Teacher],
               },
             ]}
           />
           <hr className="mb-4" />
           <div className="flex justify-end gap-3">
-            <button
-              className="primary-button"
-              type="button"
-              onClick={submitEditUser}
-            >
+            <button className="primary-button" type="button">
               {isSubmitting && (
                 <img
                   className="loading-spinner"

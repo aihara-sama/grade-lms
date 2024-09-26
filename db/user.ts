@@ -20,7 +20,6 @@ export const getUser = async (id: string) => {
 
   return result.data;
 };
-
 export const getUsers = async (
   userName = "",
   from = 0,
@@ -130,7 +129,6 @@ export const createUser = async (userDetails: CreateUserInputType) => {
   const t = await loadMessages();
 
   const result = await createUserAction(userDetails);
-  console.log({ result });
 
   if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
 };
@@ -198,6 +196,8 @@ export const deleteUser = async (id: string) => {
   if (result.error) throw new Error(t("failed_to_delete_user"));
 };
 export const deleteUsers = async (ids: string[]) => {
+  console.log({ ids });
+
   const t = await loadMessages();
 
   const result = await deleteUsersAction(ids);

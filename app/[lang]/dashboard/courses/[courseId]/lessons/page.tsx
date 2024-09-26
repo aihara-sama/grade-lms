@@ -1,5 +1,6 @@
 import CourseHeader from "@/components/course/course-header";
 import Lessons from "@/components/course/lessons";
+import { getCourse } from "@/db/server/course";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { redirect } from "next/navigation";
 
@@ -10,20 +11,21 @@ interface Props {
     courseId: string;
   };
 }
-const Page: FunctionComponent<Props> = async ({ params }) => {
-  const { data: course, error } = await getServerDB()
-    .from("courses")
-    .select("*")
-    .eq("id", params.courseId)
-    .single();
+const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
+  const [
+    {
+      data: { user },
+    },
+    course,
+  ] = await Promise.all([getServerDB().auth.getUser(), getCourse(courseId)]);
 
-  if (error) return redirect("/dashboard/courses");
+  if (!course) return redirect("/dashboard/courses");
 
   return (
-    <div>
+    <>
       <CourseHeader course={course} />
-      <Lessons courseId={params.courseId} />
-    </div>
+      <Lessons user={user} />
+    </>
   );
 };
 

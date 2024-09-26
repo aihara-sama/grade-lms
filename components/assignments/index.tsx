@@ -12,13 +12,14 @@ import CardTitle from "@/components/card-title";
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
+import ContentWrapper from "@/components/content-wrapper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import NoData from "@/components/no-data";
 import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
-import { THROTTLE_SEARCH_WAIT } from "@/constants";
+import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllAssignmentsFromLesson,
   deleteAssignment,
@@ -27,10 +28,13 @@ import {
   getLessonAssignmentsCount,
 } from "@/db/assignment";
 import { Role } from "@/enums/role.enum";
-import { useUser } from "@/hooks/use-user";
+import useFetchLock from "@/hooks/use-fetch-lock";
 import type { Assignment } from "@/types/assignment.type";
 import type { Lesson } from "@/types/lesson.type";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
+import type { User } from "@supabase/supabase-js";
+import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -38,21 +42,23 @@ import toast from "react-hot-toast";
 
 interface Props {
   lesson: Lesson;
+  user: User;
 }
-const Assignments: FunctionComponent<Props> = ({ lesson }) => {
+const Assignments: FunctionComponent<Props> = ({ user, lesson }) => {
+  // Hooks
+  const t = useTranslations();
+  const fetchLock = useFetchLock();
+
   // States
+  const [isDelAssignmentModal, setIsDelAssignmentModal] = useState(false);
   const [isDelAssignmentsModal, setIsDelAssignmentsModal] = useState(false);
   const [isEditAssignmentModal, setIsEditAssignmentModal] = useState(false);
-  const [isDelAssignmentModal, setIsDelAssignmentModal] = useState(false);
 
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [assignmentsCount, setAssignmentsCount] = useState(0);
+
   const [assignmentId, setAssignmentId] = useState<string>();
   const [assignmentsIds, setAssignmentsIds] = useState<string[]>([]);
-
-  const [searchText, setSearchText] = useState("");
-
-  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -60,12 +66,13 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
   const [isSubmittingDelAssign, setIsSubmittingDelAssign] = useState(false);
   const [isSubmittingDelAssigns, setIsSubmittingDelAssigns] = useState(false);
 
+  const [searchText, setSearchText] = useState("");
+
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
+
   // Refs
   const assignmentsOffsetRef = useRef(0);
-
-  // Hooks
-  const t = useTranslations();
-  const { user } = useUser();
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Vars
   const isData = !!assignments.length && !isLoading;
@@ -104,10 +111,7 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
       setIsLoading(false);
     }
   };
-  const fetchAssignmentsBySearch = async (
-    search: string,
-    refetch?: boolean
-  ) => {
+  const fetchAssignmentsBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
@@ -119,42 +123,39 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
       setAssignments(fetchedAssignments);
       setAssignmentsCount(fetchedAssignmentsCount);
 
-      setIsSelectedAll(false);
-      setAssignmentsIds([]);
-
-      assignmentsOffsetRef.current += refetch ? fetchedAssignments.length : 0;
+      assignmentsOffsetRef.current = fetchedAssignments.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSearching(false);
     }
   };
-  // const fetchMoreAssignments = async () => {
-  //   try {
-  //     const from = assignmentsOffsetRef.current;
-  //     const to = assignmentsOffsetRef.current + ASSIGNMENTS_GET_LIMIT - 1;
+  const fetchMoreAssignments = async () => {
+    try {
+      const from = assignmentsOffsetRef.current;
+      const to = assignmentsOffsetRef.current + ASSIGNMENTS_GET_LIMIT - 1;
 
-  //     const fetchedAssignments = await getLessonAssignments(
-  //       lesson.id,
-  //       searchText,
-  //       from,
-  //       to
-  //     );
+      const fetchedAssignments = await getLessonAssignments(
+        lesson.id,
+        searchText,
+        from,
+        to
+      );
 
-  //     setAssignments((prev) => [...prev, ...fetchedAssignments]);
+      setAssignments((prev) => [...prev, ...fetchedAssignments]);
 
-  //     if (isSelectedAll) {
-  //       setAssignmentsIds((prev) => [
-  //         ...prev,
-  //         ...fetchedAssignments.map(({ id }) => id),
-  //       ]);
-  //     }
+      if (isSelectedAll) {
+        setAssignmentsIds((prev) => [
+          ...prev,
+          ...fetchedAssignments.map(({ id }) => id),
+        ]);
+      }
 
-  //     assignmentsOffsetRef.current += fetchedAssignments.length;
-  //   } catch (error: any) {
-  //     toast.error(error.message);
-  //   }
-  // };
+      assignmentsOffsetRef.current += fetchedAssignments.length;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
 
   const submitDeleteAssignment = async () => {
     setIsSubmittingDelAssign(true);
@@ -162,9 +163,12 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
     try {
       await deleteAssignment(assignmentId);
 
-      setIsDelAssignmentModal(false);
+      setAssignments((prev) => prev.filter(({ id }) => id !== assignmentId));
+      setAssignmentsCount((prev) => prev - 1);
+
       setAssignmentsIds((_) => _.filter((id) => id !== assignmentId));
-      fetchAssignmentsBySearch(searchText, true);
+
+      setIsDelAssignmentModal(false);
 
       toast.success(t("assignment_deleted"));
     } catch (error: any) {
@@ -177,19 +181,48 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
     setIsSubmittingDelAssigns(true);
 
     try {
-      await (isSelectedAll
-        ? deleteAllAssignmentsFromLesson(lesson.id, searchText)
-        : deleteAssignments(assignmentsIds));
+      if (isSelectedAll) {
+        await deleteAllAssignmentsFromLesson(lesson.id, searchText);
+        setAssignments([]);
+        setAssignmentsCount(0);
+      } else {
+        await deleteAssignments(assignmentsIds);
+        setAssignments((prev) =>
+          prev.filter(({ id }) => !assignmentsIds.includes(id))
+        );
+        setAssignmentsCount((prev) => prev - assignmentsIds.length);
+      }
 
       setAssignmentsIds([]);
       setIsDelAssignmentsModal(false);
-      fetchAssignmentsBySearch(searchText, true);
 
       toast.success(t("assignments_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSubmittingDelAssigns(false);
+    }
+  };
+
+  const onAssignmentToggle = (checked: boolean, lessonId: string) => {
+    if (checked) {
+      setAssignmentsIds((prev) => [...prev, lessonId]);
+      setIsSelectedAll(assignmentsCount === assignmentsIds.length + 1);
+    } else {
+      setAssignmentsIds((prev) => prev.filter((_id) => _id !== lessonId));
+      setIsSelectedAll(assignmentsCount === assignmentsIds.length - 1);
+    }
+  };
+
+  const onAssignmentClick = (_assignmentId: string) => {
+    setAssignmentId(_assignmentId);
+    setIsEditAssignmentModal(true);
+  };
+  const onEditAssignmentModalClose = (mutated?: boolean) => {
+    setIsEditAssignmentModal(false);
+
+    if (mutated) {
+      fetchAssignmentsBySearch(searchText);
     }
   };
 
@@ -204,62 +237,42 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
     []
   );
 
-  const onAssignmentToggle = (checked: boolean, lessonId: string) => {
-    if (checked) {
-      setAssignmentsIds((prev) => [...prev, lessonId]);
-      setIsSelectedAll(assignmentsCount === assignmentsIds.length + 1);
-    } else {
-      setAssignmentsIds((prev) => prev.filter((_id) => _id !== lessonId));
-      setIsSelectedAll(assignmentsCount === assignmentsIds.length - 1);
-    }
-  };
-  // const onAssignmentsScroll = async (e: Event) => {
-  //   if (isCloseToBottom(e.target as HTMLElement)) {
-  //     fetchMoreAssignments();
-  //   }
-  // };
-  const onAssignmentClick = (_assignmentId: string) => {
-    setAssignmentId(_assignmentId);
-    setIsEditAssignmentModal(true);
-  };
-  const onEditAssignmentModalClose = (mutated?: boolean) => {
-    setIsEditAssignmentModal(false);
-
-    if (mutated) {
-      fetchAssignmentsBySearch(searchText);
-    }
-  };
-
-  useEffect(() => {}, []);
-
   // Effects
-  useEffect(() => {
-    // const throttled = throttleFetch(onAssignmentsScroll);
-    // document
-    //   .getElementById("content-wrapper")
-    //   .addEventListener("scroll", throttled);
-    // return () => {
-    //   document
-    //     .getElementById("content-wrapper")
-    //     ?.removeEventListener("scroll", throttled);
-    // };
-  }, [isSelectedAll, searchText]);
   useEffect(() => throttledSearch(searchText), [searchText]);
+
   useEffect(() => {
-    setIsSelectedAll(assignmentsCount === assignmentsIds.length);
+    if (assignmentsCount)
+      setIsSelectedAll(assignmentsCount === assignmentsIds.length);
   }, [assignmentsCount]);
+
   useEffect(() => {
-    // Tall screens may fit more than 20 records. This will fit the screen
-    // if (assignments.length && assignmentsCount !== assignments.length) {
-    //   const contentWrapper = document.getElementById("content-wrapper");
-    //   if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
-    //     fetchMoreAssignments();
-    //   }
-    // }
+    // Tall screens may fit more than 20 records
+    // This will fit the screen with records
+    const fn = throttle(() => {
+      if (assignments.length && assignmentsCount !== assignments.length) {
+        if (
+          contentWrapperRef.current.scrollHeight ===
+          contentWrapperRef.current.clientHeight
+        ) {
+          fetchLock("assignments", fetchMoreAssignments)();
+        }
+      }
+    }, 300);
+    fn();
+
+    window.addEventListener("resize", fn);
+
+    return () => {
+      window.removeEventListener("resize", fn);
+    };
   }, [assignments, assignmentsCount]);
 
+  // View
   return (
-    <>
+    <ContentWrapper
+      ref={contentWrapperRef}
+      onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreAssignments))}
+    >
       <p className="section-title">Assignments</p>
       <CardsContainer>
         <Total
@@ -267,10 +280,10 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
           total={assignmentsCount}
           title="Total assignments"
         />
-        {user.role === Role.Teacher && (
+        {user.user_metadata.role === Role.Teacher && (
           <CreateAssignment
             lessonId={lesson.id}
-            onCreated={() => fetchAssignmentsBySearch(searchText, true)}
+            onCreated={() => fetchAssignmentsBySearch(searchText)}
           />
         )}
       </CardsContainer>{" "}
@@ -313,13 +326,13 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
                 title={title}
                 subtitle=""
                 onToggle={
-                  user.role === Role.Teacher
+                  user.user_metadata.role === Role.Teacher
                     ? (checked) => onAssignmentToggle(checked, id)
                     : undefined
                 }
               />
             ),
-            "": user.role === Role.Teacher && (
+            "": user.user_metadata.role === Role.Teacher && (
               <BasePopper
                 placement={
                   assignments.length > 7 && assignments.length - idx < 4
@@ -356,6 +369,7 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
           assignmentId={assignmentId}
           onClose={onEditAssignmentModalClose}
           onSubmissionCreated={() => fetchAssignmentsBySearch(searchText)}
+          view={user.user_metadata.role}
         />
       )}
       {isDelAssignmentsModal && (
@@ -378,7 +392,7 @@ const Assignments: FunctionComponent<Props> = ({ lesson }) => {
           actionHandler={submitDeleteAssignment}
         />
       )}
-    </>
+    </ContentWrapper>
   );
 };
 export default Assignments;

@@ -114,7 +114,6 @@ create table sent_announcements (
   user_id uuid references auth.users on delete cascade,
   lesson_id uuid references public.lessons on delete cascade
 );
-
 /**
 * This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
 */ 

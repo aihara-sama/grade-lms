@@ -18,6 +18,7 @@ import {
   getUsersNotInCourse,
   getUsersNotInCourseCount,
 } from "@/db/user";
+import useFetchLock from "@/hooks/use-fetch-lock";
 import { DB } from "@/lib/supabase/db";
 import type { User } from "@/types/user.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
@@ -38,18 +39,22 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   // State
   const [users, setUsers] = useState<User[]>([]);
   const [usersIds, setUsersIds] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmiotting] = useState(false);
+
   const [searchText, setSearchText] = useState("");
-  const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [usersCount, setUsersCount] = useState(0);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSubmitting, setIsSubmiotting] = useState(false);
+
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const usersOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
+  const fetchLock = useFetchLock();
 
   // Vars
   const isData = !!users.length && !isLoading;
@@ -80,9 +85,6 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       setUsers(fetchedUsers);
       setUsersCount(fetchedUsersCount);
 
-      if (isSelectedAll) {
-        setUsersIds((prev) => [...prev, ...fetchedUsers.map(({ id }) => id)]);
-      }
       usersOffsetRef.current = fetchedUsers.length;
     } catch (error: any) {
       toast.error(error.message);
@@ -91,7 +93,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     }
   };
 
-  const fetchUsersBySearch = async (search: string, refetch?: boolean) => {
+  const fetchUsersBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
@@ -103,10 +105,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       setUsers(fetchedUsers);
       setUsersCount(fetchedUsersCount);
 
-      setIsSelectedAll(false);
-      setUsersIds([]);
-
-      usersOffsetRef.current += refetch ? fetchedUsers.length : 0;
+      usersOffsetRef.current = fetchedUsers.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -144,13 +143,25 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       await (isSelectedAll
         ? enrollAllUsersInCourses([courseId])
         : enrollUsersInCourses(usersIds, [courseId]));
+
       onClose(usersIds);
+
       toast(t("users_enrolled"));
       DB.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsSubmiotting(false);
+    }
+  };
+
+  const onUserToggle = (checked: boolean, userId: string) => {
+    if (checked) {
+      setUsersIds((prev) => [...prev, userId]);
+      setIsSelectedAll(usersCount === usersIds.length + 1);
+    } else {
+      setUsersIds((prev) => prev.filter((_id) => _id !== userId));
+      setIsSelectedAll(usersCount === usersIds.length - 1);
     }
   };
 
@@ -165,22 +176,12 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     []
   );
 
-  const onUserToggle = (checked: boolean, userId: string) => {
-    if (checked) {
-      setUsersIds((prev) => [...prev, userId]);
-      setIsSelectedAll(usersCount === usersIds.length + 1);
-    } else {
-      setUsersIds((prev) => prev.filter((_id) => _id !== userId));
-      setIsSelectedAll(usersCount === usersIds.length - 1);
-    }
-  };
-  const onScrollEnd = useCallback(throttleFetch(fetchMoreUsers), [
-    searchText,
-    isSelectedAll,
-  ]);
-
   // Effects
   useEffect(() => throttledSearch(searchText), [searchText]);
+
+  useEffect(() => {
+    if (usersCount) setIsSelectedAll(usersCount === usersIds.length);
+  }, [usersCount]);
 
   // View
   return (
@@ -209,7 +210,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
       {isData && (
         <Table
-          onScrollEnd={onScrollEnd}
+          onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreUsers))}
           compact
           data={users.map(({ id, avatar, name, role }) => ({
             Name: (

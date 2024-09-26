@@ -21,9 +21,9 @@ import {
   getAssignmentSubmissions,
   getAssignmentSubmissionsCount,
 } from "@/db/submission";
-import { Role } from "@/enums/role.enum";
-import { useUser } from "@/hooks/use-user";
+import useFetchLock from "@/hooks/use-fetch-lock";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
+import type { View } from "@/types/view.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { format } from "date-fns";
@@ -40,36 +40,36 @@ import {
 import toast from "react-hot-toast";
 
 interface Props {
+  view: View;
   assignmentId: string;
 }
 
-const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
+const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
+  // Hooks
+  const t = useTranslations();
+  const fetchLock = useFetchLock();
+
   // States
-  const [isDelSubmissionsModal, setIsDelSubmissionsModal] = useState(false);
   const [isDelSubmissionModal, setIsDelSubmissionModal] = useState(false);
+  const [isDelSubmissionsModal, setIsDelSubmissionsModal] = useState(false);
   const [isEditSubmissionModal, setIsEditSubmissionModal] = useState(false);
   const [isViewSubmissionModal, setIsViewSubmissionModal] = useState(false);
 
   const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
+  const [submissionsCount, setSubmissionsCount] = useState(0);
+
   const [submissionId, setSubmissionId] = useState<string>();
   const [submissionsIds, setSubmissionsIds] = useState<string[]>([]);
-  const [submissionsCount, setSubmissionsCount] = useState(0);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const [isSubmitDelSubmission, setIsSubmitDelSubmission] = useState(false);
+  const [isSubmitDelSubmissions, setIsSubmitDelSubmissions] = useState(false);
 
   const [searchText, setSearchText] = useState("");
 
   const [isSelectedAll, setIsSelectedAll] = useState(false);
-
-  const [isSearching, setIsSearching] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [isSubmittingDelSubmission, setIsSubmittingDelSubmission] =
-    useState(false);
-  const [isSubmittingDelSubmissions, setIsSubmittingDelSubmissions] =
-    useState(false);
-
-  // Hooks
-  const t = useTranslations();
-  const { user } = useUser();
 
   // Refs
   const submissionsOffsetRef = useRef(0);
@@ -97,11 +97,11 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
     try {
       const [fetchedSubmissions, fetchedSubmissionsCount] = await Promise.all([
-        user.role === Role.Teacher
+        view === "Teacher"
           ? getAssignmentSubmissions(assignmentId)
           : getAssignmentSubmissions(assignmentId),
 
-        user.role === Role.Teacher
+        view === "Teacher"
           ? getAssignmentSubmissionsCount(assignmentId)
           : getAssignmentSubmissionsCount(assignmentId),
       ]);
@@ -116,19 +116,16 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       setIsLoading(false);
     }
   };
-  const fetchSubmissionsBySearch = async (
-    search: string,
-    refetch?: boolean
-  ) => {
+  const fetchSubmissionsBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
       const [fetchedSubmissions, fetchedSubmissionsCount] = await Promise.all([
-        user.role === Role.Teacher
+        view === "Teacher"
           ? getAssignmentSubmissions(assignmentId, search)
           : getAssignmentSubmissions(assignmentId, search),
 
-        user.role === Role.Teacher
+        view === "Teacher"
           ? getAssignmentSubmissionsCount(assignmentId, search)
           : getAssignmentSubmissionsCount(assignmentId, search),
       ]);
@@ -136,10 +133,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       setSubmissions(fetchedSubmissions);
       setSubmissionsCount(fetchedSubmissionsCount);
 
-      setIsSelectedAll(false);
-      setSubmissionsIds([]);
-
-      submissionsOffsetRef.current += refetch ? fetchedSubmissions.length : 0;
+      submissionsOffsetRef.current = fetchedSubmissions.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -151,7 +145,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       const from = submissionsOffsetRef.current;
       const to = submissionsOffsetRef.current + SUBMISSIONS_GET_LIMIT - 1;
 
-      const fetchedSubmissions = await (user.role === Role.Teacher
+      const fetchedSubmissions = await (view === "Teacher"
         ? getAssignmentSubmissions(assignmentId, searchText, from, to)
         : getAssignmentSubmissions(assignmentId, searchText, from, to));
 
@@ -171,54 +165,51 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   };
 
   const submitDeleteSubmission = async () => {
-    setIsSubmittingDelSubmission(true);
+    setIsSubmitDelSubmission(true);
 
     try {
       await deleteSubmission(submissionId);
 
-      setIsDelSubmissionModal(false);
+      setSubmissions((prev) => prev.filter(({ id }) => id !== submissionId));
+      setSubmissionsCount((prev) => prev - 1);
+
       setSubmissionsIds((_) => _.filter((id) => id !== submissionId));
-      fetchSubmissionsBySearch(searchText, true);
+
+      setIsDelSubmissionModal(false);
 
       toast.success(t("submission_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDelSubmission(false);
+      setIsSubmitDelSubmission(false);
     }
   };
   const submitDeleteSubmissions = async () => {
-    setIsSubmittingDelSubmissions(true);
+    setIsSubmitDelSubmissions(true);
 
     try {
-      await (isSelectedAll
-        ? deleteAllSubmissions(searchText)
-        : deleteSubmissions(submissionsIds));
+      if (isSelectedAll) {
+        await deleteAllSubmissions(searchText);
+        setSubmissions([]);
+        setSubmissionsCount(0);
+      } else {
+        await deleteSubmissions(submissionsIds);
+        setSubmissions((prev) =>
+          prev.filter(({ id }) => !submissionsIds.includes(id))
+        );
+        setSubmissionsCount((prev) => prev - submissionsIds.length);
+      }
 
       setSubmissionsIds([]);
       setIsDelSubmissionsModal(false);
-      fetchSubmissionsBySearch(searchText, true);
 
       toast.success(t("submissions_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDelSubmissions(false);
+      setIsSubmitDelSubmissions(false);
     }
   };
-
-  const throttledSearch = useCallback(
-    throttleSearch((search) => {
-      if (search) {
-        fetchSubmissionsBySearch(search);
-      } else {
-        fetchInitialSubmissions();
-      }
-    }, THROTTLE_SEARCH_WAIT),
-    []
-  );
-
-  const onScrollEnd = useCallback(throttleFetch(fetchMoreSubmissions), []);
 
   const onSubmissionToggle = (checked: boolean, lessonId: string) => {
     if (checked) {
@@ -233,11 +224,11 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   const onSubmissionClick = (_submissionId: string) => {
     setSubmissionId(_submissionId);
 
-    if (user.role === Role.Teacher) {
+    if (view === "Teacher") {
       setIsViewSubmissionModal(true);
     }
 
-    if (user.role === Role.Student) {
+    if (view === "Student") {
       setIsEditSubmissionModal(true);
     }
   };
@@ -247,7 +238,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsEditSubmissionModal(false);
 
     if (mutated) {
-      fetchSubmissionsBySearch(searchText, true);
+      fetchSubmissionsBySearch(searchText);
     }
   };
   const onViewSubmissionModalClose = (mutated?: boolean) => {
@@ -255,9 +246,20 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsViewSubmissionModal(false);
 
     if (mutated) {
-      fetchSubmissionsBySearch(searchText, true);
+      fetchSubmissionsBySearch(searchText);
     }
   };
+
+  const throttledSearch = useCallback(
+    throttleSearch((search) => {
+      if (search) {
+        fetchSubmissionsBySearch(search);
+      } else {
+        fetchInitialSubmissions();
+      }
+    }, THROTTLE_SEARCH_WAIT),
+    []
+  );
 
   useEffect(() => throttledSearch(searchText), [searchText]);
 
@@ -292,7 +294,9 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
       {isData && (
         <Table
-          onScrollEnd={onScrollEnd}
+          onScrollEnd={throttleFetch(
+            fetchLock("submissions", fetchMoreSubmissions)
+          )}
           compact
           data={submissions.map(
             ({ id, author, title, grade, created_at }, idx) => ({
@@ -306,7 +310,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                   subtitle=""
                   onClick={() => onSubmissionClick(id)}
                   onToggle={
-                    user.role === Role.Student
+                    view === "Student"
                       ? (checked) => onSubmissionToggle(checked, id)
                       : undefined
                   }
@@ -323,7 +327,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                   {format(new Date(created_at), "EEEE, MMM d")}
                 </p>
               ),
-              "": user.role === Role.Student && (
+              "": view === "Student" && (
                 <BasePopper
                   placement={
                     submissions.length > 7 && submissions.length - idx < 4
@@ -375,7 +379,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
 
       {isDelSubmissionModal && (
         <PromptModal
-          isSubmitting={isSubmittingDelSubmission}
+          isSubmitting={isSubmitDelSubmission}
           title="Delete submission"
           action="Delete"
           body={t("prompts.delete_submission")}
@@ -385,7 +389,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       )}
       {isDelSubmissionsModal && (
         <PromptModal
-          isSubmitting={isSubmittingDelSubmissions}
+          isSubmitting={isSubmitDelSubmissions}
           onClose={() => setIsDelSubmissionsModal(false)}
           title="Delete submissions"
           action="Delete"
@@ -394,13 +398,13 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
         />
       )}
 
-      {user.role === Role.Teacher && isViewSubmissionModal && (
+      {view === "Teacher" && isViewSubmissionModal && (
         <ViewSubmissionModal
           onClose={onViewSubmissionModalClose}
           submissionId={submissionId}
         />
       )}
-      {user.role === Role.Student && isEditSubmissionModal && (
+      {view === "Student" && isEditSubmissionModal && (
         <EditSubmissionModal
           onClose={onEditSubmissionModalClose}
           submissionId={submissionId}

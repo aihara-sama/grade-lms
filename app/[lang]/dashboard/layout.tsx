@@ -4,7 +4,7 @@ import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
   return (
-    <div className="h-full flex-col">
+    <div className="h-full">
       <PushNotificationsProvider />
       <Header />
       {children}

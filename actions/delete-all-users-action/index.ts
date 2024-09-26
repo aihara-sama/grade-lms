@@ -33,7 +33,8 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
   const users = await serverDB
     .from("users")
     .select("id")
-    .ilike("name", `%${payload.userName}%`);
+    .ilike("name", `%${payload.userName}%`)
+    .neq("id", user.data.user.id);
 
   const result = await Promise.all(
     users.data.map(({ id }) => adminDB.auth.admin.deleteUser(id))

@@ -124,6 +124,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
       )}
       {isEditAssignmentModalOpen && (
         <EditAssignmentModal
+          view="Teacher"
           assignmentId={selectedAssignmentId}
           onClose={onEditAssignmentModalClose}
         />

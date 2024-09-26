@@ -13,6 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import CardTitle from "@/components/card-title";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
+import ContentWrapper from "@/components/content-wrapper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
@@ -24,61 +25,70 @@ import { LESSONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllLessonsFromCourse,
   deleteLesson,
-  deleteLessons as deleteLessonsByIds,
+  deleteLessons,
   getCourseLessons,
   getCourseLessonsCount,
 } from "@/db/lesson";
 import { Role } from "@/enums/role.enum";
-import { useUser } from "@/hooks/use-user";
+import useFetchLock from "@/hooks/use-fetch-lock";
 import type { Lesson } from "@/types/lesson.type";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
+import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
+import type { User } from "@supabase/supabase-js";
+import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  courseId: string;
+  user: User;
 }
-const Lessons: FunctionComponent<Props> = ({ courseId }) => {
-  const [isDeleteLessonsModalOpen, setIsDeleteLessonsModalOpen] =
-    useState(false);
+const Lessons: FunctionComponent<Props> = ({ user }) => {
+  const [isDelLessonsModalOpen, setIsDelLessonsModalOpen] = useState(false);
   const [isDeleteLessonModalOpen, setIsDeleteLessonModalOpen] = useState(false);
-  const [selectedLessonsIds, setSelectedLessonsIds] = useState<string[]>([]);
-  const [selectedLessonId, setSelectedLessonId] = useState<string>();
+
+  const [isSubmittingDelLesson, setIsSubmittingDelLesson] = useState(false);
+  const [isSubmittingDelLessons, setIsSubmittingDelLessons] = useState(false);
+
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalLessonsCount, setTotalLessonsCount] = useState(0);
+  const [lessonId, setLessonId] = useState<string>();
+  const [lessonsIds, setLessonsIds] = useState<string[]>([]);
+
   const [searchText, setSearchText] = useState("");
-  const [isSelectedAll, setIsSelectedAll] = useState(false);
-  const [isSubmittingDeleteLesson, setIsSubmittingDeleteLesson] =
-    useState(false);
-  const [isSubmittingDeleteLessons, setIsSubmittingDeleteLessons] =
-    useState(false);
+  const [lessonsCount, setLessonsCount] = useState(0);
+
+  const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
   const lessonsOffsetRef = useRef(0);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
+  const { courseId } = useParams<{ courseId: string }>();
+
+  const fetchLock = useFetchLock();
 
   // Vars
   const isData = !!lessons.length && !isLoading;
   const isNoData =
-    !isLoading && !isSearching && !totalLessonsCount && !searchText.length;
+    !isLoading && !isSearching && !lessonsCount && !searchText.length;
 
   const isNotFound =
     !isLoading && !isSearching && !lessons.length && !!searchText.length;
 
   // Handlers
   const selectAllLessons = () => {
-    setSelectedLessonsIds(lessons.map(({ id }) => id));
+    setLessonsIds(lessons.map(({ id }) => id));
     setIsSelectedAll(true);
   };
   const deselectAllLessons = () => {
-    setSelectedLessonsIds([]);
+    setLessonsIds([]);
     setIsSelectedAll(false);
   };
 
@@ -92,7 +102,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       ]);
 
       setLessons(fetchedLessons);
-      setTotalLessonsCount(fetchedLessonsCount);
+      setLessonsCount(fetchedLessonsCount);
 
       lessonsOffsetRef.current = fetchedLessons.length;
     } catch (error: any) {
@@ -101,7 +111,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       setIsLoading(false);
     }
   };
-  const fetchLessonsBySearch = async (search: string, refetch?: boolean) => {
+  const fetchLessonsBySearch = async (search: string) => {
     setIsSearching(true);
 
     try {
@@ -111,12 +121,9 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       ]);
 
       setLessons(fetchedLessons);
-      setTotalLessonsCount(fetchedLessonsCount);
+      setLessonsCount(fetchedLessonsCount);
 
-      setIsSelectedAll(false);
-      setSelectedLessonsIds([]);
-
-      lessonsOffsetRef.current += refetch ? fetchedLessons.length : 0;
+      lessonsOffsetRef.current = fetchedLessons.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -138,7 +145,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       setLessons((prev) => [...prev, ...fetchedLessons]);
 
       if (isSelectedAll) {
-        setSelectedLessonsIds((prev) => [
+        setLessonsIds((prev) => [
           ...prev,
           ...fetchedLessons.map(({ id }) => id),
         ]);
@@ -151,39 +158,56 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
   };
 
   const submitDeleteLesson = async () => {
-    setIsSubmittingDeleteLesson(true);
+    setIsSubmittingDelLesson(true);
 
     try {
-      await deleteLesson(selectedLessonId);
+      await deleteLesson(lessonId);
+
+      setLessons((prev) => prev.filter(({ id }) => id !== lessonId));
+      setLessonsIds((_) => _.filter((id) => id !== lessonId));
+      setLessonsCount((prev) => prev - 1);
 
       setIsDeleteLessonModalOpen(false);
-      setSelectedLessonsIds((_) => _.filter((id) => id !== selectedLessonId));
-      fetchLessonsBySearch(searchText, true);
 
       toast.success(t("lesson_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDeleteLesson(false);
+      setIsSubmittingDelLesson(false);
     }
   };
   const submitDeleteLessons = async () => {
-    setIsSubmittingDeleteLessons(true);
+    setIsSubmittingDelLessons(true);
 
     try {
-      await (isSelectedAll
-        ? deleteAllLessonsFromCourse(courseId, searchText)
-        : deleteLessonsByIds(selectedLessonsIds));
+      if (isSelectedAll) {
+        await deleteAllLessonsFromCourse(courseId, searchText);
+        setLessons([]);
+        setLessonsCount(0);
+      } else {
+        await deleteLessons(lessonsIds);
+        setLessons((prev) => prev.filter(({ id }) => !lessonsIds.includes(id)));
+        setLessonsCount((prev) => prev - lessonsIds.length);
+      }
 
-      setSelectedLessonsIds([]);
-      setIsDeleteLessonsModalOpen(false);
-      fetchLessonsBySearch(searchText);
+      setLessonsIds([]);
+      setIsDelLessonsModalOpen(false);
 
       toast.success(t("lessons_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingDeleteLessons(false);
+      setIsSubmittingDelLessons(false);
+    }
+  };
+
+  const onLessonToggle = (checked: boolean, _lessonId: string) => {
+    if (checked) {
+      setLessonsIds((prev) => [...prev, _lessonId]);
+      setIsSelectedAll(lessonsCount === lessonsIds.length + 1);
+    } else {
+      setLessonsIds((prev) => prev.filter((_id) => _id !== _lessonId));
+      setIsSelectedAll(lessonsCount === lessonsIds.length - 1);
     }
   };
 
@@ -198,74 +222,64 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
     []
   );
 
-  const onLessonToggle = (checked: boolean, lessonId: string) => {
-    if (checked) {
-      setSelectedLessonsIds((prev) => [...prev, lessonId]);
-      setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length + 1);
-    } else {
-      setSelectedLessonsIds((prev) => prev.filter((_id) => _id !== lessonId));
-      setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length - 1);
-    }
-  };
-  // const onLessonsScroll = async (e: Event) => {
-  //   if (isCloseToBottom(e.target as HTMLElement)) {
-  //     fetchMoreLessons();
-  //   }
-  // };
-
   // Effects
-  useEffect(() => {
-    // const throttled = throttleFetch(onLessonsScroll);
-    // document
-    //   .getElementById("content-wrapper")
-    //   .addEventListener("scroll", throttled);
-    // return () => {
-    //   document
-    //     .getElementById("content-wrapper")
-    //     ?.removeEventListener("scroll", throttled);
-    // };
-  }, [isSelectedAll, searchText]);
   useEffect(() => throttledSearch(searchText), [searchText]);
-  useEffect(() => {
-    setIsSelectedAll(totalLessonsCount === selectedLessonsIds.length);
-  }, [totalLessonsCount]);
-  useEffect(() => {
-    // Tall screens may fit more than 20 records. This will fit the screen
-    if (lessons.length && totalLessonsCount !== lessons.length) {
-      const contentWrapper = document.getElementById("content-wrapper");
-      if (contentWrapper.scrollHeight === contentWrapper.clientHeight) {
-        fetchMoreLessons();
-      }
-    }
-  }, [lessons, totalLessonsCount]);
 
+  useEffect(() => {
+    if (lessonsCount) setIsSelectedAll(lessonsCount === lessonsIds.length);
+  }, [lessonsCount]);
+
+  useEffect(() => {
+    // Tall screens may fit more than 20 records
+    // This will fit the screen with records
+    const fn = throttle(() => {
+      if (lessons.length && lessonsCount !== lessons.length) {
+        if (
+          contentWrapperRef.current.scrollHeight ===
+          contentWrapperRef.current.clientHeight
+        ) {
+          fetchLock("lessons", fetchMoreLessons)();
+        }
+      }
+    }, 300);
+    fn();
+
+    window.addEventListener("resize", fn);
+
+    return () => {
+      window.removeEventListener("resize", fn);
+    };
+  }, [lessons, lessonsCount]);
   return (
-    <>
+    <ContentWrapper
+      ref={contentWrapperRef}
+      onScrollEnd={throttleFetch(fetchLock("lessons", fetchMoreLessons))}
+    >
       <p className="section-title">Lessons</p>
       <CardsContainer>
         <Total
           title="Total lessons"
-          total={totalLessonsCount}
+          total={lessonsCount}
           Icon={<LessonsIcon size="lg" />}
         />
-        {user.role === Role.Teacher && (
+        {user.user_metadata.role === Role.Teacher && (
           <CreateLesson
-            onCreated={() => fetchLessonsBySearch(searchText, true)}
+            onCreated={() => fetchLessonsBySearch(searchText)}
             courseId={courseId}
           />
         )}
       </CardsContainer>
-      {selectedLessonsIds.length ? (
+      {lessonsIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
             onClick={isSelectedAll ? deselectAllLessons : selectAllLessons}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAll ? totalLessonsCount : selectedLessonsIds.length}{" "}
+            {isSelectedAll ? lessonsCount : lessonsIds.length}{" "}
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
-            onClick={() => setIsDeleteLessonsModalOpen(true)}
+            onClick={() => setIsDelLessonsModalOpen(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
             Delete <DeleteIcon />
@@ -288,55 +302,56 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
             Name: (
               <CardTitle
                 href={`/dashboard/courses/${courseId}/lessons/${lesson.id}/overview`}
-                checked={selectedLessonsIds.includes(lesson.id)}
+                checked={lessonsIds.includes(lesson.id)}
                 Icon={<LessonIcon size="md" />}
                 title={lesson.title}
                 subtitle=""
                 onToggle={
-                  user.role === Role.Teacher
+                  user.user_metadata.role === Role.Teacher
                     ? (checked) => onLessonToggle(checked, lesson.id)
                     : undefined
                 }
               />
             ),
             Starts: format(new Date(lesson.starts), "EEEE, MMM d"),
-            "": user.role === Role.Teacher && !isLessonOngoing(lesson) && (
-              <BasePopper
-                placement={
-                  lessons.length > 7 && lessons.length - idx < 4
-                    ? "top"
-                    : "bottom"
-                }
-                width="sm"
-                trigger={
-                  <button
-                    className="icon-button text-neutral-500"
-                    onClick={() => setSelectedLessonId(lesson.id)}
-                  >
-                    <DotsIcon />
-                  </button>
-                }
-              >
-                <ul className="flex flex-col">
-                  <li
-                    className="popper-list-item"
-                    onClick={() => setIsDeleteLessonModalOpen(true)}
-                  >
-                    <DeleteIcon /> Delete
-                  </li>
-                </ul>
-              </BasePopper>
-            ),
+            "": user.user_metadata.role === Role.Teacher &&
+              !isLessonOngoing(lesson) && (
+                <BasePopper
+                  placement={
+                    lessons.length > 7 && lessons.length - idx < 4
+                      ? "top"
+                      : "bottom"
+                  }
+                  width="sm"
+                  trigger={
+                    <button
+                      className="icon-button text-neutral-500"
+                      onClick={() => setLessonId(lesson.id)}
+                    >
+                      <DotsIcon />
+                    </button>
+                  }
+                >
+                  <ul className="flex flex-col">
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsDeleteLessonModalOpen(true)}
+                    >
+                      <DeleteIcon /> Delete
+                    </li>
+                  </ul>
+                </BasePopper>
+              ),
           }))}
         />
       )}
       {isNoData && <NoData />}
       {isNotFound && <NotFound />}
 
-      {isDeleteLessonsModalOpen && (
+      {isDelLessonsModalOpen && (
         <PromptModal
-          isSubmitting={isSubmittingDeleteLessons}
-          onClose={() => setIsDeleteLessonsModalOpen(false)}
+          isSubmitting={isSubmittingDelLessons}
+          onClose={() => setIsDelLessonsModalOpen(false)}
           title="Delete lessons"
           action="Delete"
           body={t("prompts.delete_lessons")}
@@ -345,7 +360,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
       )}
       {isDeleteLessonModalOpen && (
         <PromptModal
-          isSubmitting={isSubmittingDeleteLesson}
+          isSubmitting={isSubmittingDelLesson}
           onClose={() => setIsDeleteLessonModalOpen(false)}
           title="Delete lesson"
           action="Delete"
@@ -353,7 +368,7 @@ const Lessons: FunctionComponent<Props> = ({ courseId }) => {
           actionHandler={submitDeleteLesson}
         />
       )}
-    </>
+    </ContentWrapper>
   );
 };
 

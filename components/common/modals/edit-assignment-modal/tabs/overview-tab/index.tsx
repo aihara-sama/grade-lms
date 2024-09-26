@@ -5,9 +5,8 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { getAssignment, updateAssignment } from "@/db/assignment";
-import { Role } from "@/enums/role.enum";
-import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
+import type { View } from "@/types/view.type";
 import clsx from "clsx";
 import { format, isAfter } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -16,25 +15,28 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
+  view: View;
   assignmentId: string;
   onSubmissionCreated?: () => void;
   onAssignmentUpdated: () => void;
 }
 
 const OverviewTab: FunctionComponent<Props> = ({
+  view,
+  assignmentId,
   onAssignmentUpdated,
   onSubmissionCreated,
-  assignmentId,
 }) => {
+  // Hooks
+  const t = useTranslations();
+
   // States
+  const [isCreateSubmissionModal, setIsCreateSubmissionModal] = useState(false);
+
   const [assignment, setAssignment] =
     useState<ResultOf<typeof getAssignment>>();
-  const [isCreateSubmissionModal, setIsCreateSubmissionModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // hooks
-  const t = useTranslations();
-  const { user } = useUser();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Vars
   const isAssignmentPastDue =
@@ -52,13 +54,14 @@ const OverviewTab: FunctionComponent<Props> = ({
     setIsSubmitting(true);
     try {
       await updateAssignment({
+        id: assignment.id,
         body: assignment.body,
         title: assignment.title,
         due_date: assignment.due_date,
-        id: assignment.id,
       });
 
       onAssignmentUpdated();
+
       toast(t("assignment_updated"));
     } catch (error: any) {
       toast.error(error.message);
@@ -97,7 +100,7 @@ const OverviewTab: FunctionComponent<Props> = ({
       {assignment ? (
         <div>
           <Input
-            disabled={user.role === Role.Student}
+            disabled={view === "Student"}
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
             placeholder="Assignment name"
@@ -114,7 +117,7 @@ const OverviewTab: FunctionComponent<Props> = ({
                 setAssignment((_) => ({ ..._, body: JSON.stringify(data) }))
               }
               data={JSON.parse(assignment.body)}
-              readOnly={user.role === Role.Student}
+              readOnly={view === "Student"}
             />
           </div>
 
@@ -130,10 +133,10 @@ const OverviewTab: FunctionComponent<Props> = ({
                 onChange={onChangeDate}
                 label="Due date"
                 popperPlacement="top-start"
-                disabled={user.role !== Role.Teacher}
+                disabled={view !== "Teacher"}
               />
             </div>
-            {user.role === Role.Teacher ? (
+            {view === "Teacher" ? (
               <button
                 className="primary-button"
                 onClick={submitUpdateAssignment}
@@ -159,7 +162,7 @@ const OverviewTab: FunctionComponent<Props> = ({
               </button>
             )}
           </div>
-          {user.role === Role.Student && isCreateSubmissionModal && (
+          {view === "Student" && isCreateSubmissionModal && (
             <CreateSubmissionModal
               onClose={onCreateSubmissionModalClose}
               assignmentId={assignment.id}
