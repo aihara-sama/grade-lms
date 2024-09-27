@@ -5,7 +5,7 @@ import type { CourseWithRefsCount } from "@/types/course.type";
 export const getCourse = async (id: string) => {
   const result = await getServerDB()
     .from("courses")
-    .select("*")
+    .select("*, users(*), lessons(*)")
     .eq("id", id)
     .single();
 

@@ -7,7 +7,7 @@ import CreateFileMessageModal from "@/components/common/modals/create-file-messa
 import ChatIcon from "@/components/icons/chat-icon";
 import SendMessageIcon from "@/components/icons/send-message-icon";
 import Message from "@/components/live-lesson/chat/message";
-import { createChatMessage, getChatMessages } from "@/db/chat-message";
+import { createChatMessage, getChatMessages } from "@/db/client/chat-message";
 import { Event } from "@/enums/event.enum";
 import { useChat } from "@/hooks/use-chat";
 import { useChatChannel } from "@/hooks/use-chat-channel";
@@ -37,7 +37,7 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
   const messagesWrapperRef = useRef<HTMLDivElement>();
 
   // Hooks
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
   const channel = useChatChannel();
 
   const disabled = isLessonEnded(lesson);

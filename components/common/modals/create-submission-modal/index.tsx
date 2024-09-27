@@ -2,7 +2,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
-import { createSubmission } from "@/db/submission";
+import { createSubmission } from "@/db/client/submission";
 import { useUser } from "@/hooks/use-user";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { OutputData } from "@editorjs/editorjs";
@@ -28,7 +28,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
 }) => {
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   // States
   const [submission, setSubmission] = useState<TablesInsert<"submissions">>({

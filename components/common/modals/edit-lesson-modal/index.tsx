@@ -16,8 +16,8 @@ import PromptModal from "@/components/common/modals/prompt-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
-import { getCourses } from "@/db/course";
-import { deleteLessons, getLesson, updateLesson } from "@/db/lesson";
+import { getCourses } from "@/db/client/course";
+import { deleteLessons, getLesson, updateLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/select.interface";
@@ -56,7 +56,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     // Hooks
     const t = useTranslations();
     const router = useRouter();
-    const { user } = useUser();
+    const user = useUser((state) => state.user);
 
     // Handlers
     const navigateToPreview = () =>

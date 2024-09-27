@@ -2,7 +2,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { getSubmission, updateSubmission } from "@/db/submission";
+import { getSubmission, updateSubmission } from "@/db/client/submission";
 import type { ResultOf } from "@/types/utils.type";
 import type { OutputData } from "@editorjs/editorjs";
 import clsx from "clsx";

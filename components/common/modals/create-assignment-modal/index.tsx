@@ -3,7 +3,7 @@ import DateInput from "@/components/date-input";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
-import { createAssignment } from "@/db/assignment";
+import { createAssignment } from "@/db/client/assignment";
 import type { TablesInsert } from "@/types/supabase.type";
 import { getNextMorning } from "@/utils/date/get-next-morning";
 import type { OutputData } from "@editorjs/editorjs";

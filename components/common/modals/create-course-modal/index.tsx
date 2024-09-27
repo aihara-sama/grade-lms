@@ -1,7 +1,7 @@
 import BaseModal from "@/components/common/modals/base-modal";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
-import { createCourse } from "@/db/course";
+import { createCourse } from "@/db/client/course";
 import type { TablesInsert } from "@/types/supabase.type";
 import clsx from "clsx";
 import type { ChangeEvent, FunctionComponent } from "react";

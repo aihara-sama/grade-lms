@@ -5,9 +5,8 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
-import { getCourses } from "@/db/course";
-import { createLesson, getOverlappingLessons } from "@/db/lesson";
-import { useUser } from "@/hooks/use-user";
+import { getCourses } from "@/db/client/course";
+import { createLesson, getOverlappingLessons } from "@/db/client/lesson";
 import type { SelectItem } from "@/interfaces/select.interface";
 import type { Course } from "@/types/course.type";
 import type { TablesInsert } from "@/types/supabase.type";
@@ -33,14 +32,12 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 }) => {
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
 
   // State
   const [lesson, setLesson] = useState<TablesInsert<"lessons">>({
     title: "",
     starts: getNextMorning().toISOString(),
     ends: addMinutes(getNextMorning(), 30).toISOString(),
-    creator_id: user.id,
     course_id: courseId,
     ...maybeLesson,
   });

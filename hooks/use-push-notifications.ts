@@ -1,4 +1,4 @@
-import { createFcmToken, getFcmToken } from "@/db/fcm-token";
+import { createFcmToken, getFcmToken } from "@/db/client/fcm-token";
 import { useUser } from "@/hooks/use-user";
 import { messaging } from "@/lib/firebase/messaging";
 import { DB } from "@/lib/supabase/db";
@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 export const usePushNotifications = () => {
   const t = useTranslations();
-  const { user, setUser } = useUser();
+  const { user, setUser } = useUser((state) => state);
 
   const enablePushNotifications = async () => {
     try {

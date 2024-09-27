@@ -13,11 +13,9 @@ import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
 const Page: NextPage = async () => {
-  const serverDB = getServerDB();
-
   const {
     data: { user },
-  } = await serverDB.auth.getUser();
+  } = await getServerDB().auth.getUser();
 
   let Dashborad: ReactNode;
 
@@ -55,11 +53,11 @@ const Page: NextPage = async () => {
   }
 
   return (
-    <div>
+    <>
       <p className="page-title">Dashboard</p>
       <p className="text-neutral-500 mb-4">Your LMS Command Center</p>
       {Dashborad}
-    </div>
+    </>
   );
 };
 

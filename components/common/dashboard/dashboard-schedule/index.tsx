@@ -26,7 +26,7 @@ const DashboardSchedule: FunctionComponent = () => {
   const [scheduleDate, setScheduleDate] = useState(startOfDay(new Date()));
 
   const t = useTranslations();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   const getWidgetStyle = (date: Date) => {
     let classes = "rounded-xl py-[2px] px-[8px] font-bold border-2 text-sm";

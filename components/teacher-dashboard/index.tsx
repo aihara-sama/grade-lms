@@ -6,7 +6,7 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
-import { getCoursesCount, getLatestCourses } from "@/db/course";
+import { getCoursesCount, getLatestCourses } from "@/db/client/course";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/course.type";
@@ -22,7 +22,7 @@ interface Props {
 
 const TeacherDashboard: FunctionComponent<Props> = (props) => {
   const { enablePushNotifications } = usePushNotifications();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   const [usersCount] = useState(props.usersCount);
   const [coursesCount, setCoursesCount] = useState(props.coursesCount);

@@ -31,6 +31,7 @@
   "failed_to_upload_file": "Не удалось загрузить файл",
   "failed_to_update_submission_grade": "Не удалось изменить оценку здачи задания",
   "failed_to_update_submission": "Не удалось изменить здачу задания",
+  "failed_to_update_course": "Не удалось обновить курс",
   "failed_to_update_assignment": "Не удалось изменить задание",
   "failed_to_load_courses_count": "Не удалось загрузить количество курсов",
   "failed_to_download_file": "Не удалось скачать файл",

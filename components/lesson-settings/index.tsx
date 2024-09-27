@@ -1,46 +1,37 @@
 "use client";
 
+import Container from "@/components/container";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
+import LessonHeader from "@/components/live-lesson/lesson-header";
 import LoadingSpinner from "@/components/loading-spinner";
-import { DB } from "@/lib/supabase/db";
-import type { Database } from "@/types/supabase.type";
+import { updateLesson } from "@/db/client/lesson";
+import { useLesson } from "@/hooks/use-lesson";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-interface Props {
-  lesson: Database["public"]["Tables"]["lessons"]["Row"];
-  updateLessonTitle: (title: string) => void;
-}
+const LessonSettings: FunctionComponent = () => {
+  // Hooks
+  const t = useTranslations();
+  const lesson = useLesson((state) => state.lesson);
 
-const LessonSettings: FunctionComponent<Props> = ({
-  lesson,
-  updateLessonTitle,
-}) => {
-  const router = useRouter();
-  const [lessonTitle, setLessonTitle] = useState(lesson.title);
+  const setLesson = useLesson((state) => state.setLesson);
+
+  // State
+  const [title, setTitle] = useState(lesson.title);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRenameLesson = async () => {
+  const submitUpdateLesson = async () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await DB.from("lessons")
-        .update({
-          title: lessonTitle,
-        })
-        .eq("id", lesson.id);
+      await updateLesson({ id: lesson.id, title });
+      setLesson({ ...lesson, title });
 
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success("Saved!");
-        updateLessonTitle(lessonTitle);
-        router.refresh();
-      }
+      toast.success(t("lesson_updated"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -48,30 +39,31 @@ const LessonSettings: FunctionComponent<Props> = ({
     }
   };
 
+  // View
   return (
-    <div>
+    <Container>
+      <LessonHeader course={lesson.course} />
       <p className="section-title">Settings</p>
       <div className="rename-wrapper">
         <div className="flex gap-1 items-end">
           <Input
+            onChange={(e) => setTitle(e.target.value)}
             label="Lesson name"
             StartIcon={<CoursesIcon size="xs" />}
-            value={lessonTitle}
-            onChange={(e) => setLessonTitle(e.target.value)}
+            value={title}
             className="mb-auto"
           />
           <button
-            disabled={!lessonTitle || isSubmitting}
+            disabled={!title || isSubmitting}
             className="primary-button w-24"
-            onClick={handleRenameLesson}
+            onClick={submitUpdateLesson}
           >
             {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
           </button>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
-
 export default LessonSettings;

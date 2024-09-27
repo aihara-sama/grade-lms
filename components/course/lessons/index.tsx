@@ -13,7 +13,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import CardTitle from "@/components/card-title";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
-import ContentWrapper from "@/components/content-wrapper";
+import Container from "@/components/container";
+import CourseHeader from "@/components/course/course-header";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
@@ -28,14 +29,16 @@ import {
   deleteLessons,
   getCourseLessons,
   getCourseLessonsCount,
-} from "@/db/lesson";
+} from "@/db/client/lesson";
+import type { getCourse } from "@/db/server/course";
 import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useUser } from "@/hooks/use-user";
 import type { Lesson } from "@/types/lesson.type";
+import type { ResultOf } from "@/types/utils.type";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import type { User } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -43,9 +46,10 @@ import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  user: User;
+  course: ResultOf<typeof getCourse>;
 }
-const Lessons: FunctionComponent<Props> = ({ user }) => {
+
+const Lessons: FunctionComponent<Props> = ({ course }) => {
   const [isDelLessonsModalOpen, setIsDelLessonsModalOpen] = useState(false);
   const [isDeleteLessonModalOpen, setIsDeleteLessonModalOpen] = useState(false);
 
@@ -66,10 +70,11 @@ const Lessons: FunctionComponent<Props> = ({ user }) => {
 
   // Refs
   const lessonsOffsetRef = useRef(0);
-  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Hooks
   const t = useTranslations();
+  const user = useUser((state) => state.user);
   const { courseId } = useParams<{ courseId: string }>();
 
   const fetchLock = useFetchLock();
@@ -235,8 +240,8 @@ const Lessons: FunctionComponent<Props> = ({ user }) => {
     const fn = throttle(() => {
       if (lessons.length && lessonsCount !== lessons.length) {
         if (
-          contentWrapperRef.current.scrollHeight ===
-          contentWrapperRef.current.clientHeight
+          containerRef.current.scrollHeight ===
+          containerRef.current.clientHeight
         ) {
           fetchLock("lessons", fetchMoreLessons)();
         }
@@ -251,10 +256,11 @@ const Lessons: FunctionComponent<Props> = ({ user }) => {
     };
   }, [lessons, lessonsCount]);
   return (
-    <ContentWrapper
-      ref={contentWrapperRef}
+    <Container
+      ref={containerRef}
       onScrollEnd={throttleFetch(fetchLock("lessons", fetchMoreLessons))}
     >
+      <CourseHeader course={course} />
       <p className="section-title">Lessons</p>
       <CardsContainer>
         <Total
@@ -262,7 +268,7 @@ const Lessons: FunctionComponent<Props> = ({ user }) => {
           total={lessonsCount}
           Icon={<LessonsIcon size="lg" />}
         />
-        {user.user_metadata.role === Role.Teacher && (
+        {user.role === Role.Teacher && (
           <CreateLesson
             onCreated={() => fetchLessonsBySearch(searchText)}
             courseId={courseId}
@@ -307,41 +313,40 @@ const Lessons: FunctionComponent<Props> = ({ user }) => {
                 title={lesson.title}
                 subtitle=""
                 onToggle={
-                  user.user_metadata.role === Role.Teacher
+                  user.role === Role.Teacher
                     ? (checked) => onLessonToggle(checked, lesson.id)
                     : undefined
                 }
               />
             ),
             Starts: format(new Date(lesson.starts), "EEEE, MMM d"),
-            "": user.user_metadata.role === Role.Teacher &&
-              !isLessonOngoing(lesson) && (
-                <BasePopper
-                  placement={
-                    lessons.length > 7 && lessons.length - idx < 4
-                      ? "top"
-                      : "bottom"
-                  }
-                  width="sm"
-                  trigger={
-                    <button
-                      className="icon-button text-neutral-500"
-                      onClick={() => setLessonId(lesson.id)}
-                    >
-                      <DotsIcon />
-                    </button>
-                  }
-                >
-                  <ul className="flex flex-col">
-                    <li
-                      className="popper-list-item"
-                      onClick={() => setIsDeleteLessonModalOpen(true)}
-                    >
-                      <DeleteIcon /> Delete
-                    </li>
-                  </ul>
-                </BasePopper>
-              ),
+            "": user.role === Role.Teacher && !isLessonOngoing(lesson) && (
+              <BasePopper
+                placement={
+                  lessons.length > 7 && lessons.length - idx < 4
+                    ? "top"
+                    : "bottom"
+                }
+                width="sm"
+                trigger={
+                  <button
+                    className="icon-button text-neutral-500"
+                    onClick={() => setLessonId(lesson.id)}
+                  >
+                    <DotsIcon />
+                  </button>
+                }
+              >
+                <ul className="flex flex-col">
+                  <li
+                    className="popper-list-item"
+                    onClick={() => setIsDeleteLessonModalOpen(true)}
+                  >
+                    <DeleteIcon /> Delete
+                  </li>
+                </ul>
+              </BasePopper>
+            ),
           }))}
         />
       )}
@@ -368,7 +373,7 @@ const Lessons: FunctionComponent<Props> = ({ user }) => {
           actionHandler={submitDeleteLesson}
         />
       )}
-    </ContentWrapper>
+    </Container>
   );
 };
 

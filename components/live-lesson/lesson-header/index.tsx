@@ -7,39 +7,39 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
 import LessonStatus from "@/components/lesson-status";
 import NavTabs from "@/components/nav-tabs";
-import { Role } from "@/enums/role.enum";
+import { useLesson } from "@/hooks/use-lesson";
 import type { MenuItem } from "@/interfaces/menu.interface";
 import type { Course } from "@/types/course.type";
-import type { Lesson } from "@/types/lesson.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 interface Props {
   course: Course;
-  lesson: Lesson;
 }
 
 const LessonHeader: FunctionComponent<PropsWithChildren<Props>> = ({
   course,
-  lesson,
 }) => {
+  // Hooks
+  const lesson = useLesson((state) => state.lesson);
+
   const tabs: MenuItem[] = [
     {
       title: "Overview",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
       Icon: <OverviewIcon />,
-      views: [Role.Teacher, Role.Student],
+      views: ["Teacher", "Student"],
     },
     {
       title: "Assignments",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
       Icon: <AssignmentsIcon />,
-      views: [Role.Teacher, Role.Student],
+      views: ["Teacher", "Student"],
     },
     {
       title: "Settings",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
       Icon: <SettingsIcon />,
-      views: [Role.Teacher],
+      views: ["Teacher"],
     },
   ];
 

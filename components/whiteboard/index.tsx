@@ -51,7 +51,7 @@ const Whiteboard: FunctionComponent<Props> = ({
   // Hooks
   const t = useTranslations();
   const channel = useLessonChannel();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
   const { setIsExpanded } = useIsLessonHrExpanded();
 
   // State

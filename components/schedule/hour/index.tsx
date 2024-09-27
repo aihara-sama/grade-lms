@@ -49,7 +49,7 @@ const Hour: FunctionComponent<Props> = ({
   );
 
   // Hooks
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
   const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
 
   const onEventPlaceholderClick = (min: number) => {

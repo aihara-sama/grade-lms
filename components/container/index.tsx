@@ -4,12 +4,12 @@ import type { PropsWithChildren, UIEventHandler } from "react";
 import { forwardRef } from "react";
 
 interface Props {
-  fullWidth?: boolean;
   onScrollEnd?: () => void;
+  fullWidth?: boolean;
 }
 
-const ContentWrapper = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
-  function ContentWrapper({ children, onScrollEnd, fullWidth = false }, ref) {
+const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
+  function ContentWrapper({ children, fullWidth, onScrollEnd }, ref) {
     const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
       if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd?.();
     };
@@ -18,10 +18,10 @@ const ContentWrapper = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       <div
         ref={ref}
         onScroll={onScroll}
-        className="overflow-auto h-[calc(100vh-68px)] flex flex-col fixed inset-0 top-[68px]"
+        className="overflow-auto h-[calc(100vh-68px)] flex flex-col"
       >
         <div
-          className={`max-w-[1432px] [@media(min-width:1432px)]:mx-[auto] ${clsx(fullWidth && "[max-width:unset] [margin:unset]")} w-full flex flex-1 flex-col p-6`}
+          className={` ${clsx(!fullWidth && "max-w-[1432px] [@media(min-width:1432px)]:mx-[auto]")} w-full flex flex-1 flex-col p-6`}
         >
           <div className="h-full flex flex-col">{children}</div>
         </div>
@@ -30,4 +30,4 @@ const ContentWrapper = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
   }
 );
 
-export default ContentWrapper;
+export default Container;

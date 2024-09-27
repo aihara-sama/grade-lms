@@ -17,7 +17,7 @@ import {
   enrollUsersInCourses,
   getUsersNotInCourse,
   getUsersNotInCourseCount,
-} from "@/db/user";
+} from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { DB } from "@/lib/supabase/db";
 import type { User } from "@/types/user.type";

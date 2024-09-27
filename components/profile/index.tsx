@@ -34,7 +34,7 @@ const Profile: FunctionComponent = () => {
   const [isSubmittingChangePassword, setIsSubmittingChangePassword] =
     useState(false);
 
-  const { user, setUser } = useUser();
+  const { user, setUser } = useUser((state) => state);
 
   const [avatar, setAvatar] = useState(user.avatar);
   const [userName, setUserName] = useState(user.name);

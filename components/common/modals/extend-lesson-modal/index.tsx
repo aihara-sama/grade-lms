@@ -2,7 +2,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import TimeIcon from "@/components/icons/time-icon";
 import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
-import { extendLesson, getOverlappingLessons } from "@/db/lesson";
+import { extendLesson, getOverlappingLessons } from "@/db/client/lesson";
 import { useLesson } from "@/hooks/use-lesson";
 import type { Lesson } from "@/types/lesson.type";
 import clsx from "clsx";
@@ -23,7 +23,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useTranslations();
-  const { setLesson } = useLesson();
+  const setLesson = useLesson((state) => state.setLesson);
 
   // Handlers
   const submitExtendLesson = async () => {

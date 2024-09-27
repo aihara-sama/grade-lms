@@ -21,7 +21,7 @@ const MobileDrawer: FunctionComponent = () => {
   // Hooks
   const t = useTranslations();
   const router = useRouter();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   // Handlers
   const submitCreateLesson = async () => {

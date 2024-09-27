@@ -16,7 +16,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import LoadingSpinner from "@/components/loading-spinner";
 import TimezoneSelect from "@/components/timezone-select";
 import { DEFAULT_AVATAR } from "@/constants";
-import { createUser } from "@/db/user";
+import { createUser } from "@/db/client/user";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";

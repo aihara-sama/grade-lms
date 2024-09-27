@@ -1,12 +1,14 @@
 "use client";
 
-import { useLesson } from "@/hooks/use-lesson";
-import type { Lesson } from "@/types/lesson.type";
+import { LessonContext } from "@/contexts/lesson-context";
+import type { getLesson } from "@/db/server/lesson";
+import { createLessonStore } from "@/stores/lesson-store";
+import type { ResultOf } from "@/types/utils.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
-import { useEffect } from "react";
+import { useRef } from "react";
 
 interface Props {
-  lesson: Lesson;
+  lesson: ResultOf<typeof getLesson>;
 }
 
 const LessonProvider: FunctionComponent<PropsWithChildren<Props>> = ({
@@ -14,23 +16,12 @@ const LessonProvider: FunctionComponent<PropsWithChildren<Props>> = ({
   children,
 }) => {
   // Hooks
-  const lessonStore = useLesson();
-
-  // Effects
-  useEffect(() => {
-    lessonStore.setLesson(lesson);
-
-    return () => {
-      lessonStore.setLesson(null);
-    };
-  }, []);
+  const store = useRef(createLessonStore(lesson)).current;
 
   // View
-  if (lessonStore.lesson === null) return null;
-  if (lessonStore.lesson === undefined) return null;
-
-  // View
-  return <>{children}</>;
+  return (
+    <LessonContext.Provider value={store}>{children}</LessonContext.Provider>
+  );
 };
 
 export default LessonProvider;

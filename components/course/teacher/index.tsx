@@ -8,7 +8,7 @@ interface Props {
   teacher: User;
 }
 
-const Teacher: FunctionComponent<Props> = async ({ teacher }) => {
+const Teacher: FunctionComponent<Props> = ({ teacher }) => {
   return (
     <div className="mt-10">
       <p className="mb-2 font-bold">Teacher</p>

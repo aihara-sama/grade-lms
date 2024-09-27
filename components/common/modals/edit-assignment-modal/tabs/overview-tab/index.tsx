@@ -4,7 +4,7 @@ import Editor from "@/components/editor";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { getAssignment, updateAssignment } from "@/db/assignment";
+import { getAssignment, updateAssignment } from "@/db/client/assignment";
 import type { ResultOf } from "@/types/utils.type";
 import type { View } from "@/types/view.type";
 import clsx from "clsx";

@@ -104,7 +104,7 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
       ends: new Date(+new Date(lesson.ends) + miliseconds).toISOString(),
     })
     .eq("id", lesson.id)
-    .select("*")
+    .select("*, course:courses(*)")
     .single();
 
   if (result.error) throw new Error(t("failed_to_extend_lesson"));

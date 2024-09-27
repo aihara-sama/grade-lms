@@ -1,7 +1,7 @@
 import { COURSES_GET_LIMIT } from "@/constants";
 import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";
-import type { TablesInsert } from "@/types/supabase.type";
+import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
 
 // GET
@@ -98,6 +98,17 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
     .single();
 
   if (result.error) throw new Error(t("failed_to_create_course"));
+
+  return result.data;
+};
+
+// UPDATE
+export const updateCourse = async (course: TablesUpdate<"courses">) => {
+  const t = await loadMessages();
+
+  const result = await DB.from("courses").update(course).eq("id", course.id);
+
+  if (result.error) throw new Error(t("failed_to_update_course"));
 
   return result.data;
 };

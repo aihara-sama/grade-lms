@@ -23,7 +23,7 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
   const [coursesInsights, setCoursesInsights] = useState<number[]>([]);
 
   // Hooks
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   // Handlers
   const fetchCoursesInsights = () => {

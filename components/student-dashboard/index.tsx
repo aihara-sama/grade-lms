@@ -20,7 +20,7 @@ interface Props {
 
 const StudentrDashboard: FunctionComponent<Props> = (props) => {
   const { enablePushNotifications } = usePushNotifications();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   useEffect(() => {
     (async () => {

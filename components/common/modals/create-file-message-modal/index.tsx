@@ -4,7 +4,7 @@ import MessagesIcon from "@/components/icons/messages-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
 import { MAX_CHAT_FILE_SIZE } from "@/constants";
-import { uploadChatFile } from "@/db/storage";
+import { uploadChatFile } from "@/db/client/storage";
 import { Event } from "@/enums/event.enum";
 import { useChatChannel } from "@/hooks/use-chat-channel";
 import { useUser } from "@/hooks/use-user";
@@ -38,7 +38,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
 }) => {
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
   const [isSubmittingCreateMessage, setIsSubmittingCreateMessage] =
     useState(false);
   const channel = useChatChannel();

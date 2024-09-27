@@ -23,8 +23,8 @@ import toast from "react-hot-toast";
 import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
 import Select from "@/components/common/select";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
-import { getCourses } from "@/db/course";
-import { getWeekLessons, upsertLesson } from "@/db/lesson";
+import { getCourses } from "@/db/client/course";
+import { getWeekLessons, upsertLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/select.interface";
@@ -57,7 +57,7 @@ const Schedule: FunctionComponent = () => {
 
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
   const {
     canDropEvent,
     draggingEvent,

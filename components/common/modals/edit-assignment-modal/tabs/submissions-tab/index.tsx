@@ -20,7 +20,7 @@ import {
   deleteSubmissions,
   getAssignmentSubmissions,
   getAssignmentSubmissionsCount,
-} from "@/db/submission";
+} from "@/db/client/submission";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
 import type { View } from "@/types/view.type";

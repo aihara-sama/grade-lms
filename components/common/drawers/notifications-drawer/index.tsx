@@ -9,7 +9,7 @@ import {
   getNewNotificationsCount,
   getNotification,
   getNotifications,
-} from "@/db/notification";
+} from "@/db/client/notification";
 import { DB } from "@/lib/supabase/db";
 import type { ResultOf } from "@/types/utils.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";

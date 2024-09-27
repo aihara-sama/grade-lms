@@ -18,7 +18,7 @@ import EditUserModal from "@/components/common/modals/edit-user-modal";
 import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
-import ContentWrapper from "@/components/content-wrapper";
+import Container from "@/components/container";
 import CheckIcon from "@/components/icons/check-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
@@ -32,7 +32,7 @@ import {
   deleteUsers,
   getUsers,
   getUsersCount,
-} from "@/db/user";
+} from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
@@ -146,6 +146,7 @@ const Users: FunctionComponent<Props> = ({ user }) => {
 
       const fetchedUsers = await getUsers(searchText, from, to);
 
+      // Dont show current user
       setUsers((prev) => [
         ...prev,
         ...fetchedUsers.filter(({ id }) => id !== user.id),
@@ -283,7 +284,7 @@ const Users: FunctionComponent<Props> = ({ user }) => {
 
   // View
   return (
-    <ContentWrapper
+    <Container
       ref={contentWrapperRef}
       onScrollEnd={throttleFetch(fetchLock("users", fetchMoreUsers))}
     >
@@ -423,7 +424,7 @@ const Users: FunctionComponent<Props> = ({ user }) => {
           body={t("prompts.delete_users")}
         />
       )}
-    </ContentWrapper>
+    </Container>
   );
 };
 export default Users;

@@ -11,19 +11,29 @@ interface Props {
 }
 
 const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft }) => {
+  // Hooks
+  const { lesson, isEnded, isOngoing, setisEnded, setisOngoing } = useLesson(
+    (state) => state
+  );
+
+  // State
   const [liveDate, setLiveDate] = useState<string>();
+
+  // Refs
   const intervalIdRef = useRef<NodeJS.Timeout>();
 
-  const { lesson, isEnded, isOngoing, setisEnded, setisOngoing } = useLesson();
-
+  // Handlers
   const getStatusColor = () => {
     if (isOngoing) return "bg-green-500";
     if (isEnded) return "bg-red-600";
+
     return "bg-yellow-400";
   };
 
+  // Effects
   useEffect(() => {
     setLiveDate(formatDistanceToNowStrict(lesson.ends));
+
     if (intervalIdRef.current) clearInterval(intervalIdRef.current);
 
     intervalIdRef.current = setInterval(() => {
@@ -38,6 +48,7 @@ const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft }) => {
     };
   }, [lesson]);
 
+  // View
   return (
     <div className="flex items-center gap-3">
       <div className="text-4 flex items-center gap-2 relative text-sm whitespace-nowrap">

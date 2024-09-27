@@ -1,47 +1,37 @@
 "use client";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
+import Container from "@/components/container";
+import CourseHeader from "@/components/course/course-header";
 import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
-import { DB } from "@/lib/supabase/db";
+import { updateCourse } from "@/db/client/course";
 import type { Course } from "@/types/course.type";
 import clsx from "clsx";
-// import { revalidatePath } from "next/cache";
-import { useRouter } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
   course: Course;
-  updateCourseTitle: (title: string) => void;
 }
 
-const CourseSettings: FunctionComponent<Props> = ({
-  course,
-  updateCourseTitle,
-}) => {
-  const router = useRouter();
-  const [courseTitle, setCourseTitle] = useState(course.title);
+const CourseSettings: FunctionComponent<Props> = ({ course: initCourse }) => {
+  // State
+  const [course, setCourse] = useState(initCourse);
+  const [title, setTitle] = useState(initCourse.title);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRenameCourse = async () => {
+  // Handlers
+  const submitUpdateCourse = async () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await DB.from("courses")
-        .update({
-          title: courseTitle,
-        })
-        .eq("id", course.id);
+      await updateCourse({ id: course.id, title });
+      setCourse({ ...initCourse, title });
 
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success("Saved!");
-        updateCourseTitle(courseTitle);
-        router.refresh();
-      }
+      revalidatePageAction();
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -49,29 +39,31 @@ const CourseSettings: FunctionComponent<Props> = ({
     }
   };
 
+  // View
   return (
-    <div>
+    <Container>
+      <CourseHeader course={course} />
       <p className="section-title">Settings</p>
       <div>
         <div className="flex items-end gap-[4px]">
           <Input
             label="Course name"
             StartIcon={<CoursesIcon size="xs" />}
-            value={courseTitle}
-            onChange={(e) => setCourseTitle(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="mb-auto"
           />
           <button
-            disabled={!courseTitle || isSubmitting}
+            disabled={!title || isSubmitting}
             className="primary-button w-[100px]"
-            onClick={handleRenameCourse}
+            onClick={submitUpdateCourse}
           >
             {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
           </button>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 

@@ -31,6 +31,9 @@ interface Props {
 }
 
 const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
+  // Hooks
+  const t = useTranslations();
+
   // State
   const [isAsideOpen, setIsAsideOpen] = useState(true);
   const [isLessonEnding, setIsLessonEnding] = useState(false);
@@ -41,9 +44,10 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   const [activeTab, setActiveTab] = useState(0);
   const { messages } = useChat();
 
-  const t = useTranslations();
+  // Refs
   const activeTabRef = useRef(activeTab);
 
+  // Vars
   const tabs = [
     {
       title: "Cameras",

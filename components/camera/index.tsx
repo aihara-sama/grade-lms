@@ -20,7 +20,7 @@ const Camera: FunctionComponent<Props> = ({
   toggleAudio,
   toggleCamera,
 }) => {
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   return (
     <div className="relative flex group">

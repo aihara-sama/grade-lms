@@ -1,6 +1,6 @@
 import NotificationsIcon from "@/components/icons/notifications-icon";
-import type { getNotifications } from "@/db/notification";
-import { readNotification } from "@/db/notification";
+import type { getNotifications } from "@/db/client/notification";
+import { readNotification } from "@/db/client/notification";
 import type { ResultOf } from "@/types/utils.type";
 import { parseNotification } from "@/utils/parse/parse-notification";
 import { formatDistanceToNowStrict } from "date-fns";

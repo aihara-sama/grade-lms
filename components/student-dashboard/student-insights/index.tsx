@@ -13,7 +13,7 @@ import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 const StudentInsights: FunctionComponent = () => {
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
   // State
   const [assignmentsInsights, setAssignmentsInsights] = useState<number[]>([]);
   const [submissionsInsights, setSubmissionsInsights] = useState<number[]>([]);

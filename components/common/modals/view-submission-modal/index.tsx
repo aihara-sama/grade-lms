@@ -5,7 +5,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import StarIcon from "@/components/icons/star-icon";
 import Input from "@/components/input";
 import Skeleton from "@/components/skeleton";
-import { getSubmission, updateSubmission } from "@/db/submission";
+import { getSubmission, updateSubmission } from "@/db/client/submission";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";

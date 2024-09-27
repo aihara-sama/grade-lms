@@ -12,7 +12,7 @@ import CardTitle from "@/components/card-title";
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
-import ContentWrapper from "@/components/content-wrapper";
+import Container from "@/components/container";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
@@ -26,27 +26,27 @@ import {
   deleteAssignments,
   getLessonAssignments,
   getLessonAssignmentsCount,
-} from "@/db/assignment";
+} from "@/db/client/assignment";
 import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useLesson } from "@/hooks/use-lesson";
+import { useUser } from "@/hooks/use-user";
 import type { Assignment } from "@/types/assignment.type";
-import type { Lesson } from "@/types/lesson.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import type { User } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import LessonHeader from "@/components/live-lesson/lesson-header";
 
-interface Props {
-  lesson: Lesson;
-  user: User;
-}
-const Assignments: FunctionComponent<Props> = ({ user, lesson }) => {
+const Assignments: FunctionComponent = () => {
   // Hooks
   const t = useTranslations();
+  const user = useUser((state) => state.user);
+  const lesson = useLesson((state) => state.lesson);
+
   const fetchLock = useFetchLock();
 
   // States
@@ -269,10 +269,11 @@ const Assignments: FunctionComponent<Props> = ({ user, lesson }) => {
 
   // View
   return (
-    <ContentWrapper
+    <Container
       ref={contentWrapperRef}
       onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreAssignments))}
     >
+      <LessonHeader course={lesson.course} />
       <p className="section-title">Assignments</p>
       <CardsContainer>
         <Total
@@ -280,7 +281,7 @@ const Assignments: FunctionComponent<Props> = ({ user, lesson }) => {
           total={assignmentsCount}
           title="Total assignments"
         />
-        {user.user_metadata.role === Role.Teacher && (
+        {user.role === Role.Teacher && (
           <CreateAssignment
             lessonId={lesson.id}
             onCreated={() => fetchAssignmentsBySearch(searchText)}
@@ -326,13 +327,13 @@ const Assignments: FunctionComponent<Props> = ({ user, lesson }) => {
                 title={title}
                 subtitle=""
                 onToggle={
-                  user.user_metadata.role === Role.Teacher
+                  user.role === Role.Teacher
                     ? (checked) => onAssignmentToggle(checked, id)
                     : undefined
                 }
               />
             ),
-            "": user.user_metadata.role === Role.Teacher && (
+            "": user.role === Role.Teacher && (
               <BasePopper
                 placement={
                   assignments.length > 7 && assignments.length - idx < 4
@@ -369,7 +370,7 @@ const Assignments: FunctionComponent<Props> = ({ user, lesson }) => {
           assignmentId={assignmentId}
           onClose={onEditAssignmentModalClose}
           onSubmissionCreated={() => fetchAssignmentsBySearch(searchText)}
-          view={user.user_metadata.role}
+          view={user.role}
         />
       )}
       {isDelAssignmentsModal && (
@@ -392,7 +393,7 @@ const Assignments: FunctionComponent<Props> = ({ user, lesson }) => {
           actionHandler={submitDeleteAssignment}
         />
       )}
-    </ContentWrapper>
+    </Container>
   );
 };
 export default Assignments;

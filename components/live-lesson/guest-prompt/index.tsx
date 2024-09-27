@@ -1,10 +1,10 @@
 import AvatarIcon from "@/components/icons/avatar-icon";
 import Input from "@/components/input";
-import { useUser } from "@/hooks/use-user";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 
 import { Role } from "@/enums/role.enum";
+import { useUser } from "@/hooks/use-user";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import type { ChangeEvent, FunctionComponent } from "react";
 
@@ -15,14 +15,14 @@ const GuestPrompt: FunctionComponent<Props> = () => {
   const [userName, setUserName] = useState("");
 
   // Hooks
-  const userStore = useUser();
+  const { setUser } = useUser((state) => state);
 
   // Handlers
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setUserName(e.target.value);
 
   const createGuestUser = () =>
-    userStore.setUser({
+    setUser({
       id: uuid(),
       avatar: process.env.DEFAULT_AVATAR,
       created_at: new Date().toISOString(),

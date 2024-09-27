@@ -1,13 +1,14 @@
 "use client";
 
-import type { User } from "@/types/user.type";
-import { create } from "zustand";
+import { UserContext } from "@/contexts/user-context";
+// import { UserContext } from "@/components/user-provider";
+import type { UserState } from "@/stores/user-store";
+// Mimic the hook returned by `create`
+import { useContext } from "react";
+import { useStore } from "zustand";
 
-interface Store {
-  user: User;
-  setUser: (user: User) => void;
-}
-export const useUser = create<Store>((set) => ({
-  user: null,
-  setUser: (user: User) => set({ user }),
-}));
+export const useUser = <T>(selector?: (state: UserState) => T): T => {
+  const store = useContext(UserContext);
+
+  return useStore(store, selector);
+};

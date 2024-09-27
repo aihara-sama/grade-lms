@@ -16,7 +16,7 @@ export const useVideoChat = () => {
   const [cameras, setCameras] = useState<Camera[]>([]);
 
   // Hooks
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
   const { lessonId } = useParams();
   const channel = DB.channel(lessonId as string, {
     config: {

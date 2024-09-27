@@ -1,4 +1,4 @@
-import type { getNotifications } from "@/db/notification";
+import type { getNotifications } from "@/db/client/notification";
 import { NotificationType } from "@/interfaces/notification-type.interface";
 import type { ResultOf } from "@/types/utils.type";
 

@@ -13,17 +13,22 @@ const Header: FunctionComponent = async () => {
   } = await getServerDB().auth.getUser();
 
   return (
-    <div className="flex p-4 items-center shadow-lg fixed inset-x-0 top-0 bg-white z-[99]">
-      <Logo />
-      {(["Student", "Teacher"] as View[]).includes(user.user_metadata.role) && (
-        <>
-          <Nav className="mr-auto" />
-          <NotificationsDrawer className="ml-auto" />
-          <UserPopper className="ml-2" />
-        </>
-      )}
-      <MobileDrawer />
-    </div>
+    <>
+      <div className="flex p-4 items-center shadow-lg fixed inset-x-0 top-0 bg-white z-[99]">
+        <Logo />
+        {(["Student", "Teacher"] as View[]).includes(
+          user.user_metadata.role
+        ) && (
+          <>
+            <Nav className="mr-auto" />
+            <NotificationsDrawer className="ml-auto" />
+            <UserPopper className="ml-2" />
+          </>
+        )}
+        <MobileDrawer />
+      </div>
+      <div className="h-[68px]"></div>
+    </>
   );
 };
 

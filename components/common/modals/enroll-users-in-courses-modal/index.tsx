@@ -14,13 +14,13 @@ import {
   getCoursesCount,
   getUnenrolledCourses,
   getUnenrolledCoursesCount,
-} from "@/db/course";
+} from "@/db/client/course";
 import {
   enrollAllUsersInAllCourses,
   enrollAllUsersInCourses,
   enrollUsersInAllCourses,
   enrollUsersInCourses,
-} from "@/db/user";
+} from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";

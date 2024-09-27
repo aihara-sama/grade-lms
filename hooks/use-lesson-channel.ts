@@ -11,7 +11,7 @@ let lessonChannel: RealtimeChannel;
 
 export const useLessonChannel = () => {
   const params = useParams<{ lessonId?: string }>();
-  const { user } = useUser();
+  const user = useUser((state) => state.user);
 
   lessonChannel =
     lessonChannel ||

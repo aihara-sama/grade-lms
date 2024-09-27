@@ -1,22 +1,13 @@
-import { getServerDB } from "@/lib/supabase/db/get-server-db";
-import { format } from "date-fns";
+import type { getOngoingLesson } from "@/db/server/lesson";
+import type { ResultOf } from "@/types/utils.type";
 import Link from "next/link";
 import { type FunctionComponent } from "react";
 
 interface Props {
-  courseId: string;
+  lesson: ResultOf<typeof getOngoingLesson>;
 }
 
-const OngoingLessonCard: FunctionComponent<Props> = async ({ courseId }) => {
-  const data = await getServerDB()
-    .from("courses")
-    .select("lessons(*)")
-    .eq("id", courseId)
-    .lte("lessons.starts", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
-    .gte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-
-  const lesson = data.data?.[0]?.lessons?.[0];
-
+const OngoingLessonCard: FunctionComponent<Props> = ({ lesson }) => {
   return (
     <div className="relative flex-1 p-6 flex flex-col items-center justify-center">
       <img
@@ -26,9 +17,9 @@ const OngoingLessonCard: FunctionComponent<Props> = async ({ courseId }) => {
       />
       <p className="text-sm mb-[8px] text-light">Ongoing lesson</p>
       <hr className="w-48 mb-2" />
-      <p className="mb-1 text-lg font-bold">{lesson?.title || "No lesson"}</p>
-      <Link className="mt-3" href={`/dashboard/lessons/${lesson?.id}`}>
-        {lesson && <button className="warning-button w-64">Enter class</button>}
+      <p className="mb-1 text-lg font-bold">{lesson.title}</p>
+      <Link className="mt-3" href={`/dashboard/lessons/${lesson.id}`}>
+        <button className="warning-button w-64">Enter class</button>
       </Link>
     </div>
   );

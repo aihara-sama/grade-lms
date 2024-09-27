@@ -32,6 +32,7 @@
   "failed_to_load_submissions": "Failed to load submissions",
   "failed_to_update_submission_grade": "Failed to update submission grade",
   "failed_to_update_submission": "Failed to update submission",
+  "failed_to_update_course": "Failed to update course",
   "failed_to_update_assignment": "Failed to update assignment",
   "failed_to_load_courses_count": "Failed to load courses count",
   "failed_to_download_file": "Failed to download file",

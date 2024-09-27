@@ -47,7 +47,7 @@ const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = ({
   ];
 
   return (
-    <>
+    <div>
       <Breadcrumbs
         Icon={<CoursesIcon />}
         items={[
@@ -68,7 +68,7 @@ const CourseHeader: FunctionComponent<PropsWithChildren<Props>> = ({
         {course.title}
       </p>
       <NavTabs tabs={tabs} />
-    </>
+    </div>
   );
 };
 

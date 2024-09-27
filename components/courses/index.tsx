@@ -17,7 +17,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
-import ContentWrapper from "@/components/content-wrapper";
+import Container from "@/components/container";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import NoData from "@/components/no-data";
@@ -30,21 +30,17 @@ import {
   deleteCourses,
   getCourses,
   getCoursesCount,
-} from "@/db/course";
+} from "@/db/client/course";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
-import type { View } from "@/types/view.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
-interface Props {
-  view: View;
-}
-
-const Courses: FunctionComponent<Props> = ({ view }) => {
+const Courses: FunctionComponent = () => {
   // State
   const [isEnrollUsersModal, setIsEnrollUsersModal] = useState(false);
   const [isDeleteCourseModal, setIsDeleteCourseModal] = useState(false);
@@ -68,10 +64,12 @@ const Courses: FunctionComponent<Props> = ({ view }) => {
 
   // Refs
   const coursesOffsetRef = useRef(0);
-  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Hooks
   const t = useTranslations();
+  const user = useUser((state) => state.user);
+
   const fetchLock = useFetchLock();
 
   // Vars
@@ -246,8 +244,8 @@ const Courses: FunctionComponent<Props> = ({ view }) => {
     const fn = throttle(() => {
       if (courses.length && coursesCount !== courses.length) {
         if (
-          contentWrapperRef.current.scrollHeight ===
-          contentWrapperRef.current.clientHeight
+          containerRef.current.scrollHeight ===
+          containerRef.current.clientHeight
         ) {
           fetchLock("courses", fetchMoreCourses)();
         }
@@ -264,140 +262,143 @@ const Courses: FunctionComponent<Props> = ({ view }) => {
 
   // View
   return (
-    <ContentWrapper
-      ref={contentWrapperRef}
+    <Container
+      ref={containerRef}
       onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreCourses))}
     >
-      <p className="text-3xl font-bold text-neutral-600">{t("courses")}</p>
-      <p className="text-neutral-500">View and manage courses</p>
-      <hr className="my-2 mb-4" />
-      <div className="pb-8 flex-1 flex flex-col">
-        <CardsContainer>
-          <Total
-            Icon={<CoursesIcon size="lg" />}
-            total={coursesCount}
-            title="Total courses"
-          />
-          {view === "Teacher" && (
-            <CreateCourse onCreated={() => fetchCoursesBySearch(searchText)} />
-          )}
-        </CardsContainer>
-        {coursesIds.length ? (
-          <div className="mb-3 flex gap-3">
-            <button
-              onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
-              className="outline-button flex font-semibold gap-2 items-center"
-            >
-              {isSelectedAll ? coursesCount : coursesIds.length}{" "}
-              {isSelectedAll ? `Deselect` : "Select all"}{" "}
-              <CheckIcon size="xs" />
-            </button>
-            <button
-              onClick={() => setIsDeleteCoursesModal(true)}
-              className="outline-button flex font-semibold gap-2 items-center"
-            >
-              Delete <DeleteIcon />
-            </button>
-          </div>
-        ) : (
-          <Input
-            StartIcon={<SearchIcon size="xs" />}
-            placeholder={t("search")}
-            className="w-auto"
-            onChange={(e) => setSearchText(e.target.value)}
-            value={searchText}
-          />
-        )}
-        {isLoading && <Skeleton />}
-        {isData && (
-          <Table
-            data={courses.map(
-              ({ id, title, lessons, users: members }, idx) => ({
-                Name: (
-                  <CardTitle
-                    href={`/dashboard/courses/${id}/overview`}
-                    checked={coursesIds.includes(id)}
-                    Icon={<CourseIcon />}
-                    title={title}
-                    subtitle="Active"
-                    onToggle={
-                      view === "Teacher"
-                        ? (checked) => onCourseToggle(checked, id)
-                        : undefined
-                    }
-                  />
-                ),
-                Lessons: lessons[0].count,
-                Members: members[0].count,
-                "": view === "Teacher" && (
-                  <BasePopper
-                    placement={
-                      courses.length > 7 && courses.length - idx < 4
-                        ? "top"
-                        : "bottom"
-                    }
-                    width="sm"
-                    trigger={
-                      <button
-                        className="icon-button text-neutral-500"
-                        onClick={() => setCourseId(id)}
-                      >
-                        <DotsIcon />
-                      </button>
-                    }
-                  >
-                    <ul className="flex flex-col">
-                      <li
-                        className="popper-list-item"
-                        onClick={() => setIsEnrollUsersModal(true)}
-                      >
-                        <UsersIcon /> Enroll
-                      </li>
-                      <li
-                        className="popper-list-item"
-                        onClick={() => setIsDeleteCourseModal(true)}
-                      >
-                        <DeleteIcon /> Delete
-                      </li>
-                    </ul>
-                  </BasePopper>
-                ),
-              })
+      <div>
+        <p className="text-3xl font-bold text-neutral-600">{t("courses")}</p>
+        <p className="text-neutral-500">View and manage courses</p>
+        <hr className="my-2 mb-4" />
+        <div className="pb-8 flex-1 flex flex-col">
+          <CardsContainer>
+            <Total
+              Icon={<CoursesIcon size="lg" />}
+              total={coursesCount}
+              title="Total courses"
+            />
+            {user.role === "Teacher" && (
+              <CreateCourse
+                onCreated={() => fetchCoursesBySearch(searchText)}
+              />
             )}
-          />
-        )}
-        {isNoData && <NoData />}
-        {isNotFound && <NotFound />}
+          </CardsContainer>
+          {coursesIds.length ? (
+            <div className="mb-3 flex gap-3">
+              <button
+                onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
+                className="outline-button flex font-semibold gap-2 items-center"
+              >
+                {isSelectedAll ? coursesCount : coursesIds.length}{" "}
+                {isSelectedAll ? `Deselect` : "Select all"}{" "}
+                <CheckIcon size="xs" />
+              </button>
+              <button
+                onClick={() => setIsDeleteCoursesModal(true)}
+                className="outline-button flex font-semibold gap-2 items-center"
+              >
+                Delete <DeleteIcon />
+              </button>
+            </div>
+          ) : (
+            <Input
+              StartIcon={<SearchIcon size="xs" />}
+              placeholder={t("search")}
+              className="w-auto"
+              onChange={(e) => setSearchText(e.target.value)}
+              value={searchText}
+            />
+          )}
+          {isLoading && <Skeleton />}
+          {isData && (
+            <Table
+              data={courses.map(
+                ({ id, title, lessons, users: members }, idx) => ({
+                  Name: (
+                    <CardTitle
+                      href={`/dashboard/courses/${id}/overview`}
+                      checked={coursesIds.includes(id)}
+                      Icon={<CourseIcon />}
+                      title={title}
+                      subtitle="Active"
+                      onToggle={
+                        user.role === "Teacher"
+                          ? (checked) => onCourseToggle(checked, id)
+                          : undefined
+                      }
+                    />
+                  ),
+                  Lessons: lessons[0].count,
+                  Members: members[0].count,
+                  "": user.role === "Teacher" && (
+                    <BasePopper
+                      placement={
+                        courses.length > 7 && courses.length - idx < 4
+                          ? "top"
+                          : "bottom"
+                      }
+                      width="sm"
+                      trigger={
+                        <button
+                          className="icon-button text-neutral-500"
+                          onClick={() => setCourseId(id)}
+                        >
+                          <DotsIcon />
+                        </button>
+                      }
+                    >
+                      <ul className="flex flex-col">
+                        <li
+                          className="popper-list-item"
+                          onClick={() => setIsEnrollUsersModal(true)}
+                        >
+                          <UsersIcon /> Enroll
+                        </li>
+                        <li
+                          className="popper-list-item"
+                          onClick={() => setIsDeleteCourseModal(true)}
+                        >
+                          <DeleteIcon /> Delete
+                        </li>
+                      </ul>
+                    </BasePopper>
+                  ),
+                })
+              )}
+            />
+          )}
+          {isNoData && <NoData />}
+          {isNotFound && <NotFound />}
 
-        {isDeleteCoursesModal && (
-          <PromptModal
-            isSubmitting={isSubmittingDelCourses}
-            onClose={() => setIsDeleteCoursesModal(false)}
-            title="Delete courses"
-            action="Delete"
-            body="Are you sure you want to delete selected courses?"
-            actionHandler={submitDeleteCourses}
-          />
-        )}
-        {isDeleteCourseModal && (
-          <PromptModal
-            isSubmitting={isSubmittingDelCourse}
-            onClose={() => setIsDeleteCourseModal(false)}
-            title="Delete course"
-            action="Delete"
-            body="Are you sure you want to delete this course?"
-            actionHandler={submitDeleteCourse}
-          />
-        )}
-        {isEnrollUsersModal && (
-          <EnrollUsersInCourseModal
-            courseId={courseId}
-            onClose={onEnrollUsersInCourseModalClose}
-          />
-        )}
+          {isDeleteCoursesModal && (
+            <PromptModal
+              isSubmitting={isSubmittingDelCourses}
+              onClose={() => setIsDeleteCoursesModal(false)}
+              title="Delete courses"
+              action="Delete"
+              body="Are you sure you want to delete selected courses?"
+              actionHandler={submitDeleteCourses}
+            />
+          )}
+          {isDeleteCourseModal && (
+            <PromptModal
+              isSubmitting={isSubmittingDelCourse}
+              onClose={() => setIsDeleteCourseModal(false)}
+              title="Delete course"
+              action="Delete"
+              body="Are you sure you want to delete this course?"
+              actionHandler={submitDeleteCourse}
+            />
+          )}
+          {isEnrollUsersModal && (
+            <EnrollUsersInCourseModal
+              courseId={courseId}
+              onClose={onEnrollUsersInCourseModalClose}
+            />
+          )}
+        </div>
       </div>
-    </ContentWrapper>
+    </Container>
   );
 };
-
 export default Courses;

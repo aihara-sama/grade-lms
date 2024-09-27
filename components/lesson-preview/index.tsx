@@ -17,10 +17,12 @@ import type {
 } from "@excalidraw/excalidraw/types/types";
 import type { ChangeEvent, FunctionComponent } from "react";
 
+import Container from "@/components/container";
 import WhiteboardIcon from "@/components/icons/whiteboard-icon";
+import LessonHeader from "@/components/live-lesson/lesson-header";
 import LoadingSpinner from "@/components/loading-spinner";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
-import { getOverlappingLessons } from "@/db/lesson";
+import { getOverlappingLessons } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
@@ -33,8 +35,8 @@ import "react-datepicker/dist/react-datepicker.css";
 const LessonPreview: FunctionComponent = () => {
   // Hooks
   const t = useTranslations();
-  const { user } = useUser();
-  const { lesson, isEnded, isOngoing, setLesson } = useLesson();
+  const user = useUser((state) => state.user);
+  const { lesson, isEnded, isOngoing, setLesson } = useLesson((state) => state);
 
   // State
   const [starts, setStarts] = useState(new Date(lesson.starts));
@@ -104,7 +106,7 @@ const LessonPreview: FunctionComponent = () => {
           ends: ends.toISOString(),
         })
         .eq("id", lesson.id)
-        .select("*")
+        .select("*, course:courses(*)")
         .single();
 
       if (error) throw new Error(t("failed_to_update_lesson_date"));
@@ -156,97 +158,101 @@ const LessonPreview: FunctionComponent = () => {
     }
   }, []);
   return (
-    <div className="flex flex-col sm:flex-row gap-6 mt-3" ref={containerRef}>
-      <main className="flex-1">
-        <div className="border flex items-center px-3 py-2">
-          <div className="flex items-center gap-2">
-            <WhiteboardIcon size="xs" />
-            <p className="text-center text-neutral-600 font-bold text-sm">
-              Whiteboard preview
-            </p>
-          </div>
-          {user.role === Role.Teacher && (
-            <div
-              className="inter-active p-2 border rounded-md ml-auto mr-2"
-              onClick={submitUpdateWhiteboardData}
-            >
-              <SaveIcon />
+    <Container ref={containerRef}>
+      <LessonHeader course={lesson.course} />
+      <div className="flex flex-col sm:flex-row gap-6 mt-3">
+        <main className="flex-1">
+          <div className="border flex items-center px-3 py-2">
+            <div className="flex items-center gap-2">
+              <WhiteboardIcon size="xs" />
+              <p className="text-center text-neutral-600 font-bold text-sm">
+                Whiteboard preview
+              </p>
             </div>
-          )}
-        </div>
-        <div
-          className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-25px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
-          style={{
-            height: `${whiteboardHeight}px`,
-          }}
-        >
-          <Excalidraw
-            isCollaborating={false}
-            excalidrawAPI={(api) => {
-              excalidrawAPIRef.current = api;
+            {user.role === Role.Teacher && (
+              <div
+                className="inter-active p-2 border rounded-md ml-auto mr-2"
+                onClick={submitUpdateWhiteboardData}
+              >
+                <SaveIcon />
+              </div>
+            )}
+          </div>
+          <div
+            className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-25px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
+            style={{
+              height: `${whiteboardHeight}px`,
             }}
-            initialData={whiteboardInitialData}
-            onChange={
-              user.role === Role.Teacher ? onWhiteboardChange : undefined
-            }
-          />
-          <ResizeHandler
-            containerRef={containerRef}
-            initialHeight={window.innerHeight - 300}
-            minHeight={WHITEBOARD_MIN_HEIGHT}
-            onResize={setWhiteboardHeight}
-          />
-        </div>
-      </main>
-      <aside className="flex flex-col">
-        <p className="text-neutral-600 ">Timeline</p>
-        <hr className="mb-6" />
-        <DateInput
-          date={starts}
-          onChange={onDateChange}
-          label="Starts at"
-          popperPlacement="bottom-start"
-          disabled={user.role !== Role.Teacher || isOngoing || isEnded}
-        />
-        <Input
-          className="mt-3 mb-0"
-          label="Duration"
-          fullWidth
-          type="number"
-          StartIcon={<LessonsIcon />}
-          value={`${millisecondsToMinutes(duration)}`}
-          onChange={changeDateDuration}
-          disabled={user.role !== Role.Teacher || isOngoing || isEnded}
-        />
-        {user.role === Role.Teacher && (
-          <button
-            disabled={
-              (new Date(lesson.starts).toISOString() === starts.toISOString() &&
-                new Date(lesson.ends).toISOString() === ends.toISOString()) ||
-              isOngoing ||
-              isEnded
-            }
-            className="primary-button"
-            onClick={submitUpdateLessonDate}
           >
-            {isSubmittingUpdateLessonDate && <LoadingSpinner />}
-            <span
-              className={`${clsx(isSubmittingUpdateLessonDate && "opacity-0")}`}
+            <Excalidraw
+              isCollaborating={false}
+              excalidrawAPI={(api) => {
+                excalidrawAPIRef.current = api;
+              }}
+              initialData={whiteboardInitialData}
+              onChange={
+                user.role === Role.Teacher ? onWhiteboardChange : undefined
+              }
+            />
+            <ResizeHandler
+              containerRef={containerRef}
+              initialHeight={window.innerHeight - 300}
+              minHeight={WHITEBOARD_MIN_HEIGHT}
+              onResize={setWhiteboardHeight}
+            />
+          </div>
+        </main>
+        <aside className="flex flex-col">
+          <p className="text-neutral-600 ">Timeline</p>
+          <hr className="mb-6" />
+          <DateInput
+            date={starts}
+            onChange={onDateChange}
+            label="Starts at"
+            popperPlacement="bottom-start"
+            disabled={user.role !== Role.Teacher || isOngoing || isEnded}
+          />
+          <Input
+            className="mt-3 mb-0"
+            label="Duration"
+            fullWidth
+            type="number"
+            StartIcon={<LessonsIcon />}
+            value={`${millisecondsToMinutes(duration)}`}
+            onChange={changeDateDuration}
+            disabled={user.role !== Role.Teacher || isOngoing || isEnded}
+          />
+          {user.role === Role.Teacher && (
+            <button
+              disabled={
+                (new Date(lesson.starts).toISOString() ===
+                  starts.toISOString() &&
+                  new Date(lesson.ends).toISOString() === ends.toISOString()) ||
+                isOngoing ||
+                isEnded
+              }
+              className="primary-button"
+              onClick={submitUpdateLessonDate}
             >
-              Save
-            </span>
-          </button>
-        )}
-        <div className="mt-3 sm:mt-auto flex flex-col gap-1">
-          <Link
-            href={`/dashboard/lessons/${lesson.id}`}
-            className={`button warning-button ${clsx(!isOngoing && "disabled")} `}
-          >
-            Enter class
-          </Link>
-        </div>
-      </aside>
-    </div>
+              {isSubmittingUpdateLessonDate && <LoadingSpinner />}
+              <span
+                className={`${clsx(isSubmittingUpdateLessonDate && "opacity-0")}`}
+              >
+                Save
+              </span>
+            </button>
+          )}
+          <div className="mt-3 sm:mt-auto flex flex-col gap-1">
+            <Link
+              href={`/dashboard/lessons/${lesson.id}`}
+              className={`button warning-button ${clsx(!isOngoing && "disabled")} `}
+            >
+              Enter class
+            </Link>
+          </div>
+        </aside>
+      </div>
+    </Container>
   );
 };
 export default LessonPreview;

@@ -5,7 +5,8 @@ import CardTitle from "@/components/card-title";
 import CardsContainer from "@/components/cards-container";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
-import ContentWrapper from "@/components/content-wrapper";
+import Container from "@/components/container";
+import CourseHeader from "@/components/course/course-header";
 import IconTitle from "@/components/icon-title";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CheckIcon from "@/components/icons/check-icon";
@@ -25,13 +26,14 @@ import {
   deleteUsersFromCourse,
   getCourseUsers,
   getCourseUsersCount,
-} from "@/db/user";
+} from "@/db/client/user";
+import type { getCourse } from "@/db/server/course";
 import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import type { User } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -41,11 +43,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  user: User;
+  course: ResultOf<typeof getCourse>;
 }
-const Members: FunctionComponent<Props> = ({ user }) => {
+
+const Members: FunctionComponent<Props> = ({ course }) => {
   // Hooks
   const t = useTranslations();
+  const user = useUser((state) => state.user);
   const { courseId } = useParams<{ courseId: string }>();
 
   const fetchLock = useFetchLock();
@@ -71,8 +75,8 @@ const Members: FunctionComponent<Props> = ({ user }) => {
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
+  const containerRef = useRef<HTMLDivElement>(null);
   const membersOffsetRef = useRef(0);
-  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Vars
   const isData = !!members.length && !isLoading;
@@ -248,8 +252,8 @@ const Members: FunctionComponent<Props> = ({ user }) => {
     const fn = throttle(() => {
       if (Members.length && membersCount !== Members.length) {
         if (
-          contentWrapperRef.current.scrollHeight ===
-          contentWrapperRef.current.clientHeight
+          containerRef.current.scrollHeight ===
+          containerRef.current.clientHeight
         ) {
           fetchLock("members", fetchMoreMembers)();
         }
@@ -266,10 +270,11 @@ const Members: FunctionComponent<Props> = ({ user }) => {
 
   // View
   return (
-    <ContentWrapper
-      ref={contentWrapperRef}
+    <Container
+      ref={containerRef}
       onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreMembers))}
     >
+      <CourseHeader course={course} />
       <p className="section-title">Members</p>
       <CardsContainer>
         <Total
@@ -390,7 +395,7 @@ const Members: FunctionComponent<Props> = ({ user }) => {
           actionHandler={submitDispelMember}
         />
       )}
-    </ContentWrapper>
+    </Container>
   );
 };
 
