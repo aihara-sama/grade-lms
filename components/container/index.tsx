@@ -16,14 +16,14 @@ const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
 
     return (
       <div
+        className="overflow-auto"
         ref={ref}
-        onScroll={onScroll}
-        className="overflow-auto h-[calc(100vh-68px)] flex flex-col"
+        onScroll={onScrollEnd && onScroll}
       >
         <div
           className={` ${clsx(!fullWidth && "max-w-[1432px] [@media(min-width:1432px)]:mx-[auto]")} w-full flex flex-1 flex-col p-6`}
         >
-          <div className="h-full flex flex-col">{children}</div>
+          {children}
         </div>
       </div>
     );

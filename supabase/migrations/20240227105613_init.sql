@@ -876,6 +876,9 @@ ON public.sent_announcements
 FOR select
 TO service_role;
 
-create POLICY "Can insert" ON storage.objects for insert WITH CHECK (((bucket_id = 'courses'::text) AND (EXISTS ( SELECT 1 FROM user_courses WHERE ((user_courses.user_id = auth.uid()) AND ((user_courses.course_id)::text = (storage.foldername(objects.name))[1]))))));
+create POLICY "Can insert into enrolled course" ON storage.objects for insert WITH CHECK (((bucket_id = 'courses'::text) AND (EXISTS ( SELECT 1 FROM user_courses WHERE ((user_courses.user_id = auth.uid()) AND ((user_courses.course_id)::text = (storage.foldername(objects.name))[1]))))));
 
-create POLICY "Can select" ON storage.objects for select using (((bucket_id = 'courses'::text) AND (EXISTS ( SELECT 1 FROM user_courses WHERE ((user_courses.user_id = auth.uid()) AND ((user_courses.course_id)::text = (storage.foldername(objects.name))[1]))))));
+create POLICY "Can select from enrolled course" ON storage.objects for select using (((bucket_id = 'courses'::text) AND (EXISTS ( SELECT 1 FROM user_courses WHERE ((user_courses.user_id = auth.uid()) AND ((user_courses.course_id)::text = (storage.foldername(objects.name))[1]))))));
+
+CREATE POLICY "Can select any" ON storage.objects FOR SELECT TO public USING (bucket_id = 'avatars');
+CREATE POLICY "Can insert any" ON storage.objects FOR INSERT TO public WITH CHECK (bucket_id = 'avatars');

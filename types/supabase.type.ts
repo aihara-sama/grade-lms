@@ -527,22 +527,6 @@ export type Database = {
         };
         Returns: undefined;
       };
-      get_my_users: {
-        Args: Record<PropertyKey, never>;
-        Returns: {
-          avatar: string;
-          created_at: string;
-          creator_id: string | null;
-          email: string;
-          id: string;
-          is_emails_on: boolean;
-          is_push_notifications_on: boolean;
-          name: string;
-          preferred_locale: string;
-          role: Database["public"]["Enums"]["role"];
-          timezone: string;
-        }[];
-      };
       get_overlapping_lesson: {
         Args: {
           p_starts: string;

@@ -6,6 +6,8 @@ type ServerErr = Record<
 >;
 
 const serverErrors: ServerErr = {
+  "New password should be different from the old password.":
+    "auth.new_password_should_be_different_from_the_old_password",
   "Password too short": "auth.password_too_short",
   "Invalid email": "auth.invalid_email",
   "Name is required": "auth.name_is_required",

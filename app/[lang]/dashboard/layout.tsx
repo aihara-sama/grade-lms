@@ -14,7 +14,9 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
     <UserProvider user={polishUser(user)}>
       <PushNotificationsProvider />
       <Header />
-      {children}
+      <div className="overflow-auto h-[calc(100vh-68px)] flex flex-col">
+        {children}
+      </div>
     </UserProvider>
   );
 };

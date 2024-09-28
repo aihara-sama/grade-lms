@@ -98,6 +98,7 @@
     "delete_assignment": "Вы уверены что хотите удалить это задание"
   },
   "auth": {
+    "new_password_should_be_different_from_the_old_password": "Новый пароль должен отличаться от старого пароля",
     "unauthorized": "Неавторизован",
     "forbidden": "Запрещено",
     "an_email_address_is_too_long": "Адрес электронной почты слишком длинный",

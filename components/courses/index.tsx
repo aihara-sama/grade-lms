@@ -283,32 +283,36 @@ const Courses: FunctionComponent = () => {
               />
             )}
           </CardsContainer>
-          {coursesIds.length ? (
-            <div className="mb-3 flex gap-3">
-              <button
-                onClick={isSelectedAll ? deselectAllCourses : selectAllCourses}
-                className="outline-button flex font-semibold gap-2 items-center"
-              >
-                {isSelectedAll ? coursesCount : coursesIds.length}{" "}
-                {isSelectedAll ? `Deselect` : "Select all"}{" "}
-                <CheckIcon size="xs" />
-              </button>
-              <button
-                onClick={() => setIsDeleteCoursesModal(true)}
-                className="outline-button flex font-semibold gap-2 items-center"
-              >
-                Delete <DeleteIcon />
-              </button>
-            </div>
-          ) : (
-            <Input
-              StartIcon={<SearchIcon size="xs" />}
-              placeholder={t("search")}
-              className="w-auto"
-              onChange={(e) => setSearchText(e.target.value)}
-              value={searchText}
-            />
-          )}
+          <div>
+            {coursesIds.length ? (
+              <div className="mb-3 flex gap-3">
+                <button
+                  onClick={
+                    isSelectedAll ? deselectAllCourses : selectAllCourses
+                  }
+                  className="outline-button flex font-semibold gap-2 items-center"
+                >
+                  {isSelectedAll ? coursesCount : coursesIds.length}{" "}
+                  {isSelectedAll ? `Deselect` : "Select all"}{" "}
+                  <CheckIcon size="xs" />
+                </button>
+                <button
+                  onClick={() => setIsDeleteCoursesModal(true)}
+                  className="outline-button flex font-semibold gap-2 items-center"
+                >
+                  Delete <DeleteIcon />
+                </button>
+              </div>
+            ) : (
+              <Input
+                StartIcon={<SearchIcon size="xs" />}
+                placeholder={t("search")}
+                className="w-auto"
+                onChange={(e) => setSearchText(e.target.value)}
+                value={searchText}
+              />
+            )}
+          </div>
           {isLoading && <Skeleton />}
           {isData && (
             <Table
