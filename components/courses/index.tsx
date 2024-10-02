@@ -1,9 +1,6 @@
 "use client";
 
 import CardTitle from "@/components/card-title";
-import CardsContainer from "@/components/cards-container";
-import PromptModal from "@/components/common/modals/prompt-modal";
-import CreateCourse from "@/components/courses/create-course";
 import CheckIcon from "@/components/icons/check-icon";
 import CourseIcon from "@/components/icons/course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
@@ -12,12 +9,18 @@ import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
+import metadata from "@/data/metadata.json";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
+import CreateCourseModal from "@/components/common/modals/create-course-modal";
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
+import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
+import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
 import Container from "@/components/container";
+import AddCourseIcon from "@/components/icons/add-course-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
 import NoData from "@/components/no-data";
@@ -29,9 +32,9 @@ import {
   deleteCourse,
   deleteCourses,
   getCourses,
-  getCoursesCount,
 } from "@/db/client/course";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
@@ -40,30 +43,32 @@ import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
-const Courses: FunctionComponent = () => {
+interface Props {
+  courses: ResultOf<typeof getCourses>;
+}
+
+const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
   // State
   const [isEnrollUsersModal, setIsEnrollUsersModal] = useState(false);
   const [isDeleteCourseModal, setIsDeleteCourseModal] = useState(false);
   const [isDeleteCoursesModal, setIsDeleteCoursesModal] = useState(false);
+  const [isCreateCourseModal, setIsCreateCourseModal] = useState(false);
 
-  const [courses, setCourses] = useState<ResultOf<typeof getCourses>>([]);
-  const [coursesCount, setCoursesCount] = useState(0);
+  const [courses, setCourses] = useState(initCourses.data);
+  const [coursesCount, setCoursesCount] = useState(initCourses.count);
 
   const [courseId, setCourseId] = useState<string>();
   const [coursesIds, setCoursesIds] = useState<string[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-
-  const [isSubmittingDelCourse, setIsSubmittingDelCourse] = useState(false);
-  const [isSubmittingDelCourses, setIsSubmittingDelCourses] = useState(false);
 
   const [searchText, setSearchText] = useState("");
 
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
-  const coursesOffsetRef = useRef(0);
+  const coursesOffsetRef = useRef(initCourses.data.length);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Hooks
@@ -94,15 +99,12 @@ const Courses: FunctionComponent = () => {
     setIsLoading(true);
 
     try {
-      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCourses(),
-        getCoursesCount(),
-      ]);
+      const { data, count } = await getCourses();
 
-      setCourses(fetchedCourses);
-      setCoursesCount(fetchedCoursesCount);
+      setCourses(data);
+      setCoursesCount(count);
 
-      coursesOffsetRef.current = fetchedCourses.length;
+      coursesOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -113,15 +115,12 @@ const Courses: FunctionComponent = () => {
     setIsSearching(true);
 
     try {
-      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getCourses(search),
-        getCoursesCount(search),
-      ]);
+      const { data, count } = await getCourses(search);
 
-      setCourses(fetchedCourses);
-      setCoursesCount(fetchedCoursesCount);
+      setCourses(data);
+      setCoursesCount(count);
 
-      coursesOffsetRef.current = fetchedCourses.length;
+      coursesOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -133,26 +132,21 @@ const Courses: FunctionComponent = () => {
       const from = coursesOffsetRef.current;
       const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
 
-      const fetchedCourses = await getCourses(searchText, from, to);
+      const { data } = await getCourses(searchText, from, to);
 
-      setCourses((prev) => [...prev, ...fetchedCourses]);
+      setCourses((prev) => [...prev, ...data]);
 
       if (isSelectedAll) {
-        setCoursesIds((prev) => [
-          ...prev,
-          ...fetchedCourses.map(({ id }) => id),
-        ]);
+        setCoursesIds((prev) => [...prev, ...data.map(({ id }) => id)]);
       }
 
-      coursesOffsetRef.current += fetchedCourses.length;
+      coursesOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
   const submitDeleteCourse = async () => {
-    setIsSubmittingDelCourse(true);
-
     try {
       await deleteCourse(courseId);
 
@@ -163,16 +157,14 @@ const Courses: FunctionComponent = () => {
 
       setIsDeleteCourseModal(false);
 
+      coursesOffsetRef.current -= 1;
+
       toast.success("Success");
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmittingDelCourse(false);
     }
   };
   const submitDeleteCourses = async () => {
-    setIsSubmittingDelCourses(true);
-
     try {
       if (isSelectedAll) {
         await deleteAllCourses(searchText);
@@ -187,11 +179,11 @@ const Courses: FunctionComponent = () => {
       setCoursesIds([]);
       setIsDeleteCoursesModal(false);
 
+      coursesOffsetRef.current -= coursesIds.length;
+
       toast.success("success");
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmittingDelCourses(false);
     }
   };
 
@@ -204,6 +196,7 @@ const Courses: FunctionComponent = () => {
       setIsSelectedAll(coursesCount === coursesIds.length - 1);
     }
   };
+
   const onEnrollUsersInCourseModalClose = (usersIds: string[]) => {
     setCourses((prev) =>
       prev.map((course) => {
@@ -220,6 +213,15 @@ const Courses: FunctionComponent = () => {
     setIsEnrollUsersModal(false);
   };
 
+  const onCreateCourseModalClose = (mutated?: boolean) => {
+    setIsCreateCourseModal(false);
+
+    if (mutated) {
+      revalidatePageAction();
+      fetchCoursesBySearch(searchText);
+    }
+  };
+
   const throttledSearch = useCallback(
     throttleSearch((search) => {
       if (search) {
@@ -232,7 +234,7 @@ const Courses: FunctionComponent = () => {
   );
 
   // Effects
-  useEffect(() => throttledSearch(searchText), [searchText]);
+  useUpdateEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
     if (coursesCount) setIsSelectedAll(coursesCount === coursesIds.length);
@@ -270,19 +272,28 @@ const Courses: FunctionComponent = () => {
         <p className="text-3xl font-bold text-neutral-600">{t("courses")}</p>
         <p className="text-neutral-500">View and manage courses</p>
         <hr className="my-2 mb-4" />
-        <div className="pb-8 flex-1 flex flex-col">
-          <CardsContainer>
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-6">
             <Total
               Icon={<CoursesIcon size="lg" />}
               total={coursesCount}
               title="Total courses"
             />
             {user.role === "Teacher" && (
-              <CreateCourse
-                onCreated={() => fetchCoursesBySearch(searchText)}
-              />
+              <div className="card">
+                <AddCourseIcon />
+                <hr className="w-full my-3" />
+                <button
+                  className="primary-button px-8"
+                  onClick={() => setIsCreateCourseModal(true)}
+                >
+                  Create
+                </button>
+              </div>
             )}
-          </CardsContainer>
+          </div>
+        </div>
+        <div className="pb-8 flex-1 flex flex-col">
           <div>
             {coursesIds.length ? (
               <div className="mb-3 flex gap-3">
@@ -300,7 +311,7 @@ const Courses: FunctionComponent = () => {
                   onClick={() => setIsDeleteCoursesModal(true)}
                   className="outline-button flex font-semibold gap-2 items-center"
                 >
-                  Delete <DeleteIcon />
+                  Delete <DeleteIcon size="xs" />
                 </button>
               </div>
             ) : (
@@ -362,7 +373,7 @@ const Courses: FunctionComponent = () => {
                           className="popper-list-item"
                           onClick={() => setIsDeleteCourseModal(true)}
                         >
-                          <DeleteIcon /> Delete
+                          <DeleteIcon size="xs" /> Delete
                         </li>
                       </ul>
                     </BasePopper>
@@ -371,33 +382,60 @@ const Courses: FunctionComponent = () => {
               )}
             />
           )}
-          {isNoData && <NoData />}
-          {isNotFound && <NotFound />}
-
-          {isDeleteCoursesModal && (
-            <PromptModal
-              isSubmitting={isSubmittingDelCourses}
-              onClose={() => setIsDeleteCoursesModal(false)}
-              title="Delete courses"
-              action="Delete"
-              body="Are you sure you want to delete selected courses?"
-              actionHandler={submitDeleteCourses}
+          {isNoData && (
+            <NoData
+              body={metadata.courses}
+              action={
+                <button
+                  className="primary-button"
+                  onClick={() => setIsCreateCourseModal(true)}
+                >
+                  Create course
+                </button>
+              }
             />
           )}
-          {isDeleteCourseModal && (
-            <PromptModal
-              isSubmitting={isSubmittingDelCourse}
-              onClose={() => setIsDeleteCourseModal(false)}
-              title="Delete course"
-              action="Delete"
-              body="Are you sure you want to delete this course?"
-              actionHandler={submitDeleteCourse}
+          {isNotFound && (
+            <NotFound
+              action={
+                <button
+                  className="outline-button"
+                  onClick={() => setSearchText("")}
+                >
+                  Clear filters
+                </button>
+              }
             />
+          )}
+
+          {isCreateCourseModal && (
+            <CreateCourseModal onClose={onCreateCourseModalClose} />
           )}
           {isEnrollUsersModal && (
             <EnrollUsersInCourseModal
               courseId={courseId}
               onClose={onEnrollUsersInCourseModalClose}
+            />
+          )}
+          {isDeleteCourseModal && (
+            <PromptDeleteRecordModal
+              title={t("modal.titles.delete_course")}
+              prompt={`${t("prompts.delete_course")}`}
+              confirmText={t("actions.delete")}
+              record={courses.find(({ id }) => id === courseId).title}
+              onClose={() => setIsDeleteCourseModal(false)}
+              onConfirm={submitDeleteCourse}
+            />
+          )}
+          {isDeleteCoursesModal && (
+            <PromptDeleteRecordsModal
+              title={t("modal.titles.delete_courses")}
+              prompt={`${t("prompts.delete_courses", {
+                count: coursesIds.length,
+              })}`}
+              confirmText={t("actions.delete")}
+              onConfirm={submitDeleteCourses}
+              onClose={() => setIsDeleteCoursesModal(false)}
             />
           )}
         </div>

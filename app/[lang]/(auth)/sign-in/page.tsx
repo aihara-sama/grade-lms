@@ -13,14 +13,14 @@ import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 const Page: FunctionComponent = () => {
-  // State
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
   // Hooks
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // State
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,7 +33,7 @@ const Page: FunctionComponent = () => {
 
     setIsSubmitting(true);
 
-    const { error, data } = await DB.auth.signInWithPassword({
+    const { error } = await DB.auth.signInWithPassword({
       email,
       password,
     });
@@ -44,10 +44,7 @@ const Page: FunctionComponent = () => {
     else {
       setIsSuccess(true);
 
-      router.push(
-        searchParams.get("redirect") ||
-          `/${data.user.user_metadata.preferred_locale}/dashboard`
-      );
+      router.push(searchParams.get("redirect") || `/dashboard`);
     }
   };
   return (

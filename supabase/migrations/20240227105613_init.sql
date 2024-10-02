@@ -340,7 +340,7 @@ AS $$
     );
 $$;
 
-create function public.dispel_all_users_from_course(
+create function public.expel_all_users_from_course(
     p_course_id uuid,
     p_user_name text
 ) 
@@ -394,7 +394,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION public.dispel_users_from_course(
+CREATE OR REPLACE FUNCTION public.expel_users_from_course(
     p_course_id uuid,
     p_users_ids uuid[]
 ) 

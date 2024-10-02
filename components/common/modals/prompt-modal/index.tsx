@@ -6,7 +6,7 @@ interface Props {
   onClose: () => void;
   title: string;
   body: string;
-  action: "Delete" | "Dispel";
+  action: "Delete" | "Expel";
   actionHandler: () => void;
   isInsideModal?: boolean;
   isSubmitting: boolean;
@@ -24,7 +24,7 @@ const PromptModal: FunctionComponent<Props> = ({
   return (
     <BaseModal
       isInsideModal={isInsideModal}
-      isExpanded={false}
+      isFixedHeight={false}
       onClose={() => onClose()}
       title={`${title}`}
     >

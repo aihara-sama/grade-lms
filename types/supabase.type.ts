@@ -497,20 +497,6 @@ export type Database = {
         };
         Returns: undefined;
       };
-      dispel_all_users_from_course: {
-        Args: {
-          p_course_id: string;
-          p_user_name: string;
-        };
-        Returns: undefined;
-      };
-      dispel_users_from_course: {
-        Args: {
-          p_course_id: string;
-          p_users_ids: string[];
-        };
-        Returns: undefined;
-      };
       enroll_all_users_in_all_courses: {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
@@ -524,6 +510,20 @@ export type Database = {
       enroll_users_in_all_courses: {
         Args: {
           users_ids: string[];
+        };
+        Returns: undefined;
+      };
+      expel_all_users_from_course: {
+        Args: {
+          p_course_id: string;
+          p_user_name: string;
+        };
+        Returns: undefined;
+      };
+      expel_users_from_course: {
+        Args: {
+          p_course_id: string;
+          p_users_ids: string[];
         };
         Returns: undefined;
       };

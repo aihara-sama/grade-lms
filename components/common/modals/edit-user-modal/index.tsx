@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import BaseModal from "@/components/common/modals/base-modal";
+import LoadingSpinner from "@/components/loading-spinner";
 import Skeleton from "@/components/skeleton";
 import TimezoneSelect from "@/components/timezone-select";
 import type { getUsers } from "@/db/client/user";
@@ -23,15 +24,15 @@ import type { ChangeEvent, FunctionComponent } from "react";
 
 interface Props {
   userId: string;
-  onClose: (updatedUser?: ResultOf<typeof getUsers>[number]) => void;
+  onClose: (updatedUser?: ResultOf<typeof getUsers>["data"][number]) => void;
 }
 
-const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
+const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
   // Hooks
   const t = useTranslations();
 
   // State
-  const [user, setUser] = useState<ResultOf<typeof getUsers>[number]>();
+  const [user, setUser] = useState<ResultOf<typeof getUsers>["data"][number]>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +62,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
       });
       onClose(user);
 
-      toast.success(t("user_updated"));
+      toast.success(t("success.user_updated"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -81,7 +82,11 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
     fetchUser();
   }, []);
   return (
-    <BaseModal isExpanded={false} onClose={() => onClose()} title="Edit user">
+    <BaseModal
+      isFixedHeight={false}
+      onClose={() => onClose()}
+      title="Edit user"
+    >
       {isLoading ? (
         <Skeleton />
       ) : (
@@ -147,13 +152,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
           <hr className="mb-4" />
           <div className="flex justify-end gap-3">
             <button className="primary-button" type="button">
-              {isSubmitting && (
-                <img
-                  className="loading-spinner"
-                  src="/assets/gifs/loading-spinner.gif"
-                  alt=""
-                />
-              )}
+              {isSubmitting && <LoadingSpinner />}
               <span className={`${clsx(isSubmitting && "opacity-0")}`}>
                 Save
               </span>
@@ -165,4 +164,4 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
   );
 };
 
-export default CreateUserModal;
+export default EditUserModal;

@@ -17,17 +17,16 @@ const ChatProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
   const { setMessages } = useChat();
 
   const onNewChatMessage = (payload: {
-    payload: ResultOf<typeof getChatMessages>[number];
+    payload: ResultOf<typeof getChatMessages>["data"][number];
   }) => {
     setMessages((prev) => [...prev, payload.payload]);
-    console.log("onNewChatMessage");
   };
 
   const fetchChatMessages = async () => {
     try {
-      const fetchedMessages = await getChatMessages(lessonId as string);
+      const { data } = await getChatMessages(lessonId as string);
 
-      setMessages(() => fetchedMessages);
+      setMessages(() => data);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -41,7 +40,7 @@ const ChatProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
     if (!channel.joinedOnce)
       channel
         .on<
-          ResultOf<typeof getChatMessages>[number]
+          ResultOf<typeof getChatMessages>["data"][number]
         >("broadcast", { event: Event.ChatMessageCreated }, onNewChatMessage)
         .subscribe();
 

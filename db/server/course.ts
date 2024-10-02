@@ -12,6 +12,17 @@ export const getCourse = async (id: string) => {
   return result.data;
 };
 
+export const getCourses = async () => {
+  const { data, count } = await getServerDB()
+    .from("courses")
+    .select("*, lessons(count), users(count)", { count: "exact" })
+    .order("created_at", { ascending: true })
+    .range(0, COURSES_GET_LIMIT - 1)
+    .returns<CourseWithRefsCount[]>();
+
+  return { data, count };
+};
+
 export const getLatestCourses = async () => {
   const result = await getServerDB()
     .from("courses")

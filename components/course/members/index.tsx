@@ -1,13 +1,16 @@
 "use client";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import Avatar from "@/components/avatar";
 import CardTitle from "@/components/card-title";
-import CardsContainer from "@/components/cards-container";
-import PromptModal from "@/components/common/modals/prompt-modal";
+import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
+import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
+import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
 import Container from "@/components/container";
 import CourseHeader from "@/components/course/course-header";
 import IconTitle from "@/components/icon-title";
+import AddCourseIcon from "@/components/icons/add-course-icon";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
@@ -19,17 +22,17 @@ import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import Total from "@/components/total";
-import EnrollUsers from "@/components/users/enroll-users";
 import { MEMBERS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
+import metadata from "@/data/metadata.json";
 import {
   deleteAllUsersFromCourse,
   deleteUsersFromCourse,
   getCourseUsers,
-  getCourseUsersCount,
 } from "@/db/client/user";
 import type { getCourse } from "@/db/server/course";
 import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
@@ -44,9 +47,10 @@ import toast from "react-hot-toast";
 
 interface Props {
   course: ResultOf<typeof getCourse>;
+  users: ResultOf<typeof getCourseUsers>;
 }
 
-const Members: FunctionComponent<Props> = ({ course }) => {
+const Members: FunctionComponent<Props> = ({ course, users }) => {
   // Hooks
   const t = useTranslations();
   const user = useUser((state) => state.user);
@@ -55,20 +59,18 @@ const Members: FunctionComponent<Props> = ({ course }) => {
   const fetchLock = useFetchLock();
 
   // State
-  const [isDispelMemberModal, setIsDispelMemberModal] = useState(false);
-  const [isDispelMembersModal, setIsDispelMembersModal] = useState(false);
+  const [isEnrollUsersModal, setIsEnrollUsersModal] = useState(false);
+  const [isExpelMemberModal, setIsExpelMemberModal] = useState(false);
+  const [isExpelMembersModal, setIsExpelMembersModal] = useState(false);
 
-  const [members, setMembers] = useState<ResultOf<typeof getCourseUsers>>([]);
-  const [membersCount, setMembersCount] = useState(0);
+  const [members, setMembers] = useState(users.data);
+  const [membersCount, setMembersCount] = useState(users.count);
 
   const [memberId, setMemberId] = useState<string>();
   const [membersIds, setMembersIds] = useState<string[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-
-  const [isSubmitDispelMember, setIsSubmitDispelMember] = useState(false);
-  const [isSubmitDispelMembers, setIsSubmitDispelMembers] = useState(false);
 
   const [searchText, setSearchText] = useState("");
 
@@ -76,7 +78,7 @@ const Members: FunctionComponent<Props> = ({ course }) => {
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
-  const membersOffsetRef = useRef(0);
+  const membersOffsetRef = useRef(users.data.length);
 
   // Vars
   const isData = !!members.length && !isLoading;
@@ -100,15 +102,12 @@ const Members: FunctionComponent<Props> = ({ course }) => {
     setIsLoading(true);
 
     try {
-      const [fetchedMembers, fetchedMembersCount] = await Promise.all([
-        getCourseUsers(courseId),
-        getCourseUsersCount(courseId),
-      ]);
+      const { data, count } = await getCourseUsers(course.id);
 
-      setMembers(fetchedMembers);
-      setMembersCount(fetchedMembersCount);
+      setMembers(data);
+      setMembersCount(count);
 
-      membersOffsetRef.current = fetchedMembers.length;
+      membersOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -120,18 +119,15 @@ const Members: FunctionComponent<Props> = ({ course }) => {
     setIsSearching(true);
 
     try {
-      const [fetchedMembers, fetchedUsersMembers] = await Promise.all([
-        getCourseUsers(courseId, search),
-        getCourseUsersCount(courseId, search),
-      ]);
+      const { data, count } = await getCourseUsers(course.id, search);
 
-      setMembers(fetchedMembers);
-      setMembersCount(fetchedUsersMembers);
+      setMembers(data);
+      setMembersCount(count);
 
       setIsSelectedAll(false);
       setMembersIds([]);
 
-      membersOffsetRef.current = fetchedMembers.length;
+      membersOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -143,31 +139,21 @@ const Members: FunctionComponent<Props> = ({ course }) => {
       const from = membersOffsetRef.current;
       const to = membersOffsetRef.current + MEMBERS_GET_LIMIT - 1;
 
-      const fetchedMembers = await getCourseUsers(
-        courseId,
-        searchText,
-        from,
-        to
-      );
+      const { data } = await getCourseUsers(courseId, searchText, from, to);
 
-      setMembers((prev) => [...prev, ...fetchedMembers]);
+      setMembers((prev) => [...prev, ...data]);
 
       if (isSelectedAll) {
-        setMembersIds((prev) => [
-          ...prev,
-          ...fetchedMembers.map(({ id }) => id),
-        ]);
+        setMembersIds((prev) => [...prev, ...data.map(({ id }) => id)]);
       }
 
-      membersOffsetRef.current += fetchedMembers.length;
+      membersOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
-  const submitDispelMember = async () => {
-    setIsSubmitDispelMember(true);
-
+  const submitExpelMember = async () => {
     try {
       await deleteUsersFromCourse(courseId, [memberId]);
 
@@ -176,18 +162,16 @@ const Members: FunctionComponent<Props> = ({ course }) => {
 
       setMembersIds((_) => _.filter((id) => id !== memberId));
 
-      setIsDispelMemberModal(false);
+      setIsExpelMemberModal(false);
 
-      toast.success(t("student_dispelled"));
+      membersOffsetRef.current -= 1;
+
+      toast.success(t("success.member_expelled"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmitDispelMember(false);
     }
   };
-  const submitDispelCourseMembers = async () => {
-    setIsSubmitDispelMembers(true);
-
+  const submitExpelMembers = async () => {
     try {
       if (isSelectedAll) {
         await deleteAllUsersFromCourse(courseId, searchText);
@@ -200,13 +184,13 @@ const Members: FunctionComponent<Props> = ({ course }) => {
       }
 
       setMembersIds([]);
-      setIsDispelMembersModal(false);
+      setIsExpelMembersModal(false);
 
-      toast.success(t("users_dispelled"));
+      membersOffsetRef.current -= membersIds.length;
+
+      toast.success(t("success.members_expelled"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmitDispelMembers(false);
     }
   };
 
@@ -220,12 +204,9 @@ const Members: FunctionComponent<Props> = ({ course }) => {
     }
   };
 
-  const onDispelMembersModalClose = () => {
-    setIsDispelMembersModal(false);
-  };
-
-  const onDispelMemberModalClose = () => {
-    setIsDispelMemberModal(false);
+  const onUsersEnrolled = () => {
+    revalidatePageAction();
+    fetchMembersBySearch(searchText);
   };
 
   const throttledSearch = useCallback(
@@ -240,7 +221,7 @@ const Members: FunctionComponent<Props> = ({ course }) => {
   );
 
   // Effects
-  useEffect(() => throttledSearch(searchText), [searchText]);
+  useUpdateEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
     if (membersCount) setIsSelectedAll(membersCount === membersIds.length);
@@ -276,19 +257,27 @@ const Members: FunctionComponent<Props> = ({ course }) => {
     >
       <CourseHeader course={course} />
       <p className="section-title">Members</p>
-      <CardsContainer>
-        <Total
-          Icon={<AvatarIcon size="lg" />}
-          total={membersCount}
-          title="Total members"
-        />
-        {user.role === Role.Teacher && (
-          <EnrollUsers
-            onUsersEnrolled={() => fetchMembersBySearch(searchText)}
-            courseId={courseId}
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-6">
+          <Total
+            Icon={<AvatarIcon size="lg" />}
+            total={membersCount}
+            title="Total members"
           />
-        )}
-      </CardsContainer>
+          {user.role === Role.Teacher && (
+            <div className="card">
+              <AddCourseIcon />
+              <hr className="w-full my-3" />
+              <button
+                className="primary-button px-8"
+                onClick={() => setIsEnrollUsersModal(true)}
+              >
+                Create
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
       {membersIds.length ? (
         <div className="mb-3 gap-2 flex">
           <button
@@ -299,10 +288,10 @@ const Members: FunctionComponent<Props> = ({ course }) => {
             {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
           </button>
           <button
-            onClick={() => setIsDispelMembersModal(true)}
+            onClick={() => setIsExpelMembersModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Dispel <DeleteIcon />
+            Expel <DeleteIcon />
           </button>
         </div>
       ) : (
@@ -362,9 +351,9 @@ const Members: FunctionComponent<Props> = ({ course }) => {
                 <ul className="flex flex-col">
                   <li
                     className="popper-list-item"
-                    onClick={() => setIsDispelMemberModal(true)}
+                    onClick={() => setIsExpelMemberModal(true)}
                   >
-                    <DeleteIcon /> Dispel
+                    <DeleteIcon /> Expel
                   </li>
                 </ul>
               </BasePopper>
@@ -372,27 +361,59 @@ const Members: FunctionComponent<Props> = ({ course }) => {
           }))}
         />
       )}
-      {isNoData && <NoData />}
-      {isNotFound && <NotFound />}
-
-      {isDispelMembersModal && (
-        <PromptModal
-          isSubmitting={isSubmitDispelMembers}
-          onClose={onDispelMembersModalClose}
-          title="Dispel Members"
-          action="Dispel"
-          actionHandler={submitDispelCourseMembers}
-          body={t("prompts.dispel_users")}
+      {isNoData && (
+        <NoData
+          body={metadata.courses}
+          action={
+            <button
+              className="primary-button"
+              onClick={() => setIsEnrollUsersModal(true)}
+            >
+              Enroll users
+            </button>
+          }
         />
       )}
-      {isDispelMemberModal && (
-        <PromptModal
-          isSubmitting={isSubmitDispelMember}
-          onClose={onDispelMemberModalClose}
-          title="Dispel member"
-          action="Dispel"
-          body={t("prompts.dispel_user")}
-          actionHandler={submitDispelMember}
+      {isNotFound && (
+        <NotFound
+          action={
+            <button
+              className="outline-button"
+              onClick={() => setSearchText("")}
+            >
+              Clear filters
+            </button>
+          }
+        />
+      )}
+
+      {isEnrollUsersModal && (
+        <EnrollUsersInCourseModal
+          onClose={onUsersEnrolled}
+          courseId={courseId}
+        />
+      )}
+
+      {isExpelMemberModal && (
+        <PromptDeleteRecordModal
+          title={t("modal.titles.expel_member")}
+          confirmText={t("actions.expel")}
+          onConfirm={submitExpelMember}
+          prompt={`${t("prompts.expel_member")}`}
+          record={members.find(({ id }) => id === memberId).name}
+          onClose={() => setIsExpelMemberModal(false)}
+        />
+      )}
+
+      {isExpelMembersModal && (
+        <PromptDeleteRecordsModal
+          title={t("modal.titles.expel_members")}
+          prompt={`${t("prompts.expel_members", {
+            count: membersIds.length,
+          })}`}
+          confirmText={t("actions.expel")}
+          onConfirm={submitExpelMembers}
+          onClose={() => setIsExpelMembersModal(false)}
         />
       )}
     </Container>

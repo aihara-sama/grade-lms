@@ -46,7 +46,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
     try {
       await createAssignment(assignment);
 
-      toast.success(t("assignment_created"));
+      toast.success(t("success.assignment_created"));
       onClose(true);
     } catch (error: any) {
       toast.error(error.message);

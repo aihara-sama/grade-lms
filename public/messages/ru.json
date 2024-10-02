@@ -1,4 +1,8 @@
 {
+  "nouns": {
+    "course": "курс",
+    "courses": "курсы"
+  },
   "courses": "Курсы",
   "search": "Пойск",
   "profile": "Профиль",
@@ -20,7 +24,7 @@
   "failed_to_delete_lessons": "Не удалось удалить урокм",
   "failed_to_load_submissions": "Не удалось загрузить здачи задания",
   "failed_to_delete_lesson": "Не удалось удалить урок",
-  "failed_to_get_new_notifications_count": "Не удалось загрузить количество новых оповещаний",
+  "failed_to_load_new_notifications_count": "Не удалось загрузить количество новых оповещаний",
   "failed_to_update_lesson": "Не удалось изменить урок",
   "failed_to_send_message": "Не удалось отправить сообщение",
   "video_format_is_not_allowed": "Видео формат не поддерживаеться",
@@ -66,8 +70,8 @@
   "submission_deleted": "Здача задания успешно удаленна",
   "submissions_deleted": "Здачи задания успешно удаленны",
   "lesson_created": "Урок успешно создан",
-  "student_dispelled": "Ученик успешно отчислен",
-  "users_dispelled": "Пользователи успешно отчислены",
+  "student_expelled": "Ученик успешно отчислен",
+  "users_expelled": "Пользователи успешно отчислены",
   "assignment_deleted": "Задание успешно удаленно",
   "assignments_deleted": "Задания успешно удаленны",
   "lessons_deleted": "Уроки успешно удаленны",
@@ -84,13 +88,15 @@
   "failed_to_load_assignments": "Не удалось загрузить задания",
   "failed_to_load_assignment": "Не удалось загрузить задание",
   "failed_lo_load_lessons_insights": "Не удалось загрузить статистику об уроках",
-  "failed_to_dispel_user": "Не удалось очислить пользователя",
-  "failed_to_dispel_users": "Не удалось очислить пользователей",
+  "failed_to_expel_user": "Не удалось очислить пользователя",
+  "failed_to_expel_users": "Не удалось очислить пользователей",
   "prompts": {
-    "dispel_users": "Вы уверены что хотите отчислить выбранных пользователей",
+    "are_you_sure_you_want_to_delete_this_course": "Вы уверенны что хотите удалить этот курс?",
+    "are_you_sure_you_want_to_delete_selected_courses": "Вы уверенны что хотите удалить выбранные курсы ({count})?",
+    "expel_users": "Вы уверены что хотите отчислить выбранных пользователей",
     "delete_lessons": "Вы уверены что хотите удалить выбранные уроки",
     "delete_lesson": "Вы уверены что хотите удалить выбранный урок",
-    "dispel_user": "Вы уверены что хотите отчислить этого пользователя",
+    "expel_user": "Вы уверены что хотите отчислить этого пользователя",
     "delete_submission": "Вы уверены что хотите удлаить эту здачу задания",
     "delete_submissions": "Вы уверены что хотите удлаить выбранные здачи задания",
     "delete_users": "Вы уверены что хотите удалить выбранных пользователей",
@@ -114,5 +120,10 @@
     "password_too_short": "Пароль слишком короткий",
     "to_signup_please_provide_your_email_or_phone_number": "Для регистрации укажите ваш адрес электронной почты",
     "invalid_login_credentials": "Неверные учетные данные для входа"
+  },
+  "delete_course": "Удалить курс",
+  "delete_courses": "Удалить курсы",
+  "actions": {
+    "delete": "Удалить"
   }
 }

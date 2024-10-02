@@ -16,7 +16,8 @@ export const getUser = async (id: string) => {
 
   const result = await DB.from("users").select("*").eq("id", id).single();
 
-  if (result.error || !result.data) throw new Error(t("failed_to_load_user"));
+  if (result.error || !result.data)
+    throw new Error(t("error.failed_to_load_user"));
 
   return result.data;
 };
@@ -27,15 +28,15 @@ export const getUsers = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.from("users")
-    .select("*")
+  const { data, count, error } = await DB.from("users")
+    .select("*", { count: "exact" })
     .ilike("name", `%${userName}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
 
-  if (result.error) throw new Error(t("failed_to_load_users"));
+  if (error) throw new Error(t("error.failed_to_load_users"));
 
-  return result.data;
+  return { data, count };
 };
 export const getUsersCount = async (userName = "") => {
   const t = await loadMessages();
@@ -46,7 +47,7 @@ export const getUsersCount = async (userName = "") => {
     .returns<{ count: number }[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_users_count"));
+  if (result.error) throw new Error(t("error.failed_to_load_users_count"));
 
   return result.data.count;
 };
@@ -59,17 +60,16 @@ export const getCourseUsers = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.from("courses")
-    .select("users(*)")
-    .eq("id", courseId)
-    .ilike("users.name", `%${userName}%`)
-    .range(from, to, { foreignTable: "users" })
-    .order("created_at", { ascending: true, referencedTable: "users" })
-    .single();
+  const { data, count, error } = await DB.from("users")
+    .select("*, courses!inner(id)", { count: "exact" })
+    .eq("courses.id", courseId)
+    .ilike("name", `%${userName}%`)
+    .range(from, to)
+    .order("created_at", { ascending: true });
 
-  if (result.error) throw new Error(t("failed_to_load_users"));
+  if (error) throw new Error(t("error.failed_to_load_users"));
 
-  return result.data.users;
+  return { data, count };
 };
 export const getCourseUsersCount = async (courseId: string, userName = "") => {
   const t = await loadMessages();
@@ -81,7 +81,7 @@ export const getCourseUsersCount = async (courseId: string, userName = "") => {
     .returns<Record<"users", { count: number }[]>[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_users_count"));
+  if (result.error) throw new Error(t("error.failed_to_load_users_count"));
 
   return result.data.users[0].count;
 };
@@ -94,16 +94,20 @@ export const getUsersNotInCourse = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.rpc("get_users_not_in_course", {
-    p_course_id: courseId,
-    p_user_name: userName,
-  })
+  const { data, count, error } = await DB.rpc(
+    "get_users_not_in_course",
+    {
+      p_course_id: courseId,
+      p_user_name: userName,
+    },
+    { count: "exact" }
+  )
     .range(from, to)
     .order("created_at", { ascending: true });
 
-  if (result.error) throw new Error(t("failed_to_load_users"));
+  if (error) throw new Error(t("error.failed_to_load_users"));
 
-  return result.data;
+  return { data, count };
 };
 export const getUsersNotInCourseCount = async (
   courseId: string,
@@ -119,7 +123,7 @@ export const getUsersNotInCourseCount = async (
     .returns<{ count: number }[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_users"));
+  if (result.error) throw new Error(t("error.failed_to_load_users"));
 
   return result.data.count;
 };
@@ -156,8 +160,8 @@ export const enrollUsersInCourses = async (
     throw new Error(
       t(
         usersIds.length === 1
-          ? "failed_to_enroll_user"
-          : "failed_to_enroll_users"
+          ? "error.failed_to_enroll_user"
+          : "error.failed_to_enroll_users"
       )
     );
 };
@@ -168,7 +172,7 @@ export const enrollUsersInAllCourses = async (usersIds: string[]) => {
     users_ids: usersIds,
   });
 
-  if (result.error) throw new Error(t("failed_to_enroll_users"));
+  if (result.error) throw new Error(t("error.failed_to_enroll_users"));
 };
 export const enrollAllUsersInCourses = async (coursesIds: string[]) => {
   const t = await loadMessages();
@@ -177,14 +181,14 @@ export const enrollAllUsersInCourses = async (coursesIds: string[]) => {
     p_courses_ids: coursesIds,
   });
 
-  if (result.error) throw new Error(t("failed_to_enroll_users"));
+  if (result.error) throw new Error(t("error.failed_to_enroll_users"));
 };
 export const enrollAllUsersInAllCourses = async () => {
   const t = await loadMessages();
 
   const result = await DB.rpc("enroll_all_users_in_all_courses");
 
-  if (result.error) throw new Error(t("failed_to_enroll_users"));
+  if (result.error) throw new Error(t("error.failed_to_enroll_users"));
 };
 
 // DELETE
@@ -193,23 +197,21 @@ export const deleteUser = async (id: string) => {
 
   const result = await deleteUsersAction([id]);
 
-  if (result.error) throw new Error(t("failed_to_delete_user"));
+  if (result.error) throw new Error(t("error.failed_to_delete_user"));
 };
 export const deleteUsers = async (ids: string[]) => {
-  console.log({ ids });
-
   const t = await loadMessages();
 
   const result = await deleteUsersAction(ids);
 
-  if (result.error) throw new Error(t("failed_to_delete_users"));
+  if (result.error) throw new Error(t("error.failed_to_delete_users"));
 };
 export const deleteAllUsers = async (userName: string) => {
   const t = await loadMessages();
 
   const result = await deleteAllUsersAction({ userName });
 
-  if (result.error) throw new Error(t("failed_to_delete_users"));
+  if (result.error) throw new Error(t("error.failed_to_delete_users"));
 };
 
 export const deleteUsersFromCourse = async (
@@ -218,12 +220,12 @@ export const deleteUsersFromCourse = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.rpc("dispel_users_from_course", {
+  const result = await DB.rpc("expel_users_from_course", {
     p_course_id: courseId,
     p_users_ids: usersIds,
   });
 
-  if (result.error) throw new Error(t("failed_to_dispel_users"));
+  if (result.error) throw new Error(t("error.failed_to_expel_members"));
 };
 export const deleteAllUsersFromCourse = async (
   courseId: string,
@@ -231,10 +233,10 @@ export const deleteAllUsersFromCourse = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.rpc("dispel_all_users_from_course", {
+  const result = await DB.rpc("expel_all_users_from_course", {
     p_course_id: courseId,
     p_user_name: userName,
   });
 
-  if (result.error) throw new Error(t("failed_to_dispel_users"));
+  if (result.error) throw new Error(t("error.failed_to_expel_members"));
 };

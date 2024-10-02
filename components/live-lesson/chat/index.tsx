@@ -44,8 +44,6 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
 
   // Handlers
   const fireChatMessageCreate = (chatMessage: ChatMessage) => {
-    console.log("fireChatMessageCreate");
-
     channel.send({
       event: Event.ChatMessageCreated,
       type: "broadcast",
@@ -55,9 +53,9 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
 
   const fetchChatMessages = async () => {
     try {
-      const fetchedMessages = await getChatMessages(lesson.id);
+      const { data } = await getChatMessages(lesson.id);
 
-      setMessages(() => fetchedMessages);
+      setMessages(() => data);
     } catch (error: any) {
       toast.error(error.message);
     }

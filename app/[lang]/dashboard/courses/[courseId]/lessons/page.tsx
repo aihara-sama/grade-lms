@@ -1,5 +1,6 @@
 import Lessons from "@/components/course/lessons";
 import { getCourse } from "@/db/server/course";
+import { getCourseLessons } from "@/db/server/lesson";
 import type { FunctionComponent } from "react";
 
 interface Props {
@@ -7,8 +8,10 @@ interface Props {
 }
 
 const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
-  const course = await getCourse(courseId);
-
-  return <Lessons course={course} />;
+  const [course, lessons] = await Promise.all([
+    getCourse(courseId),
+    getCourseLessons(courseId),
+  ]);
+  return <Lessons course={course} lessons={lessons} />;
 };
 export default Page;

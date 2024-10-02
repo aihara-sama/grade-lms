@@ -38,7 +38,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
       await updateSubmission({ ...submission, grade });
 
       onClose(true);
-      toast.success(t("grade_updated"));
+      toast.success(t("success.grade_updated"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

@@ -6,21 +6,22 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 import LatestAssignments from "@/components/student-dashboard/latest-assignments";
 import StudentInsights from "@/components/student-dashboard/student-insights";
 import Total from "@/components/total";
+import type { getLatestAssignments } from "@/db/server/assignment";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUser } from "@/hooks/use-user";
-import type { Assignment } from "@/types/assignment.type";
+import type { ResultOf } from "@/types/utils.type";
 import { useEffect, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
   assignmentsCount: number;
   submissionsCount: number;
-  latestAssignments: Assignment[];
+  latestAssignments: ResultOf<typeof getLatestAssignments>;
 }
 
 const StudentrDashboard: FunctionComponent<Props> = (props) => {
-  const { enablePushNotifications } = usePushNotifications();
   const user = useUser((state) => state.user);
+  const { enablePushNotifications } = usePushNotifications();
 
   useEffect(() => {
     (async () => {
@@ -54,7 +55,7 @@ const StudentrDashboard: FunctionComponent<Props> = (props) => {
           />
         </div>
         <hr className="my-4" />
-        <LatestAssignments assignments={props.latestAssignments} />
+        <LatestAssignments assignments={props.latestAssignments.data} />
         <StudentInsights />
       </div>
       <div className="sm:w-[300px]">

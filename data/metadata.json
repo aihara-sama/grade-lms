@@ -1,3 +1,8 @@
 {
-  "courses": "Enroll users in courses seamlessly by assigning them to courses."
+  "users": "Create and manage users effectively",
+  "courses": "Create and manage courses effectively",
+  "lessons": "Create and manage lessons effectively",
+  "members": "Create and manage members effectively",
+  "assignments": "Create and manage assignments effectively",
+  "submissions": "Create and manage submissions effectively"
 }

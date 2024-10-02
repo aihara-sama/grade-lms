@@ -31,7 +31,7 @@ const LessonSettings: FunctionComponent = () => {
       await updateLesson({ id: lesson.id, title });
       setLesson({ ...lesson, title });
 
-      toast.success(t("lesson_updated"));
+      toast.success(t("success.lesson_updated"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

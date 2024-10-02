@@ -36,7 +36,8 @@ const CourseInsights: FunctionComponent<Props> = ({ courseId }) => {
       .lte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
       .single();
 
-    if (result.error) throw new Error(t("failed_lo_load_lessons_insights"));
+    if (result.error)
+      throw new Error(t("error.failed_lo_load_lessons_insights"));
 
     return result.data.lessons;
   };
@@ -50,7 +51,7 @@ const CourseInsights: FunctionComponent<Props> = ({ courseId }) => {
       )
       .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 
-    if (result.error) throw new Error(t("failed_lo_load_users_insights"));
+    if (result.error) throw new Error(t("error.failed_lo_load_users_insights"));
 
     return result.data;
   };

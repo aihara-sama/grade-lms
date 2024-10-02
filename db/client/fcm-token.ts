@@ -7,7 +7,7 @@ export const getFcmToken = async () => {
 
   const result = await DB.from("fcm_tokens").select("fcm_token").maybeSingle();
 
-  if (result.error) throw new Error(t("something_went_wrong"));
+  if (result.error) throw new Error(t("error.something_went_wrong"));
 
   return result.data;
 };
@@ -20,5 +20,5 @@ export const createFcmToken = async (token: string) => {
     fcm_token: token,
   });
 
-  if (result.error) throw new Error(t("something_went_wrong"));
+  if (result.error) throw new Error(t("error.something_went_wrong"));
 };

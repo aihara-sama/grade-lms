@@ -77,7 +77,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     };
     const fetchCourses = async () => {
       try {
-        setCourses(await getCourses());
+        setCourses((await getCourses()).data);
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -85,7 +85,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     const fetchCoursesBySearch = useCallback(
       throttleSearch(async (search: string) => {
         try {
-          setCourses(await getCourses(search));
+          setCourses((await getCourses(search)).data);
         } catch (error: any) {
           toast.error(error.message);
         }
@@ -99,7 +99,7 @@ const EditLessonModal: FunctionComponent<Props> = memo(
       try {
         await updateLesson(lesson);
 
-        toast(t("lesson_updated"));
+        toast(t("success.lesson_updated"));
         onClose(true);
       } catch (error: any) {
         toast.error(error.message);
@@ -164,20 +164,20 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     }, [lesson, courses.length]);
 
     const onCoursesScrollEnd = async (search: string) => {
-      const rangeCourses = await getCourses(
+      const { data } = await getCourses(
         search,
         coursesOffsetRef.current,
         coursesOffsetRef.current + COURSES_GET_LIMIT - 1
       );
 
-      setCourses((prev) => [...prev, ...rangeCourses]);
-      coursesOffsetRef.current += rangeCourses.length;
+      setCourses((prev) => [...prev, ...data]);
+      coursesOffsetRef.current += data.length;
     };
 
     // View
     return (
       <BaseModal
-        isExpanded={false}
+        isFixedHeight={false}
         onClose={() => onClose()}
         title="View lesson"
         headerButtons={

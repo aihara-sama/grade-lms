@@ -46,7 +46,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
   // View
   return (
     <BaseModal
-      isExpanded={false}
+      isFixedHeight={false}
       onClose={() => onClose()}
       title="Create course"
     >

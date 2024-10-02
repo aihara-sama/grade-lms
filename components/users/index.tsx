@@ -1,7 +1,6 @@
 "use client";
 
 import CardTitle from "@/components/card-title";
-import CardsContainer from "@/components/cards-container";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
@@ -9,16 +8,20 @@ import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
-import CreateUser from "@/components/users/create-user";
+import metadata from "@/data/metadata.json";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import Avatar from "@/components/avatar";
+import CreateUserModal from "@/components/common/modals/create-user-modal";
 import EditUserModal from "@/components/common/modals/edit-user-modal";
 import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses-modal";
-import PromptModal from "@/components/common/modals/prompt-modal";
+import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
+import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
 import Container from "@/components/container";
+import AddUserIcon from "@/components/icons/add-user-icon";
 import CheckIcon from "@/components/icons/check-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import UsersIcon from "@/components/icons/users-icon";
@@ -31,28 +34,30 @@ import {
   deleteUser,
   deleteUsers,
   getUsers,
-  getUsersCount,
 } from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useUpdateEffect } from "@/hooks/use-update-effect";
+import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import type { User } from "@supabase/supabase-js";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 interface Props {
-  user: User;
+  users: ResultOf<typeof getUsers>;
 }
 
-const Users: FunctionComponent<Props> = ({ user }) => {
+const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
   // Hooks
   const t = useTranslations();
+  const user = useUser((state) => state.user);
+
   const fetchLock = useFetchLock();
 
   // State
-
+  const [isCreateUserModal, setIsCreateUserModal] = useState(false);
   const [isEditUserModal, setIsEditUserModal] = useState(false);
   const [isDeleteUserModal, setIsDeleteUserModal] = useState(false);
   const [isDeleteUsersModal, setIsDeleteUsersModal] = useState(false);
@@ -61,17 +66,14 @@ const Users: FunctionComponent<Props> = ({ user }) => {
   const [isEnrollUsersInCoursesModal, setIsEnrollUsersInCoursesModal] =
     useState(false);
 
-  const [users, setUsers] = useState<ResultOf<typeof getUsers>>([]);
-  const [usersCount, setUsersCount] = useState(0);
+  const [users, setUsers] = useState(initUsers.data);
+  const [usersCount, setUsersCount] = useState(initUsers.count);
 
   const [userId, setUserId] = useState<string>();
   const [usersIds, setUsersIds] = useState<string[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-
-  const [isSubmittingDeleteUser, setIsSubmittingDeleteUser] = useState(false);
-  const [isSubmittingDeleteUsers, setIsSubmittingDeleteUsers] = useState(false);
 
   const [searchText, setSearchText] = useState("");
 
@@ -103,16 +105,13 @@ const Users: FunctionComponent<Props> = ({ user }) => {
     setIsLoading(true);
 
     try {
-      const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsers(),
-        getUsersCount(),
-      ]);
+      const { data, count } = await getUsers();
 
       // Dont show current user
-      setUsers(fetchedUsers.filter(({ id }) => id !== user.id));
-      setUsersCount(Math.max(fetchedUsersCount - 1, 0));
+      setUsers(data.filter(({ id }) => id !== user.id));
+      setUsersCount(Math.max(count - 1, 0));
 
-      usersOffsetRef.current = fetchedUsers.length;
+      usersOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -123,16 +122,13 @@ const Users: FunctionComponent<Props> = ({ user }) => {
     setIsSearching(true);
 
     try {
-      const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsers(search),
-        getUsersCount(search),
-      ]);
+      const { data, count } = await getUsers(search);
 
       // Dont show current user
-      setUsers(fetchedUsers.filter(({ id }) => id !== user.id));
-      setUsersCount(Math.max(fetchedUsersCount - 1, 0));
+      setUsers(data.filter(({ id }) => id !== user.id));
+      setUsersCount(Math.max(count - 1, 0));
 
-      usersOffsetRef.current = fetchedUsers.length;
+      usersOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -144,23 +140,18 @@ const Users: FunctionComponent<Props> = ({ user }) => {
       const from = usersOffsetRef.current;
       const to = usersOffsetRef.current + USERS_GET_LIMIT - 1;
 
-      const fetchedUsers = await getUsers(searchText, from, to);
+      const { data } = await getUsers(searchText, from, to);
 
       // Dont show current user
-      setUsers((prev) => [
-        ...prev,
-        ...fetchedUsers.filter(({ id }) => id !== user.id),
-      ]);
+      setUsers((prev) => [...prev, ...data.filter(({ id }) => id !== user.id)]);
 
-      usersOffsetRef.current += fetchedUsers.length;
+      usersOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
   const submitDeleteUser = async () => {
-    setIsSubmittingDeleteUser(true);
-
     try {
       await deleteUser(userId);
 
@@ -170,16 +161,12 @@ const Users: FunctionComponent<Props> = ({ user }) => {
 
       setIsDeleteUserModal(false);
 
-      toast.success(t("user_deleted"));
+      toast.success(t("success.user_deleted"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmittingDeleteUser(false);
     }
   };
   const submitDeleteUsers = async () => {
-    setIsSubmittingDeleteUsers(true);
-
     try {
       if (isSelectedAll) {
         await deleteAllUsers(searchText);
@@ -194,11 +181,9 @@ const Users: FunctionComponent<Props> = ({ user }) => {
       setUsersIds([]);
       setIsDeleteUsersModal(false);
 
-      toast.success(t("users_deleted"));
+      toast.success(t("success.users_deleted"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmittingDeleteUsers(false);
     }
   };
 
@@ -210,6 +195,11 @@ const Users: FunctionComponent<Props> = ({ user }) => {
       setUsersIds((prev) => prev.filter((_id) => _id !== _userId));
       setIsSelectedAll(usersCount === usersIds.length - 1);
     }
+  };
+
+  const onUserCreated = () => {
+    revalidatePageAction();
+    fetchUsersBySearch(searchText);
   };
 
   const onEnrollUserInCoursesModalClose = (mutated?: boolean) => {
@@ -226,9 +216,7 @@ const Users: FunctionComponent<Props> = ({ user }) => {
       setUsersIds([]);
     }
   };
-  const onEditUserModalClose = (
-    updatedUser?: ResultOf<typeof getUsers>[number]
-  ) => {
+  const onEditUserModalClose = (updatedUser?: (typeof users)[number]) => {
     setIsEditUserModal(false);
 
     if (updatedUser) {
@@ -254,7 +242,7 @@ const Users: FunctionComponent<Props> = ({ user }) => {
   );
 
   // Effects
-  useEffect(() => throttledSearch(searchText), [searchText]);
+  useUpdateEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
     // Tall screens may fit more than 20 records
@@ -291,14 +279,26 @@ const Users: FunctionComponent<Props> = ({ user }) => {
       <p className="text-3xl font-bold text-neutral-600">Users</p>
       <p className="text-neutral-500">View and manage users</p>
       <hr className="my-2 mb-4" />
-      <CardsContainer>
-        <Total
-          Icon={<AvatarIcon size="lg" />}
-          total={usersCount}
-          title="Total users"
-        />
-        <CreateUser onUserCreated={() => fetchUsersBySearch(searchText)} />
-      </CardsContainer>
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-6">
+          <Total
+            Icon={<AvatarIcon size="lg" />}
+            total={usersCount}
+            title="Total users"
+          />
+          <div className="card">
+            <AddUserIcon size="lg" />
+            <hr className="w-full my-3" />
+            <button
+              className="primary-button px-8"
+              onClick={() => setIsCreateUserModal(true)}
+            >
+              Create
+            </button>
+          </div>
+        </div>
+      </div>
+
       {usersIds.length ? (
         <div className="mb-3 gap-2 flex">
           <button
@@ -384,8 +384,33 @@ const Users: FunctionComponent<Props> = ({ user }) => {
           }))}
         />
       )}
-      {isNoData && <NoData />}
-      {isNotFound && <NotFound />}
+      {isNoData && (
+        <NoData
+          body={metadata.users}
+          action={
+            <button
+              className="primary-button"
+              onClick={() => setIsCreateUserModal(true)}
+            >
+              Create user
+            </button>
+          }
+        />
+      )}
+      {isNotFound && (
+        <NotFound
+          action={
+            <button
+              className="outline-button"
+              onClick={() => setSearchText("")}
+            >
+              Clear filters
+            </button>
+          }
+        />
+      )}
+
+      {isCreateUserModal && <CreateUserModal onClose={onUserCreated} />}
 
       {isEnrollUserInCoursesModal && (
         <EnrollUsersInCoursesModal
@@ -405,23 +430,24 @@ const Users: FunctionComponent<Props> = ({ user }) => {
       )}
 
       {isDeleteUserModal && (
-        <PromptModal
-          isSubmitting={isSubmittingDeleteUser}
-          onClose={() => setIsDeleteUsersModal(false)}
-          title="Delete user"
-          action="Delete"
-          body="Are you sure you want to delete this user?"
-          actionHandler={submitDeleteUser}
+        <PromptDeleteRecordModal
+          title={t("modal.titles.delete_user")}
+          confirmText={t("actions.delete")}
+          onConfirm={submitDeleteUser}
+          prompt={`${t("prompts.delete_user")}`}
+          record={users.find(({ id }) => id === userId).name}
+          onClose={() => setIsDeleteUserModal(false)}
         />
       )}
       {isDeleteUsersModal && (
-        <PromptModal
-          isSubmitting={isSubmittingDeleteUsers}
+        <PromptDeleteRecordsModal
+          title={t("modal.titles.delete_user")}
+          prompt={`${t("prompts.delete_users", {
+            count: usersIds.length,
+          })}`}
+          confirmText={t("actions.delete")}
           onClose={() => setIsDeleteUsersModal(false)}
-          title="Delete Users"
-          action="Delete"
-          actionHandler={submitDeleteUsers}
-          body={t("prompts.delete_users")}
+          onConfirm={submitDeleteUsers}
         />
       )}
     </Container>

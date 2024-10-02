@@ -1,4 +1,5 @@
 import Users from "@/components/users";
+import { getMyUsers } from "@/db/server/user";
 import { Role } from "@/enums/role.enum";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { redirect } from "next/navigation";
@@ -10,7 +11,9 @@ const Page = async () => {
 
   if (user.user_metadata.role !== Role.Teacher) return redirect("/dashboard");
 
-  return <Users user={user} />;
+  const users = await getMyUsers(user.id);
+
+  return <Users users={users} />;
 };
 
 export default Page;

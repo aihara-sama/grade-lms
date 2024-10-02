@@ -1,12 +1,13 @@
 "use client";
 
 import DashboardSchedule from "@/components/common/dashboard/dashboard-schedule";
+import Container from "@/components/container";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
-import { getCoursesCount, getLatestCourses } from "@/db/client/course";
+import { getLatestCourses } from "@/db/client/course";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUser } from "@/hooks/use-user";
 import type { CourseWithRefsCount } from "@/types/course.type";
@@ -32,13 +33,10 @@ const TeacherDashboard: FunctionComponent<Props> = (props) => {
 
   const fetchLatestourses = async () => {
     try {
-      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        getLatestCourses(),
-        getCoursesCount(),
-      ]);
+      const { data, count } = await getLatestCourses();
 
-      setLatestCourses(fetchedCourses);
-      setCoursesCount(fetchedCoursesCount);
+      setLatestCourses(data);
+      setCoursesCount(count);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -61,36 +59,37 @@ const TeacherDashboard: FunctionComponent<Props> = (props) => {
   }, []);
 
   return (
-    <div className="sm:flex-row flex gap-8 flex-col">
-      expected
-      <div className="flex-1 overflow-hidden">
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
-            <Total
-              adaptive={false}
-              Icon={<CoursesIcon size="lg" />}
-              total={coursesCount}
-              title="Total courses"
-            />
-            <Total
-              adaptive={false}
-              Icon={<AvatarIcon size="lg" />}
-              total={usersCount}
-              title="Total users"
-            />
+    <Container>
+      <div className="sm:flex-row flex gap-8 flex-col">
+        <div className="flex-1 overflow-hidden">
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
+              <Total
+                adaptive={false}
+                Icon={<CoursesIcon size="lg" />}
+                total={coursesCount}
+                title="Total courses"
+              />
+              <Total
+                adaptive={false}
+                Icon={<AvatarIcon size="lg" />}
+                total={usersCount}
+                title="Total users"
+              />
+            </div>
           </div>
+          <hr className="my-4" />
+          <LatestCourses
+            courses={latestCourses}
+            onCourseCreated={fetchLatestourses}
+          />
+          <TeacherInsights courses={latestCourses} />
         </div>
-        <hr className="my-4" />
-        <LatestCourses
-          courses={latestCourses}
-          onCourseCreated={fetchLatestourses}
-        />
-        <TeacherInsights courses={latestCourses} />
+        <div className="sm:w-[284px]">
+          <DashboardSchedule />
+        </div>
       </div>
-      <div className="sm:w-[284px]">
-        <DashboardSchedule />
-      </div>
-    </div>
+    </Container>
   );
 };
 

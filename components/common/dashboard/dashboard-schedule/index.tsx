@@ -57,7 +57,7 @@ const DashboardSchedule: FunctionComponent = () => {
     try {
       const { data, error } = await fetchLessonsByStartDate(scheduleDate);
 
-      if (error) throw new Error(t("failed_to_load_lessons"));
+      if (error) throw new Error(t("error.failed_to_load_lessons"));
 
       if (data.courses.length) {
         setSchedule((prev) => [
@@ -84,7 +84,7 @@ const DashboardSchedule: FunctionComponent = () => {
       const { data, error } = await fetchLessonsByStartDate(scheduleDate);
 
       if (error) {
-        toast.error(t("failed_to_load_lessons"));
+        toast.error(t("error.failed_to_load_lessons"));
       } else {
         setSchedule(data.courses.map(({ lessons }) => lessons).flat());
       }

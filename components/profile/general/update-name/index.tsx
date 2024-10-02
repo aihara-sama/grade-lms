@@ -34,7 +34,7 @@ const UpdateName: FunctionComponent = () => {
     if (error) toast.error("Something went wrong");
     else {
       setUser({ ...user, name });
-      toast.success(t("user_updated"));
+      toast.success(t("success.user_updated"));
     }
   };
 

@@ -73,8 +73,8 @@ const Whiteboard: FunctionComponent<Props> = ({
   const invite = async () => {
     navigator.clipboard
       .writeText(window.location.href)
-      .then(() => toast.success(t("invite_copied")))
-      .catch(() => toast.error(t("something_went_wrong")));
+      .then(() => toast.success(t("success.invite_copied")))
+      .catch(() => toast.error(t("error.something_went_wrong")));
   };
 
   const submitUpdateWhiteboardData = throttleFetch(async (data: string) => {
@@ -84,7 +84,7 @@ const Whiteboard: FunctionComponent<Props> = ({
       })
       .eq("id", lesson.id);
 
-    if (error) toast.error(t("failed_to_save_whiteboar_data"));
+    if (error) toast.error(t("error.failed_to_save_whiteboar_data"));
   });
 
   const onPointerUpdate: ExcalidrawProps["onPointerUpdate"] = (event) => {

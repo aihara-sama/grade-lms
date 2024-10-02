@@ -92,13 +92,13 @@ const LessonPreview: FunctionComponent = () => {
   const submitUpdateLessonDate = async () => {
     setIsSubmittingUpdateLessonDate(true);
     try {
-      const overlappingLessons = await getOverlappingLessons(
+      const { count } = await getOverlappingLessons(
         starts.toISOString(),
         ends.toISOString(),
         lesson.id
       );
 
-      if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
+      if (count) throw new Error(t("error.lesson_overlaps"));
 
       const { error, data } = await DB.from("lessons")
         .update({
@@ -109,11 +109,11 @@ const LessonPreview: FunctionComponent = () => {
         .select("*, course:courses(*)")
         .single();
 
-      if (error) throw new Error(t("failed_to_update_lesson_date"));
+      if (error) throw new Error(t("error.failed_to_update_lesson_date"));
 
       setLesson(data);
 
-      toast.success(t("lesson_date_updated"));
+      toast.success(t("success.lesson_date_updated"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

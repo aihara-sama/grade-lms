@@ -40,6 +40,9 @@
   /* ^ Scrollbar ^ */
 }
 @layer components {
+  .card {
+    @apply border border-dashed border-light bg-white px-6 py-8 flex flex-col items-center justify-between sm:w-64 w-full rounded-md;
+  }
   .base-link {
     @apply px-[14px] py-[10px] flex gap-2 items-center rounded-[3px] text-sm cursor-pointer hover:bg-gray-100 hover:text-link;
   }
@@ -51,10 +54,14 @@
   }
 
   .primary-button {
-    @apply text-white bg-link;
-    @apply hover:bg-blue-200;
-    @apply active:bg-blue-300;
-    @apply disabled:bg-link !important;
+    @apply text-white bg-blue-500;
+    @apply hover:bg-blue-600/90 active:bg-blue-700/90;
+    @apply disabled:bg-blue-500/75 !important;
+  }
+  .delete-button {
+    @apply text-white bg-red-500;
+    @apply hover:bg-red-600 active:bg-red-700;
+    @apply disabled:bg-red-500/75 !important;
   }
   .warning-button {
     @apply text-white bg-amber-400;
@@ -88,7 +95,7 @@
   }
 
   .popper-list-item {
-    @apply cursor-pointer hover:bg-gray-100 hover:text-link p-2 px-3 flex items-center gap-2;
+    @apply text-neutral-600 cursor-pointer hover:bg-gray-100 p-2 px-3 flex items-center gap-2 mx-2 rounded-md;
   }
   .loading-spinner {
     @apply size-[22.5px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
@@ -111,6 +118,9 @@
     &.outline-button {
       @apply bg-white !important;
     }
+    &.delete-button {
+      @apply bg-red-500 !important;
+    }
     @apply opacity-75 cursor-default pointer-events-none;
   }
   .inter-active {
@@ -121,7 +131,6 @@
   }
   .truncate-fade {
     position: relative;
-    /* display: inline-block; */
     overflow: hidden;
     white-space: nowrap;
     mask-image: linear-gradient(

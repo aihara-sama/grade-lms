@@ -11,7 +11,7 @@ interface Props {
   width?: "md" | "lg";
   title: string;
   headerButtons?: ReactNode;
-  isExpanded?: boolean;
+  isFixedHeight?: boolean;
   isInsideModal?: boolean;
 }
 
@@ -21,7 +21,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<Props>> = ({
   headerButtons,
   isInsideModal,
   onClose,
-  isExpanded = true,
+  isFixedHeight = true,
   width = "md",
 }) => {
   // State
@@ -55,15 +55,15 @@ const BaseModal: FunctionComponent<PropsWithChildren<Props>> = ({
       <div
         className={`flex flex-col relative top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 z-[999] w-full
         ${clsx({
-          "h-[min(500px,100%)]": isExpanded,
-          "max-h-[90vh]": !isExpanded,
+          "h-[min(500px,100%)]": isFixedHeight,
+          "max-h-[90vh]": !isFixedHeight,
           "sm:w-[400px]": width === "md",
           "sm:w-[680px]": width === "lg",
         })}
         `}
       >
         <div
-          className={`${isExpanded ? "h-[min(484px,100%)]" : "max-h-[90vh]"} pb-3 overflow-auto transition-fade flex items-center flex-col rounded-md shadow-md bg-white -translate-y-10 opacity-0 ${clsx(
+          className={`${isFixedHeight ? "h-[min(484px,100%)]" : "max-h-[90vh]"} pb-3 overflow-auto transition-fade flex items-center flex-col rounded-md shadow-md bg-white -translate-y-10 opacity-0 ${clsx(
             hasRendered && "opacity-100 translate-y-0"
           )}`}
         >
@@ -77,7 +77,7 @@ const BaseModal: FunctionComponent<PropsWithChildren<Props>> = ({
             </div>
           </div>
           <div
-            className={`overflow-auto w-full px-6 pt-3 flex flex-col ${isExpanded ? "h-[min(472px,100%)]" : "max-h-[90vh]"}`}
+            className={`overflow-auto w-full px-6 pt-3 flex flex-col ${isFixedHeight ? "h-[min(472px,100%)]" : "max-h-[90vh]"}`}
           >
             {children}
           </div>

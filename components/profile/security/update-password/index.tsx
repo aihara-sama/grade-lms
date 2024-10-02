@@ -30,7 +30,7 @@ const UpdatePassword: FunctionComponent = () => {
 
       setPassword("");
 
-      toast.success(t("password_changed"));
+      toast.success(t("success.password_changed"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

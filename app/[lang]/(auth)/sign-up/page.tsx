@@ -39,7 +39,7 @@ const Page: FunctionComponent = () => {
 
     setIsSubmitting(true);
 
-    const { error, data } = await DB.auth.signUp({
+    const { error } = await DB.auth.signUp({
       email,
       password,
       options: {
@@ -61,10 +61,7 @@ const Page: FunctionComponent = () => {
     else {
       setIsSuccess(true);
 
-      router.push(
-        searchParams.get("redirect") ||
-          `/${data.user.user_metadata.preferred_locale}/dashboard`
-      );
+      router.push(searchParams.get("redirect") || `/dashboard`);
     }
   };
 

@@ -32,7 +32,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
     try {
       // Dont check for quick lessons
       if (lesson.course_id) {
-        const overlappingLessons = await getOverlappingLessons(
+        const { count } = await getOverlappingLessons(
           lesson.starts,
           new Date(
             +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin)
@@ -40,7 +40,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
           lesson.id
         );
 
-        if (overlappingLessons.length) throw new Error(t("lesson_overlaps"));
+        if (count) throw new Error(t("error.lesson_overlaps"));
       }
 
       setLesson(
@@ -48,7 +48,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
       );
 
       onClose(true);
-      toast.success(t("lesson_extended"));
+      toast.success(t("success.lesson_extended"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -68,7 +68,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
   // View
   return (
     <BaseModal
-      isExpanded={false}
+      isFixedHeight={false}
       title="Extend lesson"
       onClose={() => onClose()}
     >

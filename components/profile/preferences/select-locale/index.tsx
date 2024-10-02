@@ -1,3 +1,4 @@
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import Select from "@/components/common/select";
 import { useUser } from "@/hooks/use-user";
 import { DEFAULT_LOCALE, locales, type Locale } from "@/i18n";
@@ -41,8 +42,10 @@ const SelectLocale: FunctionComponent = () => {
         },
       });
 
-      if (error) throw new Error(t("failed_to_change_language"));
+      if (error) throw new Error(t("error.failed_to_change_language"));
+
       router.push(getRedirectedPathName(_locale as Locale));
+      revalidatePageAction();
     } catch (error: any) {
       toast.error(error.message);
     }

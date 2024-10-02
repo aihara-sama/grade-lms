@@ -98,14 +98,14 @@ const Schedule: FunctionComponent = () => {
   };
   const fetchWeekLessons = async () => {
     try {
-      setLessons(await getWeekLessons(days, selectedCourse?.id));
+      setLessons((await getWeekLessons(days, selectedCourse?.id)).data);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
   const fetchCourses = async () => {
     try {
-      setCourses(await getCourses());
+      setCourses((await getCourses()).data);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -125,7 +125,7 @@ const Schedule: FunctionComponent = () => {
         ).toISOString(),
       });
 
-      toast.success(t("lesson_saved"));
+      toast.success(t("success.lesson_saved"));
       await fetchWeekLessons();
     } catch (error: any) {
       toast.error(error.message);
@@ -234,20 +234,20 @@ const Schedule: FunctionComponent = () => {
   }, []);
 
   const onCoursesScrollEnd = async (search: string) => {
-    const rangeCourses = await getCourses(
+    const { data } = await getCourses(
       search,
       coursesOffsetRef.current,
       coursesOffsetRef.current + COURSES_GET_LIMIT - 1
     );
 
-    setCourses((prev) => [...prev, ...rangeCourses]);
-    coursesOffsetRef.current += rangeCourses.length;
+    setCourses((prev) => [...prev, ...data]);
+    coursesOffsetRef.current += data.length;
   };
 
   const fetchCoursesBySearch = useCallback(
     throttleSearch(async (search: string) => {
       try {
-        setCourses(await getCourses(search));
+        setCourses((await getCourses(search)).data);
       } catch (error: any) {
         toast.error(error.message);
       }

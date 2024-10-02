@@ -26,17 +26,17 @@ const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
         const allowedExtensions = ["image/jpeg", "image/png", "image/gif"];
 
         if (!allowedExtensions.includes(file.type))
-          throw new Error(t("selected_file_ext_is_not_allowed"));
+          throw new Error(t("error.selected_file_ext_is_not_allowed"));
 
         if (file.size >= MAX_AVATAR_SIZE)
-          throw new Error(t("file_size_too_big"));
+          throw new Error(t("error.file_size_too_big"));
 
         setIsSubmitting(true);
         const { data, error } = await DB.storage
           .from("avatars")
           .upload(uuid(), file);
 
-        if (error) throw new Error(t("something_went_wrong"));
+        if (error) throw new Error(t("error.something_went_wrong"));
         onChange(data.path);
       }
     } catch (error: any) {

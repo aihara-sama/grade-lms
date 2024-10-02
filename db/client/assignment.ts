@@ -12,7 +12,7 @@ export const getAssignment = async (id: string) => {
     .eq("id", id)
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_assignment"));
+  if (result.error) throw new Error(t("error.failed_to_load_assignment"));
 
   return result.data;
 };
@@ -24,16 +24,16 @@ export const getLessonAssignments = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.from("assignments")
-    .select("*")
+  const { data, count, error } = await DB.from("assignments")
+    .select("*", { count: "exact" })
     .eq("lesson_id", lessonId)
     .ilike("title", `%${title}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
 
-  if (result.error) throw new Error(t("failed_to_load_assignments"));
+  if (error) throw new Error(t("error.failed_to_load_assignments"));
 
-  return result.data;
+  return { data, count };
 };
 export const getLessonAssignmentsCount = async (
   lessonId: string,
@@ -48,22 +48,10 @@ export const getLessonAssignmentsCount = async (
     .returns<{ count: number }[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_assignments_count"));
+  if (result.error)
+    throw new Error(t("error.failed_to_load_assignments_count"));
 
   return result.data.count;
-};
-
-export const getLatestAssignments = async () => {
-  const t = await loadMessages();
-
-  const result = await DB.from("courses")
-    .select("lessons(assignments(*))")
-    .limit(ASSIGNMENTS_GET_LIMIT)
-    .order("created_at", { ascending: false });
-
-  if (result.error) throw new Error(t("failed_to_load_assignments"));
-
-  return result.data;
 };
 
 // CREATE
@@ -77,7 +65,7 @@ export const createAssignment = async (
     .select("id")
     .single();
 
-  if (result.error) throw new Error(t("failed_to_create_assignment"));
+  if (result.error) throw new Error(t("error.failed_to_create_assignment"));
 
   return result.data;
 };
@@ -92,7 +80,7 @@ export const updateAssignment = async (
     .update(assignment)
     .eq("id", assignment.id);
 
-  if (result.error) throw new Error(t("failed_to_update_assignment"));
+  if (result.error) throw new Error(t("error.failed_to_update_assignment"));
 };
 
 // DELETE
@@ -101,7 +89,7 @@ export const deleteAssignment = async (id: string) => {
 
   const result = await DB.from("assignments").delete().eq("id", id);
 
-  if (result.error) throw new Error(t("failed_to_delete_assignment"));
+  if (result.error) throw new Error(t("error.failed_to_delete_assignment"));
 
   return result.data;
 };
@@ -112,7 +100,7 @@ export const deleteAssignments = async (ids: string[]) => {
     p_assignments_ids: ids,
   });
 
-  if (result.error) throw new Error(t("failed_to_delete_assignments"));
+  if (result.error) throw new Error(t("error.failed_to_delete_assignments"));
 
   return result;
 };
@@ -127,5 +115,5 @@ export const deleteAllAssignmentsFromLesson = async (
     .eq("lesson_id", lessonId)
     .ilike("title", `%${title}%`);
 
-  if (result.error) throw new Error(t("failed_to_delete_assignments"));
+  if (result.error) throw new Error(t("error.failed_to_delete_assignments"));
 };

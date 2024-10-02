@@ -6,17 +6,15 @@ import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import CheckIcon from "@/components/icons/check-icon";
-import NoDataIcon from "@/components/icons/no-data-icon";
-import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
 import {
   enrollAllUsersInCourses,
   enrollUsersInCourses,
   getUsersNotInCourse,
-  getUsersNotInCourseCount,
 } from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { DB } from "@/lib/supabase/db";
@@ -77,15 +75,12 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     setIsLoading(true);
 
     try {
-      const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsersNotInCourse(courseId),
-        getUsersNotInCourseCount(courseId),
-      ]);
+      const { data, count } = await getUsersNotInCourse(courseId);
 
-      setUsers(fetchedUsers);
-      setUsersCount(fetchedUsersCount);
+      setUsers(data);
+      setUsersCount(count);
 
-      usersOffsetRef.current = fetchedUsers.length;
+      usersOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -97,15 +92,12 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
     setIsSearching(true);
 
     try {
-      const [fetchedUsers, fetchedUsersCount] = await Promise.all([
-        getUsersNotInCourse(courseId, search),
-        getUsersNotInCourseCount(courseId, search),
-      ]);
+      const { data, count } = await getUsersNotInCourse(courseId, search);
 
-      setUsers(fetchedUsers);
-      setUsersCount(fetchedUsersCount);
+      setUsers(data);
+      setUsersCount(count);
 
-      usersOffsetRef.current = fetchedUsers.length;
+      usersOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -118,20 +110,20 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
       const from = usersOffsetRef.current;
       const to = usersOffsetRef.current + USERS_GET_LIMIT - 1;
 
-      const fetchedUsers = await getUsersNotInCourse(
+      const { data } = await getUsersNotInCourse(
         courseId,
         searchText,
         from,
         to
       );
 
-      setUsers((prev) => [...prev, ...fetchedUsers]);
+      setUsers((prev) => [...prev, ...data]);
 
       if (isSelectedAll) {
-        setUsersIds((prev) => [...prev, ...fetchedUsers.map(({ id }) => id)]);
+        setUsersIds((prev) => [...prev, ...data.map(({ id }) => id)]);
       }
 
-      usersOffsetRef.current += fetchedUsers.length;
+      usersOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -146,7 +138,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
       onClose(usersIds);
 
-      toast(t("users_enrolled"));
+      toast(t("success.users_enrolled"));
       DB.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);
@@ -206,7 +198,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           placeholder="Search..."
         />
       )}
-      {isLoading && <Skeleton className="h-[282px]" />}
+      {isLoading && <Skeleton className="h-[22px]" />}
 
       {isData && (
         <Table
@@ -228,24 +220,10 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           }))}
         />
       )}
-      {isNoData && (
-        <div className="flex justify-center mt-12 h-[234px]">
-          <div className="flex flex-col items-center">
-            <NoDataIcon size="xl" />
-            <p className="mt-4 font-bold">View your work in a list</p>
-          </div>
-        </div>
+      {(isNoData || isNotFound) && (
+        <NotFound action={null} variant="secondary" />
       )}
-      {isNotFound && (
-        <div className="flex justify-center mt-12 h-[234px]">
-          <div className="flex flex-col items-center">
-            <NotFoundIcon size="xl" />
-            <p className="mt-4 font-bold text-center">
-              It looks like we can&apos;t find any results for that match
-            </p>
-          </div>
-        </div>
-      )}
+
       <div className="flex justify-end gap-3 mt-auto">
         <button className="outline-button" onClick={() => onClose([])}>
           Cancel

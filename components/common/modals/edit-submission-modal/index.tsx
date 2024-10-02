@@ -52,7 +52,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
       });
 
       onClose(true);
-      toast.success(t("submission_updated"));
+      toast.success(t("success.submission_updated"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

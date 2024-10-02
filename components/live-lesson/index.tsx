@@ -113,7 +113,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
         .eq("id", lesson.id)
         .single();
 
-      if (error) throw new Error(t("something_went_wrong"));
+      if (error) throw new Error(t("error.something_went_wrong"));
 
       setCurrentLesson(data);
     } catch (error: any) {

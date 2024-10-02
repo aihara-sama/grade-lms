@@ -5,7 +5,7 @@ import type { ResultOf } from "@/types/utils.type";
 import { create } from "zustand";
 
 interface Store {
-  messages: ResultOf<typeof getChatMessages>;
+  messages: ResultOf<typeof getChatMessages>["data"];
   setMessages: (fn: (prev: Store["messages"]) => Store["messages"]) => void;
 }
 export const useChat = create<Store>((set) => ({

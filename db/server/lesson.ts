@@ -1,3 +1,4 @@
+import { LESSONS_GET_LIMIT } from "@/constants";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { format } from "date-fns";
 
@@ -21,4 +22,15 @@ export const getOngoingLesson = async (courseId: string) => {
     .single();
 
   return result.data;
+};
+
+export const getCourseLessons = async (courseId: string) => {
+  const { data, count } = await getServerDB()
+    .from("lessons")
+    .select("*", { count: "exact" })
+    .eq("course_id", courseId)
+    .range(0, LESSONS_GET_LIMIT - 1)
+    .order("created_at", { ascending: true });
+
+  return { data, count };
 };

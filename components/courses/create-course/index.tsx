@@ -10,11 +10,11 @@ interface Props {
 }
 
 const CreateCourse: FunctionComponent<Props> = ({ onCreated }) => {
-  const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
+  const [isCreateCourseModal, setIsCreateCourseModal] = useState(false);
 
-  const openCreateCourseModal = () => setIsCreateCourseModalOpen(true);
+  const openCreateCourseModal = () => setIsCreateCourseModal(true);
   const closeCreateCourseModal = (mutated?: boolean) => {
-    setIsCreateCourseModalOpen(false);
+    setIsCreateCourseModal(false);
 
     if (mutated) {
       onCreated();
@@ -24,10 +24,10 @@ const CreateCourse: FunctionComponent<Props> = ({ onCreated }) => {
     <div className="border border-dashed border-light bg-white px-6 py-8 flex flex-col items-center justify-between sm:w-64 w-full rounded-md">
       <AddCourseIcon />
       <hr className="w-full my-3" />
-      <button className="primary-button w-full" onClick={openCreateCourseModal}>
+      <button className="primary-button px-8" onClick={openCreateCourseModal}>
         Create
       </button>
-      {isCreateCourseModalOpen && (
+      {isCreateCourseModal && (
         <CreateCourseModal onClose={closeCreateCourseModal} />
       )}
     </div>

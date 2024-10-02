@@ -23,7 +23,7 @@ const QuickLessonButton: FunctionComponent = () => {
         .select("id")
         .single();
 
-      if (error) throw new Error(t("failed_to_create_lesson"));
+      if (error) throw new Error(t("error.failed_to_create_lesson"));
       router.push(`/dashboard/lessons/${data.id}`);
     } catch (error: any) {
       toast.error(error.message);

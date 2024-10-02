@@ -12,7 +12,7 @@ export const getSubmission = async (id: string) => {
     .eq("id", id)
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_submission"));
+  if (result.error) throw new Error(t("error.failed_to_load_submission"));
 
   return result.data;
 };
@@ -24,16 +24,16 @@ export const getAssignmentSubmissions = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.from("submissions")
-    .select("*, author:users(*)")
+  const { data, count, error } = await DB.from("submissions")
+    .select("*, author:users(*)", { count: "exact" })
     .eq("assignment_id", assignmentId)
     .ilike("title", `%${title}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
 
-  if (result.error) throw new Error(t("failed_to_load_submissions"));
+  if (error) throw new Error(t("error.failed_to_load_submissions"));
 
-  return result.data;
+  return { data, count };
 };
 export const getAssignmentSubmissionsCount = async (
   assignmentId: string,
@@ -48,7 +48,7 @@ export const getAssignmentSubmissionsCount = async (
     .returns<{ count: number }[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_submissions"));
+  if (result.error) throw new Error(t("error.failed_to_load_submissions"));
 
   return result.data.count;
 };
@@ -64,7 +64,7 @@ export const createSubmission = async (
     .select("id")
     .single();
 
-  if (result.error) throw new Error(t("failed_to_create_submission"));
+  if (result.error) throw new Error(t("error.failed_to_create_submission"));
 
   return result.data;
 };
@@ -79,7 +79,7 @@ export const updateSubmission = async (
     .update(submission)
     .eq("id", submission.id);
 
-  if (result.error) throw new Error(t("failed_to_update_submission"));
+  if (result.error) throw new Error(t("error.failed_to_update_submission"));
 };
 
 // DELETE
@@ -88,7 +88,7 @@ export const deleteSubmission = async (id: string) => {
 
   const result = await DB.from("submissions").delete().eq("id", id);
 
-  if (result.error) throw new Error(t("failed_to_delete_submission"));
+  if (result.error) throw new Error(t("error.failed_to_delete_submission"));
 
   return result;
 };
@@ -99,7 +99,7 @@ export const deleteSubmissions = async (ids: string[]) => {
     p_submissions_ids: ids,
   });
 
-  if (result.error) throw new Error(t("failed_to_delete_submissions"));
+  if (result.error) throw new Error(t("error.failed_to_delete_submissions"));
 
   return result;
 };
@@ -110,7 +110,7 @@ export const deleteAllSubmissions = async (title = "") => {
     .delete()
     .ilike("title", `%${title}%`);
 
-  if (result.error) throw new Error(t("failed_to_delete_submissions"));
+  if (result.error) throw new Error(t("error.failed_to_delete_submissions"));
 
   return result;
 };

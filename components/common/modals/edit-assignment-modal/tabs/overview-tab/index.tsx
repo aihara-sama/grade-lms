@@ -62,7 +62,7 @@ const OverviewTab: FunctionComponent<Props> = ({
 
       onAssignmentUpdated();
 
-      toast(t("assignment_updated"));
+      toast(t("success.assignment_updated"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

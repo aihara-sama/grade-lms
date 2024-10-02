@@ -29,5 +29,5 @@ const serverErrors: ServerErr = {
 };
 
 export const serverErrToIntlKey = (error: keyof ServerErr) => {
-  return serverErrors[error] || "something_went_wrong";
+  return serverErrors[error] || "error.something_went_wrong";
 };

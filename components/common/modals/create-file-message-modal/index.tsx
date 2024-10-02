@@ -71,10 +71,10 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
       const ext = await getFileExt(file);
 
       if (videoExtensions.includes(ext))
-        throw new Error(t("video_format_is_not_allowed"));
+        throw new Error(t("error.video_format_is_not_allowed"));
 
       if (file.size >= MAX_CHAT_FILE_SIZE)
-        throw new Error(t("file_size_too_big"));
+        throw new Error(t("error.file_size_too_big"));
 
       const { path } = await uploadChatFile(courseId || uuid(), file, ext);
 
@@ -94,7 +94,8 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
         .select("*, chat_files(*), author:users(*)")
         .single();
 
-      if (createdChatMessage.error) throw new Error(t("something_went_wrong"));
+      if (createdChatMessage.error)
+        throw new Error(t("error.something_went_wrong"));
 
       const createdChatFile = await DB.from("chat_files")
         .insert({
@@ -107,7 +108,8 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
         .select("*")
         .single();
 
-      if (createdChatFile.error) throw new Error(t("something_went_wrong"));
+      if (createdChatFile.error)
+        throw new Error(t("error.something_went_wrong"));
 
       fireChatMessageCreate({
         ...createdChatMessage.data,
@@ -126,7 +128,11 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   }, [file]);
 
   return (
-    <BaseModal onClose={() => onClose()} title="Send File" isExpanded={false}>
+    <BaseModal
+      onClose={() => onClose()}
+      title="Send File"
+      isFixedHeight={false}
+    >
       {filePath ? (
         <>
           <div className="flex gap-2 mb-2">

@@ -12,7 +12,7 @@ import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  chatMessage: ResultOf<typeof getChatMessages>[number];
+  chatMessage: ResultOf<typeof getChatMessages>["data"][number];
 }
 
 const Message: FunctionComponent<Props> = ({ chatMessage }) => {
@@ -35,7 +35,7 @@ const Message: FunctionComponent<Props> = ({ chatMessage }) => {
         window.URL.revokeObjectURL(url);
       }, 0);
 
-      if (error) throw new Error(t("failed_to_download_file"));
+      if (error) throw new Error(t("error.failed_to_download_file"));
     } catch (error: any) {
       toast.error(error.message);
     }

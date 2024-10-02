@@ -2,19 +2,14 @@ import CardTitle from "@/components/card-title";
 import BaseModal from "@/components/common/modals/base-modal";
 import CheckIcon from "@/components/icons/check-icon";
 import CourseIcon from "@/components/icons/course-icon";
-import NoDataIcon from "@/components/icons/no-data-icon";
-import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
+import LoadingSpinner from "@/components/loading-spinner";
+import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
-import {
-  getCourses,
-  getCoursesCount,
-  getUnenrolledCourses,
-  getUnenrolledCoursesCount,
-} from "@/db/client/course";
+import { getCourses, getUnenrolledCourses } from "@/db/client/course";
 import {
   enrollAllUsersInAllCourses,
   enrollAllUsersInCourses,
@@ -86,17 +81,14 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     setIsLoading(true);
 
     try {
-      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        isSingleUser ? getUnenrolledCourses(usersIds[0]) : getCourses(),
-        isSingleUser
-          ? getUnenrolledCoursesCount(usersIds[0])
-          : getCoursesCount(),
-      ]);
+      const { data, count } = await (isSingleUser
+        ? getUnenrolledCourses(usersIds[0])
+        : getCourses());
 
-      setCourses(fetchedCourses);
-      setCoursesCount(fetchedCoursesCount);
+      setCourses(data);
+      setCoursesCount(count);
 
-      coursesOffsetRef.current = fetchedCourses.length;
+      coursesOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -108,19 +100,14 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
     setIsSearching(true);
 
     try {
-      const [fetchedCourses, fetchedCoursesCount] = await Promise.all([
-        isSingleUser
-          ? getUnenrolledCourses(usersIds[0], search)
-          : getCourses(search),
-        isSingleUser
-          ? getUnenrolledCoursesCount(usersIds[0], search)
-          : getCoursesCount(search),
-      ]);
+      const { data, count } = await (isSingleUser
+        ? getUnenrolledCourses(usersIds[0], search)
+        : getCourses(search));
 
-      setCourses(fetchedCourses);
-      setCoursesCount(fetchedCoursesCount);
+      setCourses(data);
+      setCoursesCount(count);
 
-      coursesOffsetRef.current = fetchedCourses.length;
+      coursesOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -133,20 +120,17 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       const from = coursesOffsetRef.current;
       const to = coursesOffsetRef.current + COURSES_GET_LIMIT - 1;
 
-      const fetchedCourses = await (isSingleUser
+      const { data } = await (isSingleUser
         ? getUnenrolledCourses(usersIds[0], searchText, from, to)
         : getCourses(searchText, from, to));
 
-      setCourses((prev) => [...prev, ...fetchedCourses]);
+      setCourses((prev) => [...prev, ...data]);
 
       if (isSelectedAll) {
-        setCoursesIds((prev) => [
-          ...prev,
-          ...fetchedCourses.map(({ id }) => id),
-        ]);
+        setCoursesIds((prev) => [...prev, ...data.map(({ id }) => id)]);
       }
 
-      coursesOffsetRef.current += fetchedCourses.length;
+      coursesOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -168,7 +152,9 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       onClose(true);
       setCoursesIds([]);
 
-      toast.success(t(isSingleUser ? "user_enrolled" : "users_enrolled"));
+      toast.success(
+        t(isSingleUser ? "success.user_enrolled" : "success.users_enrolled")
+      );
 
       DB.functions.invoke("check-events");
     } catch (error: any) {
@@ -208,7 +194,11 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
   // View
   return (
-    <BaseModal onClose={() => onClose()} title="Enrollment">
+    <BaseModal
+      onClose={() => onClose()}
+      title="Enrollment"
+      isFixedHeight={false}
+    >
       <p className="mb-3 text-neutral-500">Select courses to enroll</p>
       {coursesIds.length ? (
         <div className="mb-3 flex gap-3">
@@ -230,7 +220,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
         />
       )}
 
-      {isLoading && <Skeleton className="h-[282px]" />}
+      {isLoading && <Skeleton className="h-[22px]" />}
       {isData && (
         <Table
           compact
@@ -251,23 +241,8 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           }))}
         />
       )}
-      {isNoData && (
-        <div className="flex justify-center mt-12 h-[234px]">
-          <div className="flex flex-col items-center">
-            <NoDataIcon size="xl" />
-            <p className="mt-4 font-bold">View your work in a list</p>
-          </div>
-        </div>
-      )}
-      {isNotFound && (
-        <div className="flex justify-center mt-12 h-[234px]">
-          <div className="flex flex-col items-center">
-            <NotFoundIcon size="xl" />
-            <p className="mt-4 font-bold text-center">
-              It looks like we can&apos;t find any results for that match
-            </p>
-          </div>
-        </div>
+      {(isNoData || isNotFound) && (
+        <NotFound variant="secondary" action={null} />
       )}
 
       <div className="flex justify-end gap-3 mt-auto">
@@ -279,13 +254,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           className="primary-button"
           onClick={submitEnrollUsers}
         >
-          {isSubmitting && (
-            <img
-              className="loading-spinner"
-              src="/assets/gifs/loading-spinner.gif"
-              alt=""
-            />
-          )}
+          {isSubmitting && <LoadingSpinner />}
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>Enroll</span>
         </button>
       </div>

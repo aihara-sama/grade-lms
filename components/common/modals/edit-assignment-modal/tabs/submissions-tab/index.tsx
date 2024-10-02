@@ -1,6 +1,7 @@
 import CardTitle from "@/components/card-title";
 import EditSubmissionModal from "@/components/common/modals/edit-submission-modal";
-import PromptModal from "@/components/common/modals/prompt-modal";
+import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
+import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
 import ViewSubmissionModal from "@/components/common/modals/view-submission-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
@@ -19,7 +20,6 @@ import {
   deleteSubmission,
   deleteSubmissions,
   getAssignmentSubmissions,
-  getAssignmentSubmissionsCount,
 } from "@/db/client/submission";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
@@ -64,9 +64,6 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [isSubmitDelSubmission, setIsSubmitDelSubmission] = useState(false);
-  const [isSubmitDelSubmissions, setIsSubmitDelSubmissions] = useState(false);
-
   const [searchText, setSearchText] = useState("");
 
   const [isSelectedAll, setIsSelectedAll] = useState(false);
@@ -96,20 +93,14 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
     setIsLoading(true);
 
     try {
-      const [fetchedSubmissions, fetchedSubmissionsCount] = await Promise.all([
-        view === "Teacher"
-          ? getAssignmentSubmissions(assignmentId)
-          : getAssignmentSubmissions(assignmentId),
+      const { data, count } = await (view === "Teacher"
+        ? getAssignmentSubmissions(assignmentId)
+        : getAssignmentSubmissions(assignmentId));
 
-        view === "Teacher"
-          ? getAssignmentSubmissionsCount(assignmentId)
-          : getAssignmentSubmissionsCount(assignmentId),
-      ]);
+      setSubmissions(data);
+      setSubmissionsCount(count);
 
-      setSubmissions(fetchedSubmissions);
-      setSubmissionsCount(fetchedSubmissionsCount);
-
-      submissionsOffsetRef.current = fetchedSubmissions.length;
+      submissionsOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -120,20 +111,14 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
     setIsSearching(true);
 
     try {
-      const [fetchedSubmissions, fetchedSubmissionsCount] = await Promise.all([
-        view === "Teacher"
-          ? getAssignmentSubmissions(assignmentId, search)
-          : getAssignmentSubmissions(assignmentId, search),
+      const { data, count } = await (view === "Teacher"
+        ? getAssignmentSubmissions(assignmentId, search)
+        : getAssignmentSubmissions(assignmentId, search));
 
-        view === "Teacher"
-          ? getAssignmentSubmissionsCount(assignmentId, search)
-          : getAssignmentSubmissionsCount(assignmentId, search),
-      ]);
+      setSubmissions(data);
+      setSubmissionsCount(count);
 
-      setSubmissions(fetchedSubmissions);
-      setSubmissionsCount(fetchedSubmissionsCount);
-
-      submissionsOffsetRef.current = fetchedSubmissions.length;
+      submissionsOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -145,28 +130,23 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
       const from = submissionsOffsetRef.current;
       const to = submissionsOffsetRef.current + SUBMISSIONS_GET_LIMIT - 1;
 
-      const fetchedSubmissions = await (view === "Teacher"
+      const { data } = await (view === "Teacher"
         ? getAssignmentSubmissions(assignmentId, searchText, from, to)
         : getAssignmentSubmissions(assignmentId, searchText, from, to));
 
-      setSubmissions((prev) => [...prev, ...fetchedSubmissions]);
+      setSubmissions((prev) => [...prev, ...data]);
 
       if (isSelectedAll) {
-        setSubmissionsIds((prev) => [
-          ...prev,
-          ...fetchedSubmissions.map(({ id }) => id),
-        ]);
+        setSubmissionsIds((prev) => [...prev, ...data.map(({ id }) => id)]);
       }
 
-      submissionsOffsetRef.current += fetchedSubmissions.length;
+      submissionsOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
   const submitDeleteSubmission = async () => {
-    setIsSubmitDelSubmission(true);
-
     try {
       await deleteSubmission(submissionId);
 
@@ -177,16 +157,12 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
 
       setIsDelSubmissionModal(false);
 
-      toast.success(t("submission_deleted"));
+      toast.success(t("success.submission_deleted"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmitDelSubmission(false);
     }
   };
   const submitDeleteSubmissions = async () => {
-    setIsSubmitDelSubmissions(true);
-
     try {
       if (isSelectedAll) {
         await deleteAllSubmissions(searchText);
@@ -203,11 +179,9 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
       setSubmissionsIds([]);
       setIsDelSubmissionsModal(false);
 
-      toast.success(t("submissions_deleted"));
+      toast.success(t("success.submissions_deleted"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmitDelSubmissions(false);
     }
   };
 
@@ -378,23 +352,24 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
       )}
 
       {isDelSubmissionModal && (
-        <PromptModal
-          isSubmitting={isSubmitDelSubmission}
-          title="Delete submission"
-          action="Delete"
-          body={t("prompts.delete_submission")}
-          actionHandler={submitDeleteSubmission}
+        <PromptDeleteRecordModal
+          title={t("modal.titles.delete_submission")}
+          prompt={`${t("prompts.delete_submission")}`}
+          record={submissions.find(({ id }) => id === submissionId).title}
+          confirmText={t("actions.delete")}
           onClose={() => setIsDelSubmissionModal(false)}
+          onConfirm={submitDeleteSubmission}
         />
       )}
       {isDelSubmissionsModal && (
-        <PromptModal
-          isSubmitting={isSubmitDelSubmissions}
+        <PromptDeleteRecordsModal
+          title={t("modal.titles.delete_submissions")}
+          prompt={`${t("prompts.delete_submissions", {
+            count: submissionsIds.length,
+          })}`}
+          confirmText={t("actions.delete")}
           onClose={() => setIsDelSubmissionsModal(false)}
-          title="Delete submissions"
-          action="Delete"
-          body={t("prompts.delete_submissions")}
-          actionHandler={submitDeleteSubmissions}
+          onConfirm={submitDeleteSubmissions}
         />
       )}
 

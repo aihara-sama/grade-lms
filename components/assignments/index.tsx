@@ -1,37 +1,41 @@
 "use client";
 
-import CreateAssignment from "@/components/assignments/create-assignment";
-import CardsContainer from "@/components/cards-container";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import Input from "@/components/input";
 import Table from "@/components/table";
 import Total from "@/components/total";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import CardTitle from "@/components/card-title";
+import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
-import PromptModal from "@/components/common/modals/prompt-modal";
+import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
+import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
 import Container from "@/components/container";
+import AddAssignmentIcon from "@/components/icons/add-assignment-icon";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
+import LessonHeader from "@/components/live-lesson/lesson-header";
 import NoData from "@/components/no-data";
 import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
+import metadata from "@/data/metadata.json";
 import {
   deleteAllAssignmentsFromLesson,
   deleteAssignment,
   deleteAssignments,
   getLessonAssignments,
-  getLessonAssignmentsCount,
 } from "@/db/client/assignment";
 import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useLesson } from "@/hooks/use-lesson";
+import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
-import type { Assignment } from "@/types/assignment.type";
+import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import throttle from "lodash.throttle";
@@ -39,9 +43,14 @@ import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import LessonHeader from "@/components/live-lesson/lesson-header";
 
-const Assignments: FunctionComponent = () => {
+interface Props {
+  assignments: ResultOf<typeof getLessonAssignments>;
+}
+
+const Assignments: FunctionComponent<Props> = ({
+  assignments: initAssignments,
+}) => {
   // Hooks
   const t = useTranslations();
   const user = useUser((state) => state.user);
@@ -50,28 +59,28 @@ const Assignments: FunctionComponent = () => {
   const fetchLock = useFetchLock();
 
   // States
+  const [isCreateAssignmentModal, setIsCreateAssignmentModal] = useState(false);
   const [isDelAssignmentModal, setIsDelAssignmentModal] = useState(false);
   const [isDelAssignmentsModal, setIsDelAssignmentsModal] = useState(false);
   const [isEditAssignmentModal, setIsEditAssignmentModal] = useState(false);
 
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [assignmentsCount, setAssignmentsCount] = useState(0);
+  const [assignments, setAssignments] = useState(initAssignments.data);
+  const [assignmentsCount, setAssignmentsCount] = useState(
+    initAssignments.count
+  );
 
   const [assignmentId, setAssignmentId] = useState<string>();
   const [assignmentsIds, setAssignmentsIds] = useState<string[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-
-  const [isSubmittingDelAssign, setIsSubmittingDelAssign] = useState(false);
-  const [isSubmittingDelAssigns, setIsSubmittingDelAssigns] = useState(false);
 
   const [searchText, setSearchText] = useState("");
 
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
-  const assignmentsOffsetRef = useRef(0);
+  const assignmentsOffsetRef = useRef(initAssignments.data.length);
   const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Vars
@@ -96,15 +105,12 @@ const Assignments: FunctionComponent = () => {
     setIsLoading(true);
 
     try {
-      const [fetchedAssignments, fetchedAssginemtnsCount] = await Promise.all([
-        getLessonAssignments(lesson.id),
-        getLessonAssignmentsCount(lesson.id),
-      ]);
+      const { data, count } = await getLessonAssignments(lesson.id);
 
-      setAssignments(fetchedAssignments);
-      setAssignmentsCount(fetchedAssginemtnsCount);
+      setAssignments(data);
+      setAssignmentsCount(count);
 
-      assignmentsOffsetRef.current = fetchedAssignments.length;
+      assignmentsOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -115,15 +121,12 @@ const Assignments: FunctionComponent = () => {
     setIsSearching(true);
 
     try {
-      const [fetchedAssignments, fetchedAssignmentsCount] = await Promise.all([
-        getLessonAssignments(lesson.id, search),
-        getLessonAssignmentsCount(lesson.id, search),
-      ]);
+      const { data, count } = await getLessonAssignments(lesson.id, search);
 
-      setAssignments(fetchedAssignments);
-      setAssignmentsCount(fetchedAssignmentsCount);
+      setAssignments(data);
+      setAssignmentsCount(count);
 
-      assignmentsOffsetRef.current = fetchedAssignments.length;
+      assignmentsOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -135,31 +138,26 @@ const Assignments: FunctionComponent = () => {
       const from = assignmentsOffsetRef.current;
       const to = assignmentsOffsetRef.current + ASSIGNMENTS_GET_LIMIT - 1;
 
-      const fetchedAssignments = await getLessonAssignments(
+      const { data } = await getLessonAssignments(
         lesson.id,
         searchText,
         from,
         to
       );
 
-      setAssignments((prev) => [...prev, ...fetchedAssignments]);
+      setAssignments((prev) => [...prev, ...data]);
 
       if (isSelectedAll) {
-        setAssignmentsIds((prev) => [
-          ...prev,
-          ...fetchedAssignments.map(({ id }) => id),
-        ]);
+        setAssignmentsIds((prev) => [...prev, ...data.map(({ id }) => id)]);
       }
 
-      assignmentsOffsetRef.current += fetchedAssignments.length;
+      assignmentsOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
   const submitDeleteAssignment = async () => {
-    setIsSubmittingDelAssign(true);
-
     try {
       await deleteAssignment(assignmentId);
 
@@ -170,16 +168,12 @@ const Assignments: FunctionComponent = () => {
 
       setIsDelAssignmentModal(false);
 
-      toast.success(t("assignment_deleted"));
+      toast.success(t("success.assignment_deleted"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmittingDelAssign(false);
     }
   };
   const submitDeleteAssignments = async () => {
-    setIsSubmittingDelAssigns(true);
-
     try {
       if (isSelectedAll) {
         await deleteAllAssignmentsFromLesson(lesson.id, searchText);
@@ -196,11 +190,9 @@ const Assignments: FunctionComponent = () => {
       setAssignmentsIds([]);
       setIsDelAssignmentsModal(false);
 
-      toast.success(t("assignments_deleted"));
+      toast.success(t("success.assignments_deleted"));
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmittingDelAssigns(false);
     }
   };
 
@@ -212,6 +204,11 @@ const Assignments: FunctionComponent = () => {
       setAssignmentsIds((prev) => prev.filter((_id) => _id !== lessonId));
       setIsSelectedAll(assignmentsCount === assignmentsIds.length - 1);
     }
+  };
+
+  const onAssignmentCreated = () => {
+    revalidatePageAction();
+    fetchAssignmentsBySearch(searchText);
   };
 
   const onAssignmentClick = (_assignmentId: string) => {
@@ -238,7 +235,7 @@ const Assignments: FunctionComponent = () => {
   );
 
   // Effects
-  useEffect(() => throttledSearch(searchText), [searchText]);
+  useUpdateEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
     if (assignmentsCount)
@@ -275,19 +272,28 @@ const Assignments: FunctionComponent = () => {
     >
       <LessonHeader course={lesson.course} />
       <p className="section-title">Assignments</p>
-      <CardsContainer>
-        <Total
-          Icon={<AssignmentsIcon size="md" />}
-          total={assignmentsCount}
-          title="Total assignments"
-        />
-        {user.role === Role.Teacher && (
-          <CreateAssignment
-            lessonId={lesson.id}
-            onCreated={() => fetchAssignmentsBySearch(searchText)}
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-6">
+          <Total
+            Icon={<AssignmentsIcon size="md" />}
+            total={assignmentsCount}
+            title="Total assignments"
           />
-        )}
-      </CardsContainer>{" "}
+          {user.role === Role.Teacher && (
+            <div className="card">
+              <AddAssignmentIcon size="md" />
+              <hr className="w-full my-3" />
+              <button
+                className="primary-button px-8"
+                onClick={() => setIsCreateAssignmentModal(true)}
+              >
+                Create
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       {assignmentsIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
@@ -363,8 +369,38 @@ const Assignments: FunctionComponent = () => {
           }))}
         />
       )}
-      {isNoData && <NoData />}
-      {isNotFound && <NotFound />}
+      {isNoData && (
+        <NoData
+          body={metadata.courses}
+          action={
+            <button
+              className="primary-button"
+              onClick={() => setIsCreateAssignmentModal(true)}
+            >
+              Enroll users
+            </button>
+          }
+        />
+      )}
+      {isNotFound && (
+        <NotFound
+          action={
+            <button
+              className="outline-button"
+              onClick={() => setSearchText("")}
+            >
+              Clear filters
+            </button>
+          }
+        />
+      )}
+
+      {isCreateAssignmentModal && (
+        <CreateAssignmentModal
+          lessonId={lesson.id}
+          onClose={onAssignmentCreated}
+        />
+      )}
       {isEditAssignmentModal && (
         <EditAssignmentModal
           assignmentId={assignmentId}
@@ -373,24 +409,25 @@ const Assignments: FunctionComponent = () => {
           view={user.role}
         />
       )}
-      {isDelAssignmentsModal && (
-        <PromptModal
-          isSubmitting={isSubmittingDelAssigns}
-          title="Delete assignments"
-          action="Delete"
-          body={t("prompts.delete_assignments")}
-          actionHandler={submitDeleteAssignments}
-          onClose={() => setIsDelAssignmentsModal(false)}
+      {isDelAssignmentModal && (
+        <PromptDeleteRecordModal
+          title={t("modal.titles.delete_assignment")}
+          prompt={`${t("prompts.delete_assignment")}`}
+          record={assignments.find(({ id }) => id === assignmentId).title}
+          confirmText={t("actions.delete")}
+          onClose={() => setIsDelAssignmentModal(false)}
+          onConfirm={submitDeleteAssignment}
         />
       )}
-      {isDelAssignmentModal && (
-        <PromptModal
-          isSubmitting={isSubmittingDelAssign}
-          onClose={() => setIsDelAssignmentModal(false)}
-          title="Delete assignment"
-          action="Delete"
-          body={t("prompts.delete_assignment")}
-          actionHandler={submitDeleteAssignment}
+      {isDelAssignmentsModal && (
+        <PromptDeleteRecordsModal
+          title={t("modal.titles.delete_assignments")}
+          prompt={`${t("prompts.delete_assignments", {
+            count: assignmentsIds.length,
+          })}`}
+          confirmText={t("actions.delete")}
+          onClose={() => setIsDelAssignmentsModal(false)}
+          onConfirm={submitDeleteAssignments}
         />
       )}
     </Container>

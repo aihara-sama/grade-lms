@@ -51,7 +51,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
       await createUser(user);
       onClose(true);
 
-      toast.success(t("user_created"));
+      toast.success(t("success.user_created"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -71,7 +71,11 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
 
   // View
   return (
-    <BaseModal isExpanded={false} onClose={() => onClose()} title="Create user">
+    <BaseModal
+      isFixedHeight={false}
+      onClose={() => onClose()}
+      title="Create user"
+    >
       <form noValidate>
         <Tabs
           tabs={[

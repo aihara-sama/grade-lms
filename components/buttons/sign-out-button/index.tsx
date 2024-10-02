@@ -20,7 +20,7 @@ const SignOutButton: FunctionComponent<PropsWithClassName> = ({
     try {
       const { error } = await DB.auth.signOut();
 
-      if (error) throw new Error(t("something_went_wrong"));
+      if (error) throw new Error(t("error.something_went_wrong"));
       router.push(`/sign-in`);
     } catch (error: any) {
       toast.error(error.message);

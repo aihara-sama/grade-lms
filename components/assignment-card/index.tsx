@@ -1,9 +1,10 @@
 import CourseIcon from "@/components/icons/course-icon";
-import type { Assignment } from "@/types/assignment.type";
+import type { getLatestAssignments } from "@/db/server/assignment";
+import type { ResultOf } from "@/types/utils.type";
 import type { FunctionComponent } from "react";
 
 interface Props {
-  assignment: Assignment;
+  assignment: ResultOf<typeof getLatestAssignments>["data"][number];
 }
 
 const AssignmentCard: FunctionComponent<Props> = ({ assignment }) => {

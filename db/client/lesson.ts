@@ -11,7 +11,7 @@ export const getLesson = async (id: string) => {
 
   const result = await DB.from("lessons").select("*").eq("id", id).single();
 
-  if (result.error) throw new Error(t("failed_to_load_lesson"));
+  if (result.error) throw new Error(t("error.failed_to_load_lesson"));
 
   return result.data;
 };
@@ -20,7 +20,7 @@ export const getWeekLessons = async (days: string[], courseId?: string) => {
   const t = await loadMessages();
 
   const builder = DB.from("lessons")
-    .select("*")
+    .select("*", { count: "exact" })
     .filter("course_id", "not.is", null)
     .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
     .lte(
@@ -29,11 +29,13 @@ export const getWeekLessons = async (days: string[], courseId?: string) => {
     )
     .order("starts", { ascending: true });
 
-  const result = await (courseId ? builder.eq("course_id", courseId) : builder);
+  const { data, count, error } = await (courseId
+    ? builder.eq("course_id", courseId)
+    : builder);
 
-  if (result.error) throw new Error(t("failed_to_load_lessons"));
+  if (error) throw new Error(t("error.failed_to_load_lessons"));
 
-  return result.data;
+  return { data, count };
 };
 export const getCourseLessons = async (
   courseId: string,
@@ -43,16 +45,16 @@ export const getCourseLessons = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.from("lessons")
-    .select("*")
+  const { data, count, error } = await DB.from("lessons")
+    .select("*", { count: "exact" })
     .eq("course_id", courseId)
     .ilike("title", `%${title}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
 
-  if (result.error) throw new Error(t("failed_to_load_lessons"));
+  if (error) throw new Error(t("error.failed_to_load_lessons"));
 
-  return result.data;
+  return { data, count };
 };
 export const getCourseLessonsCount = async (courseId: string, title = "") => {
   const t = await loadMessages();
@@ -64,7 +66,7 @@ export const getCourseLessonsCount = async (courseId: string, title = "") => {
     .returns<{ count: number }[]>()
     .single();
 
-  if (result.error) throw new Error(t("failed_to_load_lessons_count"));
+  if (result.error) throw new Error(t("error.failed_to_load_lessons_count"));
 
   return result.data.count;
 };
@@ -76,14 +78,18 @@ export const getOverlappingLessons = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.rpc("get_overlapping_lesson", {
-    p_lesson_id: lessonId,
-    p_ends: ends,
-    p_starts: starts,
-  });
-  if (result.error) throw new Error(t("something_went_wrong"));
+  const { data, count, error } = await DB.rpc(
+    "get_overlapping_lesson",
+    {
+      p_lesson_id: lessonId,
+      p_ends: ends,
+      p_starts: starts,
+    },
+    { count: "exact" }
+  );
+  if (error) throw new Error(t("error.something_went_wrong"));
 
-  return result.data;
+  return { data, count };
 };
 
 // CREATE
@@ -92,7 +98,7 @@ export const createLesson = async (lesson: TablesInsert<"lessons">) => {
 
   const result = await DB.from("lessons").insert(lesson);
 
-  if (result.error) throw new Error(t("failed_to_create_lesson"));
+  if (result.error) throw new Error(t("error.failed_to_create_lesson"));
 };
 
 // UPDATE
@@ -107,7 +113,7 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
     .select("*, course:courses(*)")
     .single();
 
-  if (result.error) throw new Error(t("failed_to_extend_lesson"));
+  if (result.error) throw new Error(t("error.failed_to_extend_lesson"));
 
   return result.data;
 };
@@ -116,7 +122,7 @@ export const updateLesson = async (lesson: TablesUpdate<"lessons">) => {
 
   const result = await DB.from("lessons").update(lesson).eq("id", lesson.id);
 
-  if (result.error) throw new Error(t("failed_to_update_lesson"));
+  if (result.error) throw new Error(t("error.failed_to_update_lesson"));
 
   return result.data;
 };
@@ -125,7 +131,7 @@ export const upsertLesson = async (lesson: Lesson) => {
 
   const result = await DB.from("lessons").upsert(lesson).eq("id", lesson.id);
 
-  if (result.error) throw new Error(t("failed_to_save_lesson"));
+  if (result.error) throw new Error(t("error.failed_to_save_lesson"));
 };
 
 // DELETE
@@ -134,7 +140,7 @@ export const deleteLesson = async (id: string) => {
 
   const result = await DB.from("lessons").delete().eq("id", id);
 
-  if (result.error) throw new Error(t("failed_to_delete_lesson"));
+  if (result.error) throw new Error(t("error.failed_to_delete_lesson"));
 
   return result;
 };
@@ -145,7 +151,7 @@ export const deleteLessons = async (ids: string[]) => {
     p_lessons_ids: ids,
   });
 
-  if (result.error) throw new Error(t("failed_to_delete_lessons"));
+  if (result.error) throw new Error(t("error.failed_to_delete_lessons"));
 
   return result;
 };
@@ -160,7 +166,7 @@ export const deleteAllLessonsFromCourse = async (
     .eq("course_id", courseId)
     .ilike("title", `%${title}%`);
 
-  if (result.error) throw new Error(t("failed_to_delete_lessons"));
+  if (result.error) throw new Error(t("error.failed_to_delete_lessons"));
 
   return result;
 };

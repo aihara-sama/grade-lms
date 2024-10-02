@@ -40,7 +40,7 @@ const Table: FunctionComponent<Props> = memo(function Table({
               ))}
             </div>
             <div
-              className={clsx(compact && "overflow-auto h-[234px]")}
+              className={clsx(compact && "overflow-auto h-[222px]")}
               onScroll={onScroll}
             >
               <div className="p-2">

@@ -28,7 +28,7 @@ export const usePushNotifications = () => {
         } as UserMetadata,
       });
 
-      if (error) throw new Error(t("something_went_wrong"));
+      if (error) throw new Error(t("error.something_went_wrong"));
 
       setUser({ ...user, is_push_notifications_on: true });
     } catch (err: any) {

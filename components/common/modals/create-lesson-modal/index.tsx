@@ -8,8 +8,8 @@ import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
 import { createLesson, getOverlappingLessons } from "@/db/client/lesson";
 import type { SelectItem } from "@/interfaces/select.interface";
-import type { Course } from "@/types/course.type";
 import type { TablesInsert } from "@/types/supabase.type";
+import type { ResultOf } from "@/types/utils.type";
 import { getNextMorning } from "@/utils/date/get-next-morning";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import clsx from "clsx";
@@ -42,7 +42,9 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     ...maybeLesson,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<ResultOf<typeof getCourses>["data"]>(
+    []
+  );
   const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
 
   const duration = +new Date(lesson.ends) - +new Date(lesson.starts);
@@ -64,7 +66,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   };
   const fetchCourses = async () => {
     try {
-      setCourses(await getCourses());
+      setCourses((await getCourses()).data);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -73,7 +75,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   const fetchCoursesBySearch = useCallback(
     throttleSearch(async (search: string) => {
       try {
-        setCourses(await getCourses(search));
+        setCourses((await getCourses(search)).data);
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -86,16 +88,13 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     setIsSubmitting(true);
 
     try {
-      const overlappingLesson = await getOverlappingLessons(
-        lesson.starts,
-        lesson.ends
-      );
+      const { count } = await getOverlappingLessons(lesson.starts, lesson.ends);
 
-      if (overlappingLesson.length) throw new Error(t("lesson_overlaps"));
+      if (count) throw new Error(t("error.lesson_overlaps"));
 
       await createLesson(lesson);
 
-      toast(t("lesson_created"));
+      toast(t("success.lesson_created"));
       onClose(true);
     } catch (error: any) {
       toast.error(error.message);
@@ -113,14 +112,14 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   const onCourseSelect = (item: SelectItem) => setSelectedCourse(item);
 
   const onCoursesScrollEnd = async (search: string) => {
-    const rangeCourses = await getCourses(
+    const { data } = await getCourses(
       search,
       coursesOffsetRef.current,
       coursesOffsetRef.current + COURSES_GET_LIMIT - 1
     );
 
-    setCourses((prev) => [...prev, ...rangeCourses]);
-    coursesOffsetRef.current += rangeCourses.length;
+    setCourses((prev) => [...prev, ...data]);
+    coursesOffsetRef.current += data.length;
   };
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) =>
@@ -137,7 +136,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
   return (
     <BaseModal
-      isExpanded={false}
+      isFixedHeight={false}
       onClose={() => onClose()}
       title="Create lesson"
     >

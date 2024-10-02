@@ -6,13 +6,13 @@ import { loadMessages } from "@/utils/localization/load-messages";
 export const getChatMessages = async (lessonId: string) => {
   const t = await loadMessages();
 
-  const result = await DB.from("chat_messages")
-    .select("*, chat_files(*), author:users(*)")
+  const { data, count, error } = await DB.from("chat_messages")
+    .select("*, chat_files(*), author:users(*)", { count: "exact" })
     .eq("lesson_id", lessonId);
 
-  if (result.error) throw new Error(t("failed_to_load_messages"));
+  if (error) throw new Error(t("error.failed_to_load_messages"));
 
-  return result.data;
+  return { data, count };
 };
 
 // CREATE
@@ -21,12 +21,12 @@ export const createChatMessage = async (
 ) => {
   const t = await loadMessages();
 
-  const result = await DB.from("chat_messages")
+  const { data, error } = await DB.from("chat_messages")
     .insert(chatMessage)
     .select("*, chat_files(*), author:users(*)")
     .single();
 
-  if (result.error) throw new Error(t("failed_to_send_message"));
+  if (error) throw new Error(t("error.failed_to_send_message"));
 
-  return result.data;
+  return data;
 };
