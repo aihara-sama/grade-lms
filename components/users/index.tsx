@@ -198,6 +198,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
   };
 
   const onUserCreated = () => {
+    setIsCreateUserModal(false);
     revalidatePageAction();
     fetchUsersBySearch(searchText);
   };
