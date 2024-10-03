@@ -10,7 +10,7 @@ export interface UserState {
 
 export type UserStore = ReturnType<typeof createUserStore>;
 
-export const createUserStore = (initUser: User) => {
+export const createUserStore = (initUser: User | null) => {
   return createStore<UserState>()((set) => ({
     user: initUser,
     setUser: (user: User) => set({ user }),

@@ -1,7 +1,6 @@
 import AvatarIcon from "@/components/icons/avatar-icon";
 import Input from "@/components/input";
 import { useState } from "react";
-import { v4 as uuid } from "uuid";
 
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
@@ -21,9 +20,9 @@ const GuestPrompt: FunctionComponent<Props> = () => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
     setUserName(e.target.value);
 
-  const createGuestUser = () =>
+  const createGuestUser = () => {
     setUser({
-      id: uuid(),
+      id: undefined,
       avatar: process.env.DEFAULT_AVATAR,
       created_at: new Date().toISOString(),
       creator_id: null,
@@ -35,6 +34,7 @@ const GuestPrompt: FunctionComponent<Props> = () => {
       is_emails_on: false,
       is_push_notifications_on: false,
     });
+  };
 
   // View
   return (

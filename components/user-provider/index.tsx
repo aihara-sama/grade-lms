@@ -2,31 +2,31 @@
 
 import GuestPrompt from "@/components/live-lesson/guest-prompt";
 import { UserContext } from "@/contexts/user-context";
-import { DB } from "@/lib/supabase/db";
 import { createUserStore } from "@/stores/user-store";
 import type { User } from "@/types/user.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
-import { useEffect, useRef } from "react";
+import { useRef, useState } from "react";
 
 interface Props {
   user: User | null;
 }
 
 const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
-  user,
+  user: initUser,
   children,
 }) => {
   // Hooks
-  const store = useRef(createUserStore(user)).current;
+  const store = useRef(createUserStore(initUser)).current;
 
-  // Effects
-  useEffect(() => {
-    DB.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") store.setState({ user: null });
-    });
-  }, []);
+  const [user, setUser] = useState(initUser);
+  store.subscribe((state) => setUser(state.user));
 
-  if (!user) return <GuestPrompt />;
+  if (!user)
+    return (
+      <UserContext.Provider value={store}>
+        <GuestPrompt />
+      </UserContext.Provider>
+    );
 
   // View
   return <UserContext.Provider value={store}>{children}</UserContext.Provider>;

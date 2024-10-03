@@ -235,7 +235,7 @@ const Whiteboard: FunctionComponent<Props> = ({
               Extend?
             </button>
           )}
-          {user.role === Role.Teacher && (
+          {user.role === Role.Teacher && !lesson.course_id && (
             <button className="icon-button" onClick={invite}>
               <InviteIcon size="sm" />
             </button>

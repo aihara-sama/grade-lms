@@ -2,10 +2,10 @@ import { getLocale } from "@/utils/localization/get-locale";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function updateSession(
+export const updateSession = async (
   request: NextRequest,
   response: NextResponse
-) {
+) => {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -50,10 +50,10 @@ export async function updateSession(
   if (error)
     return NextResponse.redirect(
       new URL(
-        `/${locale}/sign-up?redirect=${encodeURIComponent(request.url)}`,
+        `/${locale}/sign-in?redirect=${encodeURIComponent(request.url)}`,
         request.url
       )
     );
 
   return response;
-}
+};

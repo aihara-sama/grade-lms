@@ -14,6 +14,7 @@ import { useEffect, useRef, useState, type FunctionComponent } from "react";
 
 import Breadcrumbs from "@/components/breadcrumbs";
 import Camera from "@/components/camera";
+import Container from "@/components/container";
 import CoursesIcon from "@/components/icons/courses-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { useChat } from "@/hooks/use-chat";
@@ -174,7 +175,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
   }, [messages]);
 
   return (
-    <div>
+    <Container fullWidth={true}>
       {currentLesson.course && (
         <Breadcrumbs
           Icon={<CoursesIcon />}
@@ -223,7 +224,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
           </aside>
         </div>
       </main>
-    </div>
+    </Container>
   );
 };
 export default LiveLesson;
