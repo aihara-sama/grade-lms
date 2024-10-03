@@ -207,6 +207,7 @@ const Assignments: FunctionComponent<Props> = ({
   };
 
   const onAssignmentCreated = () => {
+    setIsCreateAssignmentModal(false);
     revalidatePageAction();
     fetchAssignmentsBySearch(searchText);
   };
@@ -309,7 +310,7 @@ const Assignments: FunctionComponent<Props> = ({
             onClick={() => setIsDelAssignmentsModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Delete <DeleteIcon />
+            Delete <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -361,7 +362,7 @@ const Assignments: FunctionComponent<Props> = ({
                     className="popper-list-item"
                     onClick={() => setIsDelAssignmentModal(true)}
                   >
-                    <DeleteIcon /> Delete
+                    <DeleteIcon size="xs" /> Delete
                   </li>
                 </ul>
               </BasePopper>
@@ -375,6 +376,7 @@ const Assignments: FunctionComponent<Props> = ({
           action={
             <button
               className="primary-button"
+              disabled={user.role !== "Teacher"}
               onClick={() => setIsCreateAssignmentModal(true)}
             >
               Enroll users

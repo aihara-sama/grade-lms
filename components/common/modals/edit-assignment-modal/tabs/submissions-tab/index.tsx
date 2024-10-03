@@ -252,7 +252,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
             onClick={() => setIsDelSubmissionsModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Delete <DeleteIcon />
+            Delete <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -323,7 +323,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
                       className="popper-list-item"
                       onClick={() => setIsDelSubmissionModal(true)}
                     >
-                      <DeleteIcon /> Delete
+                      <DeleteIcon size="xs" /> Delete
                     </li>
                   </ul>
                 </BasePopper>

@@ -387,6 +387,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
               body={metadata.courses}
               action={
                 <button
+                  disabled={user.role !== "Teacher"}
                   className="primary-button"
                   onClick={() => setIsCreateCourseModal(true)}
                 >

@@ -205,6 +205,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
   };
 
   const onUsersEnrolled = () => {
+    setIsEnrollUsersModal(false);
     revalidatePageAction();
     fetchMembersBySearch(searchText);
   };
@@ -272,7 +273,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
                 className="primary-button px-8"
                 onClick={() => setIsEnrollUsersModal(true)}
               >
-                Create
+                Enroll
               </button>
             </div>
           )}
@@ -291,7 +292,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
             onClick={() => setIsExpelMembersModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Expel <DeleteIcon />
+            Expel <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -353,7 +354,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
                     className="popper-list-item"
                     onClick={() => setIsExpelMemberModal(true)}
                   >
-                    <DeleteIcon /> Expel
+                    <DeleteIcon size="xs" /> Expel
                   </li>
                 </ul>
               </BasePopper>
@@ -367,6 +368,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
           action={
             <button
               className="primary-button"
+              disabled={user.role !== "Teacher"}
               onClick={() => setIsEnrollUsersModal(true)}
             >
               Enroll users

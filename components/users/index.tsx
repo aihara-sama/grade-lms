@@ -319,7 +319,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
             onClick={() => setIsDeleteUsersModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Delete <DeleteIcon />
+            Delete <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -377,7 +377,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
                     onClick={() => setIsDeleteUserModal(true)}
                     className="popper-list-item"
                   >
-                    <DeleteIcon /> Delete
+                    <DeleteIcon size="xs" /> Delete
                   </li>
                 </ul>
               </BasePopper>
@@ -391,6 +391,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
           action={
             <button
               className="primary-button"
+              disabled={user.role !== "Teacher"}
               onClick={() => setIsCreateUserModal(true)}
             >
               Create user
