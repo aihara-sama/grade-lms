@@ -2,15 +2,17 @@ import type { Lesson } from "@/types/lesson.type";
 import { minToPx } from "@/utils/date/min-to-px";
 import { getEventWidth } from "@/utils/DOM/get-event-width";
 import clsx from "clsx";
+import { format } from "date-fns";
 import { forwardRef, memo } from "react";
 
 interface Props {
   event: Lesson;
   canDropEvent: boolean;
   initEventPosition: { x: number; y: number };
+  hoveredDate: Date;
 }
 const DraggingEvent = forwardRef<HTMLDivElement, Props>(function DraggingEvent(
-  { event, canDropEvent, initEventPosition },
+  { event, canDropEvent, initEventPosition, hoveredDate },
   ref
 ) {
   return (
@@ -27,6 +29,21 @@ const DraggingEvent = forwardRef<HTMLDivElement, Props>(function DraggingEvent(
       }}
     >
       {event.title}
+      {hoveredDate && (
+        <>
+          <br />
+          {format(new Date(hoveredDate), "HH:mm")}
+          {" - "}
+          {format(
+            new Date(
+              new Date(
+                +hoveredDate + +new Date(event.ends) - +new Date(event.starts)
+              )
+            ),
+            "HH:mm"
+          )}
+        </>
+      )}
     </div>
   );
 });

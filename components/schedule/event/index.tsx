@@ -88,10 +88,10 @@ const Event: FunctionComponent<Props> = ({
       style={eventStyles}
     >
       {event.title}
-      <div className="flex gap-1">
-        <p>{format(new Date(event.starts), "HH:mm")}</p>-
-        <p>{format(new Date(event.ends), "HH:mm")}</p>
-      </div>
+      <br />
+      {format(new Date(event.starts), "HH:mm")}
+      {" - "}
+      {format(new Date(event.ends), "HH:mm")}
     </div>
   );
 };

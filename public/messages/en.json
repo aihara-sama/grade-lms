@@ -115,7 +115,7 @@
     "delete_courses": "Are you sure you want to delete selected courses ({count})?",
     "expel_member": "Are you sure you want to expel this member?",
     "expel_members": "Are you sure you want to expel selected members ({count})?",
-    "delete_lesson": "Are you sure you want to delete selected lesson?",
+    "delete_lesson": "Are you sure you want to delete this lesson?",
     "delete_lessons": "Are you sure you want to delete selected lessons ({count})?",
     "delete_submission": "Are you sure you want to delete this submission?",
     "delete_submissions": "Are you sure you want to delete selected submissions ({count})?",

@@ -12,7 +12,7 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-import PromptModal from "@/components/common/modals/prompt-modal";
+import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
@@ -43,8 +43,6 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     const [isDeleteLessonModalOpen, setIsDeleteLessonModalOpen] =
       useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isSubmittingDeleteLesson, setIsSubmittingDeleteLesson] =
-      useState(false);
     const [isSubmittingUpdateLesson, setIsSubmittingUpdateLesson] =
       useState(false);
 
@@ -108,7 +106,6 @@ const EditLessonModal: FunctionComponent<Props> = memo(
       }
     };
     const submitDeleteLesson = async () => {
-      setIsSubmittingDeleteLesson(true);
       try {
         await deleteLessons([lesson.id]);
 
@@ -117,8 +114,6 @@ const EditLessonModal: FunctionComponent<Props> = memo(
         onClose(true);
       } catch (error: any) {
         toast.error(error.message);
-      } finally {
-        setIsSubmittingDeleteLesson(false);
       }
     };
     const onChangeDuration = (e: ChangeEvent<HTMLInputElement>) => {
@@ -276,14 +271,13 @@ const EditLessonModal: FunctionComponent<Props> = memo(
           <Skeleton />
         )}
         {isDeleteLessonModalOpen && (
-          <PromptModal
-            isSubmitting={isSubmittingDeleteLesson}
+          <PromptDeleteRecordModal
             onClose={() => setIsDeleteLessonModalOpen(false)}
-            isInsideModal
-            title="Delete lesson"
-            action="Delete"
-            actionHandler={submitDeleteLesson}
-            body={t("prompts.delete_lesson")}
+            title={t("modal.titles.delete_lesson")}
+            record={lesson.title}
+            confirmText={t("actions.delete")}
+            onConfirm={submitDeleteLesson}
+            prompt={t("prompts.delete_lesson")}
           />
         )}
       </BaseModal>

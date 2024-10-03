@@ -1,6 +1,7 @@
 "use client";
 
 import DashboardSchedule from "@/components/common/dashboard/dashboard-schedule";
+import Container from "@/components/container";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import LatestAssignments from "@/components/student-dashboard/latest-assignments";
@@ -40,28 +41,32 @@ const StudentrDashboard: FunctionComponent<Props> = (props) => {
   }, []);
 
   return (
-    <div className="sm:flex-row flex gap-8 flex-col">
-      <div className="flex-1 overflow-hidden">
-        <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
-          <Total
-            Icon={<AssignmentsIcon size="lg" />}
-            total={props.assignmentsCount}
-            title="Total assignments"
-          />
-          <Total
-            Icon={<SubmissionsIcon size="lg" />}
-            total={props.submissionsCount}
-            title="Total submissions"
-          />
+    <Container>
+      <p className="page-title">Dashboard</p>
+      <p className="text-neutral-500 mb-4">Your LMS Command Center</p>
+      <div className="sm:flex-row flex gap-8 flex-col">
+        <div className="flex-1 overflow-hidden">
+          <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
+            <Total
+              Icon={<AssignmentsIcon size="lg" />}
+              total={props.assignmentsCount}
+              title="Total assignments"
+            />
+            <Total
+              Icon={<SubmissionsIcon size="lg" />}
+              total={props.submissionsCount}
+              title="Total submissions"
+            />
+          </div>
+          <hr className="my-4" />
+          <LatestAssignments assignments={props.latestAssignments.data} />
+          <StudentInsights />
         </div>
-        <hr className="my-4" />
-        <LatestAssignments assignments={props.latestAssignments.data} />
-        <StudentInsights />
+        <div className="sm:w-[300px]">
+          <DashboardSchedule />
+        </div>
       </div>
-      <div className="sm:w-[300px]">
-        <DashboardSchedule />
-      </div>
-    </div>
+    </Container>
   );
 };
 

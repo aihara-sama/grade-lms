@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 
 import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
 import Select from "@/components/common/select";
+import Container from "@/components/container";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
 import { getWeekLessons, upsertLesson } from "@/db/client/lesson";
@@ -53,7 +54,7 @@ const Schedule: FunctionComponent = () => {
   const intervalIDRef = useRef<NodeJS.Timeout>();
   const draggingEventRef = useRef<HTMLDivElement>();
   const hoursLabelsDaysWrapperRef = useRef<HTMLDivElement>();
-  const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
+  const coursesOffsetRef = useRef(0);
 
   // Hooks
   const t = useTranslations();
@@ -105,7 +106,10 @@ const Schedule: FunctionComponent = () => {
   };
   const fetchCourses = async () => {
     try {
-      setCourses((await getCourses()).data);
+      const { data } = await getCourses();
+
+      setCourses(data);
+      coursesOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -292,125 +296,131 @@ const Schedule: FunctionComponent = () => {
 
   // View
   return (
-    <div onMouseUp={onMouseUp}>
-      <h1 className="page-title">Schedule</h1>
-      <p className="text-neutral-500">View and manage your schedule</p>
-      <hr className="my-2 mb-8" />
-      <div className="flex justify-between items-center mb-2">
-        <div className="mt-1 flex items-center gap-3">
-          <div className="flex gap-1 font-bold">
-            <div className="start">{format(days[0], "MMM d")}</div>
-            <span>-</span>
-            <div className="end">{format(days[days.length - 1], "MMM d")}</div>
+    <Container>
+      <div onMouseUp={onMouseUp}>
+        <h1 className="page-title">Schedule</h1>
+        <p className="text-neutral-500">View and manage your schedule</p>
+        <hr className="my-2 mb-8" />
+        <div className="flex justify-between items-center mb-2">
+          <div className="mt-1 flex items-center gap-3">
+            <div className="flex gap-1 font-bold">
+              <div className="start">{format(days[0], "MMM d")}</div>
+              <span>-</span>
+              <div className="end">
+                {format(days[days.length - 1], "MMM d")}
+              </div>
+            </div>
+            <div className="flex">
+              <button
+                className="icon-button"
+                onClick={() => setDays(getWeekDays(subDays(days[0], 7)))}
+              >
+                <ArrowLeftIcon />
+              </button>
+              <button
+                className="icon-button"
+                onClick={() => setDays(getWeekDays(addDays(days[0], 7)))}
+              >
+                <ArrowRightIcon />
+              </button>
+            </div>
           </div>
-          <div className="flex">
-            <button
-              className="icon-button"
-              onClick={() => setDays(getWeekDays(subDays(days[0], 7)))}
-            >
-              <ArrowLeftIcon />
-            </button>
-            <button
-              className="icon-button"
-              onClick={() => setDays(getWeekDays(addDays(days[0], 7)))}
-            >
-              <ArrowRightIcon />
-            </button>
-          </div>
+          <Select
+            label="Course"
+            options={courses}
+            onChange={(item) => setSelectedCourse(item)}
+            defaultValue={selectedCourse}
+            useUnselect
+            fullWidth
+            popperProps={{
+              popperClassName: "h-[250px]",
+              className: "w-52",
+            }}
+            onScrollEnd={onCoursesScrollEnd}
+            onSearchInputChange={fetchCoursesBySearch}
+          />
         </div>
-        <Select
-          label="Course"
-          options={courses}
-          onChange={(item) => setSelectedCourse(item)}
-          defaultValue={selectedCourse}
-          useUnselect
-          fullWidth
-          popperProps={{
-            popperClassName: "h-[250px]",
-            className: "w-52",
-          }}
-          onScrollEnd={onCoursesScrollEnd}
-          onSearchInputChange={fetchCoursesBySearch}
-        />
-      </div>
 
-      <hr />
+        <hr />
 
-      <div className="flex ml-[75px] mt-1">
-        {days.map((day, idx) => (
-          <div
-            key={idx}
-            className="flex-[1] text-center text-sm font-bold py-4"
-          >
-            {format(new Date(day), "EE")}
-          </div>
-        ))}
-      </div>
-      <div
-        ref={hoursLabelsDaysWrapperRef}
-        className="flex gap-[6px] max-h-[calc(100vh_-_261px)] overflow-auto pt-[6px] pr-[6px]"
-      >
-        <div className="-mt-[10px] text-sm font-bold">
-          {[...Array(24)].map((_, idx) => (
+        <div className="flex ml-[75px] mt-1">
+          {days.map((day, idx) => (
             <div
               key={idx}
-              className="h-[81px] relative"
-              data-hour-label={format(
-                addHours(new Date("01/01/2000"), idx),
-                "h:mm a"
-              )}
+              className="flex-[1] text-center text-sm font-bold py-4"
             >
-              {format(addHours(new Date("01/01/2000"), idx), "h:mm a")}
+              {format(new Date(day), "EE")}
             </div>
           ))}
         </div>
+        <div
+          ref={hoursLabelsDaysWrapperRef}
+          className="flex gap-[6px] max-h-[calc(100vh_-_261px)] overflow-auto pt-[6px] pr-[6px]"
+        >
+          <div className="-mt-[10px] text-sm font-bold">
+            {[...Array(24)].map((_, idx) => (
+              <div
+                key={idx}
+                className="h-[81px] relative"
+                data-hour-label={format(
+                  addHours(new Date("01/01/2000"), idx),
+                  "h:mm a"
+                )}
+              >
+                {format(addHours(new Date("01/01/2000"), idx), "h:mm a")}
+              </div>
+            ))}
+          </div>
 
-        <div className="flex-1" ref={daysRef}>
-          <div className="relative flex overflow-hidden">
-            {days.map((day, idx) => {
-              return (
-                <div className="flex-1" key={idx}>
-                  {[...Array(differenceInHours(addDays(day, 1), day))].map(
-                    (__, i) => (
-                      <Hour
-                        value={value}
-                        key={i}
-                        day={day}
-                        index={i}
-                        events={lessons}
-                        hour={+addHours(day, i)}
-                        quarter={getHourQuarter(day, i)}
-                        draggingEvent={getMaybeDraggingEvent(day, i)}
-                      />
-                    )
-                  )}
-                </div>
-              );
-            })}
-            {draggingEvent && (
-              <DraggingEvent
-                event={draggingEvent}
-                canDropEvent={canDropEvent}
-                initEventPosition={initEventPosition}
-              />
-            )}
+          <div className="flex-1" ref={daysRef}>
+            <div className="relative flex overflow-hidden">
+              {days.map((day, idx) => {
+                return (
+                  <div className="flex-1" key={idx}>
+                    {[...Array(differenceInHours(addDays(day, 1), day))].map(
+                      (__, i) => (
+                        <Hour
+                          value={value}
+                          key={i}
+                          day={day}
+                          index={i}
+                          events={lessons}
+                          hour={+addHours(day, i)}
+                          quarter={getHourQuarter(day, i)}
+                          draggingEvent={getMaybeDraggingEvent(day, i)}
+                        />
+                      )
+                    )}
+                  </div>
+                );
+              })}
+              {draggingEvent && (
+                <DraggingEvent
+                  ref={draggingEventRef}
+                  event={draggingEvent}
+                  canDropEvent={canDropEvent}
+                  initEventPosition={initEventPosition}
+                  hoveredDate={hoveredDate}
+                />
+              )}
+            </div>
           </div>
         </div>
+        {!!selectedLesson && selectedLesson.id && (
+          <EditLessonModal
+            onClose={onLessonModalClose}
+            lessonId={selectedLesson.id}
+          />
+        )}
+        {!!selectedLesson && !selectedLesson.id && (
+          <CreateLessonModal
+            onClose={onLessonModalClose}
+            courseId={selectedCourse?.id}
+            maybeLesson={selectedLesson}
+          />
+        )}
       </div>
-      {!!selectedLesson && selectedLesson.id && (
-        <EditLessonModal
-          onClose={onLessonModalClose}
-          lessonId={selectedLesson.id}
-        />
-      )}
-      {!!selectedLesson && !selectedLesson.id && (
-        <CreateLessonModal
-          onClose={onLessonModalClose}
-          courseId={selectedCourse?.id}
-          maybeLesson={selectedLesson}
-        />
-      )}
-    </div>
+    </Container>
   );
 };
 

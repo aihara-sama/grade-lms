@@ -60,6 +60,8 @@ const TeacherDashboard: FunctionComponent<Props> = (props) => {
 
   return (
     <Container>
+      <p className="page-title">Dashboard</p>
+      <p className="text-neutral-500 mb-4">Your LMS Command Center</p>
       <div className="sm:flex-row flex gap-8 flex-col">
         <div className="flex-1 overflow-hidden">
           <div className="mb-6">

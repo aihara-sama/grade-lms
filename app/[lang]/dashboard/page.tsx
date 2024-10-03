@@ -52,13 +52,7 @@ const Page: NextPage = async () => {
     );
   }
 
-  return (
-    <>
-      <p className="page-title">Dashboard</p>
-      <p className="text-neutral-500 mb-4">Your LMS Command Center</p>
-      {Dashborad}
-    </>
-  );
+  return <>{Dashborad}</>;
 };
 
 export default Page;
