@@ -88,6 +88,8 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
     payload: RealtimePostgresInsertPayload<(typeof notifications)[number]>
   ) => {
     try {
+      console.log({ user });
+
       const data = await getNotification(payload.new.id);
 
       setNotifications((prev) => [data, ...prev]);
@@ -114,7 +116,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
         onNewNotification
       )
       .subscribe();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     (async () => {
