@@ -12,10 +12,10 @@ export const getCourse = async (id: string) => {
   return result.data;
 };
 
-export const getCourses = async () => {
+export const getCourses = async (options?: { head?: boolean }) => {
   const { data, count } = await getServerDB()
     .from("courses")
-    .select("*, lessons(count), users(count)", { count: "exact" })
+    .select("*, lessons(count), users(count)", { count: "exact", ...options })
     .order("created_at", { ascending: true })
     .range(0, COURSES_GET_LIMIT - 1)
     .returns<CourseWithRefsCount[]>();
@@ -24,25 +24,12 @@ export const getCourses = async () => {
 };
 
 export const getLatestCourses = async () => {
-  const result = await getServerDB()
+  const { data, count } = await getServerDB()
     .from("courses")
-    .select("*, users(count), lessons(count)")
-    .limit(COURSES_GET_LIMIT)
+    .select("*, users(count), lessons(count)", { count: "exact" })
+    .range(0, COURSES_GET_LIMIT - 1)
     .order("created_at", { ascending: false })
     .returns<CourseWithRefsCount[]>();
 
-  if (result.error) return [];
-
-  return result.data;
-};
-export const getCoursesCount = async () => {
-  const result = await getServerDB()
-    .from("courses")
-    .select("count")
-    .returns<{ count: number }[]>()
-    .single();
-
-  if (result.error) return 0;
-
-  return result.data.count;
+  return { data, count };
 };

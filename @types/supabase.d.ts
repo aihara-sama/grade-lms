@@ -9,7 +9,7 @@ export declare module "@supabase/auth-js" {
     preferred_locale: Locale;
     creator_id?: string;
     timezone: string;
-    is_push_notifications_on: boolean;
+    push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
     is_emails_on: boolean;
   }
 }

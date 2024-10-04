@@ -11,7 +11,7 @@ const Page = async () => {
 
   if (user.user_metadata.role !== Role.Teacher) return redirect("/dashboard");
 
-  const users = await getMyUsers(user.id);
+  const users = await getMyUsers();
 
   return <Users users={users} />;
 };

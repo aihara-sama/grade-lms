@@ -15,6 +15,6 @@ export const polishUser = (user: SupabaseUser | null): User | null => {
     preferred_locale: user.user_metadata.preferred_locale,
     timezone: user.user_metadata.timezone,
     is_emails_on: user.user_metadata.is_emails_on,
-    is_push_notifications_on: user.user_metadata.is_push_notifications_on,
+    push_notifications_state: user.user_metadata.push_notifications_state,
   };
 };

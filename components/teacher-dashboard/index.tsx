@@ -7,56 +7,30 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import LatestCourses from "@/components/teacher-dashboard/latest-courses";
 import TeacherInsights from "@/components/teacher-dashboard/teacher-insights";
 import Total from "@/components/total";
-import { getLatestCourses } from "@/db/client/course";
-import { usePushNotifications } from "@/hooks/use-push-notifications";
-import { useUser } from "@/hooks/use-user";
-import type { CourseWithRefsCount } from "@/types/course.type";
+import type { createCourse, getLatestCourses } from "@/db/client/course";
+import type { ResultOf } from "@/types/utils.type";
 import type { FunctionComponent } from "react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 
 interface Props {
-  coursesCount: number;
   usersCount: number;
-  latestCourses: CourseWithRefsCount[];
+  coursesCount: number;
+  latestCourses: ResultOf<typeof getLatestCourses>;
 }
 
-const TeacherDashboard: FunctionComponent<Props> = (props) => {
-  const { enablePushNotifications } = usePushNotifications();
-  const user = useUser((state) => state.user);
+const TeacherDashboard: FunctionComponent<Props> = ({
+  usersCount: initUsersCount,
+  coursesCount: initCoursesCount,
+  latestCourses: initLatestCourses,
+}) => {
+  const [usersCount] = useState(initUsersCount);
+  const [coursesCount, setCoursesCount] = useState(initCoursesCount);
+  const [latestCourses, setLatestCourses] = useState(initLatestCourses.data);
 
-  const [usersCount] = useState(props.usersCount);
-  const [coursesCount, setCoursesCount] = useState(props.coursesCount);
-  const [latestCourses, setLatestCourses] = useState<CourseWithRefsCount[]>(
-    props.latestCourses
-  );
-
-  const fetchLatestourses = async () => {
-    try {
-      const { data, count } = await getLatestCourses();
-
-      setLatestCourses(data);
-      setCoursesCount(count);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
+  const onCourseCreate = (course: ResultOf<typeof createCourse>) => {
+    setLatestCourses((prev) => [course, ...prev]);
+    setCoursesCount((prev) => prev + 1);
   };
-
-  useEffect(() => {
-    (async () => {
-      if (!user.is_push_notifications_on) {
-        try {
-          const permission = await Notification.requestPermission();
-
-          if (permission === "granted") await enablePushNotifications();
-
-          toast.success("Notifications enabled!");
-        } catch (err: any) {
-          console.error(err.message);
-        }
-      }
-    })();
-  }, []);
 
   return (
     <Container>
@@ -83,7 +57,7 @@ const TeacherDashboard: FunctionComponent<Props> = (props) => {
           <hr className="my-4" />
           <LatestCourses
             courses={latestCourses}
-            onCourseCreated={fetchLatestourses}
+            onCourseCreated={onCourseCreate}
           />
           <TeacherInsights courses={latestCourses} />
         </div>

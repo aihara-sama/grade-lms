@@ -13,24 +13,28 @@ export const usePushNotifications = () => {
 
   const enablePushNotifications = async () => {
     try {
-      const data = await getFcmToken();
+      const permission = await Notification.requestPermission();
 
-      if (!data) {
-        const token = await getToken(messaging, {
-          vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
+      if (permission === "granted") {
+        const data = await getFcmToken();
+
+        if (!data) {
+          const token = await getToken(messaging, {
+            vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
+          });
+          await createFcmToken(token);
+        }
+
+        const { error } = await DB.auth.updateUser({
+          data: {
+            push_notifications_state: "On",
+          } as UserMetadata,
         });
-        await createFcmToken(token);
+
+        if (error) throw new Error(t("error.something_went_wrong"));
+
+        setUser({ ...user, push_notifications_state: "On" });
       }
-
-      const { error } = await DB.auth.updateUser({
-        data: {
-          is_push_notifications_on: true,
-        } as UserMetadata,
-      });
-
-      if (error) throw new Error(t("error.something_went_wrong"));
-
-      setUser({ ...user, is_push_notifications_on: true });
     } catch (err: any) {
       toast.error(err.message);
     }

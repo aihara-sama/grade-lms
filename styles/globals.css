@@ -10,6 +10,7 @@
   body {
     @apply overflow-x-hidden !important;
     @apply overflow-y-auto;
+    @apply grid;
   }
 
   a {
@@ -102,6 +103,9 @@
   }
 }
 @layer utilities {
+  .container {
+    @apply max-w-[1432px] [@media(min-width:1432px)]:mx-[auto];
+  }
   .disabled {
     &.warning-button {
       @apply bg-amber-400 !important;

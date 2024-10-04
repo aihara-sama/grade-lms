@@ -2,6 +2,8 @@
 
 import CreateCourseModal from "@/components/common/modals/create-course-modal";
 import AddCourseIcon from "@/components/icons/add-course-icon";
+import type { createCourse } from "@/db/client/course";
+import type { ResultOf } from "@/types/utils.type";
 import type { FunctionComponent } from "react";
 import { useState } from "react";
 
@@ -13,12 +15,12 @@ const CreateCourse: FunctionComponent<Props> = ({ onCreated }) => {
   const [isCreateCourseModal, setIsCreateCourseModal] = useState(false);
 
   const openCreateCourseModal = () => setIsCreateCourseModal(true);
-  const closeCreateCourseModal = (mutated?: boolean) => {
+  const closeCreateCourseModal = (
+    maybeCourse?: ResultOf<typeof createCourse>
+  ) => {
     setIsCreateCourseModal(false);
 
-    if (mutated) {
-      onCreated();
-    }
+    if (maybeCourse) onCreated();
   };
   return (
     <div className="border border-dashed border-light bg-white px-6 py-8 flex flex-col items-center justify-between sm:w-64 w-full rounded-md">

@@ -11,3 +11,10 @@ export const getSubmissionsCount = async () => {
 
   return result.data.count;
 };
+export const getSubmissions = async (options?: { head?: boolean }) => {
+  const { data, count } = await getServerDB()
+    .from("submissions")
+    .select("*", { count: "exact", ...options });
+
+  return { data, count };
+};

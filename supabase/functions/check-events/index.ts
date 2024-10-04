@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
           if ((await sendEmailResult.text()) !== "OK") throw new Error(message);
         }
 
-        if (user.is_push_notifications_on) {
+        if (user.push_notifications_state === "On") {
           await admin.messaging(firebaseAdminApp).send({
             token: user.fcm_token,
             notification: {

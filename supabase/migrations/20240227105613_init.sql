@@ -4,6 +4,7 @@
 * Note: This table contains user data. Users should only be able to view and update their own data.
 */
 CREATE TYPE public.Role AS ENUM ('Teacher', 'Student', 'Guest');
+CREATE TYPE public.Push_Notifications_State AS ENUM ('Idle', 'On', 'Off');
 create table users (
   -- UUID from auth.users
   id uuid references auth.users on delete cascade not null primary key,
@@ -15,7 +16,7 @@ create table users (
   preferred_locale text not null,
   timezone text not null,
   is_emails_on boolean not null default true,
-  is_push_notifications_on boolean not null default false,
+  push_notifications_state Push_Notifications_State not null default 'Idle',
   created_at timestamp not null default now()
 );
 
@@ -120,8 +121,8 @@ create table sent_announcements (
 create function public.handle_new_user() 
 returns trigger as $$
 begin
-  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone)
-  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone');
+  insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone, push_notifications_state)
+  values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone', (new.raw_user_meta_data->>'push_notifications_state')::public.Push_Notifications_State);
   return new;
 end;
 $$ language plpgsql security definer;
@@ -143,7 +144,7 @@ begin
     preferred_locale = new.raw_user_meta_data->>'preferred_locale',
     timezone = new.raw_user_meta_data->>'timezone',
     is_emails_on = (new.raw_user_meta_data->>'is_emails_on')::boolean,
-    is_push_notifications_on = (new.raw_user_meta_data->>'is_push_notifications_on')::boolean
+    push_notifications_state = (new.raw_user_meta_data->>'push_notifications_state')::public.Push_Notifications_State
   where id = new.id;
   return new;
 end;
@@ -151,6 +152,16 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_updated
   after update on auth.users
   for each row execute procedure public.handle_update_user();
+
+
+create or replace function public.get_my_users()
+returns setof users as $$
+begin
+return query
+  select * from users
+  where id != auth.uid();
+end;
+$$ language plpgsql;
 
 -- Create a trigger function to insert into user_courses table
 create function insert_user_course()
@@ -317,7 +328,7 @@ RETURNS TABLE (
   fcm_token text,
   lesson_id text,
   is_emails_on boolean,
-  is_push_notifications_on boolean
+  push_notifications_state Push_Notifications_State
 )
 LANGUAGE sql
 AS $$
@@ -327,7 +338,7 @@ AS $$
     COALESCE(ft.fcm_token, '') AS fcm_token,
     l.id AS lesson_id,
     u.is_emails_on,
-    u.is_push_notifications_on
+    u.push_notifications_state
   FROM lessons l
   INNER JOIN user_courses uc ON l.course_id = uc.course_id
   INNER JOIN public.users u ON uc.user_id = u.id

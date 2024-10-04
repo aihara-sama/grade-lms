@@ -11,24 +11,19 @@ export const getCourseUsers = async (courseId: string) => {
 
   return { data, count };
 };
-export const getMyUsers = async (meId: string) => {
+
+export const getMyUsers = async (options?: { head?: boolean }) => {
   const { data, count } = await getServerDB()
-    .from("users")
-    .select("*", { count: "exact" })
-    .neq("id", meId)
-    .order("created_at", { ascending: true })
-    .range(0, USERS_GET_LIMIT - 1);
+    .rpc(
+      "get_my_users",
+      {},
+      {
+        count: "exact",
+        ...options,
+      }
+    )
+    .range(0, USERS_GET_LIMIT - 1)
+    .order("created_at", { ascending: true });
 
   return { data, count };
-};
-
-export const getMyUsersCount = async (meId: string) => {
-  const { count } = await getServerDB()
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .neq("id", meId)
-    .returns<{ count: number }[]>()
-    .single();
-
-  return count;
 };

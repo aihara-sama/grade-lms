@@ -2,11 +2,13 @@ import type { FunctionComponent } from "react";
 
 interface Props {
   className?: string;
+  onClick?: () => void;
 }
 
-const CloseIcon: FunctionComponent<Props> = ({ className }) => {
+const CloseIcon: FunctionComponent<Props> = ({ className, onClick }) => {
   return (
     <svg
+      onClick={onClick}
       width="11"
       height="11"
       className={className}

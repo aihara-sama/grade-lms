@@ -20,13 +20,17 @@ interface Props {
   latestAssignments: ResultOf<typeof getLatestAssignments>;
 }
 
-const StudentrDashboard: FunctionComponent<Props> = (props) => {
+const StudentrDashboard: FunctionComponent<Props> = ({
+  assignmentsCount,
+  submissionsCount,
+  latestAssignments,
+}) => {
   const user = useUser((state) => state.user);
   const { enablePushNotifications } = usePushNotifications();
 
   useEffect(() => {
     (async () => {
-      if (!user.is_push_notifications_on) {
+      if (user.push_notifications_state === "Idle") {
         try {
           const permission = await Notification.requestPermission();
 
@@ -49,17 +53,17 @@ const StudentrDashboard: FunctionComponent<Props> = (props) => {
           <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
             <Total
               Icon={<AssignmentsIcon size="lg" />}
-              total={props.assignmentsCount}
+              total={assignmentsCount}
               title="Total assignments"
             />
             <Total
               Icon={<SubmissionsIcon size="lg" />}
-              total={props.submissionsCount}
+              total={submissionsCount}
               title="Total submissions"
             />
           </div>
           <hr className="my-4" />
-          <LatestAssignments assignments={props.latestAssignments.data} />
+          <LatestAssignments assignments={latestAssignments.data} />
           <StudentInsights />
         </div>
         <div className="sm:w-[300px]">

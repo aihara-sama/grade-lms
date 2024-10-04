@@ -15,7 +15,7 @@ import BaseModal from "@/components/common/modals/base-modal";
 import LoadingSpinner from "@/components/loading-spinner";
 import Skeleton from "@/components/skeleton";
 import TimezoneSelect from "@/components/timezone-select";
-import type { getUsers } from "@/db/client/user";
+import type { getMyUsers } from "@/db/client/user";
 import { getUser, updateUser } from "@/db/client/user";
 import type { ResultOf } from "@/types/utils.type";
 import clsx from "clsx";
@@ -24,7 +24,7 @@ import type { ChangeEvent, FunctionComponent } from "react";
 
 interface Props {
   userId: string;
-  onClose: (updatedUser?: ResultOf<typeof getUsers>["data"][number]) => void;
+  onClose: (updatedUser?: ResultOf<typeof getMyUsers>["data"][number]) => void;
 }
 
 const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
@@ -32,7 +32,8 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
   const t = useTranslations();
 
   // State
-  const [user, setUser] = useState<ResultOf<typeof getUsers>["data"][number]>();
+  const [user, setUser] =
+    useState<ResultOf<typeof getMyUsers>["data"][number]>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

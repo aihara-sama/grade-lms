@@ -38,7 +38,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       preferred_locale: user.user_metadata.preferred_locale,
       timezone: payload.timezone,
       is_emails_on: true,
-      is_push_notifications_on: false,
+      push_notifications_state: "Idle",
     } as UserMetadata,
     email_confirm: true,
   });

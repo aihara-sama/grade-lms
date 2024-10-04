@@ -50,7 +50,7 @@ const Page: FunctionComponent = () => {
           preferred_locale: "en",
           timezone: getTimeZone(),
           is_emails_on: true,
-          is_push_notifications_on: false,
+          push_notifications_state: "Idle",
         } as UserMetadata,
       },
     });

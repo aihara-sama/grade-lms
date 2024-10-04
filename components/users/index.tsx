@@ -33,7 +33,7 @@ import {
   deleteAllUsers,
   deleteUser,
   deleteUsers,
-  getUsers,
+  getMyUsers,
 } from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
@@ -46,7 +46,7 @@ import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 interface Props {
-  users: ResultOf<typeof getUsers>;
+  users: ResultOf<typeof getMyUsers>;
 }
 
 const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
@@ -105,11 +105,10 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     setIsLoading(true);
 
     try {
-      const { data, count } = await getUsers();
+      const { data, count } = await getMyUsers();
 
-      // Dont show current user
-      setUsers(data.filter(({ id }) => id !== user.id));
-      setUsersCount(Math.max(count - 1, 0));
+      setUsers(data);
+      setUsersCount(count);
 
       usersOffsetRef.current = data.length;
     } catch (error: any) {
@@ -122,11 +121,10 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     setIsSearching(true);
 
     try {
-      const { data, count } = await getUsers(search);
+      const { data, count } = await getMyUsers(search);
 
-      // Dont show current user
-      setUsers(data.filter(({ id }) => id !== user.id));
-      setUsersCount(Math.max(count - 1, 0));
+      setUsers(data);
+      setUsersCount(count);
 
       usersOffsetRef.current = data.length;
     } catch (error: any) {
@@ -140,10 +138,9 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       const from = usersOffsetRef.current;
       const to = usersOffsetRef.current + USERS_GET_LIMIT - 1;
 
-      const { data } = await getUsers(searchText, from, to);
+      const { data } = await getMyUsers(searchText, from, to);
 
-      // Dont show current user
-      setUsers((prev) => [...prev, ...data.filter(({ id }) => id !== user.id)]);
+      setUsers(data);
 
       usersOffsetRef.current += data.length;
     } catch (error: any) {

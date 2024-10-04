@@ -21,12 +21,21 @@ export const getAssignmentsCount = async () => {
 
   return extractAssignmentsCount(result.data);
 };
+export const getAssignments = async (options?: { head?: boolean }) => {
+  const { data, count } = await getServerDB()
+    .from("assignments")
+    .select("*", { count: "exact", ...options })
+    .range(0, ASSIGNMENTS_GET_LIMIT - 1)
+    .order("created_at", { ascending: true });
+
+  return { data, count };
+};
 
 export const getLatestAssignments = async () => {
   const { data, count } = await getServerDB()
     .from("assignments")
     .select("*", { count: "exact" })
-    .limit(ASSIGNMENTS_GET_LIMIT)
+    .range(0, ASSIGNMENTS_GET_LIMIT - 1)
     .order("created_at", { ascending: false });
 
   return { data, count };

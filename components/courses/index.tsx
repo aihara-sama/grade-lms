@@ -27,6 +27,7 @@ import NoData from "@/components/no-data";
 import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
+import type { createCourse } from "@/db/client/course";
 import {
   deleteAllCourses,
   deleteCourse,
@@ -213,10 +214,12 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
     setIsEnrollUsersModal(false);
   };
 
-  const onCreateCourseModalClose = (mutated?: boolean) => {
+  const onCreateCourseModalClose = (
+    maybeCourse?: ResultOf<typeof createCourse>
+  ) => {
     setIsCreateCourseModal(false);
 
-    if (mutated) {
+    if (maybeCourse) {
       revalidatePageAction();
       fetchCoursesBySearch(searchText);
     }

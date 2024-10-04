@@ -420,9 +420,9 @@ export type Database = {
           email: string;
           id: string;
           is_emails_on: boolean;
-          is_push_notifications_on: boolean;
           name: string;
           preferred_locale: string;
+          push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
           role: Database["public"]["Enums"]["role"];
           timezone: string;
         };
@@ -433,9 +433,9 @@ export type Database = {
           email: string;
           id: string;
           is_emails_on?: boolean;
-          is_push_notifications_on?: boolean;
           name: string;
           preferred_locale: string;
+          push_notifications_state?: Database["public"]["Enums"]["push_notifications_state"];
           role: Database["public"]["Enums"]["role"];
           timezone: string;
         };
@@ -446,9 +446,9 @@ export type Database = {
           email?: string;
           id?: string;
           is_emails_on?: boolean;
-          is_push_notifications_on?: boolean;
           name?: string;
           preferred_locale?: string;
+          push_notifications_state?: Database["public"]["Enums"]["push_notifications_state"];
           role?: Database["public"]["Enums"]["role"];
           timezone?: string;
         };
@@ -527,6 +527,22 @@ export type Database = {
         };
         Returns: undefined;
       };
+      get_my_users: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          avatar: string;
+          created_at: string;
+          creator_id: string | null;
+          email: string;
+          id: string;
+          is_emails_on: boolean;
+          name: string;
+          preferred_locale: string;
+          push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
+          role: Database["public"]["Enums"]["role"];
+          timezone: string;
+        }[];
+      };
       get_overlapping_lesson: {
         Args: {
           p_starts: string;
@@ -564,7 +580,7 @@ export type Database = {
           fcm_token: string;
           lesson_id: string;
           is_emails_on: boolean;
-          is_push_notifications_on: boolean;
+          push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
         }[];
       };
       get_users_not_in_course: {
@@ -579,9 +595,9 @@ export type Database = {
           email: string;
           id: string;
           is_emails_on: boolean;
-          is_push_notifications_on: boolean;
           name: string;
           preferred_locale: string;
+          push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
           role: Database["public"]["Enums"]["role"];
           timezone: string;
         }[];
@@ -595,6 +611,7 @@ export type Database = {
       };
     };
     Enums: {
+      push_notifications_state: "Idle" | "On" | "Off";
       role: "Teacher" | "Student" | "Guest";
     };
     CompositeTypes: {

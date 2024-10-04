@@ -3,13 +3,14 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import Input from "@/components/input";
 import { createCourse } from "@/db/client/course";
 import type { TablesInsert } from "@/types/supabase.type";
+import type { ResultOf } from "@/types/utils.type";
 import clsx from "clsx";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  onClose: (mutated?: boolean) => void;
+  onClose: (maybeCourse?: ResultOf<typeof createCourse>) => void;
 }
 
 const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
@@ -25,8 +26,8 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
     setIsSubmitting(true);
 
     try {
-      await createCourse(course);
-      onClose(true);
+      const data = await createCourse(course);
+      onClose(data);
 
       toast.success("Course created");
     } catch (error: any) {

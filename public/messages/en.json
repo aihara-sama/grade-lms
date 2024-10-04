@@ -52,6 +52,7 @@
     "failed_to_expel_members": "Failed to expel users",
     "failed_to_delete_user": "Failed to delete user",
     "failed_to_delete_users": "Failed to delete users",
+    "failed_to_update_user": "Failed to update user",
 
     "failed_to_load_courses": "Failed to load course",
     "failed_to_load_courses_count": "Failed to load courses count",

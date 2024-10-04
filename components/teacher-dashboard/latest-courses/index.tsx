@@ -1,11 +1,13 @@
 import CreateCourseModal from "@/components/common/modals/create-course-modal";
 import CourseCard from "@/components/course-card";
 import PlusIcon from "@/components/icons/plus-icon";
+import type { createCourse } from "@/db/client/course";
 import type { CourseWithRefsCount } from "@/types/course.type";
+import type { ResultOf } from "@/types/utils.type";
 import { useState, type FunctionComponent } from "react";
 
 interface Props {
-  onCourseCreated: () => void;
+  onCourseCreated: (course: ResultOf<typeof createCourse>) => void;
   courses: CourseWithRefsCount[];
 }
 
@@ -13,14 +15,14 @@ const LatestCourses: FunctionComponent<Props> = ({
   courses,
   onCourseCreated,
 }) => {
-  const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
+  const [isCreateCourseModal, setIsCreateCourseModal] = useState(false);
 
-  const onCreateCourseModalClose = (mutated?: boolean) => {
-    setIsCreateCourseModalOpen(false);
+  const onCreateCourseModalClose = (
+    maybeCourse?: ResultOf<typeof createCourse>
+  ) => {
+    setIsCreateCourseModal(false);
 
-    if (mutated) {
-      onCourseCreated();
-    }
+    if (maybeCourse) onCourseCreated(maybeCourse);
   };
 
   return (
@@ -31,13 +33,13 @@ const LatestCourses: FunctionComponent<Props> = ({
           <CourseCard key={course.id} course={course} />
         ))}
         <div
-          onClick={() => setIsCreateCourseModalOpen(true)}
+          onClick={() => setIsCreateCourseModal(true)}
           className="min-w-14 min-h-14 rounded-lg border border-neutral-300 flex items-center justify-center text-neutral-500 inter-active"
         >
           <PlusIcon size="sm" />
         </div>
       </div>
-      {isCreateCourseModalOpen && (
+      {isCreateCourseModal && (
         <CreateCourseModal onClose={onCreateCourseModalClose} />
       )}
     </div>

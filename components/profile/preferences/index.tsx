@@ -18,8 +18,8 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
 
   // State
   const [isEmailsOn, setIsEmailsOn] = useState(user.is_emails_on);
-  const [isPushNotificationsOn, setIsPushNotificationsOn] = useState(
-    user.is_push_notifications_on
+  const [pushNotificationsState, setPushNotificationsState] = useState(
+    user.push_notifications_state
   );
 
   // Effects
@@ -40,24 +40,24 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   useUpdateEffect(() => {
     (async () => {
       try {
-        if (isPushNotificationsOn) {
-          const permission = await Notification.requestPermission();
-
-          if (permission === "granted") enablePushNotifications();
-        } else {
+        if (pushNotificationsState === "On") enablePushNotifications();
+        if (pushNotificationsState === "Off") {
           await DB.auth.updateUser({
             data: {
-              is_push_notifications_on: false,
+              push_notifications_state: "Off",
             } as UserMetadata,
           });
-        }
 
-        setUser({ ...user, is_push_notifications_on: isPushNotificationsOn });
+          setUser({
+            ...user,
+            push_notifications_state: "Off",
+          });
+        }
       } catch (err: any) {
         console.error(err.message);
       }
     })();
-  }, [isPushNotificationsOn]);
+  }, [pushNotificationsState]);
 
   // View
   return (
@@ -70,8 +70,10 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
         </div>
         <div className="flex items-center gap-3">
           <Switch
-            isChecked={isPushNotificationsOn}
-            setIsChecked={setIsPushNotificationsOn}
+            isChecked={pushNotificationsState === "On"}
+            setIsChecked={(checked) =>
+              setPushNotificationsState(checked ? "On" : "Off")
+            }
           />
           <span>Enable/Disable push notifications</span>
         </div>

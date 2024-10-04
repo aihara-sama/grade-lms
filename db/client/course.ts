@@ -99,6 +99,7 @@ export const createCourse = async (course: TablesInsert<"courses">) => {
   const result = await DB.from("courses")
     .insert(course)
     .select("*, lessons(count), users(count)")
+    .returns<CourseWithRefsCount[]>()
     .single();
 
   if (result.error) throw new Error(t("error.failed_to_create_course"));

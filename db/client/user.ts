@@ -21,15 +21,20 @@ export const getUser = async (id: string) => {
 
   return result.data;
 };
-export const getUsers = async (
+export const getMyUsers = async (
   userName = "",
   from = 0,
   to = USERS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
 
-  const { data, count, error } = await DB.from("users")
-    .select("*", { count: "exact" })
+  const { data, count, error } = await DB.rpc(
+    "get_my_users",
+    {},
+    {
+      count: "exact",
+    }
+  )
     .ilike("name", `%${userName}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
@@ -38,6 +43,7 @@ export const getUsers = async (
 
   return { data, count };
 };
+
 export const getUsersCount = async (userName = "") => {
   const t = await loadMessages();
 
