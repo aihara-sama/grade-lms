@@ -72,6 +72,10 @@ const CalendarWidget: React.FC<Props> = ({ onChange }) => {
     if (selectedDate && isSameDay(day, selectedDate)) {
       return "bg-blue-100 text-white  hover:bg-blue-200 active:bg-blue-300";
     }
+    if (isSameDay(day, new Date())) {
+      return "text-blue-100 hover:bg-gray-100 active:bg-gray-200";
+    }
+
     return "text-gray-800 hover:bg-gray-100 active:bg-gray-200";
   };
 

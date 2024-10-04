@@ -55,6 +55,7 @@ const Assignments: FunctionComponent<Props> = ({
   const t = useTranslations();
   const user = useUser((state) => state.user);
   const lesson = useLesson((state) => state.lesson);
+  const isEnded = useLesson((state) => state.isEnded);
 
   const fetchLock = useFetchLock();
 
@@ -285,6 +286,7 @@ const Assignments: FunctionComponent<Props> = ({
               <AddAssignmentIcon size="md" />
               <hr className="w-full my-3" />
               <button
+                disabled={isEnded}
                 className="primary-button px-8"
                 onClick={() => setIsCreateAssignmentModal(true)}
               >

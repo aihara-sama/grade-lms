@@ -50,7 +50,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   const duration = +new Date(lesson.ends) - +new Date(lesson.starts);
 
   // Refs
-  const coursesOffsetRef = useRef(COURSES_GET_LIMIT);
+  const coursesOffsetRef = useRef(0);
 
   const changeDuration = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -66,7 +66,10 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   };
   const fetchCourses = async () => {
     try {
-      setCourses((await getCourses()).data);
+      const { data } = await getCourses();
+      setCourses(data);
+
+      coursesOffsetRef.current += data.length;
     } catch (error: any) {
       toast.error(error.message);
     }

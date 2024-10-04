@@ -7,6 +7,7 @@
   "submissions": "Submissions",
   "search": "Search",
   "profile": "Profile",
+  "deleted": "Deleted",
 
   "success": {
     "user_created": "User successfully created",
@@ -40,7 +41,6 @@
     "invite_copied": "Invite link successfully copied to clipboard",
     "password_changed": "Password successfully changed"
   },
-
   "error": {
     "failed_to_load_user": "Failed to load user",
     "failed_to_load_users": "Failed to load users",
@@ -108,7 +108,6 @@
     "failed_to_change_password": "Failed to change password",
     "something_went_wrong": "Something went wrong"
   },
-
   "prompts": {
     "delete_user": "Are you sure you want to delete this user?",
     "delete_users": "Are you sure you want to delete selected users ({count})?",
@@ -160,5 +159,25 @@
   "actions": {
     "delete": "Delete",
     "expel": "Expel"
+  },
+  "notifications": {
+    "submission": {
+      "title": "New submission",
+      "body": "Your student has created a new submission for the {assignment} assignment",
+      "textHref": "See in assignments",
+      "href": "/dashboard/courses/{courseId}/lessons/{lessonId}/assignments"
+    },
+    "assignment": {
+      "title": "New assignment",
+      "body": "Your teacher has created the assignment {assignment} for the {lesson} lesson",
+      "textHref": "See in assignments",
+      "href": "/dashboard/courses/{courseId}/lessons/{lessonId}/assignments"
+    },
+    "enrollment": {
+      "title": "You have been enrolled to a new course",
+      "body": "You have been enrolled to the {course} course",
+      "textHref": "See in courses",
+      "href": "/dashboard/courses"
+    }
   }
 }

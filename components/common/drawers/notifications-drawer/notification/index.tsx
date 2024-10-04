@@ -2,8 +2,8 @@ import NotificationsIcon from "@/components/icons/notifications-icon";
 import type { getNotifications } from "@/db/client/notification";
 import { readNotification } from "@/db/client/notification";
 import type { ResultOf } from "@/types/utils.type";
-import { parseNotification } from "@/utils/parse/parse-notification";
 import { formatDistanceToNowStrict } from "date-fns";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -19,7 +19,10 @@ const Notification: FunctionComponent<Props> = ({
   onNavigateAway,
   onReadNotification,
 }) => {
-  const { body, href, textHref, title } = parseNotification(notification);
+  console.log({ notification });
+
+  // Hooks
+  const t = useTranslations();
 
   const submitReadNotification = async () => {
     try {
@@ -44,13 +47,27 @@ const Notification: FunctionComponent<Props> = ({
           ></div>
         </button>
         <div>
-          <p className="text-neutral-700 text-[15px] font-bold">{title}</p>
-          <p className="">{body}</p>
-          <p className="text-sm text-neutral-500 mb-2">
-            {formatDistanceToNowStrict(new Date(notification.created_at))}
+          <p className="text-neutral-700 text-[15px] font-bold">
+            {t(`notifications.${notification.type}.title`)}
           </p>
-          <Link href={`${href}`} className="text-sm" onClick={onNavigateAway}>
-            {textHref}
+          <p className="text-[15px]">
+            {t(`notifications.${notification.type}.body`, {
+              course: notification.course?.title || t("deleted"),
+              assignment: notification.assignment?.title || t("deleted"),
+              lesson: notification.lesson?.title || t("deleted"),
+            })}
+          </p>
+          <p className="text-sm text-neutral-500 mb-2">
+            {formatDistanceToNowStrict(new Date(notification.created_at), {
+              addSuffix: true,
+            })}
+          </p>
+          <Link
+            href={`${t(`notifications.${notification.type}.href`, { courseId: notification.course?.id, lessonId: notification.lesson?.id })}`}
+            className="text-sm"
+            onClick={onNavigateAway}
+          >
+            {t(`notifications.${notification.type}.textHref`)}
           </Link>
         </div>
       </div>

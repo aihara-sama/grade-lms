@@ -10,6 +10,8 @@ import {
   getNotification,
   getNotifications,
 } from "@/db/client/notification";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
 import type { ResultOf } from "@/types/utils.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
@@ -25,6 +27,10 @@ interface Props {
 }
 
 const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
+  // Hooks
+  const user = useUser((state) => state.user);
+  const { firePushNotification } = usePushNotifications();
+
   // State
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,14 +88,14 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
     payload: RealtimePostgresInsertPayload<(typeof notifications)[number]>
   ) => {
     try {
-      const { data: fetchedNotification } = await getNotification(
-        payload.new.id
-      );
+      const data = await getNotification(payload.new.id);
 
-      setNotifications((prev) => [fetchedNotification, ...prev]);
+      setNotifications((prev) => [data, ...prev]);
       setNewNotificationsCount((prev) => prev + 1);
 
       notificationsOffsetRef.current += 1;
+
+      if (user.push_notifications_state === "On") firePushNotification(data);
     } catch (error: any) {
       toast.error(error.message);
     }

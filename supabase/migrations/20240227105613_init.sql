@@ -5,6 +5,7 @@
 */
 CREATE TYPE public.Role AS ENUM ('Teacher', 'Student', 'Guest');
 CREATE TYPE public.Push_Notifications_State AS ENUM ('Idle', 'On', 'Off');
+CREATE TYPE public.NotificationType AS ENUM ('enrollment', 'submission', 'assignment');
 create table users (
   -- UUID from auth.users
   id uuid references auth.users on delete cascade not null primary key,
@@ -87,8 +88,8 @@ create table notifications (
   lesson_id uuid references public.lessons on delete SET NULL,
   assignment_id uuid references public.assignments on delete SET NULL,
   submission_id uuid references public.submissions on delete SET NULL,
-  created_at timestamp not null default now(),
-  type text not null,
+  created_at timestamp with time zone not null default now(),
+  type NotificationType not null,
   is_read boolean not null
 );
 
@@ -180,6 +181,33 @@ after insert on courses
 for each row execute function insert_user_course();
 
 
+-- Create a trigger function to insert into notifications table
+create function create_enrollment_notification()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the user being assigned is not the current user
+    IF new.user_id != auth.uid() THEN
+        -- Insert notification for the assigned user
+        INSERT INTO notifications (recipient_id, user_id, course_id, type, is_read)
+        VALUES (
+            new.user_id,          -- The user being assigned
+            auth.uid(),       -- The user who performed the assignment
+            new.course_id,         -- The course to which the user was assigned
+            'enrollment',-- Notification type
+            false                  -- Mark the notification as unread
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create a trigger on the courses table to execute the function after insert
+create trigger on_user_courses_created
+after insert on user_courses
+for each row execute function create_enrollment_notification();
+
+
 CREATE OR REPLACE FUNCTION create_submission_notification()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -189,7 +217,7 @@ BEGIN
     u.id,                     -- Recipient ID (user_id of the course creator)
     auth.uid(),               -- Current user who created the submission
     l.course_id,              -- Course ID
-    'Submission',             -- Type of notification
+    'submission',             -- Type of notification
     false                     -- Mark as unread
   FROM assignments a
   JOIN lessons l ON a.lesson_id = l.id
@@ -238,7 +266,7 @@ BEGIN
 
     -- Insert the notification
     INSERT INTO notifications (recipient_id, user_id, course_id, lesson_id, assignment_id, created_at, type, is_read)
-    VALUES (assigned_user.user_id::text, assigned_user.user_id, lesson_course_id, NEW.lesson_id, NEW.id, NOW(), 'Assignment', FALSE);
+    VALUES (assigned_user.user_id::text, assigned_user.user_id, lesson_course_id, NEW.lesson_id, NEW.id, NOW(), 'assignment', FALSE);
   END LOOP;
 
   RETURN NEW;

@@ -236,7 +236,7 @@ export type Database = {
           lesson_id: string | null;
           recipient_id: string;
           submission_id: string | null;
-          type: string;
+          type: Database["public"]["Enums"]["notificationtype"];
           user_id: string | null;
         };
         Insert: {
@@ -248,7 +248,7 @@ export type Database = {
           lesson_id?: string | null;
           recipient_id: string;
           submission_id?: string | null;
-          type: string;
+          type: Database["public"]["Enums"]["notificationtype"];
           user_id?: string | null;
         };
         Update: {
@@ -260,7 +260,7 @@ export type Database = {
           lesson_id?: string | null;
           recipient_id?: string;
           submission_id?: string | null;
-          type?: string;
+          type?: Database["public"]["Enums"]["notificationtype"];
           user_id?: string | null;
         };
         Relationships: [
@@ -611,6 +611,7 @@ export type Database = {
       };
     };
     Enums: {
+      notificationtype: "enrollment" | "submission" | "assignment";
       push_notifications_state: "Idle" | "On" | "Off";
       role: "Teacher" | "Student" | "Guest";
     };

@@ -8,11 +8,8 @@ import LatestAssignments from "@/components/student-dashboard/latest-assignments
 import StudentInsights from "@/components/student-dashboard/student-insights";
 import Total from "@/components/total";
 import type { getLatestAssignments } from "@/db/server/assignment";
-import { usePushNotifications } from "@/hooks/use-push-notifications";
-import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
-import { useEffect, type FunctionComponent } from "react";
-import toast from "react-hot-toast";
+import { type FunctionComponent } from "react";
 
 interface Props {
   assignmentsCount: number;
@@ -25,25 +22,6 @@ const StudentrDashboard: FunctionComponent<Props> = ({
   submissionsCount,
   latestAssignments,
 }) => {
-  const user = useUser((state) => state.user);
-  const { enablePushNotifications } = usePushNotifications();
-
-  useEffect(() => {
-    (async () => {
-      if (user.push_notifications_state === "Idle") {
-        try {
-          const permission = await Notification.requestPermission();
-
-          if (permission === "granted") await enablePushNotifications();
-
-          toast.success("Notifications enabled!");
-        } catch (err: any) {
-          console.error(err.message);
-        }
-      }
-    })();
-  }, []);
-
   return (
     <Container>
       <p className="page-title">Dashboard</p>

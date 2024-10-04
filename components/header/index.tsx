@@ -46,7 +46,7 @@ const Header: FunctionComponent = () => {
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
                 <NotificationsIcon size="xs" />
-                <p className="text-sm font-bold">
+                <p className="text-sm font-bold flex-1">
                   Do you want to enable browser notifications?
                 </p>
               </div>

@@ -34,6 +34,7 @@ const Layout: FunctionComponent<PropsWithChildren<Props>> = async ({
           as="image"
         />
         <link rel="prefetch" href="/assets/svg/bubbled-bg.svg" as="image" />
+        <link rel="prefetch" href="/assets/svg/chart-skeleton.svg" as="image" />
       </head>
       <body className={`${latoFont.className}`}>
         <NextIntlClientProvider messages={messages}>

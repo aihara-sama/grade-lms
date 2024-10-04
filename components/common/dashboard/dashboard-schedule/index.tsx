@@ -3,6 +3,7 @@
 import CalendarWidget from "@/components/calendar-widget";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
+import NoDataIcon from "@/components/icons/no-data-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { LESSONS_GET_LIMIT } from "@/constants";
 import { useUser } from "@/hooks/use-user";
@@ -100,6 +101,12 @@ const DashboardSchedule: FunctionComponent = () => {
           className="flex flex-col gap-4 max-h-[800px] [@media(min-width:768px)]:max-h-[492px] [@media(min-width:897px)]:max-h-[300px] overflow-auto pr-2"
           onScroll={onScroll}
         >
+          {!schedule.length && (
+            <div className="flex gap-2 flex-col items-center mt-8">
+              <NoDataIcon size="xl" />
+              <p className="text-neutral-500">Your schedule will show here</p>
+            </div>
+          )}
           {schedule.map((lesson) => (
             <div key={lesson.id}>
               <div className="flex justify-between items-center">

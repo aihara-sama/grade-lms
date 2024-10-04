@@ -15,7 +15,7 @@ export const getNotification = async (id: string) => {
 
   if (result.error) throw new Error(t("error.failed_to_load_notifications"));
 
-  return result;
+  return result.data;
 };
 export const getNotifications = async (
   from = 0,
