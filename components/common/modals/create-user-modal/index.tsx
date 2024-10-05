@@ -17,13 +17,14 @@ import LoadingSpinner from "@/components/loading-spinner";
 import TimezoneSelect from "@/components/timezone-select";
 import { DEFAULT_AVATAR } from "@/constants";
 import { createUser } from "@/db/client/user";
+import type { ResultOf } from "@/types/utils.type";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 
 interface Props {
-  onClose: (mutated?: boolean) => void;
+  onClose: (maybeUser?: ResultOf<typeof createUser>) => void;
 }
 
 const initUser: UserInputType = {
@@ -48,8 +49,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
     setIsSubmitting(true);
 
     try {
-      await createUser(user);
-      onClose(true);
+      onClose(await createUser(user));
 
       toast.success(t("success.user_created"));
     } catch (error: any) {

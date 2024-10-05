@@ -21,7 +21,7 @@ import toast from "react-hot-toast";
 
 interface Props {
   courseId?: string;
-  onClose: (mutated?: boolean) => void;
+  onClose: (maybeLesson?: ResultOf<typeof createLesson>) => void;
   maybeLesson?: TablesInsert<"lessons">;
 }
 
@@ -95,10 +95,8 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
       if (count) throw new Error(t("error.lesson_overlaps"));
 
-      await createLesson(lesson);
-
       toast(t("success.lesson_created"));
-      onClose(true);
+      onClose(await createLesson(lesson));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

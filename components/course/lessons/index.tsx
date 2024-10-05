@@ -26,6 +26,7 @@ import NoData from "@/components/no-data";
 import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { LESSONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
+import type { createLesson } from "@/db/client/lesson";
 import {
   deleteAllLessonsFromCourse,
   deleteLesson,
@@ -162,6 +163,8 @@ const Lessons: FunctionComponent<Props> = ({
 
       setIsDeleteLessonModal(false);
 
+      revalidatePageAction();
+
       lessonsOffsetRef.current -= 1;
 
       toast.success(t("success.lesson_deleted"));
@@ -184,6 +187,8 @@ const Lessons: FunctionComponent<Props> = ({
       setLessonsIds([]);
       setIsDelLessonsModal(false);
 
+      revalidatePageAction();
+
       lessonsOffsetRef.current -= lessonsIds.length;
 
       toast.success(t("success.lessons_deleted"));
@@ -201,10 +206,15 @@ const Lessons: FunctionComponent<Props> = ({
       setIsSelectedAll(lessonsCount === lessonsIds.length - 1);
     }
   };
-  const onLessonCreated = () => {
+  const onCreateLessonModalClose = (
+    maybeLesson?: ResultOf<typeof createLesson>
+  ) => {
     setIsCreateLessonModal(false);
-    revalidatePageAction();
-    fetchLessonsBySearch(searchText);
+
+    if (maybeLesson) {
+      revalidatePageAction();
+      fetchLessonsBySearch(searchText);
+    }
   };
 
   const throttledSearch = useCallback(
@@ -359,7 +369,7 @@ const Lessons: FunctionComponent<Props> = ({
               disabled={user.role !== "Teacher"}
               onClick={() => setIsCreateLessonModal(true)}
             >
-              Create user
+              Create lesson
             </button>
           }
         />
@@ -378,7 +388,10 @@ const Lessons: FunctionComponent<Props> = ({
       )}
 
       {isCreateLessonModal && (
-        <CreateLessonModal onClose={onLessonCreated} courseId={courseId} />
+        <CreateLessonModal
+          onClose={onCreateLessonModalClose}
+          courseId={courseId}
+        />
       )}
 
       {isDeleteLessonModal && (

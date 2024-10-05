@@ -7,11 +7,10 @@ import BasePopper from "@/components/common/poppers/base-popper";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
-import NoDataIcon from "@/components/icons/no-data-icon";
-import NotFoundIcon from "@/components/icons/not-found-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Input from "@/components/input";
+import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import Table from "@/components/table";
 import { SUBMISSIONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
@@ -332,23 +331,8 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
           )}
         />
       )}
-      {isNoData && (
-        <div className="flex justify-center mt-12">
-          <div className="flex flex-col items-center">
-            <NoDataIcon size="xl" />
-            <p className="mt-4 font-bold">View your work in a list</p>
-          </div>
-        </div>
-      )}
-      {isNotFound && (
-        <div className="flex justify-center mt-12">
-          <div className="flex flex-col items-center">
-            <NotFoundIcon size="xl" />
-            <p className="mt-4 font-bold">
-              It looks like we can&apos;t find any results for that match
-            </p>
-          </div>
-        </div>
+      {(isNoData || isNotFound) && (
+        <NotFound variant="secondary" action={null} />
       )}
 
       {isDelSubmissionModal && (

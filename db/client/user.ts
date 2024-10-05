@@ -138,9 +138,11 @@ export const getUsersNotInCourseCount = async (
 export const createUser = async (userDetails: CreateUserInputType) => {
   const t = await loadMessages();
 
-  const result = await createUserAction(userDetails);
+  const { data, error } = await createUserAction(userDetails);
 
-  if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
+  if (error) throw new Error(t(serverErrToIntlKey(error)));
+
+  return { data };
 };
 
 // UPDATE

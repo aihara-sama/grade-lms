@@ -96,9 +96,11 @@ export const getOverlappingLessons = async (
 export const createLesson = async (lesson: TablesInsert<"lessons">) => {
   const t = await loadMessages();
 
-  const result = await DB.from("lessons").insert(lesson);
+  const { data, error } = await DB.from("lessons").insert(lesson);
 
-  if (result.error) throw new Error(t("error.failed_to_create_lesson"));
+  if (error) throw new Error(t("error.failed_to_create_lesson"));
+
+  return { data };
 };
 
 // UPDATE

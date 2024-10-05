@@ -24,6 +24,7 @@ import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import metadata from "@/data/metadata.json";
+import type { createAssignment } from "@/db/client/assignment";
 import {
   deleteAllAssignmentsFromLesson,
   deleteAssignment,
@@ -169,6 +170,8 @@ const Assignments: FunctionComponent<Props> = ({
 
       setIsDelAssignmentModal(false);
 
+      revalidatePageAction();
+
       toast.success(t("success.assignment_deleted"));
     } catch (error: any) {
       toast.error(error.message);
@@ -191,6 +194,8 @@ const Assignments: FunctionComponent<Props> = ({
       setAssignmentsIds([]);
       setIsDelAssignmentsModal(false);
 
+      revalidatePageAction();
+
       toast.success(t("success.assignments_deleted"));
     } catch (error: any) {
       toast.error(error.message);
@@ -207,10 +212,15 @@ const Assignments: FunctionComponent<Props> = ({
     }
   };
 
-  const onAssignmentCreated = () => {
+  const onCreateAssignmentModalClose = (
+    maybeAssignment?: ResultOf<typeof createAssignment>
+  ) => {
     setIsCreateAssignmentModal(false);
-    revalidatePageAction();
-    fetchAssignmentsBySearch(searchText);
+
+    if (maybeAssignment) {
+      revalidatePageAction();
+      fetchAssignmentsBySearch(searchText);
+    }
   };
 
   const onAssignmentClick = (_assignmentId: string) => {
@@ -402,7 +412,7 @@ const Assignments: FunctionComponent<Props> = ({
       {isCreateAssignmentModal && (
         <CreateAssignmentModal
           lessonId={lesson.id}
-          onClose={onAssignmentCreated}
+          onClose={onCreateAssignmentModalClose}
         />
       )}
       {isEditAssignmentModal && (

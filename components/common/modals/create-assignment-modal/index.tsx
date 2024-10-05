@@ -5,6 +5,7 @@ import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
 import { createAssignment } from "@/db/client/assignment";
 import type { TablesInsert } from "@/types/supabase.type";
+import type { ResultOf } from "@/types/utils.type";
 import { getNextMorning } from "@/utils/date/get-next-morning";
 import type { OutputData } from "@editorjs/editorjs";
 import clsx from "clsx";
@@ -20,7 +21,7 @@ const Editor = dynamic(() => import("@/components/editor"), {
 });
 
 interface Props {
-  onClose: (mutated?: boolean) => void;
+  onClose: (maybeAssignment?: ResultOf<typeof createAssignment>) => void;
   lessonId: string;
 }
 
@@ -44,10 +45,9 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
   const submitCreateAssignment = async () => {
     setIsSubmitting(true);
     try {
-      await createAssignment(assignment);
+      onClose(await createAssignment(assignment));
 
       toast.success(t("success.assignment_created"));
-      onClose(true);
     } catch (error: any) {
       toast.error(error.message);
     } finally {

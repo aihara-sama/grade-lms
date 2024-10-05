@@ -164,6 +164,8 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
 
       setIsExpelMemberModal(false);
 
+      revalidatePageAction();
+
       membersOffsetRef.current -= 1;
 
       toast.success(t("success.member_expelled"));
@@ -186,6 +188,8 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       setMembersIds([]);
       setIsExpelMembersModal(false);
 
+      revalidatePageAction();
+
       membersOffsetRef.current -= membersIds.length;
 
       toast.success(t("success.members_expelled"));
@@ -204,10 +208,13 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
     }
   };
 
-  const onUsersEnrolled = () => {
+  const onUsersEnrolled = (usersIds: string[]) => {
     setIsEnrollUsersModal(false);
-    revalidatePageAction();
-    fetchMembersBySearch(searchText);
+
+    if (usersIds.length) {
+      revalidatePageAction();
+      fetchMembersBySearch(searchText);
+    }
   };
 
   const throttledSearch = useCallback(

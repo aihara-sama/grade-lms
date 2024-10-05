@@ -29,6 +29,7 @@ import NoData from "@/components/no-data";
 import NotFound from "@/components/not-found";
 import Skeleton from "@/components/skeleton";
 import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
+import type { createUser } from "@/db/client/user";
 import {
   deleteAllUsers,
   deleteUser,
@@ -158,6 +159,8 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
 
       setIsDeleteUserModal(false);
 
+      revalidatePageAction();
+
       toast.success(t("success.user_deleted"));
     } catch (error: any) {
       toast.error(error.message);
@@ -178,6 +181,8 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       setUsersIds([]);
       setIsDeleteUsersModal(false);
 
+      revalidatePageAction();
+
       toast.success(t("success.users_deleted"));
     } catch (error: any) {
       toast.error(error.message);
@@ -194,10 +199,13 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     }
   };
 
-  const onUserCreated = () => {
+  const onCreateUserModalClose = (maybeUser: ResultOf<typeof createUser>) => {
     setIsCreateUserModal(false);
-    revalidatePageAction();
-    fetchUsersBySearch(searchText);
+
+    if (maybeUser) {
+      revalidatePageAction();
+      fetchUsersBySearch(searchText);
+    }
   };
 
   const onEnrollUserInCoursesModalClose = (mutated?: boolean) => {
@@ -409,7 +417,9 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
         />
       )}
 
-      {isCreateUserModal && <CreateUserModal onClose={onUserCreated} />}
+      {isCreateUserModal && (
+        <CreateUserModal onClose={onCreateUserModalClose} />
+      )}
 
       {isEnrollUserInCoursesModal && (
         <EnrollUsersInCoursesModal

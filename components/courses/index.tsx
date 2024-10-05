@@ -158,6 +158,8 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
 
       setIsDeleteCourseModal(false);
 
+      revalidatePageAction();
+
       coursesOffsetRef.current -= 1;
 
       toast.success("Success");
@@ -179,6 +181,8 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
 
       setCoursesIds([]);
       setIsDeleteCoursesModal(false);
+
+      revalidatePageAction();
 
       coursesOffsetRef.current -= coursesIds.length;
 
