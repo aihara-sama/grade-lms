@@ -1,6 +1,6 @@
 "use client";
 
-import EditLessonModal from "@/components/common/modals/edit-lesson-modal";
+import UpdateLessonModal from "@/components/common/modals/update-lesson-modal";
 import ArrowLeftIcon from "@/components/icons/arrow-left-icon";
 import ArrowRightIcon from "@/components/icons/arrow-right-icon";
 import DraggingEvent from "@/components/schedule/event/dragging-event";
@@ -26,11 +26,7 @@ import Select from "@/components/common/select";
 import Container from "@/components/container";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
-import type {
-  createLesson,
-  deleteLesson,
-  updateLesson,
-} from "@/db/client/lesson";
+import type { createLesson, updateLesson } from "@/db/client/lesson";
 import { getWeekLessons, upsertLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
@@ -49,7 +45,9 @@ import type { FunctionComponent } from "react";
 const Schedule: FunctionComponent = () => {
   // State
   const [days, setDays] = useState<string[]>(getWeekDays());
-  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [lessons, setLessons] = useState<
+    ResultOf<typeof getWeekLessons>["data"]
+  >([]);
   const [hoveredDate, setHoveredDate] = useState<Date>();
   const [courses, setCourses] = useState<SelectItem[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
@@ -236,18 +234,32 @@ const Schedule: FunctionComponent = () => {
     setInitPointerPosition(undefined);
   };
 
-  const onLessonModalClose = useCallback(
-    (
-      maybeLesson?: ResultOf<
-        typeof createLesson | typeof updateLesson | typeof deleteLesson
-      >
-    ) => {
+  const onCreateLessonModalClose = useCallback(
+    (maybeLesson?: ResultOf<typeof createLesson>) => {
       setSelectedLesson(undefined);
 
       if (maybeLesson) {
         revalidatePageAction();
 
-        fetchWeekLessons();
+        setLessons((prev) => [maybeLesson, ...prev]);
+      }
+    },
+    []
+  );
+  const onUpdateLessonModalClose = useCallback(
+    (maybeLesson?: ResultOf<typeof updateLesson>) => {
+      setSelectedLesson(undefined);
+
+      if (maybeLesson) {
+        revalidatePageAction();
+
+        setLessons((prev) => {
+          return prev.map((lesson) => {
+            if (maybeLesson.id === lesson.id) return maybeLesson;
+
+            return lesson;
+          });
+        });
       }
     },
     []
@@ -423,14 +435,14 @@ const Schedule: FunctionComponent = () => {
           </div>
         </div>
         {!!selectedLesson && selectedLesson.id && (
-          <EditLessonModal
-            onClose={onLessonModalClose}
+          <UpdateLessonModal
+            onClose={onUpdateLessonModalClose}
             lessonId={selectedLesson.id}
           />
         )}
         {!!selectedLesson && !selectedLesson.id && (
           <CreateLessonModal
-            onClose={onLessonModalClose}
+            onClose={onCreateLessonModalClose}
             courseId={selectedCourse?.id}
             maybeLesson={selectedLesson}
           />

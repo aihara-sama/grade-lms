@@ -96,11 +96,14 @@ export const getOverlappingLessons = async (
 export const createLesson = async (lesson: TablesInsert<"lessons">) => {
   const t = await loadMessages();
 
-  const { data, error } = await DB.from("lessons").insert(lesson);
+  const { data, error } = await DB.from("lessons")
+    .insert(lesson)
+    .select("*")
+    .single();
 
   if (error) throw new Error(t("error.failed_to_create_lesson"));
 
-  return { data };
+  return data;
 };
 
 // UPDATE
@@ -122,11 +125,15 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
 export const updateLesson = async (lesson: TablesUpdate<"lessons">) => {
   const t = await loadMessages();
 
-  const result = await DB.from("lessons").update(lesson).eq("id", lesson.id);
+  const { data, error } = await DB.from("lessons")
+    .update(lesson)
+    .eq("id", lesson.id)
+    .select("*")
+    .single();
 
-  if (result.error) throw new Error(t("error.failed_to_update_lesson"));
+  if (error) throw new Error(t("error.failed_to_update_lesson"));
 
-  return result.data;
+  return data;
 };
 export const upsertLesson = async (lesson: Lesson) => {
   const t = await loadMessages();
@@ -140,7 +147,11 @@ export const upsertLesson = async (lesson: Lesson) => {
 export const deleteLesson = async (id: string) => {
   const t = await loadMessages();
 
-  const { data, error } = await DB.from("lessons").delete().eq("id", id);
+  const { data, error } = await DB.from("lessons")
+    .delete()
+    .eq("id", id)
+    .select("*")
+    .single();
 
   if (error) throw new Error(t("error.failed_to_delete_lesson"));
 

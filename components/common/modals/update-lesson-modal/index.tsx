@@ -12,12 +12,12 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
-import type { deleteLesson } from "@/db/client/lesson";
 import { deleteLessons, getLesson, updateLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
@@ -32,14 +32,12 @@ import clsx from "clsx";
 import { useTranslations } from "next-intl";
 
 interface Props {
-  onClose: (
-    maybeLesson?: ResultOf<typeof updateLesson | typeof deleteLesson>
-  ) => void;
+  onClose: (maybeLesson?: ResultOf<typeof updateLesson>) => void;
   lessonId: string;
 }
 
-const EditLessonModal: FunctionComponent<Props> = memo(
-  function EditLessonModal({ onClose, lessonId }) {
+const UpdateLessonModal: FunctionComponent<Props> = memo(
+  function UpdateLessonModal({ onClose, lessonId }) {
     // State
     const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
     const [courses, setCourses] = useState<Course[]>([]);
@@ -110,9 +108,12 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     };
     const submitDeleteLesson = async () => {
       try {
-        setIsDeleteLessonModalOpen(false);
+        await deleteLessons([lesson.id]);
 
-        onClose(await deleteLessons([lesson.id]));
+        setIsDeleteLessonModalOpen(false);
+        onClose();
+
+        revalidatePageAction();
 
         toast.success("Lesson deleted");
       } catch (error: any) {
@@ -288,4 +289,4 @@ const EditLessonModal: FunctionComponent<Props> = memo(
   }
 );
 
-export default EditLessonModal;
+export default UpdateLessonModal;

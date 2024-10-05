@@ -21,7 +21,7 @@ const Table: FunctionComponent<PropsWithClassName<Props>> = memo(
     if (!data.length) return null;
 
     return (
-      <div className={`flex-1 flex flex-col ${className}`}>
+      <div className={`flex-1 flex flex-col overflow-auto ${className}`}>
         <div
           className={`flex-1 flex flex-col ${clsx(!compact && "min-w-[352px]")}`}
         >
