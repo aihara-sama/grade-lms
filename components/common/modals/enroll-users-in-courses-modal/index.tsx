@@ -220,9 +220,10 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
         />
       )}
 
-      {isLoading && <Skeleton className="h-[22px]" />}
+      {isLoading && <Skeleton className="h-[222px]" />}
       {isData && (
         <Table
+          className="mb-2"
           compact
           onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreCourses))}
           data={courses.map(({ id, title }) => ({

@@ -198,10 +198,11 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           placeholder="Search..."
         />
       )}
-      {isLoading && <Skeleton className="h-[22px]" />}
+      {isLoading && <Skeleton className="h-[222px]" />}
 
       {isData && (
         <Table
+          className="mb-2"
           onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreUsers))}
           compact
           data={users.map(({ id, avatar, name, role }) => ({
