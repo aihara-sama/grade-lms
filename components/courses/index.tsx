@@ -275,7 +275,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
       ref={containerRef}
       onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreCourses))}
     >
-      <div>
+      <div className="flex flex-col flex-1">
         <p className="text-3xl font-bold text-neutral-600">{t("courses")}</p>
         <p className="text-neutral-500">View and manage courses</p>
         <hr className="my-2 mb-4" />
@@ -300,7 +300,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
             )}
           </div>
         </div>
-        <div className="pb-8 flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col">
           <div>
             {coursesIds.length ? (
               <div className="mb-3 flex gap-3">

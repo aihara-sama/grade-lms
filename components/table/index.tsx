@@ -23,12 +23,16 @@ const Table: FunctionComponent<Props> = memo(function Table({
   if (!data.length) return null;
 
   return (
-    <div className={`${clsx("overflow-x-auto")}`}>
-      <div className={`${clsx("min-w-[352px]")}`}>
+    <div
+      className={`${clsx(compact && "overflow-x-auto")} flex-1 flex flex-col`}
+    >
+      <div
+        className={`flex-1 flex flex-col ${clsx("min-w-[352px]")} ${clsx(compact && "overflow-x-hidden")}`}
+      >
         <div
-          className={`relative ${clsx(!compact && "min-h-[500px]")} rounded-md border-2 border-neutral-100 flex-1`}
+          className={`relative ${clsx(!compact && "")} overflow-x-hidden rounded-md border-2 border-neutral-100 flex-1 flex flex-col`}
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1">
             <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
               {keys.map((key) => (
                 <div

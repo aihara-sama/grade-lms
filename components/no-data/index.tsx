@@ -8,7 +8,7 @@ interface Props {
 
 const NoData: FunctionComponent<Props> = ({ action, body }) => {
   return (
-    <div className="flex justify-center min-h-[500px]">
+    <div className="flex justify-center mt-12">
       <div className="flex flex-col items-center">
         <NoDataIcon />
         <p className="mt-4 font-bold mb-2 text-xl">View your work in a list</p>

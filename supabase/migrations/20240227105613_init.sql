@@ -738,6 +738,8 @@ USING (
 );
 
 -- Submissions' policies
+ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+
 -- Create a policy to allow insert if the user is assigned to the course the lesson is assigned to and is a Student
 CREATE POLICY "Can insert if assigned to course and Student"
 ON submissions
