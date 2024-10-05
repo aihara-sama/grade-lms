@@ -5,12 +5,15 @@ import AssignmentsIcon from "@/components/icons/assignments-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import { useEffect, useState } from "react";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
 import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
+import type { createAssignment } from "@/db/client/assignment";
 import { deleteAssignment } from "@/db/client/assignment";
 import { DB } from "@/lib/supabase/db";
 import type { Assignment } from "@/types/assignment.type";
+import type { ResultOf } from "@/types/utils.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -64,10 +67,13 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
     }
   };
 
-  const onCreateAssignmentModalClose = (mutated?: boolean) => {
+  const onCreateAssignmentModalClose = (
+    maybeAssignment?: ResultOf<typeof createAssignment>
+  ) => {
     setIsCreateAssignmentModalOpen(false);
 
-    if (mutated) {
+    if (maybeAssignment) {
+      revalidatePageAction();
       fetchAssignments();
     }
   };

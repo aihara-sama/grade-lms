@@ -17,12 +17,14 @@ import Select from "@/components/common/select";
 import Skeleton from "@/components/skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
+import type { deleteLesson } from "@/db/client/lesson";
 import { deleteLessons, getLesson, updateLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/select.interface";
 import type { Course } from "@/types/course.type";
 import type { Lesson } from "@/types/lesson.type";
+import type { ResultOf } from "@/types/utils.type";
 import { getLessonDuration } from "@/utils/lesson/get-lesson-duration";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
@@ -30,7 +32,9 @@ import clsx from "clsx";
 import { useTranslations } from "next-intl";
 
 interface Props {
-  onClose: (mutated?: boolean) => void;
+  onClose: (
+    maybeLesson?: ResultOf<typeof updateLesson | typeof deleteLesson>
+  ) => void;
   lessonId: string;
 }
 
@@ -95,10 +99,9 @@ const EditLessonModal: FunctionComponent<Props> = memo(
       e.preventDefault();
       setIsSubmittingUpdateLesson(true);
       try {
-        await updateLesson(lesson);
+        onClose(await updateLesson(lesson));
 
         toast(t("success.lesson_updated"));
-        onClose(true);
       } catch (error: any) {
         toast.error(error.message);
       } finally {
@@ -107,11 +110,11 @@ const EditLessonModal: FunctionComponent<Props> = memo(
     };
     const submitDeleteLesson = async () => {
       try {
-        await deleteLessons([lesson.id]);
+        setIsDeleteLessonModalOpen(false);
+
+        onClose(await deleteLessons([lesson.id]));
 
         toast.success("Lesson deleted");
-        setIsDeleteLessonModalOpen(false);
-        onClose(true);
       } catch (error: any) {
         toast.error(error.message);
       }

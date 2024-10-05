@@ -140,11 +140,11 @@ export const upsertLesson = async (lesson: Lesson) => {
 export const deleteLesson = async (id: string) => {
   const t = await loadMessages();
 
-  const result = await DB.from("lessons").delete().eq("id", id);
+  const { data, error } = await DB.from("lessons").delete().eq("id", id);
 
-  if (result.error) throw new Error(t("error.failed_to_delete_lesson"));
+  if (error) throw new Error(t("error.failed_to_delete_lesson"));
 
-  return result;
+  return { data };
 };
 export const deleteLessons = async (ids: string[]) => {
   const t = await loadMessages();

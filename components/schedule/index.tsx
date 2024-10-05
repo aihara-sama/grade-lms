@@ -20,16 +20,23 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import CreateLessonModal from "@/components/common/modals/create-lesson-modal";
 import Select from "@/components/common/select";
 import Container from "@/components/container";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
+import type {
+  createLesson,
+  deleteLesson,
+  updateLesson,
+} from "@/db/client/lesson";
 import { getWeekLessons, upsertLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/select.interface";
 import type { Lesson } from "@/types/lesson.type";
+import type { ResultOf } from "@/types/utils.type";
 import { getEventElFromPoints } from "@/utils/DOM/get-event-el-from-points";
 import { getEventPlaceholderElFromPoints } from "@/utils/DOM/get-event-placeholder-el-from-points";
 import { getEventWidth } from "@/utils/DOM/get-event-width";
@@ -229,13 +236,22 @@ const Schedule: FunctionComponent = () => {
     setInitPointerPosition(undefined);
   };
 
-  const onLessonModalClose = useCallback((mutated?: boolean) => {
-    setSelectedLesson(undefined);
+  const onLessonModalClose = useCallback(
+    (
+      maybeLesson?: ResultOf<
+        typeof createLesson | typeof updateLesson | typeof deleteLesson
+      >
+    ) => {
+      setSelectedLesson(undefined);
 
-    if (mutated) {
-      fetchWeekLessons();
-    }
-  }, []);
+      if (maybeLesson) {
+        revalidatePageAction();
+
+        fetchWeekLessons();
+      }
+    },
+    []
+  );
 
   const onCoursesScrollEnd = async (search: string) => {
     const { data } = await getCourses(

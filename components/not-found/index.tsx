@@ -16,6 +16,7 @@ const NotFound: FunctionComponent<Props> = ({
       className={`flex justify-center mb-4 ${clsx({
         "mt-12": variant === "primary",
         "mt-4": variant === "secondary",
+        "min-h-[500px]": variant === "primary",
       })}`}
     >
       <div className="flex flex-col items-center">
