@@ -85,8 +85,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
   const isNoData =
     !isLoading && !isSearching && !membersCount && !searchText.length;
 
-  const isNotFound =
-    !isLoading && !isSearching && !members.length && !!searchText.length;
+  const isNotFound = !isLoading && !members.length && !!searchText.length;
 
   // Handlers
   const selectAllMembers = () => {

@@ -75,8 +75,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
   const isNoData =
     !isLoading && !isSearching && !submissionsCount && !searchText.length;
 
-  const isNotFound =
-    !isLoading && !isSearching && !submissions.length && !!searchText.length;
+  const isNotFound = !isLoading && !submissions.length && !!searchText.length;
 
   // Handlers
   const selectAllMembers = () => {

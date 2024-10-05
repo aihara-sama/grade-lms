@@ -89,8 +89,7 @@ const Lessons: FunctionComponent<Props> = ({
   const isNoData =
     !isLoading && !isSearching && !lessonsCount && !searchText.length;
 
-  const isNotFound =
-    !isLoading && !isSearching && !lessons.length && !!searchText.length;
+  const isNotFound = !isLoading && !lessons.length && !!searchText.length;
 
   // Handlers
   const selectAllLessons = () => {

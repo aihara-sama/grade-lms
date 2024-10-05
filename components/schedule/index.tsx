@@ -29,6 +29,7 @@ import { getCourses } from "@/db/client/course";
 import type { createLesson, updateLesson } from "@/db/client/lesson";
 import { getWeekLessons, upsertLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
+import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { SelectItem } from "@/interfaces/select.interface";
 import type { Lesson } from "@/types/lesson.type";
@@ -42,15 +43,25 @@ import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
-const Schedule: FunctionComponent = () => {
+interface Props {
+  courses: ResultOf<typeof getCourses>;
+  weekLessons: ResultOf<typeof getWeekLessons>;
+}
+
+const Schedule: FunctionComponent<Props> = ({
+  courses: initCourses,
+  weekLessons: initWeekLessons,
+}) => {
   // State
   const [days, setDays] = useState<string[]>(getWeekDays());
-  const [lessons, setLessons] = useState<
-    ResultOf<typeof getWeekLessons>["data"]
-  >([]);
-  const [hoveredDate, setHoveredDate] = useState<Date>();
-  const [courses, setCourses] = useState<SelectItem[]>([]);
+
+  const [courses, setCourses] = useState(initCourses.data);
   const [selectedCourse, setSelectedCourse] = useState<SelectItem>();
+
+  const [lessons, setLessons] = useState(initWeekLessons.data);
+
+  const [hoveredDate, setHoveredDate] = useState<Date>();
+
   const [value, setValue] = useState(0);
 
   // Refs
@@ -59,7 +70,7 @@ const Schedule: FunctionComponent = () => {
   const intervalIDRef = useRef<NodeJS.Timeout>();
   const draggingEventRef = useRef<HTMLDivElement>();
   const hoursLabelsDaysWrapperRef = useRef<HTMLDivElement>();
-  const coursesOffsetRef = useRef(0);
+  const coursesOffsetRef = useRef(initCourses.data.length);
 
   // Hooks
   const t = useTranslations();
@@ -80,7 +91,6 @@ const Schedule: FunctionComponent = () => {
   } = useSchedule();
 
   // Handlers
-
   const getMaybeDraggingEvent = (day: string, hour: number) => {
     //  return the dragging event if user hovered over the hour's quarter
     return new Array(4)
@@ -105,16 +115,6 @@ const Schedule: FunctionComponent = () => {
   const fetchWeekLessons = async () => {
     try {
       setLessons((await getWeekLessons(days, selectedCourse?.id)).data);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-  const fetchCourses = async () => {
-    try {
-      const { data } = await getCourses();
-
-      setCourses(data);
-      coursesOffsetRef.current = data.length;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -291,10 +291,7 @@ const Schedule: FunctionComponent = () => {
   useEffect(() => {
     isDraggingEventRef.current = !!draggingEvent;
   }, [draggingEvent]);
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-  useEffect(() => {
+  useUpdateEffect(() => {
     fetchWeekLessons();
   }, [selectedCourse, days]);
   useEffect(() => {

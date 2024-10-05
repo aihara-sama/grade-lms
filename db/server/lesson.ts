@@ -34,3 +34,22 @@ export const getCourseLessons = async (courseId: string) => {
 
   return { data, count };
 };
+
+export const getWeekLessons = async (days: string[], courseId?: string) => {
+  const builder = getServerDB()
+    .from("lessons")
+    .select("*", { count: "exact" })
+    .filter("course_id", "not.is", null)
+    .gte("starts", format(days[0], "yyyy-MM-dd'T'HH:mm:ss"))
+    .lte(
+      "starts",
+      format(`${days[days.length - 1]} 23:45:00`, "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .order("starts", { ascending: true });
+
+  const { data, count } = await (courseId
+    ? builder.eq("course_id", courseId)
+    : builder);
+
+  return { data, count };
+};

@@ -83,8 +83,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
   const isNoData =
     !isLoading && !isSearching && !coursesCount && !searchText.length;
 
-  const isNotFound =
-    !isLoading && !isSearching && !courses.length && !!searchText.length;
+  const isNotFound = !isLoading && !courses.length && !!searchText.length;
 
   // Handdlers
   const selectAllCourses = () => {

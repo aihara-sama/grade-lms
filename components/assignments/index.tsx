@@ -90,8 +90,7 @@ const Assignments: FunctionComponent<Props> = ({
   const isNoData =
     !isLoading && !isSearching && !assignmentsCount && !searchText.length;
 
-  const isNotFound =
-    !isLoading && !isSearching && !assignments.length && !!searchText.length;
+  const isNotFound = !isLoading && !assignments.length && !!searchText.length;
 
   // Handlers
   const selectAllAssignments = () => {

@@ -89,8 +89,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
   const isNoData =
     !isLoading && !isSearching && !usersCount && !searchText.length;
 
-  const isNotFound =
-    !isLoading && !isSearching && !users.length && !!searchText.length;
+  const isNotFound = !isLoading && !users.length && !!searchText.length;
 
   // Handlers
   const selectAllUsers = () => {
