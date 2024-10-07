@@ -4,7 +4,6 @@ import Input from "@/components/input";
 import LoadingSpinner from "@/components/loading-spinner";
 import { extendLesson, getOverlappingLessons } from "@/db/client/lesson";
 import { useLesson } from "@/hooks/use-lesson";
-import type { Lesson } from "@/types/lesson.type";
 import clsx from "clsx";
 import { minutesToMilliseconds } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -13,14 +12,16 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 interface Props {
-  onClose: (mutated?: boolean) => void;
-  lesson: Lesson;
+  onClose: () => void;
 }
 
-const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
+const ExtendLessonModal: FunctionComponent<Props> = ({ onClose }) => {
   // State
   const [extendLessonByMin, setExtendLessonByMin] = useState(15);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Hooks
+  const lesson = useLesson((state) => state.lesson);
 
   const t = useTranslations();
   const setLesson = useLesson((state) => state.setLesson);
@@ -32,22 +33,27 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ lesson, onClose }) => {
     try {
       // Dont check for quick lessons
       if (lesson.course_id) {
+        const ends = new Date(
+          +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin)
+        ).toISOString();
+
         const { count } = await getOverlappingLessons(
           lesson.starts,
-          new Date(
-            +new Date(lesson.ends) + minutesToMilliseconds(extendLessonByMin)
-          ).toISOString(),
+          ends,
           lesson.id
         );
 
         if (count) throw new Error(t("error.lesson_overlaps"));
       }
 
-      setLesson(
-        await extendLesson(lesson, minutesToMilliseconds(extendLessonByMin))
+      const data = await extendLesson(
+        lesson,
+        minutesToMilliseconds(extendLessonByMin)
       );
 
-      onClose(true);
+      setLesson({ ...lesson, ends: data.ends });
+
+      onClose();
       toast.success(t("success.lesson_extended"));
     } catch (error: any) {
       toast.error(error.message);

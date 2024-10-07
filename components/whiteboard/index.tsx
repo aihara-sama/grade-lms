@@ -2,7 +2,6 @@
 
 import ResizeHandler from "@/components/resize-handler";
 import { Role } from "@/enums/role.enum";
-import { useIsLessonHrExpanded } from "@/hooks/useIsLessonHrExpanded";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 // import toast from "react-hot-toast";
@@ -12,11 +11,10 @@ import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import LessonStatus from "@/components/lesson-status";
 import ExtendLessonTemplate from "@/components/toast-templates/extend-lesson-template";
 import { Event } from "@/enums/event.enum";
+import { useLesson } from "@/hooks/use-lesson";
 import { useLessonChannel } from "@/hooks/use-lesson-channel";
 import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
-import type { Lesson } from "@/types/lesson.type";
-import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import type {
@@ -37,25 +35,16 @@ const Excalidraw = dynamic(
   }
 );
 
-interface Props {
-  lesson: Lesson;
-  isLessonEnding: boolean;
-  onLessonExtended: () => void;
-}
-
-const Whiteboard: FunctionComponent<Props> = ({
-  lesson,
-  isLessonEnding,
-  onLessonExtended,
-}) => {
+const Whiteboard: FunctionComponent = () => {
   // Hooks
-  const t = useTranslations();
-  const channel = useLessonChannel();
   const user = useUser((state) => state.user);
-  const { setIsExpanded } = useIsLessonHrExpanded();
+  const channel = useLessonChannel();
+  const { lesson, isEnding, isOngoing } = useLesson((state) => state);
+
+  const t = useTranslations();
 
   // State
-  const [isExtendLessonModalOpen, setIsExtendLessonModalOpen] = useState(false);
+  const [isExtendLessonModal, setIsExtendLessonModal] = useState(false);
   const [whiteboardHeight, setWhiteboardHeight] = useState(500);
   const [whiteboardInitialHeight] = useState(
     window.innerHeight - (lesson.course_id ? 205 : 185)
@@ -70,11 +59,35 @@ const Whiteboard: FunctionComponent<Props> = ({
     useRef<Parameters<ExcalidrawProps["onPointerUpdate"]>[0]>();
 
   // Handlers
-  const invite = async () => {
+  const copyInviteLink = async () => {
     navigator.clipboard
       .writeText(window.location.href)
       .then(() => toast.success(t("success.invite_copied")))
       .catch(() => toast.error(t("error.something_went_wrong")));
+  };
+
+  const parseWhiteboardData = () => {
+    if (user.role === Role.Student) {
+      const data = JSON.parse(lesson.whiteboard_data);
+
+      if (!data.appState) data.appState = {};
+
+      data.appState.collaborators = new Map();
+      data.appState.activeTool = {
+        type: "hand",
+        locked: false,
+        lastActiveTool: {
+          type: "hand",
+          customType: null,
+        },
+        customType: null,
+      };
+      return data;
+    }
+    const data = JSON.parse(lesson.whiteboard_data);
+    if (data.appState) data.appState.collaborators = new Map();
+
+    return data;
   };
 
   const submitUpdateWhiteboardData = throttleFetch(async (data: string) => {
@@ -143,34 +156,6 @@ const Whiteboard: FunctionComponent<Props> = ({
       },
     });
   };
-  const parseWhiteboardData = () => {
-    if (user.role === Role.Student) {
-      const data = JSON.parse(lesson.whiteboard_data);
-
-      if (!data.appState) data.appState = {};
-
-      data.appState.collaborators = new Map();
-      data.appState.activeTool = {
-        type: "hand",
-        locked: false,
-        lastActiveTool: {
-          type: "hand",
-          customType: null,
-        },
-        customType: null,
-      };
-      return data;
-    }
-    const data = JSON.parse(lesson.whiteboard_data);
-    if (data.appState) data.appState.collaborators = new Map();
-
-    return data;
-  };
-  const onExtendLessonModalClose = (mutated?: boolean) => {
-    setIsExtendLessonModalOpen(false);
-
-    if (mutated) onLessonExtended();
-  };
 
   // Effects
   useEffect(() => {
@@ -183,17 +168,16 @@ const Whiteboard: FunctionComponent<Props> = ({
     }
   }, []);
   useEffect(() => setWhiteboardInitialData(parseWhiteboardData()), []);
-  useEffect(() => setIsExpanded(true), []);
 
   useEffect(() => {
-    if (isLessonEnding) {
+    if (isEnding) {
       toast(
         ({ id }) => (
           <ExtendLessonTemplate
             duration={5000}
             onExtendClick={() => {
               toast.dismiss(id);
-              setIsExtendLessonModalOpen(true);
+              setIsExtendLessonModal(true);
             }}
           />
         ),
@@ -202,7 +186,7 @@ const Whiteboard: FunctionComponent<Props> = ({
         }
       );
     }
-  }, [isLessonEnding]);
+  }, [isEnding]);
 
   useEffect(() => {
     if (user.role !== Role.Teacher) {
@@ -214,6 +198,8 @@ const Whiteboard: FunctionComponent<Props> = ({
       });
     }
   }, []);
+
+  // View
   return (
     <div className="flex-[4]" ref={rootRef}>
       <div className="border flex items-center px-3 py-2 justify-between gap-3">
@@ -227,16 +213,16 @@ const Whiteboard: FunctionComponent<Props> = ({
         </div>
         <div className="flex gap-3 items-center flex-shrink-0">
           <LessonStatus showTimeLeft />
-          {isLessonOngoing(lesson) && user.role === Role.Teacher && (
+          {isOngoing && user.role === Role.Teacher && (
             <button
               className="text-link"
-              onClick={() => setIsExtendLessonModalOpen(true)}
+              onClick={() => setIsExtendLessonModal(true)}
             >
               Extend?
             </button>
           )}
           {user.role === Role.Teacher && !lesson.course_id && (
-            <button className="icon-button" onClick={invite}>
+            <button className="icon-button" onClick={copyInviteLink}>
               <InviteIcon size="sm" />
             </button>
           )}
@@ -269,8 +255,8 @@ const Whiteboard: FunctionComponent<Props> = ({
           onResize={(height) => setWhiteboardHeight(height)}
         />
       </div>
-      {isExtendLessonModalOpen && (
-        <ExtendLessonModal lesson={lesson} onClose={onExtendLessonModalClose} />
+      {isExtendLessonModal && (
+        <ExtendLessonModal onClose={() => setIsExtendLessonModal(false)} />
       )}
     </div>
   );

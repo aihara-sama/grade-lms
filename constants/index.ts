@@ -19,6 +19,4 @@ export const THROTTLE_SEARCH_WAIT = 1000;
 export const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
 export const MAX_CHAT_FILE_SIZE = 10 * 1024 * 1024; // 2MB
 
-export const HEADER_HEIGHT = 68;
-
 export const DEFAULT_AVATAR = "default-avatar.jpg";

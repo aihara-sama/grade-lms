@@ -24,13 +24,10 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
 
   const [user, setUser] = useState(initUser);
   store.subscribe((state) => setUser(state.user));
-  console.log({ user });
 
   // Effects
   useEffect(() => {
     DB.auth.onAuthStateChange((event) => {
-      console.log({ event });
-
       if (event === "SIGNED_OUT") {
         store.setState({ user: undefined });
 

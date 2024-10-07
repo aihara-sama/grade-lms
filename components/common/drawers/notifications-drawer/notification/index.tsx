@@ -19,11 +19,10 @@ const Notification: FunctionComponent<Props> = ({
   onNavigateAway,
   onReadNotification,
 }) => {
-  console.log({ notification });
-
   // Hooks
   const t = useTranslations();
 
+  // Handlers
   const submitReadNotification = async () => {
     try {
       await readNotification(notification.id);

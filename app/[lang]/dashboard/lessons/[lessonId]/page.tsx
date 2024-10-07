@@ -1,7 +1,7 @@
 import ChatProvider from "@/components/chat-provider";
 import LessonProvider from "@/components/lesson-provider";
 import LiveLesson from "@/components/live-lesson";
-import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import { getLessonWithCourse } from "@/db/server/lesson";
 import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
@@ -12,20 +12,14 @@ interface Props {
   };
 }
 const Page: FunctionComponent<Props> = async ({ params: { lessonId } }) => {
-  const lessonResult = await getServerDB()
-    .from("lessons")
-    .select("*, course:courses(*)")
-    .eq("id", lessonId)
-    .single();
+  const lesson = await getLessonWithCourse(lessonId);
 
-  if (!lessonResult.data) {
-    return redirect("/dashboard");
-  }
+  if (!lesson) return redirect("/dashboard");
 
   return (
-    <LessonProvider lesson={lessonResult.data}>
+    <LessonProvider lesson={lesson}>
       <ChatProvider>
-        <LiveLesson lesson={lessonResult.data} />
+        <LiveLesson />
       </ChatProvider>
     </LessonProvider>
   );

@@ -12,6 +12,16 @@ export const getLesson = async (id: string) => {
   return result.data;
 };
 
+export const getLessonWithCourse = async (id: string) => {
+  const result = await getServerDB()
+    .from("lessons")
+    .select("*, course:courses(*)")
+    .eq("id", id)
+    .single();
+
+  return result.data;
+};
+
 export const getOngoingLesson = async (courseId: string) => {
   const result = await getServerDB()
     .from("lessons")

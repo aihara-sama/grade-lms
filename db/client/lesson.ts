@@ -15,6 +15,18 @@ export const getLesson = async (id: string) => {
 
   return result.data;
 };
+export const getLessonWithCourse = async (id: string) => {
+  const t = await loadMessages();
+
+  const result = await DB.from("lessons")
+    .select("*, course:courses(*)")
+    .eq("id", id)
+    .single();
+
+  if (result.error) throw new Error(t("error.failed_to_load_lesson"));
+
+  return result.data;
+};
 
 export const getWeekLessons = async (days: string[], courseId?: string) => {
   const t = await loadMessages();

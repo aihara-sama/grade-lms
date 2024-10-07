@@ -10,40 +10,57 @@ import Tabs from "@/components/tabs";
 import Whiteboard from "@/components/whiteboard";
 import { Role } from "@/enums/role.enum";
 import clsx from "clsx";
-import { useEffect, useRef, useState, type FunctionComponent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from "react";
 
 import Breadcrumbs from "@/components/breadcrumbs";
 import Camera from "@/components/camera";
 import Container from "@/components/container";
 import CoursesIcon from "@/components/icons/courses-icon";
 import TimeIcon from "@/components/icons/time-icon";
+import { getLesson } from "@/db/client/lesson";
 import { useChat } from "@/hooks/use-chat";
+import { useLesson } from "@/hooks/use-lesson";
 import { useVideoChat } from "@/hooks/use-video-chat";
-import { DB } from "@/lib/supabase/db";
-import type { Course } from "@/types/course.type";
-import type { Lesson } from "@/types/lesson.type";
 import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";
 import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
-import { useTranslations } from "next-intl";
+import { isLessonEnding } from "@/utils/lesson/is-lesson-ending";
 import toast from "react-hot-toast";
 
-interface Props {
-  lesson: Lesson & { course: Course };
-}
-
-const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
+const LiveLesson: FunctionComponent = () => {
   // Hooks
-  const t = useTranslations();
+  const { lesson, isEnded, setisEnding, setisEnded } = useLesson(
+    (state) => state
+  );
+
+  const { cameras, toggleAudio, toggleCamera, endSession, startSession } =
+    useVideoChat();
+  const { messages } = useChat();
+
+  const stopExecAtStartOfMin = useMemo(
+    () =>
+      execAtStartOfMin(async () => {
+        try {
+          const data = await getLesson(lesson.id);
+
+          setisEnding(isLessonEnding(data));
+          setisEnded(isLessonEnded(data));
+        } catch (error: any) {
+          console.error(error);
+        }
+      }),
+    []
+  );
 
   // State
   const [isAsideOpen, setIsAsideOpen] = useState(true);
-  const [isLessonEnding, setIsLessonEnding] = useState(false);
-  const [currentLesson, setCurrentLesson] = useState(lesson);
-  const { cameras, toggleAudio, toggleCamera, endSession, startSession } =
-    useVideoChat();
   const [isNewChatMessage, setIsNewChatMessage] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const { messages } = useChat();
 
   // Refs
   const activeTabRef = useRef(activeTab);
@@ -55,12 +72,12 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
       content: (
         <div
           className={`flex flex-col flex-1 ${clsx({
-            "max-h-[calc(100vh-196px)]": !currentLesson.course_id,
-            "max-h-[calc(100vh-216px)]": !!currentLesson.course_id,
+            "max-h-[calc(100vh-196px)]": !lesson.course_id,
+            "max-h-[calc(100vh-216px)]": !!lesson.course_id,
           })} overflow-auto`}
         >
           <div className="flex flex-col gap-3">
-            {isLessonEnded(lesson) ? (
+            {isEnded ? (
               <div className="mt-5 flex flex-col items-center gap-4 text-neutral-500">
                 <div> This session has ended</div>
                 <TimeIcon size="md" />
@@ -100,70 +117,30 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
       },
       {
         title: "Assignments",
-        content: <AssignmentsTab lessonId={currentLesson.id} />,
+        content: <AssignmentsTab lessonId={lesson.id} />,
         Icon: <AssignmentsIcon />,
         tier: [Role.Teacher],
       }
     );
   }
 
-  const fetchLesson = async () => {
-    try {
-      const { data, error } = await DB.from("lessons")
-        .select("*, course:courses(*)")
-        .eq("id", lesson.id)
-        .single();
-
-      if (error) throw new Error(t("error.something_went_wrong"));
-
-      setCurrentLesson(data);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
+  // Effects
   useEffect(() => {
-    if (!isLessonEnded(lesson)) startSession();
+    if (!isEnded) startSession();
   }, []);
+
   useEffect(() => {
-    if (isLessonEnded(lesson)) endSession();
-  }, [lesson]);
-  useEffect(() => {
-    if (!isLessonEnded(lesson)) {
-      const stop = execAtStartOfMin(async () => {
-        try {
-          const { data, error } = await DB.from("lessons")
-            .select("ends")
-            .eq("id", lesson.id)
-            .single();
+    if (isEnded) {
+      endSession();
+      stopExecAtStartOfMin();
 
-          if (error) throw new Error(error.message);
-
-          const timeRemains = +new Date(data.ends) - +new Date();
-
-          if (isLessonEnded(lesson)) {
-            endSession();
-            setCurrentLesson((_) => ({ ..._ }));
-            toast.success("The lesson has ended");
-
-            stop();
-          }
-
-          if (timeRemains <= 1000 * 60) {
-            setIsLessonEnding(true);
-          }
-        } catch (error: any) {
-          console.error(error);
-        }
-      });
-
-      return () => {
-        stop();
-      };
+      toast.success("The lesson has ended");
     }
 
-    return () => {};
-  }, []);
+    return () => {
+      stopExecAtStartOfMin();
+    };
+  }, [isEnded]);
 
   useEffect(() => {
     if (activeTab === 1) setIsNewChatMessage(false);
@@ -176,7 +153,7 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
 
   return (
     <Container fullWidth={true}>
-      {currentLesson.course && (
+      {lesson.course && (
         <Breadcrumbs
           Icon={<CoursesIcon />}
           items={[
@@ -185,30 +162,26 @@ const LiveLesson: FunctionComponent<Props> = ({ lesson }) => {
               href: `/dashboard/courses`,
             },
             {
-              title: currentLesson.course.title,
-              href: `/dashboard/courses/${currentLesson.course.id}/overview`,
+              title: lesson.course.title,
+              href: `/dashboard/courses/${lesson.course.id}/overview`,
             },
             {
               title: "Lessons",
-              href: `/dashboard/courses/${currentLesson.course.id}/lessons`,
+              href: `/dashboard/courses/${lesson.course.id}/lessons`,
             },
             {
-              title: currentLesson.title,
-              href: `/dashboard/courses/${currentLesson.course.id}/lessons/${currentLesson.id}/overview`,
+              title: lesson.title,
+              href: `/dashboard/courses/${lesson.course.id}/lessons/${lesson.id}/overview`,
             },
           ]}
         />
       )}
       <main className="flex gap-6 mt-4">
-        <Whiteboard
-          isLessonEnding={isLessonEnding}
-          onLessonExtended={fetchLesson}
-          lesson={currentLesson}
-        />
+        <Whiteboard />
         <div
           className={` ${clsx({
-            "h-[calc(100vh-132px)]": !currentLesson.course_id,
-            "h-[calc(100vh-152px)]": !!currentLesson.course_id,
+            "h-[calc(100vh-132px)]": !lesson.course_id,
+            "h-[calc(100vh-152px)]": !!lesson.course_id,
           })}  pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}
         >
           <button
