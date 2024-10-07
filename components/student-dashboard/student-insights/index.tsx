@@ -2,47 +2,18 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
-import { getAssignmentsInsights } from "@/db/client/assignment";
-import { getSubmissionsInsights } from "@/db/client/submission";
 import { getWeekNames } from "@/utils/date/get-week-names";
-import { parseInsights } from "@/utils/parse/parse-insights";
 import type { FunctionComponent } from "react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 
-const StudentInsights: FunctionComponent = () => {
-  // State
-  const [assignmentsInsights, setAssignmentsInsights] = useState<number[]>([]);
-  const [submissionsInsights, setSubmissionsInsights] = useState<number[]>([]);
+interface Props {
+  assignmentsInsights: number[];
+  submissionsInsights: number[];
+}
 
-  // Effects
-  useEffect(() => {
-    (async () => {
-      try {
-        const [
-          { data: newAssignmentsInsights },
-          { data: newSubmissionsInsights },
-        ] = await Promise.all([
-          getAssignmentsInsights(),
-          getSubmissionsInsights(),
-        ]);
-
-        if (newAssignmentsInsights.length) {
-          setAssignmentsInsights(
-            Object.values(parseInsights(newAssignmentsInsights))
-          );
-        }
-        if (newSubmissionsInsights.length) {
-          setSubmissionsInsights(
-            Object.values(parseInsights(newSubmissionsInsights))
-          );
-        }
-      } catch (error: any) {
-        toast.error(error.message);
-      }
-    })();
-  }, []);
-
+const StudentInsights: FunctionComponent<Props> = ({
+  assignmentsInsights,
+  submissionsInsights,
+}) => {
   // View
   return (
     <div>

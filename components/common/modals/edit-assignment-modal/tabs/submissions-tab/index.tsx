@@ -21,8 +21,8 @@ import {
   getAssignmentSubmissions,
 } from "@/db/client/submission";
 import useFetchLock from "@/hooks/use-fetch-lock";
+import { useUser } from "@/hooks/use-user";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
-import type { View } from "@/types/view.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { format } from "date-fns";
@@ -39,13 +39,14 @@ import {
 import toast from "react-hot-toast";
 
 interface Props {
-  view: View;
   assignmentId: string;
 }
 
-const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
+const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   // Hooks
   const t = useTranslations();
+  const user = useUser((state) => state.user);
+
   const fetchLock = useFetchLock();
 
   // States
@@ -91,7 +92,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
     setIsLoading(true);
 
     try {
-      const { data, count } = await (view === "Teacher"
+      const { data, count } = await (user.role === "Teacher"
         ? getAssignmentSubmissions(assignmentId)
         : getAssignmentSubmissions(assignmentId));
 
@@ -109,7 +110,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
     setIsSearching(true);
 
     try {
-      const { data, count } = await (view === "Teacher"
+      const { data, count } = await (user.role === "Teacher"
         ? getAssignmentSubmissions(assignmentId, search)
         : getAssignmentSubmissions(assignmentId, search));
 
@@ -128,7 +129,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
       const from = submissionsOffsetRef.current;
       const to = submissionsOffsetRef.current + SUBMISSIONS_GET_LIMIT - 1;
 
-      const { data } = await (view === "Teacher"
+      const { data } = await (user.role === "Teacher"
         ? getAssignmentSubmissions(assignmentId, searchText, from, to)
         : getAssignmentSubmissions(assignmentId, searchText, from, to));
 
@@ -155,6 +156,8 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
 
       setIsDelSubmissionModal(false);
 
+      submissionsOffsetRef.current -= 1;
+
       toast.success(t("success.submission_deleted"));
     } catch (error: any) {
       toast.error(error.message);
@@ -177,6 +180,8 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
       setSubmissionsIds([]);
       setIsDelSubmissionsModal(false);
 
+      submissionsOffsetRef.current -= submissionsIds.length;
+
       toast.success(t("success.submissions_deleted"));
     } catch (error: any) {
       toast.error(error.message);
@@ -196,11 +201,11 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
   const onSubmissionClick = (_submissionId: string) => {
     setSubmissionId(_submissionId);
 
-    if (view === "Teacher") {
+    if (user.role === "Teacher") {
       setIsViewSubmissionModal(true);
     }
 
-    if (view === "Student") {
+    if (user.role === "Student") {
       setIsEditSubmissionModal(true);
     }
   };
@@ -282,7 +287,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
                   subtitle=""
                   onClick={() => onSubmissionClick(id)}
                   onToggle={
-                    view === "Student"
+                    user.role === "Student"
                       ? (checked) => onSubmissionToggle(checked, id)
                       : undefined
                   }
@@ -299,7 +304,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
                   {format(new Date(created_at), "EEEE, MMM d")}
                 </p>
               ),
-              "": view === "Student" && (
+              "": user.role === "Student" && (
                 <BasePopper
                   placement={
                     submissions.length > 7 && submissions.length - idx < 4
@@ -356,13 +361,13 @@ const SubmissionsTab: FunctionComponent<Props> = ({ view, assignmentId }) => {
         />
       )}
 
-      {view === "Teacher" && isViewSubmissionModal && (
+      {user.role === "Teacher" && isViewSubmissionModal && (
         <ViewSubmissionModal
           onClose={onViewSubmissionModalClose}
           submissionId={submissionId}
         />
       )}
-      {view === "Student" && isEditSubmissionModal && (
+      {user.role === "Student" && isEditSubmissionModal && (
         <EditSubmissionModal
           onClose={onEditSubmissionModalClose}
           submissionId={submissionId}

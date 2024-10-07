@@ -9,7 +9,7 @@ import Total from "@/components/total";
 import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import CardTitle from "@/components/card-title";
 import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
-import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
+import ViewAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
 import BasePopper from "@/components/common/poppers/base-popper";
@@ -390,7 +390,7 @@ const Assignments: FunctionComponent<Props> = ({
               disabled={user.role !== "Teacher"}
               onClick={() => setIsCreateAssignmentModal(true)}
             >
-              Enroll users
+              Create assignment
             </button>
           }
         />
@@ -415,11 +415,10 @@ const Assignments: FunctionComponent<Props> = ({
         />
       )}
       {isEditAssignmentModal && (
-        <EditAssignmentModal
+        <ViewAssignmentModal
           assignmentId={assignmentId}
           onClose={onEditAssignmentModalClose}
           onSubmissionCreated={() => fetchAssignmentsBySearch(searchText)}
-          view={user.role}
         />
       )}
       {isDelAssignmentModal && (

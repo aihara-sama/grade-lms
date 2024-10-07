@@ -7,18 +7,15 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 import Tabs from "@/components/tabs";
 
 import BaseModal from "@/components/common/modals/base-modal";
-import type { View } from "@/types/view.type";
 import type { FunctionComponent } from "react";
 
 interface Props {
   assignmentId: string;
   onClose: (mutated?: boolean) => void;
   onSubmissionCreated?: () => void;
-  view: View;
 }
 
-const EditAssignmentModal: FunctionComponent<Props> = ({
-  view,
+const ViewAssignmentModal: FunctionComponent<Props> = ({
   assignmentId,
   onClose,
   onSubmissionCreated,
@@ -33,7 +30,6 @@ const EditAssignmentModal: FunctionComponent<Props> = ({
               Icon: <OverviewIcon />,
               content: (
                 <OverviewTab
-                  view={view}
                   assignmentId={assignmentId}
                   onSubmissionCreated={onSubmissionCreated}
                   onAssignmentUpdated={() => onClose(true)}
@@ -43,9 +39,7 @@ const EditAssignmentModal: FunctionComponent<Props> = ({
             {
               title: "Submissions",
               Icon: <SubmissionsIcon />,
-              content: (
-                <SubmissionsTab view={view} assignmentId={assignmentId} />
-              ),
+              content: <SubmissionsTab assignmentId={assignmentId} />,
             },
           ]}
         />
@@ -54,4 +48,4 @@ const EditAssignmentModal: FunctionComponent<Props> = ({
   );
 };
 
-export default EditAssignmentModal;
+export default ViewAssignmentModal;

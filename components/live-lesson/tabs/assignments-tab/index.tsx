@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
-import EditAssignmentModal from "@/components/common/modals/edit-assignment-modal";
+import ViewAssignmentModal from "@/components/common/modals/edit-assignment-modal";
 import PromptModal from "@/components/common/modals/prompt-modal";
 import type { createAssignment } from "@/db/client/assignment";
 import { deleteAssignment } from "@/db/client/assignment";
@@ -129,8 +129,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
         />
       )}
       {isEditAssignmentModalOpen && (
-        <EditAssignmentModal
-          view="Teacher"
+        <ViewAssignmentModal
           assignmentId={selectedAssignmentId}
           onClose={onEditAssignmentModalClose}
         />

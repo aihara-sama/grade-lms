@@ -211,12 +211,14 @@ for each row execute function create_enrollment_notification();
 CREATE OR REPLACE FUNCTION create_submission_notification()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Insert notification
-  INSERT INTO notifications (recipient_id, user_id, course_id, type, is_read)
+  -- Insert notification with lesson_id and assignment_id
+  INSERT INTO notifications (recipient_id, user_id, course_id, lesson_id, assignment_id, type, is_read)
   SELECT 
     u.id,                     -- Recipient ID (user_id of the course creator)
     auth.uid(),               -- Current user who created the submission
     l.course_id,              -- Course ID
+    a.lesson_id,              -- Lesson ID from the assignment
+    NEW.assignment_id,         -- Assignment ID from the new submission
     'submission',             -- Type of notification
     false                     -- Mark as unread
   FROM assignments a

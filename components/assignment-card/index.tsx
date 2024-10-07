@@ -5,11 +5,13 @@ import type { FunctionComponent } from "react";
 
 interface Props {
   assignment: ResultOf<typeof getLatestAssignments>["data"][number];
+  onClick: (assignmentId: string) => void;
 }
 
-const AssignmentCard: FunctionComponent<Props> = ({ assignment }) => {
+const AssignmentCard: FunctionComponent<Props> = ({ assignment, onClick }) => {
   return (
     <div
+      onClick={() => onClick(assignment.id)}
       key={assignment.id}
       className="border border-neutral-300 rounded-lg px-4 py-2 flex items-center justify-between min-w-[280px] inter-active"
     >

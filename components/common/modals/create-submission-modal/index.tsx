@@ -47,7 +47,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
       await createSubmission(submission);
 
       toast.success(t("success.submission_created"));
-      onClose(false);
+      onClose(true);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
