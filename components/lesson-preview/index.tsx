@@ -22,11 +22,10 @@ import WhiteboardIcon from "@/components/icons/whiteboard-icon";
 import LessonHeader from "@/components/live-lesson/lesson-header";
 import LoadingSpinner from "@/components/loading-spinner";
 import { WHITEBOARD_MIN_HEIGHT } from "@/constants";
-import { getOverlappingLessons } from "@/db/client/lesson";
+import { getOverlappingLessons, updateLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useLesson } from "@/hooks/use-lesson";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -57,6 +56,15 @@ const LessonPreview: FunctionComponent = () => {
   const duration = +new Date(ends) - +new Date(starts);
 
   // Handlers
+  const isSaveButtonDisabled = () => {
+    return (
+      (new Date(lesson.starts).toISOString() === starts.toISOString() &&
+        new Date(lesson.ends).toISOString() === ends.toISOString()) ||
+      isOngoing ||
+      isEnded
+    );
+  };
+
   const parseWhiteboardData = () => {
     if (user.role === Role.Student) {
       const data = JSON.parse(lesson.whiteboard_data);
@@ -91,6 +99,7 @@ const LessonPreview: FunctionComponent = () => {
   };
   const submitUpdateLessonDate = async () => {
     setIsSubmittingUpdateLessonDate(true);
+
     try {
       const { count } = await getOverlappingLessons(
         starts.toISOString(),
@@ -100,18 +109,17 @@ const LessonPreview: FunctionComponent = () => {
 
       if (count) throw new Error(t("error.lesson_overlaps"));
 
-      const { error, data } = await DB.from("lessons")
-        .update({
-          starts: starts.toISOString(),
-          ends: ends.toISOString(),
-        })
-        .eq("id", lesson.id)
-        .select("*, course:courses(*)")
-        .single();
+      const data = await updateLesson({
+        starts: starts.toISOString(),
+        ends: ends.toISOString(),
+        id: lesson.id,
+      });
 
-      if (error) throw new Error(t("error.failed_to_update_lesson_date"));
-
-      setLesson(data);
+      setLesson({
+        ...lesson,
+        starts: data.starts,
+        ends: data.ends,
+      });
 
       toast.success(t("success.lesson_date_updated"));
     } catch (error: any) {
@@ -121,14 +129,16 @@ const LessonPreview: FunctionComponent = () => {
     }
   };
   const submitUpdateWhiteboardData = async () => {
-    const { error } = await DB.from("lessons")
-      .update({
+    try {
+      await updateLesson({
+        id: lesson.id,
         whiteboard_data: JSON.stringify(whiteboardDataRef.current),
-      })
-      .eq("id", lesson.id);
+      });
 
-    if (error) toast.error(error.message);
-    else toast.success("Saved!");
+      toast.success("Saved!");
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
   const onDateChange = (date: Date) => {
     setStarts(date);
@@ -224,14 +234,8 @@ const LessonPreview: FunctionComponent = () => {
           />
           {user.role === Role.Teacher && (
             <button
-              disabled={
-                (new Date(lesson.starts).toISOString() ===
-                  starts.toISOString() &&
-                  new Date(lesson.ends).toISOString() === ends.toISOString()) ||
-                isOngoing ||
-                isEnded
-              }
               className="primary-button"
+              disabled={isSaveButtonDisabled()}
               onClick={submitUpdateLessonDate}
             >
               {isSubmittingUpdateLessonDate && <LoadingSpinner />}

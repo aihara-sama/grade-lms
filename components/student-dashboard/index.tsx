@@ -39,7 +39,6 @@ const StudentDashboard: FunctionComponent<Props> = ({
     useState(initSubmissionsCount);
 
   // Handlers
-
   const getInsights = async () => {
     try {
       const [
