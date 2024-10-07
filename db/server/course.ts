@@ -1,6 +1,7 @@
 import { COURSES_GET_LIMIT } from "@/constants";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import type { CourseWithRefsCount } from "@/types/course.type";
+import { addDays, format, subWeeks } from "date-fns";
 
 export const getCourse = async (id: string) => {
   const result = await getServerDB()
@@ -19,6 +20,19 @@ export const getCourses = async (options?: { head?: boolean }) => {
     .order("created_at", { ascending: true })
     .range(0, COURSES_GET_LIMIT - 1)
     .returns<CourseWithRefsCount[]>();
+
+  return { data, count };
+};
+
+export const getCoursesInsights = async () => {
+  const { data, count } = await getServerDB()
+    .from("courses")
+    .select("timestamp:created_at")
+    .gte(
+      "created_at",
+      format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 
   return { data, count };
 };

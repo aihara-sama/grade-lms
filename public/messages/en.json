@@ -42,6 +42,7 @@
     "password_changed": "Password successfully changed"
   },
   "error": {
+    "failed_to_load_users_insights": "Failed to load users insights",
     "failed_to_load_user": "Failed to load user",
     "failed_to_load_users": "Failed to load users",
     "failed_to_load_users_count": "Failed to load users count",
@@ -54,6 +55,7 @@
     "failed_to_delete_users": "Failed to delete users",
     "failed_to_update_user": "Failed to update user",
 
+    "failed_to_load_courses_insights": "Failed to load courses insights",
     "failed_to_load_courses": "Failed to load course",
     "failed_to_load_courses_count": "Failed to load courses count",
     "failed_to_create_course": "Failed to create course",

@@ -6,28 +6,28 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import NoDataIcon from "@/components/icons/no-data-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import { LESSONS_GET_LIMIT } from "@/constants";
-import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
-import type { Lesson } from "@/types/lesson.type";
+import { getDayLessons } from "@/db/client/lesson";
+import { useUpdateEffect } from "@/hooks/use-update-effect";
+import type { ResultOf } from "@/types/utils.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
-import { addDays, format, formatDistanceToNow, startOfDay } from "date-fns";
-import { useTranslations } from "next-intl";
+import { format, formatDistanceToNow, startOfDay } from "date-fns";
 import Link from "next/link";
 import type { FunctionComponent, UIEventHandler } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import toast from "react-hot-toast";
 
-const DashboardSchedule: FunctionComponent = () => {
-  const [schedule, setSchedule] = useState<
-    (Lesson & { course: { title: string } })[]
-  >([]);
-  const [scheduleDate, setScheduleDate] = useState(startOfDay(new Date()));
+interface Props {
+  dayLessons: ResultOf<typeof getDayLessons>;
+}
 
-  const t = useTranslations();
-  const user = useUser((state) => state.user);
+const DashboardSchedule: FunctionComponent<Props> = ({
+  dayLessons: initDayLessons,
+}) => {
+  const [day, setDay] = useState(startOfDay(new Date()));
+  const [dayLessons, setDayLessons] = useState(initDayLessons.data);
 
   const getWidgetStyle = (date: Date) => {
     let classes = "rounded-xl py-[2px] px-[8px] font-bold border-2 text-sm";
@@ -40,74 +40,61 @@ const DashboardSchedule: FunctionComponent = () => {
     return classes;
   };
 
-  const fetchLessonsByStartDate = (date: Date) =>
-    DB.from("users")
-      .select("id, courses(id, lessons(*, course:courses(title)))")
-      .eq("id", user.id)
-      .range(schedule.length, schedule.length + LESSONS_GET_LIMIT - 1, {
-        foreignTable: "courses.lessons",
-      })
-      .gte("courses.lessons.starts", format(date, "yyyy-MM-dd'T'HH:mm:ss"))
-      .lt(
-        "courses.lessons.starts",
-        format(`${startOfDay(addDays(date, 1))}`, "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .single();
-
-  const fetchMoreLessons = async () => {
+  const fetchMoreDayLessons = async () => {
     try {
-      const { data, error } = await fetchLessonsByStartDate(scheduleDate);
+      const { data } = await getDayLessons(
+        day,
+        dayLessons.length,
+        dayLessons.length + LESSONS_GET_LIMIT - 1
+      );
 
-      if (error) throw new Error(t("error.failed_to_load_lessons"));
-
-      if (data.courses.length) {
-        setSchedule((prev) => [
-          ...prev,
-          ...data.courses.map(({ lessons }) => lessons).flat(),
-        ]);
-      }
+      setDayLessons((prev) => [...prev, ...data]);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
-  const onScrollEnd = useCallback(throttleFetch(fetchMoreLessons), [
-    scheduleDate,
-    schedule.length,
+  const onScrollEnd = useCallback(throttleFetch(fetchMoreDayLessons), [
+    day,
+    dayLessons.length,
   ]);
 
   const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
     if (isCloseToBottom(e.target as HTMLElement, 100)) onScrollEnd();
   };
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     (async () => {
-      const { data, error } = await fetchLessonsByStartDate(scheduleDate);
+      try {
+        const { data } = await getDayLessons(
+          day,
+          dayLessons.length,
+          dayLessons.length + LESSONS_GET_LIMIT - 1
+        );
 
-      if (error) {
-        toast.error(t("error.failed_to_load_lessons"));
-      } else {
-        setSchedule(data.courses.map(({ lessons }) => lessons).flat());
+        setDayLessons(data);
+      } catch (error: any) {
+        toast.error(error.message);
       }
     })();
-  }, [scheduleDate]);
+  }, [day]);
 
   return (
     <div>
-      <CalendarWidget onChange={(date) => setScheduleDate(startOfDay(date))} />
+      <CalendarWidget onChange={(date) => setDay(startOfDay(date))} />
       <div className="mt-4">
         <h2 className="font-bold text-lg">My schedule</h2>
         <div
           className="flex flex-col gap-4 max-h-[800px] [@media(min-width:768px)]:max-h-[492px] [@media(min-width:897px)]:max-h-[300px] overflow-auto pr-2"
           onScroll={onScroll}
         >
-          {!schedule.length && (
+          {!dayLessons.length && (
             <div className="flex gap-2 flex-col items-center mt-8">
               <NoDataIcon size="xl" />
               <p className="text-neutral-500">Your schedule will show here</p>
             </div>
           )}
-          {schedule.map((lesson) => (
+          {dayLessons.map((lesson) => (
             <div key={lesson.id}>
               <div className="flex justify-between items-center">
                 <div
@@ -151,7 +138,7 @@ const DashboardSchedule: FunctionComponent = () => {
                   <LessonsIcon size="xs" />
                 </Link>
               </div>
-              <hr className="" />
+              <hr />
             </div>
           ))}
         </div>

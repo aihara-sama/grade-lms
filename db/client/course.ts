@@ -3,6 +3,7 @@ import { DB } from "@/lib/supabase/db";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
+import { addDays, format, subWeeks } from "date-fns";
 
 // GET
 export const getCourses = async (
@@ -13,7 +14,7 @@ export const getCourses = async (
   const t = await loadMessages();
 
   const { data, count, error } = await DB.from("courses")
-    .select("*, lessons(count), users(count)", { count: "exact" })
+    .select("*, users(count), lessons(count)", { count: "exact" })
     .ilike("title", `%${title}%`)
     .range(from, to)
     .order("created_at", { ascending: true })
@@ -23,19 +24,7 @@ export const getCourses = async (
 
   return { data, count };
 };
-export const getCoursesCount = async (title = "") => {
-  const t = await loadMessages();
 
-  const result = await DB.from("courses")
-    .select("count")
-    .ilike("title", `%${title}%`)
-    .returns<{ count: number }[]>()
-    .single();
-
-  if (result.error) throw new Error(t("error.failed_to_load_courses_count"));
-
-  return result.data.count;
-};
 export const getLatestCourses = async (
   from = 0,
   to = COURSES_GET_LIMIT - 1
@@ -49,6 +38,21 @@ export const getLatestCourses = async (
     .returns<CourseWithRefsCount[]>();
 
   if (error) throw new Error(t("error.failed_to_load_courses"));
+
+  return { data, count };
+};
+export const getCoursesInsights = async () => {
+  const t = await loadMessages();
+
+  const { data, count, error } = await DB.from("courses")
+    .select("timestamp:created_at")
+    .gte(
+      "created_at",
+      format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+
+  if (error) throw new Error(t("error.failed_to_load_courses_insights"));
 
   return { data, count };
 };

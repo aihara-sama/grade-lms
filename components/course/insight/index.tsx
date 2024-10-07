@@ -84,14 +84,16 @@ const Insight: FunctionComponent<Props> = ({
   }, [shouldCalcRightSide]);
 
   return (
-    <div className="flex-[1] h-[300px]">
+    <div className="flex-[1] h-[300px]" suppressHydrationWarning>
       <div
+        suppressHydrationWarning
         className="h-[300px] overflow-hidden relative"
         style={{
           width: `${chartWidth}px`,
         }}
       >
         <Line
+          suppressHydrationWarning
           data={{
             labels,
             datasets: [

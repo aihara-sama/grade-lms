@@ -9,6 +9,7 @@ import { DB } from "@/lib/supabase/db";
 import { loadMessages } from "@/utils/localization/load-messages";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import { parseUsersCoursesIds } from "@/utils/parse/parse-users-courses-ids";
+import { addDays, format, subWeeks } from "date-fns";
 
 // GET
 export const getUser = async (id: string) => {
@@ -38,6 +39,25 @@ export const getMyUsers = async (
     .ilike("name", `%${userName}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
+
+  if (error) throw new Error(t("error.failed_to_load_users"));
+
+  return { data, count };
+};
+export const getUsersInsights = async () => {
+  const t = await loadMessages();
+
+  const { data, count, error } = await DB.rpc(
+    "get_my_users",
+    {},
+    { count: "exact" }
+  )
+    .gte(
+      "created_at",
+      format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
+    .select("timestamp:created_at");
 
   if (error) throw new Error(t("error.failed_to_load_users"));
 

@@ -3,7 +3,7 @@ import { DB } from "@/lib/supabase/db";
 import type { Lesson } from "@/types/lesson.type";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
-import { format } from "date-fns";
+import { addDays, format, startOfDay } from "date-fns";
 
 // GET
 export const getLesson = async (id: string) => {
@@ -56,21 +56,26 @@ export const getCourseLessons = async (
 
   return { data, count };
 };
-export const getCourseLessonsCount = async (courseId: string, title = "") => {
+export const getDayLessons = async (
+  day: Date,
+  from = 0,
+  to = LESSONS_GET_LIMIT - 1
+) => {
   const t = await loadMessages();
 
-  const result = await DB.from("lessons")
-    .select("count")
-    .ilike("title", `%${title}%`)
-    .eq("course_id", courseId)
-    .returns<{ count: number }[]>()
-    .single();
+  const { data, count, error } = await DB.from("lessons")
+    .select("*, course:courses(title)")
+    .range(from, to)
+    .gte("starts", format(day, "yyyy-MM-dd'T'HH:mm:ss"))
+    .lt(
+      "starts",
+      format(`${startOfDay(addDays(day, 1))}`, "yyyy-MM-dd'T'HH:mm:ss")
+    );
 
-  if (result.error) throw new Error(t("error.failed_to_load_lessons_count"));
+  if (error) throw new Error(t("error.failed_to_load_lessons"));
 
-  return result.data.count;
+  return { data, count };
 };
-
 export const getOverlappingLessons = async (
   starts: string,
   ends: string,

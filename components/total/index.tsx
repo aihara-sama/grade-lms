@@ -6,13 +6,13 @@ interface Props {
   total: number;
   title: string;
   Icon: ReactNode;
-  link?: string;
+  href?: string;
   adaptive?: boolean;
 }
 
 const Total: FunctionComponent<Props> = ({
   total,
-  link,
+  href,
   title,
   Icon,
   adaptive = true,
@@ -25,8 +25,8 @@ const Total: FunctionComponent<Props> = ({
       <hr className="w-full my-3" />
       <p className="text-neutral-500">{title}</p>
       <p className="mt-2 text-4xl text-neutral-600">{total}</p>
-      {link && (
-        <Link className="mt-3 w-full" href={link}>
+      {href && (
+        <Link className="mt-3 w-full" href={href}>
           <button className="primary-button w-full">View all</button>
         </Link>
       )}

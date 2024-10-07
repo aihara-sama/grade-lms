@@ -38,13 +38,13 @@ const CourseOverview: FunctionComponent<Props> = ({
                 <Total
                   title="Total members"
                   total={users.length}
-                  link={`/dashboard/courses/${course.id}/members`}
+                  href={`/dashboard/courses/${course.id}/members`}
                   Icon={<AvatarIcon size="lg" />}
                 />
                 <Total
                   title="Total lessons"
                   total={lessons.length}
-                  link={`/dashboard/courses/${course.id}/lessons`}
+                  href={`/dashboard/courses/${course.id}/lessons`}
                   Icon={<LessonsIcon size="lg" />}
                 />
               </div>

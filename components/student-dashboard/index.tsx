@@ -8,6 +8,7 @@ import LatestAssignments from "@/components/student-dashboard/latest-assignments
 import StudentInsights from "@/components/student-dashboard/student-insights";
 import Total from "@/components/total";
 import type { getLatestAssignments } from "@/db/server/assignment";
+import type { getDayLessons } from "@/db/server/lesson";
 import type { ResultOf } from "@/types/utils.type";
 import { type FunctionComponent } from "react";
 
@@ -15,12 +16,14 @@ interface Props {
   assignmentsCount: number;
   submissionsCount: number;
   latestAssignments: ResultOf<typeof getLatestAssignments>;
+  dayLessons: ResultOf<typeof getDayLessons>;
 }
 
-const StudentrDashboard: FunctionComponent<Props> = ({
+const StudentDashboard: FunctionComponent<Props> = ({
   assignmentsCount,
   submissionsCount,
   latestAssignments,
+  dayLessons,
 }) => {
   return (
     <Container>
@@ -45,11 +48,11 @@ const StudentrDashboard: FunctionComponent<Props> = ({
           <StudentInsights />
         </div>
         <div className="sm:w-[300px]">
-          <DashboardSchedule />
+          <DashboardSchedule dayLessons={dayLessons} />
         </div>
       </div>
     </Container>
   );
 };
 
-export default StudentrDashboard;
+export default StudentDashboard;

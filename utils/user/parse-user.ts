@@ -1,7 +1,7 @@
 import type { User } from "@/types/user.type";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
-export const polishUser = (user: SupabaseUser | null): User | null => {
+export const parseUser = (user: SupabaseUser | null): User | null => {
   if (user === null) return null;
 
   return {

@@ -1,6 +1,6 @@
 import { LESSONS_GET_LIMIT } from "@/constants";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
-import { format } from "date-fns";
+import { addDays, format, startOfDay } from "date-fns";
 
 export const getLesson = async (id: string) => {
   const result = await getServerDB()
@@ -31,6 +31,19 @@ export const getCourseLessons = async (courseId: string) => {
     .eq("course_id", courseId)
     .range(0, LESSONS_GET_LIMIT - 1)
     .order("created_at", { ascending: true });
+
+  return { data, count };
+};
+
+export const getDayLessons = async (day: Date) => {
+  const { data, count } = await getServerDB()
+    .from("lessons")
+    .select("*, course:courses(title)")
+    .gte("starts", format(day, "yyyy-MM-dd'T'HH:mm:ss"))
+    .lt(
+      "starts",
+      format(`${startOfDay(addDays(day, 1))}`, "yyyy-MM-dd'T'HH:mm:ss")
+    );
 
   return { data, count };
 };

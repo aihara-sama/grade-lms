@@ -2,71 +2,37 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
-import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
-import type { CourseWithRefsCount } from "@/types/course.type";
+import type { getCourses } from "@/db/client/course";
+import { getCoursesInsights } from "@/db/client/course";
+import { getUsersInsights } from "@/db/client/user";
+import type { ResultOf } from "@/types/utils.type";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
-import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 
 import type { FunctionComponent } from "react";
-import toast from "react-hot-toast";
 
 interface Props {
-  courses: CourseWithRefsCount[];
+  courses: ResultOf<typeof getCourses>["data"];
 }
 
 const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
   // State
-  const [usersInsights, setUsersInsights] = useState<number[]>([]);
-  const [coursesInsights, setCoursesInsights] = useState<number[]>([]);
-
-  // Hooks
-  const user = useUser((state) => state.user);
-
-  // Handlers
-  const fetchCoursesInsights = () => {
-    return DB.from("users")
-      .select("courses(timestamp:created_at)")
-      .eq("id", user.id)
-      .gte(
-        "created_at",
-        format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-    // .single();
-  };
-  const fetchUsersInsights = () => {
-    return DB.from("users")
-      .select("timestamp:created_at")
-      .eq("creator_id", user.id)
-      .gte(
-        "created_at",
-        format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-  };
+  const [usersInsights, setUsersInsights] = useState([]);
+  const [coursesInsights, setCoursesInsights] = useState([]);
 
   // Effects
   useEffect(() => {
     (async () => {
-      const [usersData, coursesData] = await Promise.all([
-        fetchUsersInsights(),
-        fetchCoursesInsights(),
-      ]);
+      const [{ data: newUsersInsights }, { data: newCoursesInsights }] =
+        await Promise.all([getUsersInsights(), getCoursesInsights()]);
 
-      if (usersData.data.length) {
-        setUsersInsights(Object.values(parseInsights(usersData.data)));
+      if (newUsersInsights.length) {
+        setUsersInsights(Object.values(parseInsights(newUsersInsights)));
       }
-      if (coursesData.data[0]?.courses?.length) {
-        setCoursesInsights(
-          Object.values(parseInsights(coursesData.data[0].courses))
-        );
+      if (newCoursesInsights.length) {
+        setCoursesInsights(Object.values(parseInsights(newCoursesInsights)));
       }
-
-      if (coursesData.error || usersData.error)
-        toast.error("Something went wrong");
     })();
   }, [courses]);
 
@@ -74,10 +40,10 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
     <div>
       <p className="section-title">Insights</p>
       <div className="flex gap-5 flex-col md:flex-row">
-        {usersInsights.length ? (
+        {coursesInsights.length ? (
           <Insight
-            shouldCalcRightSide={false}
             label="Users"
+            shouldCalcRightSide={false}
             data={usersInsights}
             labels={getWeekNames()}
           />
@@ -88,8 +54,8 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
         )}
         {coursesInsights.length ? (
           <Insight
-            shouldCalcRightSide={false}
             label="Courses"
+            shouldCalcRightSide={false}
             data={coursesInsights}
             labels={getWeekNames()}
           />
