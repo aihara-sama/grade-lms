@@ -2,76 +2,48 @@
 
 import Insight from "@/components/course/insight";
 import ChartSkeleton from "@/components/skeletons/chart-skeleton";
-import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
+import { getAssignmentsInsights } from "@/db/client/assignment";
+import { getSubmissionsInsights } from "@/db/client/submission";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
-import { addDays, format, subWeeks } from "date-fns";
-import { useEffect, useState } from "react";
-
 import type { FunctionComponent } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const StudentInsights: FunctionComponent = () => {
-  const user = useUser((state) => state.user);
   // State
   const [assignmentsInsights, setAssignmentsInsights] = useState<number[]>([]);
   const [submissionsInsights, setSubmissionsInsights] = useState<number[]>([]);
 
-  // Handlers
-  const fetchAssignmentsInsights = () => {
-    return DB.from("users")
-      .select("courses(lessons(assignments(timestamp:created_at)))")
-      .eq("id", user.id)
-      .gte(
-        "courses.lessons.assignments.created_at",
-        format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .lte(
-        "courses.lessons.assignments.created_at",
-        format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .single();
-  };
-  const fetchSubmissionsInsights = () => {
-    return DB.from("submissions")
-      .select("timestamp:created_at")
-      .eq("user_id", user.id)
-      .gte(
-        "created_at",
-        format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-  };
-
   // Effects
   useEffect(() => {
     (async () => {
-      const [submissionsData, assignmentsData] = await Promise.all([
-        fetchSubmissionsInsights(),
-        fetchAssignmentsInsights(),
-      ]);
+      try {
+        const [
+          { data: newAssignmentsInsights },
+          { data: newSubmissionsInsights },
+        ] = await Promise.all([
+          getAssignmentsInsights(),
+          getSubmissionsInsights(),
+        ]);
 
-      if (submissionsData.data) {
-        setSubmissionsInsights(
-          Object.values(parseInsights(submissionsData.data))
-        );
+        if (newAssignmentsInsights.length) {
+          setAssignmentsInsights(
+            Object.values(parseInsights(newAssignmentsInsights))
+          );
+        }
+        if (newSubmissionsInsights.length) {
+          setSubmissionsInsights(
+            Object.values(parseInsights(newSubmissionsInsights))
+          );
+        }
+      } catch (error: any) {
+        toast.error(error.message);
       }
-      if (assignmentsData.data.courses[0]?.lessons[0]?.assignments) {
-        setAssignmentsInsights(
-          Object.values(
-            parseInsights(
-              assignmentsData.data.courses[0].lessons[0].assignments
-            )
-          )
-        );
-      }
-
-      if (assignmentsData.error || submissionsData.error)
-        toast.error("Something went wrong");
     })();
   }, []);
 
+  // View
   return (
     <div>
       <p className="section-title">Insights</p>

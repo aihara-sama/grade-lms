@@ -2,6 +2,7 @@ import { SUBMISSIONS_GET_LIMIT } from "@/constants";
 import { DB } from "@/lib/supabase/db";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
+import { addDays, format, subWeeks } from "date-fns";
 
 // GET
 export const getSubmission = async (id: string) => {
@@ -32,6 +33,21 @@ export const getAssignmentSubmissions = async (
     .order("created_at", { ascending: true });
 
   if (error) throw new Error(t("error.failed_to_load_submissions"));
+
+  return { data, count };
+};
+export const getSubmissionsInsights = async () => {
+  const t = await loadMessages();
+
+  const { data, count, error } = await DB.from("submissions")
+    .select("timestamp:created_at")
+    .gte(
+      "created_at",
+      format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+
+  if (error) throw new Error(t("error.failed_to_load_submissions_insights"));
 
   return { data, count };
 };

@@ -11,6 +11,7 @@ import { parseInsights } from "@/utils/parse/parse-insights";
 import { useEffect, useState } from "react";
 
 import type { FunctionComponent } from "react";
+import toast from "react-hot-toast";
 
 interface Props {
   courses: ResultOf<typeof getCourses>["data"];
@@ -24,14 +25,18 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
   // Effects
   useEffect(() => {
     (async () => {
-      const [{ data: newUsersInsights }, { data: newCoursesInsights }] =
-        await Promise.all([getUsersInsights(), getCoursesInsights()]);
+      try {
+        const [{ data: newUsersInsights }, { data: newCoursesInsights }] =
+          await Promise.all([getUsersInsights(), getCoursesInsights()]);
 
-      if (newUsersInsights.length) {
-        setUsersInsights(Object.values(parseInsights(newUsersInsights)));
-      }
-      if (newCoursesInsights.length) {
-        setCoursesInsights(Object.values(parseInsights(newCoursesInsights)));
+        if (newUsersInsights.length) {
+          setUsersInsights(Object.values(parseInsights(newUsersInsights)));
+        }
+        if (newCoursesInsights.length) {
+          setCoursesInsights(Object.values(parseInsights(newCoursesInsights)));
+        }
+      } catch (error: any) {
+        toast.error(error.message);
       }
     })();
   }, [courses]);

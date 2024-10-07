@@ -1,5 +1,3 @@
-"use client";
-
 import DashboardSchedule from "@/components/common/dashboard/dashboard-schedule";
 import Container from "@/components/container";
 import AssignmentsIcon from "@/components/icons/assignments-icon";
