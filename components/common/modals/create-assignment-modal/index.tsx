@@ -1,8 +1,8 @@
-import BaseModal from "@/components/common/modals/base-modal";
-import DateInput from "@/components/date-input";
+import BasicInput from "@/components/common/inputs/basic-input";
+import DateInput from "@/components/common/inputs/date-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
-import Input from "@/components/input";
-import LoadingSpinner from "@/components/loading-spinner";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { createAssignment } from "@/db/client/assignment";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { ResultOf } from "@/types/utils.type";
@@ -16,7 +16,7 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-const Editor = dynamic(() => import("@/components/editor"), {
+const Editor = dynamic(() => import("@/components/common/editor"), {
   ssr: false,
 });
 
@@ -71,9 +71,9 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
   };
 
   return (
-    <BaseModal width="lg" onClose={() => onClose()} title="Create assignment">
+    <BasicModal width="lg" onClose={() => onClose()} title="Create assignment">
       <div>
-        <Input
+        <BasicInput
           autoFocus
           fullWidth
           StartIcon={<LessonsIcon size="xs" />}
@@ -113,7 +113,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
           </button>
         </div>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 export default CreateAssignmentModal;

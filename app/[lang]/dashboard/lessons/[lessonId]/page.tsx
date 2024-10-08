@@ -1,6 +1,6 @@
-import ChatProvider from "@/components/chat-provider";
-import LessonProvider from "@/components/lesson-provider";
-import LiveLesson from "@/components/live-lesson";
+import LiveLesson from "@/app/[lang]/dashboard/lessons/[lessonId]/components/live-lesson";
+import ChatProvider from "@/components/providers/chat-provider";
+import LessonProvider from "@/components/providers/lesson-provider";
 import { getLessonWithCourse } from "@/db/server/lesson";
 import { redirect } from "next/navigation";
 

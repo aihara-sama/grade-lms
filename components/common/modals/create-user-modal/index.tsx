@@ -1,20 +1,19 @@
 "use client";
 
-import AvatarUpload from "@/components/avatar-upload";
+import AvatarUpload from "@/components/common/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CameraIcon from "@/components/icons/camera-icon";
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
-import Input from "@/components/input";
-import Tabs from "@/components/tabs";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 import type { InputType as UserInputType } from "@/actions/create-user-action/types";
-import BaseModal from "@/components/common/modals/base-modal";
-import LoadingSpinner from "@/components/loading-spinner";
-import TimezoneSelect from "@/components/timezone-select";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
+import TimezoneSelect from "@/components/common/selects/timezone-select";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { DEFAULT_AVATAR } from "@/constants";
 import { createUser } from "@/db/client/user";
 import type { ResultOf } from "@/types/utils.type";
@@ -22,6 +21,7 @@ import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
+import BasicTabs from "@/components/common/tabs/basic-tabs";
 
 interface Props {
   onClose: (maybeUser?: ResultOf<typeof createUser>) => void;
@@ -71,20 +71,20 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
 
   // View
   return (
-    <BaseModal
+    <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
       title="Create user"
     >
       <form noValidate>
-        <Tabs
+        <BasicTabs
           tabs={[
             {
               title: "General",
               Icon: <OverviewIcon />,
               content: (
                 <>
-                  <Input
+                  <BasicInput
                     onChange={onInputChange}
                     value={user.name}
                     fullWidth
@@ -93,7 +93,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     label="Name"
                     autoFocus
                   />
-                  <Input
+                  <BasicInput
                     onChange={onInputChange}
                     value={user.email}
                     StartIcon={<EmailIcon size="xs" />}
@@ -102,7 +102,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     name="email"
                     fullWidth
                   />
-                  <Input
+                  <BasicInput
                     onChange={onInputChange}
                     value={user.password}
                     name="password"
@@ -154,7 +154,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
           </button>
         </div>
       </form>
-    </BaseModal>
+    </BasicModal>
   );
 };
 

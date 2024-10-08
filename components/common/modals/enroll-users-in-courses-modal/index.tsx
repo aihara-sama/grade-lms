@@ -1,13 +1,13 @@
-import CardTitle from "@/components/card-title";
-import BaseModal from "@/components/common/modals/base-modal";
+import TitleCard from "@/components/common/cards/title-card";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
+import NotFound from "@/components/common/not-found";
+import Table from "@/components/common/table";
 import CheckIcon from "@/components/icons/check-icon";
 import CourseIcon from "@/components/icons/course-icon";
 import SearchIcon from "@/components/icons/search-icon";
-import Input from "@/components/input";
-import LoadingSpinner from "@/components/loading-spinner";
-import NotFound from "@/components/not-found";
-import Skeleton from "@/components/skeleton";
-import Table from "@/components/table";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses, getUnenrolledCourses } from "@/db/client/course";
 import {
@@ -194,7 +194,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
   // View
   return (
-    <BaseModal
+    <BasicModal
       onClose={() => onClose()}
       title="Enrollment"
       isFixedHeight={false}
@@ -211,7 +211,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           </button>
         </div>
       ) : (
-        <Input
+        <BasicInput
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           StartIcon={<SearchIcon />}
@@ -220,7 +220,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
         />
       )}
 
-      {isLoading && <Skeleton className="h-[222px]" />}
+      {isLoading && <LoadingSkeleton className="h-[222px]" />}
       {isData && (
         <Table
           className="mb-2"
@@ -228,7 +228,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreCourses))}
           data={courses.map(({ id, title }) => ({
             Name: (
-              <CardTitle
+              <TitleCard
                 href={`/dashboard/courses/${id}/overview`}
                 checked={coursesIds.includes(id)}
                 Icon={<CourseIcon />}
@@ -259,7 +259,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>Enroll</span>
         </button>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 

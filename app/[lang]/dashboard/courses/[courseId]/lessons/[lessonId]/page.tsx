@@ -7,9 +7,7 @@ interface Props {
     courseId: string;
   };
 }
-const Page: FunctionComponent<Props> = async ({
-  params: { lessonId, courseId },
-}) => {
+const Page: FunctionComponent<Props> = ({ params: { lessonId, courseId } }) => {
   return redirect(
     `/dashboard/courses/${courseId}/lessons/${lessonId}/overview`
   );

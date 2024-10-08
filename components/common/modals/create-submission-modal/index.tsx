@@ -1,7 +1,7 @@
-import BaseModal from "@/components/common/modals/base-modal";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
-import Input from "@/components/input";
-import LoadingSpinner from "@/components/loading-spinner";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { createSubmission } from "@/db/client/submission";
 import { useUser } from "@/hooks/use-user";
 import type { TablesInsert } from "@/types/supabase.type";
@@ -14,7 +14,7 @@ import { useState } from "react";
 
 import toast from "react-hot-toast";
 
-const Editor = dynamic(() => import("@/components/editor"), {
+const Editor = dynamic(() => import("@/components/common/editor"), {
   ssr: false,
 });
 
@@ -65,14 +65,14 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
     }));
 
   return (
-    <BaseModal
+    <BasicModal
       isInsideModal
       width="lg"
       onClose={() => onClose()}
       title="Submission"
     >
       <div>
-        <Input
+        <BasicInput
           autoFocus
           fullWidth
           StartIcon={<LessonsIcon size="xs" />}
@@ -104,7 +104,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
           </button>
         </div>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 export default CreateSubmissionModal;

@@ -1,20 +1,20 @@
 "use client";
 
-import AvatarUpload from "@/components/avatar-upload";
+import AvatarUpload from "@/components/common/avatar-upload";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import CameraIcon from "@/components/icons/camera-icon";
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
-import Input from "@/components/input";
-import Tabs from "@/components/tabs";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-import BaseModal from "@/components/common/modals/base-modal";
-import LoadingSpinner from "@/components/loading-spinner";
-import Skeleton from "@/components/skeleton";
-import TimezoneSelect from "@/components/timezone-select";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
+import TimezoneSelect from "@/components/common/selects/timezone-select";
+import BasicTabs from "@/components/common/tabs/basic-tabs";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import type { getMyUsers } from "@/db/client/user";
 import { getUser, updateUser } from "@/db/client/user";
 import type { ResultOf } from "@/types/utils.type";
@@ -83,23 +83,23 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
     fetchUser();
   }, []);
   return (
-    <BaseModal
+    <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
       title="Edit user"
     >
       {isLoading ? (
-        <Skeleton />
+        <LoadingSkeleton />
       ) : (
         <form noValidate onSubmit={submitUpdateUser}>
-          <Tabs
+          <BasicTabs
             tabs={[
               {
                 title: "General",
                 Icon: <OverviewIcon />,
                 content: (
                   <>
-                    <Input
+                    <BasicInput
                       onChange={onInputChange}
                       value={user.name}
                       fullWidth
@@ -108,7 +108,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                       label="Name"
                       autoFocus
                     />
-                    <Input
+                    <BasicInput
                       onChange={onInputChange}
                       value={user.email}
                       StartIcon={<EmailIcon size="xs" />}
@@ -117,7 +117,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                       name="email"
                       fullWidth
                     />
-                    <Input
+                    <BasicInput
                       name="password"
                       StartIcon={<SecurityIcon size="xs" />}
                       label="Password"
@@ -161,7 +161,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
           </div>
         </form>
       )}
-    </BaseModal>
+    </BasicModal>
   );
 };
 

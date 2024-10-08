@@ -1,4 +1,4 @@
-import Courses from "@/components/courses";
+import Courses from "@/app/[lang]/dashboard/courses/components/courses";
 import { getCourses } from "@/db/server/course";
 import type { Metadata, NextPage } from "next";
 

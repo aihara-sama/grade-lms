@@ -1,4 +1,4 @@
-import LessonProvider from "@/components/lesson-provider";
+import LessonProvider from "@/components/providers/lesson-provider";
 import { getLesson } from "@/db/server/lesson";
 import { redirect } from "next/navigation";
 import type { FunctionComponent, PropsWithChildren } from "react";
@@ -13,7 +13,7 @@ const Layout: FunctionComponent<PropsWithChildren<Props>> = async ({
   params: { lessonId },
   children,
 }) => {
-  const [lesson] = await Promise.all([getLesson(lessonId)]);
+  const lesson = await getLesson(lessonId);
 
   if (!lesson) return redirect("/dashboard");
 

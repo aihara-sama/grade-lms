@@ -1,6 +1,6 @@
-import BaseModal from "@/components/common/modals/base-modal";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import CoursesIcon from "@/components/icons/courses-icon";
-import Input from "@/components/input";
 import { createCourse } from "@/db/client/course";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { ResultOf } from "@/types/utils.type";
@@ -46,12 +46,12 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
 
   // View
   return (
-    <BaseModal
+    <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
       title="Create course"
     >
-      <Input
+      <BasicInput
         fullWidth
         name="title"
         label="Course name"
@@ -81,7 +81,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>Create</span>
         </button>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 export default CreateCourseModal;

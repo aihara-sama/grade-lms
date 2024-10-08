@@ -1,18 +1,18 @@
-import CardTitle from "@/components/card-title";
+import TitleCard from "@/components/common/cards/title-card";
+import BasicInput from "@/components/common/inputs/basic-input";
 import EditSubmissionModal from "@/components/common/modals/edit-submission-modal";
 import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
 import ViewSubmissionModal from "@/components/common/modals/view-submission-modal";
-import BasePopper from "@/components/common/poppers/base-popper";
+import NotFound from "@/components/common/not-found";
+import BasicPopper from "@/components/common/poppers/basic-popper";
+import Table from "@/components/common/table";
 import CheckIcon from "@/components/icons/check-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import DotsIcon from "@/components/icons/dots-icon";
 import SearchIcon from "@/components/icons/search-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
-import Input from "@/components/input";
-import NotFound from "@/components/not-found";
-import Skeleton from "@/components/skeleton";
-import Table from "@/components/table";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { SUBMISSIONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllSubmissions,
@@ -259,7 +259,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
           </button>
         </div>
       ) : (
-        <Input
+        <BasicInput
           StartIcon={<SearchIcon size="xs" />}
           placeholder={t("search")}
           onChange={(e) => setSearchText(e.target.value)}
@@ -267,7 +267,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
           value={searchText}
         />
       )}
-      {isLoading && <Skeleton />}
+      {isLoading && <LoadingSkeleton />}
 
       {isData && (
         <Table
@@ -278,7 +278,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
           data={submissions.map(
             ({ id, author, title, grade, created_at }, idx) => ({
               Name: (
-                <CardTitle
+                <TitleCard
                   checkboxSize="sm"
                   checked={submissionsIds.includes(id)}
                   Icon={<SubmissionsIcon size="sm" />}
@@ -305,7 +305,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                 </p>
               ),
               "": user.role === "Student" && (
-                <BasePopper
+                <BasicPopper
                   placement={
                     submissions.length > 7 && submissions.length - idx < 4
                       ? "top"
@@ -329,7 +329,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                       <DeleteIcon size="xs" /> Delete
                     </li>
                   </ul>
-                </BasePopper>
+                </BasicPopper>
               ),
             })
           )}

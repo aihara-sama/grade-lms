@@ -1,6 +1,6 @@
-import BaseModal from "@/components/common/modals/base-modal";
+import BasicModal from "@/components/common/modals/basic-modal";
 import DeleteIcon from "@/components/icons/delete-icon";
-import LoadingSpinner from "@/components/loading-spinner";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import clsx from "clsx";
 import { useState, type FunctionComponent } from "react";
 
@@ -34,7 +34,7 @@ const PromptDeleteRecordModal: FunctionComponent<Props> = ({
   };
 
   return (
-    <BaseModal
+    <BasicModal
       isInsideModal={isInsideModal}
       isFixedHeight={false}
       onClose={() => onClose()}
@@ -60,7 +60,7 @@ const PromptDeleteRecordModal: FunctionComponent<Props> = ({
           </span>
         </button>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 

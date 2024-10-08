@@ -1,15 +1,15 @@
-import Avatar from "@/components/avatar";
-import CardTitle from "@/components/card-title";
-import BaseModal from "@/components/common/modals/base-modal";
-import Table from "@/components/table";
+import Avatar from "@/components/common/avatar";
+import TitleCard from "@/components/common/cards/title-card";
+import BasicModal from "@/components/common/modals/basic-modal";
+import Table from "@/components/common/table";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import BasicInput from "@/components/common/inputs/basic-input";
+import NotFound from "@/components/common/not-found";
 import CheckIcon from "@/components/icons/check-icon";
 import SearchIcon from "@/components/icons/search-icon";
-import Input from "@/components/input";
-import NotFound from "@/components/not-found";
-import Skeleton from "@/components/skeleton";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
 import {
   enrollAllUsersInCourses,
@@ -177,7 +177,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
   // View
   return (
-    <BaseModal onClose={() => onClose([])} title="Enrollment">
+    <BasicModal onClose={() => onClose([])} title="Enrollment">
       <p className="mb-3 text-neutral-500">Select users to enroll</p>
       {usersIds.length ? (
         <div className="mb-3 flex gap-3">
@@ -190,7 +190,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           </button>
         </div>
       ) : (
-        <Input
+        <BasicInput
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           StartIcon={<SearchIcon />}
@@ -198,7 +198,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           placeholder="Search..."
         />
       )}
-      {isLoading && <Skeleton className="h-[222px]" />}
+      {isLoading && <LoadingSkeleton className="h-[222px]" />}
 
       {isData && (
         <Table
@@ -207,7 +207,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           compact
           data={users.map(({ id, avatar, name, role }) => ({
             Name: (
-              <CardTitle
+              <TitleCard
                 href={`/users/${id}`}
                 checked={usersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
@@ -244,7 +244,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>Enroll</span>
         </button>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 

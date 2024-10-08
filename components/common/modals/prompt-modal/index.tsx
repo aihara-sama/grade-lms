@@ -1,4 +1,4 @@
-import BaseModal from "@/components/common/modals/base-modal";
+import BasicModal from "@/components/common/modals/basic-modal";
 import clsx from "clsx";
 import type { FunctionComponent } from "react";
 
@@ -22,7 +22,7 @@ const PromptModal: FunctionComponent<Props> = ({
   actionHandler,
 }) => {
   return (
-    <BaseModal
+    <BasicModal
       isInsideModal={isInsideModal}
       isFixedHeight={false}
       onClose={() => onClose()}
@@ -46,7 +46,7 @@ const PromptModal: FunctionComponent<Props> = ({
           </span>
         </button>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 

@@ -1,9 +1,9 @@
 "use client";
 
-import BaseDrawer from "@/components/common/drawers/base-drawer";
-import Hamburger from "@/components/hamburger";
-import { menu } from "@/components/header/menu";
-import Logo from "@/components/logo";
+import BasicDrawer from "@/components/common/drawers/basic-drawer";
+import Hamburger from "@/components/common/drawers/mobile-drawer/hamburger";
+import Logo from "@/components/common/logo";
+import { navigation } from "@/components/layout/header/navigation";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
@@ -48,15 +48,15 @@ const MobileDrawer: FunctionComponent = () => {
     <>
       <Hamburger onClick={() => setIsOpen(true)} />
       {isOpen && (
-        <BaseDrawer
+        <BasicDrawer
           header={<Logo />}
           placement="left"
           onClose={() => setIsOpen(false)}
         >
           <div className="px-7">
             <ul className="flex flex-col gap-4 mt-4">
-              {menu
-                .filter(({ views: tier }) => tier.includes(user.role))
+              {navigation
+                .filter(({ tier }) => tier.includes(user.role))
                 .map(({ title, href, Icon }, idx) => (
                   <li key={idx}>
                     <Link
@@ -80,7 +80,7 @@ const MobileDrawer: FunctionComponent = () => {
               </button>
             )}
           </div>
-        </BaseDrawer>
+        </BasicDrawer>
       )}
     </>
   );

@@ -4,9 +4,9 @@ import OverviewTab from "@/components/common/modals/edit-assignment-modal/tabs/o
 import SubmissionsTab from "@/components/common/modals/edit-assignment-modal/tabs/submissions-tab";
 import OverviewIcon from "@/components/icons/dashboard-icon";
 import SubmissionsIcon from "@/components/icons/submissions-icon";
-import Tabs from "@/components/tabs";
 
-import BaseModal from "@/components/common/modals/base-modal";
+import BasicModal from "@/components/common/modals/basic-modal";
+import BasicTabs from "@/components/common/tabs/basic-tabs";
 import type { FunctionComponent } from "react";
 
 interface Props {
@@ -21,9 +21,9 @@ const ViewAssignmentModal: FunctionComponent<Props> = ({
   onSubmissionCreated,
 }) => {
   return (
-    <BaseModal width="lg" onClose={() => onClose()} title="View assignment">
+    <BasicModal width="lg" onClose={() => onClose()} title="View assignment">
       <div className="">
-        <Tabs
+        <BasicTabs
           tabs={[
             {
               title: "Overview",
@@ -44,7 +44,7 @@ const ViewAssignmentModal: FunctionComponent<Props> = ({
           ]}
         />
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 

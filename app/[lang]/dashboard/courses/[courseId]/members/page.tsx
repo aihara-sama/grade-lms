@@ -1,4 +1,4 @@
-import Members from "@/components/course/members";
+import Members from "@/app/[lang]/dashboard/courses/[courseId]/members/components/members";
 import { getCourse } from "@/db/server/course";
 import { getCourseUsers } from "@/db/server/user";
 

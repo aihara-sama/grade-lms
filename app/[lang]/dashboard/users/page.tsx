@@ -1,4 +1,4 @@
-import Users from "@/components/users";
+import Users from "@/app/[lang]/dashboard/users/components/users";
 import { getMyUsers } from "@/db/server/user";
 import { Role } from "@/enums/role.enum";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";

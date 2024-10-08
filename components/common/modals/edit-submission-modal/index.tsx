@@ -1,7 +1,7 @@
-import BaseModal from "@/components/common/modals/base-modal";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
-import Input from "@/components/input";
-import Skeleton from "@/components/skeleton";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { getSubmission, updateSubmission } from "@/db/client/submission";
 import type { ResultOf } from "@/types/utils.type";
 import type { OutputData } from "@editorjs/editorjs";
@@ -13,7 +13,7 @@ import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const Editor = dynamic(() => import("@/components/editor"), {
+const Editor = dynamic(() => import("@/components/common/editor"), {
   ssr: false,
 });
 interface Props {
@@ -73,7 +73,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
   }, []);
 
   return (
-    <BaseModal
+    <BasicModal
       isInsideModal
       width="lg"
       onClose={() => onClose()}
@@ -81,7 +81,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
     >
       {submission ? (
         <div>
-          <Input
+          <BasicInput
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
             placeholder="Submission name"
@@ -126,9 +126,9 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
           </div>
         </div>
       ) : (
-        <Skeleton />
+        <LoadingSkeleton />
       )}
-    </BaseModal>
+    </BasicModal>
   );
 };
 

@@ -1,9 +1,9 @@
-import BaseModal from "@/components/common/modals/base-modal";
-import Select from "@/components/common/select";
-import DateInput from "@/components/date-input";
+import BasicInput from "@/components/common/inputs/basic-input";
+import DateInput from "@/components/common/inputs/date-input";
+import BasicModal from "@/components/common/modals/basic-modal";
+import BasicSelect from "@/components/common/selects/basic-select";
 import LessonsIcon from "@/components/icons/lessons-icon";
-import Input from "@/components/input";
-import LoadingSpinner from "@/components/loading-spinner";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
 import { createLesson, getOverlappingLessons } from "@/db/client/lesson";
@@ -136,14 +136,14 @@ const CreateLessonModal: FunctionComponent<Props> = ({
   }, [selectedCourse]);
 
   return (
-    <BaseModal
+    <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
       title="Create lesson"
     >
       <form onSubmit={submitCreateLesson}>
         {!courseId && (
-          <Select
+          <BasicSelect
             label="Course"
             defaultValue={selectedCourse}
             onChange={onCourseSelect}
@@ -157,7 +157,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
             onSearchInputChange={fetchCoursesBySearch}
           />
         )}
-        <Input
+        <BasicInput
           autoFocus
           fullWidth
           value={lesson.title}
@@ -172,7 +172,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           onChange={onDateChange}
           label="Starts at"
         />
-        <Input
+        <BasicInput
           fullWidth
           label="Duration"
           type="number"
@@ -195,7 +195,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           </button>
         </div>
       </form>
-    </BaseModal>
+    </BasicModal>
   );
 };
 export default CreateLessonModal;

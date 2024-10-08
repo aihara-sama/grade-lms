@@ -1,4 +1,4 @@
-import Lessons from "@/components/course/lessons";
+import Lessons from "@/app/[lang]/dashboard/courses/[courseId]/lessons/components/lessons";
 import { getCourse } from "@/db/server/course";
 import { getCourseLessons } from "@/db/server/lesson";
 import type { FunctionComponent } from "react";
@@ -12,6 +12,7 @@ const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
     getCourse(courseId),
     getCourseLessons(courseId),
   ]);
+
   return <Lessons course={course} lessons={lessons} />;
 };
 export default Page;

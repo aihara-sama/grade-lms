@@ -1,8 +1,8 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 
-import ProgressBar from "@/components/pregress-bar";
 import PaypalProvider from "@/components/providers/paypal-provider";
+import ProgressBar from "@/components/utilities/pregress-bar";
 import "@/styles/globals.css";
 import { Lato } from "next/font/google";
 import type { FunctionComponent, PropsWithChildren } from "react";

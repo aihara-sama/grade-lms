@@ -1,8 +1,8 @@
-import Header from "@/components/header";
-import PushNotificationsProvider from "@/components/push-notifications-provider";
-import UserProvider from "@/components/user-provider";
+import PushNotificationsProvider from "@/components/providers/push-notifications-provider";
+import UserProvider from "@/components/providers/user-provider";
 import { getProfile } from "@/db/server/user";
 import { parseUser } from "@/utils/user/parse-user";
+import Header from "@editorjs/header";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {

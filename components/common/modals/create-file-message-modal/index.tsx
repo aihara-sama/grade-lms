@@ -1,8 +1,8 @@
-import BaseModal from "@/components/common/modals/base-modal";
-import File from "@/components/file";
+import File from "@/components/common/file";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import MessagesIcon from "@/components/icons/messages-icon";
-import Input from "@/components/input";
-import Skeleton from "@/components/skeleton";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { MAX_CHAT_FILE_SIZE } from "@/constants";
 import { uploadChatFile } from "@/db/client/storage";
 import { Event } from "@/enums/event.enum";
@@ -128,7 +128,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
   }, [file]);
 
   return (
-    <BaseModal
+    <BasicModal
       onClose={() => onClose()}
       title="Send File"
       isFixedHeight={false}
@@ -153,7 +153,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
             </div>
           </div>
           <div className="flex items-center gap-2 mb-1">
-            <Input
+            <BasicInput
               StartIcon={<MessagesIcon size="xs" />}
               value={chatMessage.text}
               onChange={onTextChange}
@@ -177,9 +177,9 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
           </div>
         </>
       ) : (
-        <Skeleton />
+        <LoadingSkeleton />
       )}
-    </BaseModal>
+    </BasicModal>
   );
 };
 export default CreateFileMessageModal;

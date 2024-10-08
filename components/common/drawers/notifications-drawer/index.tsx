@@ -1,9 +1,9 @@
 "use client";
 
-import BaseDrawer from "@/components/common/drawers/base-drawer";
+import BasicDrawer from "@/components/common/drawers/basic-drawer";
 import Notification from "@/components/common/drawers/notifications-drawer/notification";
 import NotificationsIcon from "@/components/icons/notifications-icon";
-import Skeleton from "@/components/skeleton";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { NOTIFICATIONS_GET_LIMIT } from "@/constants";
 import {
   getNewNotifications,
@@ -138,7 +138,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
       </button>
 
       {isOpen && (
-        <BaseDrawer
+        <BasicDrawer
           onClose={() => setIsOpen(false)}
           placement="right"
           header={
@@ -147,7 +147,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
             </div>
           }
         >
-          {isLoading && <Skeleton className="px-4 pt-4" />}
+          {isLoading && <LoadingSkeleton className="px-4 pt-4" />}
           {!isLoading && (
             <div
               onScroll={onScroll}
@@ -163,7 +163,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
               ))}
             </div>
           )}
-        </BaseDrawer>
+        </BasicDrawer>
       )}
     </>
   );

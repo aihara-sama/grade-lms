@@ -1,8 +1,8 @@
 "use client";
 
+import BasicInput from "@/components/common/inputs/basic-input";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
-import Input from "@/components/input";
 import { DB } from "@/lib/supabase/db";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import clsx from "clsx";
@@ -53,7 +53,7 @@ const Page: FunctionComponent = () => {
         Login
       </p>
       <form onSubmit={handleSubmit}>
-        <Input
+        <BasicInput
           required
           name="email"
           type="email"
@@ -61,7 +61,7 @@ const Page: FunctionComponent = () => {
           StartIcon={<EmailIcon />}
           fullWidth
         />
-        <Input
+        <BasicInput
           required
           name="password"
           type="password"

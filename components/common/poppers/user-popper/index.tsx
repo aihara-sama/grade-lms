@@ -1,14 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { type FunctionComponent } from "react";
-
-import Avatar from "@/components/avatar";
-import SignOutButton from "@/components/buttons/sign-out-button";
-import BasePopper from "@/components/common/poppers/base-popper";
-import { menu } from "@/components/common/poppers/user-popper/menu";
+import Avatar from "@/components/common/avatar";
+import SignOutButton from "@/components/common/buttons/sign-out-button";
+import BasicPopper from "@/components/common/poppers/basic-popper";
+import { navigation } from "@/components/common/poppers/user-popper/navigation";
 import { useUser } from "@/hooks/use-user";
 import type { PropsWithClassName } from "@/types/props.type";
+import Link from "next/link";
+import type { FunctionComponent } from "react";
 
 const UserPopper: FunctionComponent<PropsWithClassName> = ({
   className = "",
@@ -17,7 +16,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
 
   // View
   return (
-    <BasePopper
+    <BasicPopper
       width="md"
       className={className}
       trigger={<Avatar avatar={user.avatar} className="cursor-pointer" />}
@@ -32,7 +31,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
 
       <hr className="my-3" />
       <ul className="flex flex-col">
-        {menu.map(({ title, href, Icon }, idx) => (
+        {navigation.map(({ title, href, Icon }, idx) => (
           <li key={idx}>
             <Link href={`${href}`} key={idx} className="base-link">
               {Icon}
@@ -44,7 +43,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
           <SignOutButton className="w-full" />
         </li>
       </ul>
-    </BasePopper>
+    </BasicPopper>
   );
 };
 

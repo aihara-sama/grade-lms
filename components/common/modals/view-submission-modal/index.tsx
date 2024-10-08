@@ -1,10 +1,10 @@
-import BaseModal from "@/components/common/modals/base-modal";
-import IconTitle from "@/components/icon-title";
+import IconTitle from "@/components/common/icon-title";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import StarIcon from "@/components/icons/star-icon";
-import Input from "@/components/input";
-import Skeleton from "@/components/skeleton";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { getSubmission, updateSubmission } from "@/db/client/submission";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
 import clsx from "clsx";
@@ -14,7 +14,7 @@ import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const Editor = dynamic(() => import("@/components/editor"), {
+const Editor = dynamic(() => import("@/components/common/editor"), {
   ssr: false,
 });
 interface Props {
@@ -61,17 +61,17 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
   }, []);
 
   return (
-    <BaseModal
+    <BasicModal
       isInsideModal
       width="lg"
       onClose={() => onClose()}
       title="Submission"
     >
       {!submission ? (
-        <Skeleton className="" />
+        <LoadingSkeleton className="" />
       ) : (
         <div>
-          <Input
+          <BasicInput
             disabled
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
@@ -133,7 +133,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
           </div>
         </div>
       )}
-    </BaseModal>
+    </BasicModal>
   );
 };
 export default ViewSubmissionModal;

@@ -1,9 +1,9 @@
 "use client";
 
+import BasicInput from "@/components/common/inputs/basic-input";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
-import Input from "@/components/input";
 import { DEFAULT_AVATAR } from "@/constants";
 import { Role } from "@/enums/role.enum";
 import { DB } from "@/lib/supabase/db";
@@ -72,7 +72,7 @@ const Page: FunctionComponent = () => {
         Create account
       </p>
       <form onSubmit={handleSubmit}>
-        <Input
+        <BasicInput
           autoFocus
           required
           name="name"
@@ -83,7 +83,7 @@ const Page: FunctionComponent = () => {
           maxLength={76}
           minLength={1}
         />
-        <Input
+        <BasicInput
           required
           name="email"
           type="email"
@@ -91,7 +91,7 @@ const Page: FunctionComponent = () => {
           StartIcon={<EmailIcon />}
           fullWidth
         />
-        <Input
+        <BasicInput
           required
           name="password"
           type="password"

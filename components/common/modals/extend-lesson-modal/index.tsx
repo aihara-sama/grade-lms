@@ -1,7 +1,7 @@
-import BaseModal from "@/components/common/modals/base-modal";
+import BasicInput from "@/components/common/inputs/basic-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import TimeIcon from "@/components/icons/time-icon";
-import Input from "@/components/input";
-import LoadingSpinner from "@/components/loading-spinner";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { extendLesson, getOverlappingLessons } from "@/db/client/lesson";
 import { useLesson } from "@/hooks/use-lesson";
 import clsx from "clsx";
@@ -73,14 +73,14 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ onClose }) => {
   };
   // View
   return (
-    <BaseModal
+    <BasicModal
       isFixedHeight={false}
       title="Extend lesson"
       onClose={() => onClose()}
     >
       <div>
         <div>
-          <Input
+          <BasicInput
             value={`${extendLessonByMin}`}
             onChange={onExtendLessonInputChange}
             autoFocus
@@ -106,7 +106,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ onClose }) => {
           </button>
         </div>
       </div>
-    </BaseModal>
+    </BasicModal>
   );
 };
 export default ExtendLessonModal;

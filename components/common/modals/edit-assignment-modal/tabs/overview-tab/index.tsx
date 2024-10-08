@@ -1,9 +1,9 @@
+import Editor from "@/components/common/editor";
+import BasicInput from "@/components/common/inputs/basic-input";
+import DateInput from "@/components/common/inputs/date-input";
 import CreateSubmissionModal from "@/components/common/modals/create-submission-modal";
-import DateInput from "@/components/date-input";
-import Editor from "@/components/editor";
 import LessonsIcon from "@/components/icons/lessons-icon";
-import Input from "@/components/input";
-import Skeleton from "@/components/skeleton";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { getAssignment, updateAssignment } from "@/db/client/assignment";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
@@ -98,7 +98,7 @@ const OverviewTab: FunctionComponent<Props> = ({
     <div>
       {assignment ? (
         <div>
-          <Input
+          <BasicInput
             disabled={user.role !== "Teacher"}
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
@@ -169,7 +169,7 @@ const OverviewTab: FunctionComponent<Props> = ({
           )}
         </div>
       ) : (
-        <Skeleton />
+        <LoadingSkeleton />
       )}
     </div>
   );

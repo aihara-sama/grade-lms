@@ -1,4 +1,4 @@
-import Assignments from "@/components/assignments";
+import Assignments from "@/app/[lang]/dashboard/courses/[courseId]/lessons/[lessonId]/assignments/components/assignments";
 import { getLessonAssignments } from "@/db/server/assignment";
 
 import { type FunctionComponent } from "react";

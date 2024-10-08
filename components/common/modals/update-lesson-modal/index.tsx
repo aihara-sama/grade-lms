@@ -1,11 +1,10 @@
 "use client";
 
-import BaseModal from "@/components/common/modals/base-modal";
-import DateInput from "@/components/date-input";
+import DateInput from "@/components/common/inputs/date-input";
+import BasicModal from "@/components/common/modals/basic-modal";
 import DeleteIcon from "@/components/icons/delete-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
-import Input from "@/components/input";
 import { addMinutes, millisecondsToMinutes, subMinutes } from "date-fns";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FunctionComponent } from "react";
@@ -13,9 +12,10 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { revalidatePageAction } from "@/actions/revalidate-page-action";
+import BasicInput from "@/components/common/inputs/basic-input";
 import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
-import Select from "@/components/common/select";
-import Skeleton from "@/components/skeleton";
+import BasicSelect from "@/components/common/selects/basic-select";
+import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
 import { deleteLessons, getLesson, updateLesson } from "@/db/client/lesson";
@@ -175,7 +175,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
 
     // View
     return (
-      <BaseModal
+      <BasicModal
         isFixedHeight={false}
         onClose={() => onClose()}
         title="View lesson"
@@ -205,7 +205,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
         {lesson && !isLoading ? (
           <form onSubmit={submitUpdateLesson}>
             {user.role === Role.Teacher && (
-              <Select
+              <BasicSelect
                 label="Course"
                 defaultValue={selectedCourse}
                 onChange={onCourseSelect}
@@ -218,7 +218,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
                 onSearchInputChange={fetchCoursesBySearch}
               />
             )}
-            <Input
+            <BasicInput
               name="title"
               fullWidth
               StartIcon={<LessonsIcon size="xs" />}
@@ -234,7 +234,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
               label="Starts at"
               disabled={isLessonOngoing(lesson) || user.role !== Role.Teacher}
             />
-            <Input
+            <BasicInput
               fullWidth
               label="Duration:"
               type="number"
@@ -272,7 +272,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
             </div>
           </form>
         ) : (
-          <Skeleton />
+          <LoadingSkeleton />
         )}
         {isDeleteLessonModalOpen && (
           <PromptDeleteRecordModal
@@ -284,7 +284,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
             prompt={t("prompts.delete_lesson")}
           />
         )}
-      </BaseModal>
+      </BasicModal>
     );
   }
 );

@@ -36,6 +36,7 @@ const Notification: FunctionComponent<Props> = ({
     if (!notification.is_read) submitReadNotification();
   };
 
+  // View
   return (
     <div onMouseEnter={onMouseEnter} className="flex flex-col pb-4 px-7 ">
       <div className="flex items-start gap-2">

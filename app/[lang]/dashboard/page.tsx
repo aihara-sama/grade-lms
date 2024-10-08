@@ -1,5 +1,5 @@
-import StudentDashboard from "@/components/student-dashboard";
-import TeacherDashboard from "@/components/teacher-dashboard";
+import StudentDashboard from "@/app/[lang]/dashboard/components/student-dashboard";
+import TeacherDashboard from "@/app/[lang]/dashboard/components/teacher-dashboard";
 import { getAssignments, getLatestAssignments } from "@/db/server/assignment";
 import {
   getCourses,
