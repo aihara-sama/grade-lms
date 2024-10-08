@@ -108,7 +108,7 @@ const Page: FunctionComponent = () => {
           {isSubmitting && (
             <img
               className="loading-spinner"
-              src="/assets/gifs/loading-spinner.gif"
+              src="/assets/gif/loading-spinner.gif"
               alt=""
             />
           )}

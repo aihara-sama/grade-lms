@@ -58,7 +58,7 @@ const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
           <div className="absolute inset-0 bg-neutral-950/20 rounded-[50%] z-10" />
           <img
             className="loading-spinner size-16"
-            src="/assets/gifs/loading-spinner.gif"
+            src="/assets/gif/loading-spinner.gif"
             alt=""
           />
         </div>

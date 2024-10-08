@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import CheckList from "@editorjs/checklist";
 import Code from "@editorjs/code";
 import Delimiter from "@editorjs/delimiter";

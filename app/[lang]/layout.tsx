@@ -30,7 +30,7 @@ const Layout: FunctionComponent<PropsWithChildren<Props>> = async ({
       <head>
         <link
           rel="prefetch"
-          href="/assets/gifs/loading-spinner.gif"
+          href="/assets/gif/loading-spinner.gif"
           as="image"
         />
         <link rel="prefetch" href="/assets/svg/bubbled-bg.svg" as="image" />

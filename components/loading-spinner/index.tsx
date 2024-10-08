@@ -6,7 +6,7 @@ const LoadingSpinner: FunctionComponent<IProps> = () => {
   return (
     <img
       className="loading-spinner"
-      src="/assets/gifs/loading-spinner.gif"
+      src="/assets/gif/loading-spinner.gif"
       alt=""
     />
   );

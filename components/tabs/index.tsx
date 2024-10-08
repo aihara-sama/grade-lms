@@ -1,7 +1,7 @@
 "use client";
 
 import Tab from "@/components/tabs/tab";
-import type { ITab } from "@/interfaces/tabs.interface";
+import type { Tab as ITab } from "@/interfaces/tabs.interface";
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 

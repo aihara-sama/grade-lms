@@ -254,7 +254,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
                   {isSubmittingUpdateLesson && (
                     <img
                       className="loading-spinner"
-                      src="/assets/gifs/loading-spinner.gif"
+                      src="/assets/gif/loading-spinner.gif"
                       alt=""
                     />
                   )}
