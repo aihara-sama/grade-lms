@@ -48,14 +48,14 @@ export const readNotification = async (id: string) => {
 
   return result.data;
 };
-export const getNewNotificationsCount = async () => {
+export const getNewNotifications = async (options?: { head?: boolean }) => {
   const t = await loadMessages();
-  const result = await DB.from("notifications")
-    .select("*", { count: "exact", head: true })
+
+  const { data, count, error } = await DB.from("notifications")
+    .select("*", { count: "exact", ...options })
     .eq("is_read", false);
 
-  if (result.error)
-    throw new Error(t("error.failed_to_load_new_notifications_count"));
+  if (error) throw new Error(t("error.failed_to_load_new_notifications"));
 
-  return result.count;
+  return { data, count };
 };

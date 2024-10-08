@@ -64,20 +64,6 @@ export const getUsersInsights = async () => {
   return { data, count };
 };
 
-export const getUsersCount = async (userName = "") => {
-  const t = await loadMessages();
-
-  const result = await DB.from("users")
-    .select("count")
-    .ilike("name", `%${userName}%`)
-    .returns<{ count: number }[]>()
-    .single();
-
-  if (result.error) throw new Error(t("error.failed_to_load_users_count"));
-
-  return result.data.count;
-};
-
 export const getCourseUsers = async (
   courseId: string,
   userName = "",
@@ -96,20 +82,6 @@ export const getCourseUsers = async (
   if (error) throw new Error(t("error.failed_to_load_users"));
 
   return { data, count };
-};
-export const getCourseUsersCount = async (courseId: string, userName = "") => {
-  const t = await loadMessages();
-
-  const result = await DB.from("courses")
-    .select("users(count)")
-    .eq("id", courseId)
-    .ilike("users.name", `%${userName}%`)
-    .returns<Record<"users", { count: number }[]>[]>()
-    .single();
-
-  if (result.error) throw new Error(t("error.failed_to_load_users_count"));
-
-  return result.data.users[0].count;
 };
 
 export const getUsersNotInCourse = async (
@@ -134,24 +106,6 @@ export const getUsersNotInCourse = async (
   if (error) throw new Error(t("error.failed_to_load_users"));
 
   return { data, count };
-};
-export const getUsersNotInCourseCount = async (
-  courseId: string,
-  userName = ""
-) => {
-  const t = await loadMessages();
-
-  const result = await DB.rpc("get_users_not_in_course", {
-    p_course_id: courseId,
-    p_user_name: userName,
-  })
-    .select("count")
-    .returns<{ count: number }[]>()
-    .single();
-
-  if (result.error) throw new Error(t("error.failed_to_load_users"));
-
-  return result.data.count;
 };
 
 // CREATE

@@ -16,6 +16,7 @@ export const usePushNotifications = () => {
   const router = useRouter();
   const { user, setUser } = useUser((state) => state);
 
+  // Handlers
   const enablePushNotifications = async () => {
     try {
       const permission = await Notification.requestPermission();
@@ -44,7 +45,6 @@ export const usePushNotifications = () => {
       toast.error(err.message);
     }
   };
-
   const firePushNotification = (
     notification: ResultOf<typeof getNotification>
   ) => {

@@ -3,27 +3,27 @@
 import type { Lesson } from "@/types/lesson.type";
 import { create } from "zustand";
 
-export interface IPointerPosition {
+export interface PointerPosition {
   pointerX: number;
   pointerY: number;
 }
 
-export interface ISchedueState {
+export interface SchedueState {
   selectedLesson?: Lesson;
   setSelectedLesson: (lesson: Lesson) => void;
   canDropEvent: boolean;
   draggingEvent?: Lesson;
   setDraggingEvent: (lesson: Lesson) => void;
-  pointerOffsetPositionOnEvent?: IPointerPosition;
-  initPointerPosition?: IPointerPosition;
+  pointerOffsetPositionOnEvent?: PointerPosition;
+  initPointerPosition?: PointerPosition;
   initEventPosition?: { x: number; y: number };
-  setInitPointerPosition: (pointerPosition: IPointerPosition) => void;
+  setInitPointerPosition: (pointerPosition: PointerPosition) => void;
   setInitEventPosition: (initEventPosition: { x: number; y: number }) => void;
-  setPointerOffsetPositionOnEvent: (pointerPosition: IPointerPosition) => void;
+  setPointerOffsetPositionOnEvent: (pointerPosition: PointerPosition) => void;
   setCanDropEvent: (canDrop: boolean) => void;
 }
 
-export const useSchedule = create<ISchedueState>((set) => ({
+export const useSchedule = create<SchedueState>((set) => ({
   canDropEvent: true,
   draggingEvent: undefined,
   selectedLesson: undefined,

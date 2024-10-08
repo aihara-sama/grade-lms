@@ -13,6 +13,7 @@ import type { MediaConnection } from "peerjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useVideoChat = () => {
+  // State
   const [cameras, setCameras] = useState<Camera[]>([]);
 
   // Hooks
@@ -30,17 +31,7 @@ export const useVideoChat = () => {
   const localStreamRef = useRef<MediaStream>();
   const peerRef = useRef<Peer>();
 
-  const endSession = () => {
-    if (peerRef.current) {
-      peerRef.current.disconnect();
-      peerRef.current.destroy();
-    }
-    localStreamRef.current?.getTracks().forEach((track) => {
-      track.stop();
-    });
-
-    channel.unsubscribe();
-  };
+  // Handlers
   const addCamera = (stream: MediaStream, _user: User) => {
     setCameras((_) => {
       return [
@@ -112,7 +103,6 @@ export const useVideoChat = () => {
         });
     }
   };
-
   const onPresenceLeave = (
     payload: RealtimePresenceLeavePayload<{ user: User }>
   ) => {
@@ -120,7 +110,6 @@ export const useVideoChat = () => {
       _.filter((camera) => payload.leftPresences[0].user.id !== camera.user.id)
     );
   };
-
   const onPresenceSubscribe = async (
     status: `${REALTIME_SUBSCRIBE_STATES}`
   ) => {
@@ -168,7 +157,19 @@ export const useVideoChat = () => {
       peerRef.current.on("call", onPeerCall);
     });
   };
+  const endSession = () => {
+    if (peerRef.current) {
+      peerRef.current.disconnect();
+      peerRef.current.destroy();
+    }
+    localStreamRef.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
 
+    channel.unsubscribe();
+  };
+
+  // Effects
   useEffect(() => {
     return () => {
       if (peerRef.current) {

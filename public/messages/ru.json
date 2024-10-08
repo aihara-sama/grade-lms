@@ -92,7 +92,7 @@
     "failed_to_delete_submissions": "Не удалось удалить работы",
 
     "failed_to_load_notifications": "Не удалось загрузить уведомления",
-    "failed_to_load_new_notifications_count": "Не удалось получить количество новых уведомлений",
+    "failed_to_load_new_notifications": "Не удалось получить количество новых уведомлений",
     "failed_to_read_notification": "Не удалось прочитать уведомление",
 
     "failed_to_load_messages": "Не удалось загрузить сообщения",

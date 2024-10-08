@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { useStore } from "zustand";
 
 export const useUser = <T>(selector?: (state: UserState) => T): T => {
+  // Hooks
   const store = useContext(UserContext);
 
   return useStore(store, selector);

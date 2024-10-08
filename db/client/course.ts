@@ -80,21 +80,6 @@ export const getUnenrolledCourses = async (
 
   return { data, count };
 };
-export const getUnenrolledCoursesCount = async (userId: string, title = "") => {
-  const t = await loadMessages();
-
-  const result = await DB.rpc("get_unenrolled_courses", {
-    p_user_id: userId,
-    p_course_title: title,
-  })
-    .select("count")
-    .returns<{ count: number }[]>()
-    .single();
-
-  if (result.error) throw new Error(t("error.failed_to_load_courses_count"));
-
-  return result.data.count;
-};
 
 // CREATE
 export const createCourse = async (course: TablesInsert<"courses">) => {
@@ -122,7 +107,7 @@ export const updateCourse = async (course: TablesUpdate<"courses">) => {
   return result.data;
 };
 
-// DELTE
+// DELETE
 export const deleteCourse = async (id: string) => {
   const t = await loadMessages();
 

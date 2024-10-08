@@ -51,23 +51,6 @@ export const getSubmissionsInsights = async () => {
 
   return { data, count };
 };
-export const getAssignmentSubmissionsCount = async (
-  assignmentId: string,
-  title = ""
-) => {
-  const t = await loadMessages();
-
-  const result = await DB.from("submissions")
-    .select("count")
-    .eq("assignment_id", assignmentId)
-    .ilike("title", `%${title}%`)
-    .returns<{ count: number }[]>()
-    .single();
-
-  if (result.error) throw new Error(t("error.failed_to_load_submissions"));
-
-  return result.data.count;
-};
 
 // CREATE
 export const createSubmission = async (

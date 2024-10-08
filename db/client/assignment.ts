@@ -51,24 +51,6 @@ export const getAssignmentsInsights = async () => {
 
   return { data, count };
 };
-export const getLessonAssignmentsCount = async (
-  lessonId: string,
-  title = ""
-) => {
-  const t = await loadMessages();
-
-  const result = await DB.from("assignments")
-    .select("count")
-    .ilike("title", `%${title}%`)
-    .eq("lesson_id", lessonId)
-    .returns<{ count: number }[]>()
-    .single();
-
-  if (result.error)
-    throw new Error(t("error.failed_to_load_assignments_count"));
-
-  return result.data.count;
-};
 
 // CREATE
 export const createAssignment = async (

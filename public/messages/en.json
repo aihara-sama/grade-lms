@@ -96,7 +96,7 @@
     "failed_to_delete_submissions": "Failed to delete submissions",
 
     "failed_to_load_notifications": "Failed to load notifications",
-    "failed_to_load_new_notifications_count": "Failed to get new notifications count",
+    "failed_to_load_new_notifications": "Failed to get new notifications count",
     "failed_to_read_notification": "Failed to read notification",
 
     "failed_to_load_messages": "Failed to load messages",

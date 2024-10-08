@@ -6,7 +6,7 @@ import NotificationsIcon from "@/components/icons/notifications-icon";
 import Skeleton from "@/components/skeleton";
 import { NOTIFICATIONS_GET_LIMIT } from "@/constants";
 import {
-  getNewNotificationsCount,
+  getNewNotifications,
   getNotification,
   getNotifications,
 } from "@/db/client/notification";
@@ -60,19 +60,20 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
   };
   const fetchNotifications = async () => {
     try {
-      const [{ data: fetchedNotifications }, fetchedNewNotificationsCount] =
-        await Promise.all([
+      const [fetchedNotifications, fetchedNewNotifications] = await Promise.all(
+        [
           getNotifications(
             notificationsOffsetRef.current,
             notificationsOffsetRef.current + NOTIFICATIONS_GET_LIMIT - 1
           ),
-          getNewNotificationsCount(),
-        ]);
+          getNewNotifications({ head: true }),
+        ]
+      );
 
-      setNewNotificationsCount(fetchedNewNotificationsCount);
-      setNotifications((prev) => [...prev, ...fetchedNotifications]);
+      setNewNotificationsCount(fetchedNewNotifications.count);
+      setNotifications((prev) => [...prev, ...fetchedNotifications.data]);
 
-      notificationsOffsetRef.current += fetchedNotifications.length;
+      notificationsOffsetRef.current += fetchedNotifications.data.length;
     } catch (error: any) {
       toast.error(error.message);
     }

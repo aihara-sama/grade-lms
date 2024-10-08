@@ -1,30 +1,3 @@
-// import { useCallback, useState } from "react";
-
-// // Custom hook to lock asynchronous functions
-// const useFetchLock = () => {
-//   const [isFetching, setIsFetching] = useState(false);
-
-//   const fetchWithLock = useCallback(
-//     async (fetchFn: () => Promise<void>) => {
-//       // If already fetching, return early
-//       if (isFetching) return;
-
-//       setIsFetching(true); // Set the fetching flag to true
-//       try {
-//         await fetchFn(); // Execute the async function
-//       } catch (error) {
-//         console.error("Error during fetch:", error);
-//       } finally {
-//         setIsFetching(false); // Reset the fetching flag
-//       }
-//     },
-//     [isFetching]
-//   );
-
-//   return fetchWithLock;
-// };
-
-// export default useFetchLock;
 import { useCallback, useState } from "react";
 
 // Type for the fetching states
