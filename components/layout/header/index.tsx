@@ -47,14 +47,14 @@ const Header: FunctionComponent = () => {
               <div className="flex items-center gap-2">
                 <NotificationsIcon size="xs" />
                 <p className="text-sm font-bold flex-1">
-                  Do you want to enable browser notifications?
+                  {t("dashboard.header.enable_browser_notifications")}
                 </p>
               </div>
               <button
                 onClick={enablePushNotifications}
                 className="rounded border border-dark-200 inter-active cursor-pointer px-4 py-1 text-sm"
               >
-                Enable
+                {t("dashboard.header.enable")}
               </button>
             </div>
           </Alert>

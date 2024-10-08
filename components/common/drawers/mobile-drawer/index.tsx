@@ -4,9 +4,10 @@ import BasicDrawer from "@/components/common/drawers/basic-drawer";
 import Hamburger from "@/components/common/drawers/mobile-drawer/hamburger";
 import Logo from "@/components/common/logo";
 import { navigation } from "@/components/layout/header/navigation";
+import { createLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
+import type { Navigation } from "@/types/navigation.type";
 import { addMinutes } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-nprogress-bar";
@@ -26,17 +27,14 @@ const MobileDrawer: FunctionComponent = () => {
   // Handlers
   const submitCreateLesson = async () => {
     try {
-      const { error, data } = await DB.from("lessons")
-        .insert({
-          starts: new Date().toISOString(),
-          ends: addMinutes(new Date(), 30).toISOString(),
-          creator_id: user.id,
-        })
-        .select("id")
-        .single();
+      const lesson = await createLesson({
+        starts: new Date().toISOString(),
+        ends: addMinutes(new Date(), 30).toISOString(),
+        creator_id: user.id,
+      });
 
-      if (error) throw new Error(t("error.failed_to_create_lesson"));
-      router.push(`/dashboard/lessons/${data.id}`);
+      router.push(`/dashboard/lessons/${lesson.id}`);
+
       setIsOpen(false);
     } catch (error: any) {
       toast.error(error.message);
@@ -65,7 +63,11 @@ const MobileDrawer: FunctionComponent = () => {
                       className="flex items-center gap-2"
                     >
                       {Icon}
-                      <span className="text-md"> {title}</span>
+                      <span className="text-md">
+                        {t(
+                          `dashboard.header.navigation.${title as Navigation}`
+                        )}
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -76,7 +78,7 @@ const MobileDrawer: FunctionComponent = () => {
                 className="primary-button mt-4"
                 onClick={submitCreateLesson}
               >
-                Quick lesson
+                {t("dashboard.header.navigation.quick_lesson")}
               </button>
             )}
           </div>

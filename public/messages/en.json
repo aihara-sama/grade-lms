@@ -10,6 +10,22 @@
   "deleted": "Deleted",
   "login": "login",
 
+  "dashboard": {
+    "header": {
+      "enable_browser_notifications": "Do you want to enable browser notifications?",
+      "enable": "Enable",
+      "notifications": "Notifications",
+      "navigation": {
+        "dashboard": "Dashboard",
+        "courses": "Courses",
+        "users": "Users",
+        "schedule": "Schedule",
+        "profile": "Profile",
+        "quick_lesson": "Quick lesson"
+      }
+    }
+  },
+
   "sign-in": {
     "dont_have_an_account?": "Don't have an account?",
     "join": "Join"

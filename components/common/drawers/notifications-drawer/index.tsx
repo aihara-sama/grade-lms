@@ -17,6 +17,7 @@ import type { ResultOf } from "@/types/utils.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import type { RealtimePostgresInsertPayload } from "@supabase/supabase-js";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent, UIEventHandler } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -30,6 +31,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
   // Hooks
   const user = useUser((state) => state.user);
   const { firePushNotification } = usePushNotifications();
+  const t = useTranslations();
 
   // State
   const [isOpen, setIsOpen] = useState(false);
@@ -79,12 +81,6 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
     }
   };
 
-  const onScrollEnd = useCallback(throttleFetch(fetchNotifications), []);
-
-  const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
-    if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd();
-  };
-
   const onNewNotification = async (
     payload: RealtimePostgresInsertPayload<(typeof notifications)[number]>
   ) => {
@@ -100,6 +96,12 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
     } catch (error: any) {
       toast.error(error.message);
     }
+  };
+
+  const onScrollEnd = useCallback(throttleFetch(fetchNotifications), []);
+
+  const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
+    if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd();
   };
 
   // Effects
@@ -125,6 +127,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
     })();
   }, []);
 
+  // View
   return (
     <>
       <button
@@ -143,7 +146,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
           placement="right"
           header={
             <div className="text-center flex-1 text-md font-bold">
-              Notifications
+              {t("dashboard.header.notifications")}
             </div>
           }
         >

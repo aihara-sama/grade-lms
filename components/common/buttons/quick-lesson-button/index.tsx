@@ -33,7 +33,7 @@ const QuickLessonButton: FunctionComponent = () => {
   // View
   return (
     <button className="primary-button" onClick={submitCreateLesson}>
-      Quick lesson
+      {t("dashboard.header.navigation.quick_lesson")}
     </button>
   );
 };

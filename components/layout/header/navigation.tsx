@@ -6,25 +6,25 @@ import type { MenuItem } from "@/interfaces/menu.interface";
 
 export const navigation: MenuItem[] = [
   {
-    title: "Dashboard",
+    title: "dashboard",
     href: "/dashboard",
     Icon: <OverviewIcon />,
     tier: ["Teacher", "Student"],
   },
   {
-    title: "Courses",
+    title: "courses",
     href: "/dashboard/courses",
     Icon: <CoursesIcon />,
     tier: ["Teacher", "Student"],
   },
   {
-    title: "Users",
+    title: "users",
     href: "/dashboard/users",
     Icon: <UsersIcon />,
     tier: ["Teacher"],
   },
   {
-    title: "Schedule",
+    title: "schedule",
     href: "/dashboard/schedule",
     Icon: <CalendarIcon />,
     tier: ["Teacher", "Student"],

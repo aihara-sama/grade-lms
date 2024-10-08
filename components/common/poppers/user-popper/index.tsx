@@ -5,13 +5,17 @@ import SignOutButton from "@/components/common/buttons/sign-out-button";
 import BasicPopper from "@/components/common/poppers/basic-popper";
 import { navigation } from "@/components/common/poppers/user-popper/navigation";
 import { useUser } from "@/hooks/use-user";
+import type { Navigation } from "@/types/navigation.type";
 import type { PropsWithClassName } from "@/types/props.type";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 
 const UserPopper: FunctionComponent<PropsWithClassName> = ({
   className = "",
 }) => {
+  // Hooks
+  const t = useTranslations();
   const user = useUser((state) => state.user);
 
   // View
@@ -35,7 +39,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
           <li key={idx}>
             <Link href={`${href}`} key={idx} className="base-link">
               {Icon}
-              {title}
+              {t(`dashboard.header.navigation.${title as Navigation}`)}
             </Link>
           </li>
         ))}

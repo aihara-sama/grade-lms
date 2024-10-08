@@ -4,7 +4,7 @@ import type { MenuItem } from "@/interfaces/menu.interface";
 export const navigation: MenuItem[] = [
   {
     Icon: <ProfileIcon />,
-    title: "Profile",
+    title: "profile",
     href: "/dashboard/profile",
     tier: ["Teacher", "Student"],
   },
