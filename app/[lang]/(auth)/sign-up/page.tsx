@@ -60,7 +60,6 @@ const Page: FunctionComponent = () => {
     if (error) toast(t(serverErrToIntlKey(error.message)));
     else {
       setIsSuccess(true);
-
       router.push(searchParams.get("redirect") || `/dashboard`);
     }
   };
@@ -69,7 +68,7 @@ const Page: FunctionComponent = () => {
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
       <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
-        Create account
+        {t("sign-up.create_account")}
       </p>
       <form onSubmit={handleSubmit}>
         <BasicInput
@@ -77,7 +76,7 @@ const Page: FunctionComponent = () => {
           required
           name="name"
           type="text"
-          placeholder="Name"
+          placeholder={t("placeholders.name")}
           StartIcon={<AvatarIcon size="xs" />}
           fullWidth
           maxLength={76}
@@ -87,7 +86,7 @@ const Page: FunctionComponent = () => {
           required
           name="email"
           type="email"
-          placeholder="Email"
+          placeholder={t("placeholders.email")}
           StartIcon={<EmailIcon />}
           fullWidth
         />
@@ -95,7 +94,7 @@ const Page: FunctionComponent = () => {
           required
           name="password"
           type="password"
-          placeholder="Password"
+          placeholder={t("placeholders.password")}
           StartIcon={<SecurityIcon />}
           fullWidth
           minLength={6}
@@ -113,17 +112,17 @@ const Page: FunctionComponent = () => {
             />
           )}
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-            Create account
+            {t("sign-up.create_account")}
           </span>
         </button>
       </form>
       <p className="text-sm">
-        Already have an account?{" "}
+        {t("sign-up.already_have_an_account?")}{" "}
         <Link
           href={`/sign-in/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
           className="underline"
         >
-          Login
+          {t("login")}
         </Link>
       </p>
     </div>

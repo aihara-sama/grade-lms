@@ -3,6 +3,7 @@
 import BasicInput from "@/components/common/inputs/basic-input";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { DB } from "@/lib/supabase/db";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import clsx from "clsx";
@@ -47,17 +48,19 @@ const Page: FunctionComponent = () => {
       router.push(searchParams.get("redirect") || `/dashboard`);
     }
   };
+
+  // View
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
       <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
-        Login
+        {t("login")}
       </p>
       <form onSubmit={handleSubmit}>
         <BasicInput
           required
           name="email"
           type="email"
-          placeholder="Email"
+          placeholder={t("placeholders.email")}
           StartIcon={<EmailIcon />}
           fullWidth
         />
@@ -65,7 +68,7 @@ const Page: FunctionComponent = () => {
           required
           name="password"
           type="password"
-          placeholder="Password"
+          placeholder={t("placeholders.password")}
           StartIcon={<SecurityIcon />}
           fullWidth
         />
@@ -73,23 +76,19 @@ const Page: FunctionComponent = () => {
           disabled={isSubmitting || isSuccess}
           className="primary-button w-full"
         >
-          {isSubmitting && (
-            <img
-              className="loading-spinner"
-              src="/assets/gif/loading-spinner.gif"
-              alt=""
-            />
-          )}
-          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Login</span>
+          {isSubmitting && <LoadingSpinner />}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+            {t("login")}
+          </span>
         </button>
       </form>
       <p className="text-sm">
-        Don&apos;t have an account?{" "}
+        {t("sign-in.dont_have_an_account?")}{" "}
         <Link
           href={`/sign-up/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
           className="underline"
         >
-          Join
+          {t("sign-in.join")}
         </Link>
       </p>
     </div>

@@ -8,6 +8,23 @@
   "search": "Search",
   "profile": "Profile",
   "deleted": "Deleted",
+  "login": "login",
+
+  "sign-in": {
+    "dont_have_an_account?": "Don't have an account?",
+    "join": "Join"
+  },
+
+  "sign-up": {
+    "create_account": "Create account",
+    "already_have_an_account?": "Already have an account?"
+  },
+
+  "placeholders": {
+    "name": "Name",
+    "email": "Email",
+    "password": "password"
+  },
 
   "success": {
     "user_created": "User successfully created",
