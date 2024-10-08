@@ -12,9 +12,13 @@ interface Props {
 
 const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft = false }) => {
   // Hooks
-  const { lesson, isEnded, isOngoing, setisEnded, setisOngoing } = useLesson(
-    (state) => state
-  );
+  const {
+    lesson,
+    isEnded,
+    isOngoing,
+    setIsEnded: setisEnded,
+    setIsOngoing: setisOngoing,
+  } = useLesson((state) => state);
 
   // State
   const [liveDate, setLiveDate] = useState<string>();

@@ -95,6 +95,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
           <BasicTabs
             tabs={[
               {
+                tier: ["Teacher"],
                 title: "General",
                 Icon: <OverviewIcon />,
                 content: (
@@ -137,6 +138,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                 ),
               },
               {
+                tier: ["Teacher"],
                 title: "Avatar",
                 Icon: <CameraIcon />,
                 content: (

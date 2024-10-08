@@ -13,9 +13,9 @@ export interface LessonState {
   isEnded: boolean;
   isOngoing: boolean;
   setLesson: (lesson: LessonState["lesson"]) => void;
-  setisEnding: (isEnding: boolean) => void;
-  setisEnded: (isEnded: boolean) => void;
-  setisOngoing: (isOngoing: boolean) => void;
+  setIsEnding: (isEnding: boolean) => void;
+  setIsEnded: (isEnded: boolean) => void;
+  setIsOngoing: (isOngoing: boolean) => void;
 }
 
 export type LessonStore = ReturnType<typeof createLessonStore>;
@@ -36,8 +36,8 @@ export const createLessonStore = (initLesson: LessonState["lesson"]) => {
             }
           : {}),
       }),
-    setisEnded: (isEnded) => set({ isEnded }),
-    setisEnding: (isEnding) => set({ isEnding }),
-    setisOngoing: (isOngoing) => set({ isOngoing }),
+    setIsEnded: (isEnded) => set({ isEnded }),
+    setIsEnding: (isEnding) => set({ isEnding }),
+    setIsOngoing: (isOngoing) => set({ isOngoing }),
   }));
 };

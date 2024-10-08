@@ -7,7 +7,6 @@ import AssignmentsIcon from "@/components/icons/assignments-icon";
 import CameraIcon from "@/components/icons/camera-icon";
 import ChatIcon from "@/components/icons/chat-icon";
 import Whiteboard from "@/components/lesson/whiteboard";
-import { Role } from "@/enums/role.enum";
 import clsx from "clsx";
 import {
   useEffect,
@@ -27,6 +26,7 @@ import { getLesson } from "@/db/client/lesson";
 import { useChat } from "@/hooks/use-chat";
 import { useLesson } from "@/hooks/use-lesson";
 import { useVideoChat } from "@/hooks/use-video-chat";
+import type { Tab } from "@/interfaces/tabs.interface";
 import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";
 import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
 import { isLessonEnding } from "@/utils/lesson/is-lesson-ending";
@@ -34,7 +34,7 @@ import toast from "react-hot-toast";
 
 const LiveLesson: FunctionComponent = () => {
   // Hooks
-  const { lesson, isEnded, setisEnding, setisEnded } = useLesson(
+  const { lesson, isEnded, setIsEnding, setIsEnded } = useLesson(
     (state) => state
   );
 
@@ -48,8 +48,9 @@ const LiveLesson: FunctionComponent = () => {
         try {
           const data = await getLesson(lesson.id);
 
-          setisEnding(isLessonEnding(data));
-          setisEnded(isLessonEnded(data));
+          if (!isLessonEnded(data)) setIsEnding(isLessonEnding(data));
+
+          setIsEnded(isLessonEnded(data));
         } catch (error: any) {
           console.error(error);
         }
@@ -66,7 +67,7 @@ const LiveLesson: FunctionComponent = () => {
   const activeTabRef = useRef(activeTab);
 
   // Vars
-  const tabs = [
+  const tabs: Tab[] = [
     {
       title: "Cameras",
       content: (
@@ -96,7 +97,7 @@ const LiveLesson: FunctionComponent = () => {
         </div>
       ),
       Icon: <CameraIcon />,
-      tier: [Role.Teacher, Role.Student, Role.Guest],
+      tier: ["Teacher", "Student", "Guest"],
     },
   ];
 
@@ -113,13 +114,13 @@ const LiveLesson: FunctionComponent = () => {
             )}
           </div>
         ),
-        tier: [Role.Teacher, Role.Student, Role.Guest],
+        tier: ["Teacher", "Student", "Guest"],
       },
       {
         title: "Assignments",
         content: <AssignmentsTab lessonId={lesson.id} />,
         Icon: <AssignmentsIcon />,
-        tier: [Role.Teacher],
+        tier: ["Teacher"],
       }
     );
   }
@@ -136,10 +137,6 @@ const LiveLesson: FunctionComponent = () => {
 
       toast.success("The lesson has ended");
     }
-
-    return () => {
-      stopExecAtStartOfMin();
-    };
   }, [isEnded]);
 
   useEffect(() => {
@@ -150,6 +147,8 @@ const LiveLesson: FunctionComponent = () => {
   useEffect(() => {
     if (activeTab !== 1 && messages.length) setIsNewChatMessage(true);
   }, [messages]);
+
+  useEffect(() => stopExecAtStartOfMin, []);
 
   return (
     <Container fullWidth={true}>
@@ -179,7 +178,7 @@ const LiveLesson: FunctionComponent = () => {
       <main className="flex gap-6 mt-4">
         <Whiteboard />
         <div
-          className={` ${clsx({
+          className={`${clsx({
             "h-[calc(100vh-132px)]": !lesson.course_id,
             "h-[calc(100vh-152px)]": !!lesson.course_id,
           })}  pl-6 flex relative border-l-2 border-gray-200 ${isAsideOpen ? "flex-1" : "flex-[0]"}`}

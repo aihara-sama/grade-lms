@@ -13,6 +13,7 @@ import type { InputType as UserInputType } from "@/actions/create-user-action/ty
 import BasicInput from "@/components/common/inputs/basic-input";
 import BasicModal from "@/components/common/modals/basic-modal";
 import TimezoneSelect from "@/components/common/selects/timezone-select";
+import BasicTabs from "@/components/common/tabs/basic-tabs";
 import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { DEFAULT_AVATAR } from "@/constants";
 import { createUser } from "@/db/client/user";
@@ -21,7 +22,6 @@ import { getTimeZone } from "@/utils/localization/get-time-zone";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
-import BasicTabs from "@/components/common/tabs/basic-tabs";
 
 interface Props {
   onClose: (maybeUser?: ResultOf<typeof createUser>) => void;
@@ -80,6 +80,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
         <BasicTabs
           tabs={[
             {
+              tier: ["Teacher"],
               title: "General",
               Icon: <OverviewIcon />,
               content: (
@@ -124,6 +125,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
               ),
             },
             {
+              tier: ["Teacher"],
               title: "Avatar",
               Icon: <CameraIcon />,
               content: (
