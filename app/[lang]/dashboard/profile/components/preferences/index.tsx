@@ -6,6 +6,7 @@ import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
 import type { PropsWithClassName } from "@/types/props.type";
 import type { UserMetadata } from "@supabase/supabase-js";
+import { useTranslations } from "next-intl";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
@@ -13,6 +14,7 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   className = "",
 }) => {
   // Hooks
+  const t = useTranslations();
   const { user, setUser } = useUser((state) => state);
   const { enablePushNotifications } = usePushNotifications();
 
@@ -62,11 +64,13 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   // View
   return (
     <div className={className}>
-      <p className="text-2xl font-bold text-neutral-600">Preferences</p>
+      <p className="text-2xl font-bold text-neutral-600">
+        {t("profile.preferences")}
+      </p>
       <div className="flex flex-col gap-2 mt-3 mb-8">
         <div className="flex items-center gap-3">
           <Switch isChecked={isEmailsOn} setIsChecked={setIsEmailsOn} />
-          <span>Enable/Disable emails</span>
+          <span>{t("profile.enable_disable_emails")}</span>
         </div>
         <div className="flex items-center gap-3">
           <Switch
@@ -75,7 +79,7 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
               setPushNotificationsState(checked ? "on" : "off")
             }
           />
-          <span>Enable/Disable push notifications</span>
+          <span>{t("profile.enable_disable_browser_notifications")}</span>
         </div>
       </div>
       <SelectLocale />

@@ -63,7 +63,7 @@ const SelectLocale: FunctionComponent = () => {
           ),
           id: toCapitalCase(_locale),
         }))}
-        label="Language"
+        label={t("labels.language")}
         onChange={({ id }) => {
           submitUpdateLocale(id.toLocaleLowerCase() as Locale);
         }}

@@ -14,10 +14,12 @@ import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
 import type { UserMetadata } from "@supabase/supabase-js";
 import type { NextPage } from "next";
+import { useTranslations } from "next-intl";
 
 const Page: NextPage = () => {
   // Hooks
   const { user, setUser } = useUser((state) => state);
+  const t = useTranslations();
 
   // State
   const [avatar, setAvatar] = useState(user.avatar);
@@ -34,7 +36,7 @@ const Page: NextPage = () => {
 
         setUser({ ...user, avatar });
 
-        toast.success("Avatar changed");
+        toast.success(t("success.avatar_changed"));
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -58,10 +60,14 @@ const Page: NextPage = () => {
         <Preferences className="mt-16" />
         <Security className="mt-16" />
         <div className="mt-16">
-          <p className="text-2xl font-bold text-neutral-600">Plan</p>
+          <p className="text-2xl font-bold text-neutral-600">
+            {t("profile.plan")}
+          </p>
           <div className="mt-3">
             <p className="text-neutral-500">
-              You plan is <span className="font-bold">Basic</span>
+              {t.rich("profile.your_plan_is basic", {
+                b: (chunks) => <span className="font-bold">{chunks}</span>,
+              })}
             </p>
             <a
               className="button link-button w-40 mt-1"
@@ -69,7 +75,7 @@ const Page: NextPage = () => {
               href={`/${user.preferred_locale}/subscription`}
             >
               <CrownIcon />
-              Upgrade
+              {t("links.upgrade")}
             </a>
           </div>
         </div>

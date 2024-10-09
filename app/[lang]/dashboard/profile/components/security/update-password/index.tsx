@@ -47,7 +47,7 @@ const UpdatePassword: FunctionComponent = () => {
         fullWidth
         name="password"
         StartIcon={<SecurityIcon size="xs" />}
-        label="Password"
+        label={t("labels.password")}
         className="mb-auto"
       />
       <button
@@ -57,7 +57,7 @@ const UpdatePassword: FunctionComponent = () => {
       >
         {isSubmitting && <LoadingSpinner />}
         <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-          Change password
+          {t("buttons.change_password")}
         </span>
       </button>
     </div>

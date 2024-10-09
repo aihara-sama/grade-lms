@@ -1,5 +1,6 @@
 import BasicInput from "@/components/common/inputs/basic-input";
 import AvatarIcon from "@/components/icons/avatar-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { useUser } from "@/hooks/use-user";
 import { DB } from "@/lib/supabase/db";
 import type { UserMetadata } from "@supabase/supabase-js";
@@ -31,7 +32,7 @@ const UpdateName: FunctionComponent = () => {
 
     setIsSubmitting(false);
 
-    if (error) toast.error("Something went wrong");
+    if (error) toast.error(t("error.something_went_wrong"));
     else {
       setUser({ ...user, name });
       toast.success(t("success.user_updated"));
@@ -47,7 +48,7 @@ const UpdateName: FunctionComponent = () => {
         fullWidth
         name="name"
         StartIcon={<AvatarIcon size="xs" />}
-        label="Name"
+        label={t("labels.name")}
         autoFocus
         className="mb-auto"
       />
@@ -56,14 +57,10 @@ const UpdateName: FunctionComponent = () => {
         className="primary-button w-[100px]"
         onClick={submitUpdateName}
       >
-        {isSubmitting && (
-          <img
-            className="loading-spinner"
-            src="/assets/gif/loading-spinner.gif"
-            alt=""
-          />
-        )}
-        <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
+        {isSubmitting && <LoadingSpinner />}
+        <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+          {t("buttons.save")}
+        </span>
       </button>
     </div>
   );
