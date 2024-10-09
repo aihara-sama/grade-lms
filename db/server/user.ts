@@ -5,7 +5,7 @@ import { cache } from "react";
 
 export const getProfile = cache(() => getServerDB().auth.getUser());
 
-export const getCourseUsers = async (courseId: string) => {
+export const getMembers = async (courseId: string) => {
   const { data, count } = await getServerDB()
     .from("users")
     .select("*, courses!inner(id)", { count: "exact" })

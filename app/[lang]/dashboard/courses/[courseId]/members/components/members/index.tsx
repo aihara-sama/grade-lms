@@ -23,14 +23,12 @@ import SearchIcon from "@/components/icons/search-icon";
 import Container from "@/components/layout/container";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { MEMBERS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
-import metadata from "@/data/metadata.json";
 import {
   deleteAllUsersFromCourse,
   deleteUsersFromCourse,
   getCourseUsers,
 } from "@/db/client/user";
 import type { getCourse } from "@/db/server/course";
-import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
@@ -263,15 +261,15 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreMembers))}
     >
       <Header course={course} />
-      <p className="section-title">Members</p>
+      <p className="section-title">{t("members.title")}</p>
       <div className="mb-6">
         <div className="flex flex-wrap gap-6">
           <Total
             Icon={<AvatarIcon size="lg" />}
             total={membersCount}
-            title="Total members"
+            title={t("cards.titles.total_members")}
           />
-          {user.role === Role.Teacher && (
+          {user.role === "teacher" && (
             <div className="card">
               <AddCourseIcon />
               <hr className="w-full my-3" />
@@ -279,7 +277,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
                 className="primary-button px-8"
                 onClick={() => setIsEnrollUsersModal(true)}
               >
-                Enroll
+                {t("buttons.enroll")}
               </button>
             </div>
           )}
@@ -292,13 +290,14 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? membersCount : membersIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+            {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
+            <CheckIcon size="xs" />
           </button>
           <button
             onClick={() => setIsExpelMembersModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Expel <DeleteIcon size="xs" />
+            {t("buttons.expel")} <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -320,7 +319,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
                   Icon={<Avatar avatar={avatar} />}
                   key={id}
                   title={name}
-                  subtitle={role}
+                  subtitle={t(`roles.${role}`)}
                   href={`/users/${id}`}
                 />
               ) : (
@@ -329,16 +328,16 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
                   checked={membersIds.includes(id)}
                   Icon={<Avatar avatar={avatar} />}
                   title={name}
-                  subtitle={role}
+                  subtitle={t(`roles.${role}`)}
                   onClick={() => {}}
                   onToggle={
-                    user.role === Role.Teacher
+                    user.role === "teacher"
                       ? (checked) => onMemberToggle(checked, id)
                       : undefined
                   }
                 />
               ),
-            "": user.role === Role.Teacher && role !== Role.Teacher && (
+            "": user.role === "teacher" && role !== "teacher" && (
               <BasicPopper
                 placement={
                   members.length > 7 && members.length - idx < 4
@@ -360,7 +359,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
                     className="popper-list-item"
                     onClick={() => setIsExpelMemberModal(true)}
                   >
-                    <DeleteIcon size="xs" /> Expel
+                    <DeleteIcon size="xs" /> {t("buttons.expel")}
                   </li>
                 </ul>
               </BasicPopper>
@@ -370,14 +369,14 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       )}
       {isNoData && (
         <NoData
-          body={metadata.courses}
+          body={t("lessons.description")}
           action={
             <button
               className="primary-button"
               disabled={user.role !== "teacher"}
               onClick={() => setIsEnrollUsersModal(true)}
             >
-              Enroll users
+              {t("buttons.enroll_users")}
             </button>
           }
         />
@@ -389,7 +388,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
               className="outline-button"
               onClick={() => setSearchText("")}
             >
-              Clear filters
+              {t("buttons.clear_filters")}
             </button>
           }
         />

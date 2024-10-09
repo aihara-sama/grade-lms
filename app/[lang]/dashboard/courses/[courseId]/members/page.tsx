@@ -1,6 +1,6 @@
 import Members from "@/app/[lang]/dashboard/courses/[courseId]/members/components/members";
 import { getCourse } from "@/db/server/course";
-import { getCourseUsers } from "@/db/server/user";
+import { getMembers } from "@/db/server/user";
 
 import { type FunctionComponent } from "react";
 
@@ -11,7 +11,7 @@ interface Props {
 const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
   const [course, users] = await Promise.all([
     getCourse(courseId),
-    getCourseUsers(courseId),
+    getMembers(courseId),
   ]);
 
   return <Members course={course} users={users} />;

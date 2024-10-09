@@ -35,6 +35,7 @@
     "create": "Create",
     "quick_lesson": "Quick lesson",
     "create_course": "Create course",
+    "enroll_users": "Enroll users",
     "create_lesson": "Create lesson",
     "create_user": "Create user",
     "clear_filters": "Clear filters",
@@ -126,6 +127,10 @@
   "lessons": {
     "title": "Lessons",
     "description": "Create and manage lessons effectively"
+  },
+  "members": {
+    "title": "Members",
+    "description": "Enroll and manage users effectively"
   },
 
   "users": {
