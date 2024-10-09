@@ -4,6 +4,7 @@ import BasicModal from "@/components/common/modals/basic-modal";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import StarIcon from "@/components/icons/star-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { getSubmission, updateSubmission } from "@/db/client/submission";
 import type { SubmissionWithAuthor } from "@/types/submission.type";
@@ -65,7 +66,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
       isInsideModal
       width="lg"
       onClose={() => onClose()}
-      title="Submission"
+      title={t("modal.titles.view_submission.title")}
     >
       {!submission ? (
         <LoadingSkeleton className="" />
@@ -75,11 +76,11 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
             disabled
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
-            placeholder="Submission name"
+            placeholder={t("placeholders.submission_name")}
             name="title"
             value={submission.title}
           />
-          <p>Description</p>
+          <p>{t("labels.description")}</p>
           <div className="">
             <Editor
               height="md"
@@ -94,7 +95,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
               <IconTitle
                 Icon={<AvatarIcon size="md" />}
                 title={submission.author.name}
-                subtitle={submission.author.role}
+                subtitle={t(`roles.${submission.author.role}`)}
                 href={`/users/${submission.author.id}`}
               />
             </div>
@@ -119,15 +120,9 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
               disabled={submission.grade === grade}
               className="primary-button w-[100px]"
             >
-              {isSubmitting && (
-                <img
-                  className="loading-spinner"
-                  src="/assets/gif/loading-spinner.gif"
-                  alt=""
-                />
-              )}
+              {isSubmitting && <LoadingSpinner />}
               <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-                Submit
+                {t("buttons.submit")}
               </span>
             </button>
           </div>

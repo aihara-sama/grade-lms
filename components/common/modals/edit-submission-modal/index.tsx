@@ -1,6 +1,7 @@
 import BasicInput from "@/components/common/inputs/basic-input";
 import BasicModal from "@/components/common/modals/basic-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { getSubmission, updateSubmission } from "@/db/client/submission";
 import type { ResultOf } from "@/types/utils.type";
@@ -77,20 +78,20 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
       isInsideModal
       width="lg"
       onClose={() => onClose()}
-      title="Submission"
+      title={t("modal.titles.edit_submission.title")}
     >
       {submission ? (
         <div>
           <BasicInput
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
-            placeholder="Submission name"
+            placeholder={t("placeholders.submission_name")}
             name="title"
             value={submission.title}
             onChange={onInputChange}
             disabled={isAssignmentPastDue}
           />
-          <p>Description</p>
+          <p>{t("labels.description")}</p>
           <div className="">
             <Editor
               height="lg"
@@ -112,15 +113,9 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
               }
               className="primary-button w-[100px]"
             >
-              {isSubmitting && (
-                <img
-                  className="loading-spinner"
-                  src="/assets/gif/loading-spinner.gif"
-                  alt=""
-                />
-              )}
+              {isSubmitting && <LoadingSpinner />}
               <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-                Save
+                {t("buttons.save")}
               </span>
             </button>
           </div>

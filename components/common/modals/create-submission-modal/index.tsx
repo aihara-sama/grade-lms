@@ -64,24 +64,25 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
       body: JSON.stringify(data),
     }));
 
+  // View
   return (
     <BasicModal
       isInsideModal
       width="lg"
       onClose={() => onClose()}
-      title="Submission"
+      title={t("modal.titles.create_submission.title")}
     >
       <div>
         <BasicInput
           autoFocus
           fullWidth
           StartIcon={<LessonsIcon size="xs" />}
-          placeholder="Submission name"
+          placeholder={t("placeholders.submission_name")}
           name="title"
           onChange={onInputChange}
           value={submission.title}
         />
-        <p>Description</p>
+        <p>{t("labels.description")}</p>
         <div className="min-h-[274px]">
           <Editor
             height="md"
@@ -99,7 +100,7 @@ const CreateSubmissionModal: FunctionComponent<Props> = ({
           >
             {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-              Create
+              {t("buttons.create")}
             </span>
           </button>
         </div>

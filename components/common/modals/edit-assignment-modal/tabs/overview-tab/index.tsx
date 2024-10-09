@@ -3,6 +3,7 @@ import BasicInput from "@/components/common/inputs/basic-input";
 import DateInput from "@/components/common/inputs/date-input";
 import CreateSubmissionModal from "@/components/common/modals/create-submission-modal";
 import LessonsIcon from "@/components/icons/lessons-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { getAssignment, updateAssignment } from "@/db/client/assignment";
 import { useUser } from "@/hooks/use-user";
@@ -94,6 +95,7 @@ const OverviewTab: FunctionComponent<Props> = ({
     fetchAssignment();
   }, []);
 
+  // View
   return (
     <div>
       {assignment ? (
@@ -102,12 +104,12 @@ const OverviewTab: FunctionComponent<Props> = ({
             disabled={user.role !== "teacher"}
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
-            placeholder="Assignment name"
+            placeholder={t("labels.assignment_name")}
             name="title"
             value={assignment.title}
             onChange={onInputChange}
           />
-          <p>Description</p>
+          <p>{t("labels.description")}</p>
           <div className="min-h-[216px]">
             <Editor
               id="assignment-editor"
@@ -130,7 +132,7 @@ const OverviewTab: FunctionComponent<Props> = ({
               <DateInput
                 date={new Date(assignment.due_date)}
                 onChange={onChangeDate}
-                label="Due date"
+                label={t("labels.due_date")}
                 popperPlacement="top-start"
                 disabled={user.role !== "teacher"}
               />
@@ -140,15 +142,9 @@ const OverviewTab: FunctionComponent<Props> = ({
                 className="primary-button"
                 onClick={submitUpdateAssignment}
               >
-                {isSubmitting && (
-                  <img
-                    className="loading-spinner"
-                    src="/assets/gif/loading-spinner.gif"
-                    alt=""
-                  />
-                )}
+                {isSubmitting && <LoadingSpinner />}
                 <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-                  Save
+                  {t("buttons.save")}
                 </span>
               </button>
             ) : (
@@ -157,7 +153,7 @@ const OverviewTab: FunctionComponent<Props> = ({
                 className="primary-button"
                 onClick={() => setIsCreateSubmissionModal(true)}
               >
-                Create submission
+                {t("buttons.create_submission")}
               </button>
             )}
           </div>

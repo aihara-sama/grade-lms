@@ -13,6 +13,7 @@ import Paragraph from "@editorjs/paragraph";
 import Quote from "@editorjs/quote";
 import SimpleImage from "@editorjs/simple-image";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { useEffect, useRef } from "react";
 
@@ -31,15 +32,18 @@ const Editor: FunctionComponent<Props> = ({
   height,
   id,
 }) => {
+  // Hooks
+  const t = useTranslations();
+
+  // Refs
   const ejInstance = useRef<EditorJS>();
-  // const [editorData, setEditorData] = useState<OutputData>(data);
 
   const initEditor = () => {
     const editor = new EditorJS({
       readOnly,
       inlineToolbar: true,
       sanitizer: {},
-      placeholder: "Start here...",
+      placeholder: t("placeholders.start_here"),
       minHeight: 242,
       holder: id,
       data,
@@ -58,7 +62,7 @@ const Editor: FunctionComponent<Props> = ({
         header: {
           class: Header,
           config: {
-            placeholder: "Enter a Header",
+            placeholder: t("placeholders.enter_a_header"),
             levels: [2, 3, 4],
             defaultLevel: 2,
           },
@@ -77,7 +81,7 @@ const Editor: FunctionComponent<Props> = ({
     });
   };
 
-  // This will run only once
+  // Effects
   useEffect(() => {
     if (!ejInstance.current) {
       initEditor();
@@ -88,6 +92,7 @@ const Editor: FunctionComponent<Props> = ({
     };
   }, []);
 
+  // View
   return (
     <div
       className={`overflow-auto ${clsx({ "max-h-[198px]": height === "sm", "max-h-[282px]": height === "lg", "max-h-[281px]": height === "md" })} p-2 border border-gray-200`}

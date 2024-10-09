@@ -23,7 +23,6 @@ import DotsIcon from "@/components/icons/dots-icon";
 import Container from "@/components/layout/container";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { ASSIGNMENTS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
-import metadata from "@/data/metadata.json";
 import type { createAssignment } from "@/db/client/assignment";
 import {
   deleteAllAssignmentsFromLesson,
@@ -31,7 +30,6 @@ import {
   deleteAssignments,
   getLessonAssignments,
 } from "@/db/client/assignment";
-import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useLesson } from "@/hooks/use-lesson";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
@@ -170,8 +168,6 @@ const Assignments: FunctionComponent<Props> = ({
       setIsDelAssignmentModal(false);
 
       revalidatePageAction();
-
-      toast.success(t("success.assignment_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -194,8 +190,6 @@ const Assignments: FunctionComponent<Props> = ({
       setIsDelAssignmentsModal(false);
 
       revalidatePageAction();
-
-      toast.success(t("success.assignments_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -290,7 +284,7 @@ const Assignments: FunctionComponent<Props> = ({
             total={assignmentsCount}
             title="Total assignments"
           />
-          {user.role === Role.Teacher && (
+          {user.role === "teacher" && (
             <div className="card">
               <AddAssignmentIcon size="md" />
               <hr className="w-full my-3" />
@@ -315,19 +309,20 @@ const Assignments: FunctionComponent<Props> = ({
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? assignmentsCount : assignmentsIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+            {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
+            <CheckIcon size="xs" />
           </button>
           <button
             onClick={() => setIsDelAssignmentsModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Delete <DeleteIcon size="xs" />
+            {t("buttons.delete")} <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
         <BasicInput
           StartIcon={<SearchIcon size="xs" />}
-          placeholder="Search"
+          placeholder={t("placeholders.search")}
           className="w-auto"
           onChange={(e) => setSearchText(e.target.value)}
           value={searchText}
@@ -345,13 +340,13 @@ const Assignments: FunctionComponent<Props> = ({
                 title={title}
                 subtitle=""
                 onToggle={
-                  user.role === Role.Teacher
+                  user.role === "teacher"
                     ? (checked) => onAssignmentToggle(checked, id)
                     : undefined
                 }
               />
             ),
-            "": user.role === Role.Teacher && (
+            "": user.role === "teacher" && (
               <BasicPopper
                 placement={
                   assignments.length > 7 && assignments.length - idx < 4
@@ -373,7 +368,7 @@ const Assignments: FunctionComponent<Props> = ({
                     className="popper-list-item"
                     onClick={() => setIsDelAssignmentModal(true)}
                   >
-                    <DeleteIcon size="xs" /> Delete
+                    <DeleteIcon size="xs" /> {t("buttons.delete")}
                   </li>
                 </ul>
               </BasicPopper>
@@ -383,14 +378,14 @@ const Assignments: FunctionComponent<Props> = ({
       )}
       {isNoData && (
         <NoData
-          body={metadata.courses}
+          body={t("assignments.description")}
           action={
             <button
               className="primary-button"
               disabled={user.role !== "teacher"}
               onClick={() => setIsCreateAssignmentModal(true)}
             >
-              Create assignment
+              {t("buttons.create_assignment")}
             </button>
           }
         />
@@ -402,7 +397,7 @@ const Assignments: FunctionComponent<Props> = ({
               className="outline-button"
               onClick={() => setSearchText("")}
             >
-              Clear filters
+              {t("buttons.clear_filters")}
             </button>
           }
         />

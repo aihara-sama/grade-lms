@@ -7,6 +7,7 @@ import SubmissionsIcon from "@/components/icons/submissions-icon";
 
 import BasicModal from "@/components/common/modals/basic-modal";
 import BasicTabs from "@/components/common/tabs/basic-tabs";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 interface Props {
@@ -20,14 +21,22 @@ const ViewAssignmentModal: FunctionComponent<Props> = ({
   onClose,
   onSubmissionCreated,
 }) => {
+  // Hooks
+  const t = useTranslations();
+
+  // View
   return (
-    <BasicModal width="lg" onClose={() => onClose()} title="View assignment">
+    <BasicModal
+      width="lg"
+      onClose={() => onClose()}
+      title={t("modal.titles.view_assignment.title")}
+    >
       <div className="">
         <BasicTabs
           tabs={[
             {
               tier: ["teacher", "student"],
-              title: "Overview",
+              title: t("modal.titles.view_assignment.tabs.overview.title"),
               Icon: <OverviewIcon />,
               content: (
                 <OverviewTab
@@ -39,7 +48,7 @@ const ViewAssignmentModal: FunctionComponent<Props> = ({
             },
             {
               tier: ["teacher", "student"],
-              title: "Submissions",
+              title: t("modal.titles.view_assignment.tabs.submissions.title"),
               Icon: <SubmissionsIcon />,
               content: <SubmissionsTab assignmentId={assignmentId} />,
             },

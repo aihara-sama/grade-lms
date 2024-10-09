@@ -157,8 +157,6 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       setIsDelSubmissionModal(false);
 
       submissionsOffsetRef.current -= 1;
-
-      toast.success(t("success.submission_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -181,8 +179,6 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       setIsDelSubmissionsModal(false);
 
       submissionsOffsetRef.current -= submissionsIds.length;
-
-      toast.success(t("success.submissions_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -249,13 +245,14 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? submissionsCount : submissionsIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+            {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
+            <CheckIcon size="xs" />
           </button>
           <button
             onClick={() => setIsDelSubmissionsModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Delete <DeleteIcon size="xs" />
+            {t("buttons.delete")} <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -326,7 +323,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                       className="popper-list-item"
                       onClick={() => setIsDelSubmissionModal(true)}
                     >
-                      <DeleteIcon size="xs" /> Delete
+                      <DeleteIcon size="xs" /> {t("buttons.delete")}
                     </li>
                   </ul>
                 </BasicPopper>

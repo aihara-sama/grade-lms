@@ -71,7 +71,11 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
   };
 
   return (
-    <BasicModal width="lg" onClose={() => onClose()} title="Create assignment">
+    <BasicModal
+      width="lg"
+      onClose={() => onClose()}
+      title={t("modal.titles.create_assignment")}
+    >
       <div>
         <BasicInput
           autoFocus
@@ -82,7 +86,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
           onChange={onInputChange}
           value={assignment.title}
         />
-        <p>Description</p>
+        <p>{t("labels.description")}</p>
         <div className="min-h-[274px]">
           <Editor
             id="create-assignment-editor"
@@ -97,7 +101,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
             <DateInput
               date={new Date(assignment.due_date)}
               onChange={onDateChange}
-              label="Due date"
+              label={t("labels.due_date")}
               popperPlacement="top-start"
             />
           </div>
@@ -108,7 +112,7 @@ const CreateAssignmentModal: FunctionComponent<Props> = ({
           >
             {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-              Create
+              {t("buttons.create")}
             </span>
           </button>
         </div>
