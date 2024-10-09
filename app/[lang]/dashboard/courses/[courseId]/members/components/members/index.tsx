@@ -405,7 +405,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       {isExpelMemberModal && (
         <PromptDeleteRecordModal
           title={t("modal.titles.expel_member")}
-          confirmText={t("actions.expel")}
+          confirmText={t("buttons.expel")}
           onConfirm={submitExpelMember}
           prompt={`${t("prompts.expel_member")}`}
           record={members.find(({ id }) => id === memberId).name}
@@ -419,7 +419,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
           prompt={`${t("prompts.expel_members", {
             count: membersIds.length,
           })}`}
-          confirmText={t("actions.expel")}
+          confirmText={t("buttons.expel")}
           onConfirm={submitExpelMembers}
           onClose={() => setIsExpelMembersModal(false)}
         />

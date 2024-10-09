@@ -344,7 +344,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
           title={t("modal.titles.delete_submission")}
           prompt={`${t("prompts.delete_submission")}`}
           record={submissions.find(({ id }) => id === submissionId).title}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onClose={() => setIsDelSubmissionModal(false)}
           onConfirm={submitDeleteSubmission}
         />
@@ -355,7 +355,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
           prompt={`${t("prompts.delete_submissions", {
             count: submissionsIds.length,
           })}`}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onClose={() => setIsDelSubmissionsModal(false)}
           onConfirm={submitDeleteSubmissions}
         />

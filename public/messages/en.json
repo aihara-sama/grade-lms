@@ -29,11 +29,13 @@
 
   "buttons": {
     "delete": "Delete",
+    "expel": "Expel",
     "enroll": "Enroll",
     "cancel": "Cancel",
     "create": "Create",
     "quick_lesson": "Quick lesson",
     "create_course": "Create course",
+    "create_lesson": "Create lesson",
     "create_user": "Create user",
     "clear_filters": "Clear filters",
     "select_all": "Select all",
@@ -121,6 +123,11 @@
     "students": "Students"
   },
 
+  "lessons": {
+    "title": "Lessons",
+    "description": "Create and manage lessons effectively"
+  },
+
   "users": {
     "title": "Users",
     "sub_title": "View and manage users",
@@ -142,7 +149,8 @@
     "email": "Email",
     "password": "password",
     "search": "Search",
-    "my_course": "My course..."
+    "my_course": "My course...",
+    "lesson_name": "Lesson name"
   },
 
   "labels": {
@@ -154,7 +162,10 @@
     "lessons": "Lessons",
     "new_members": "New members",
     "courses": "Courses",
-    "users": "Users"
+    "users": "Users",
+    "course": "Course",
+    "starts_at": "Starts at",
+    "duration": "Duration"
   },
 
   "success": {
@@ -298,6 +309,7 @@
   },
   "modal": {
     "titles": {
+      "create_lesson": "Create lesson",
       "create_course": "Create course",
       "create_user": "Create user",
       "edit_user": "Edit user",
@@ -315,10 +327,6 @@
       "delete_submissions": "Delete submissions",
       "enrollment": "Enrollment"
     }
-  },
-  "actions": {
-    "delete": "Delete",
-    "expel": "Expel"
   },
   "notifications": {
     "submission": {

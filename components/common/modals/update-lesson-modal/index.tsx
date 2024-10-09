@@ -279,7 +279,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
             onClose={() => setIsDeleteLessonModalOpen(false)}
             title={t("modal.titles.delete_lesson")}
             record={lesson.title}
-            confirmText={t("actions.delete")}
+            confirmText={t("buttons.delete")}
             onConfirm={submitDeleteLesson}
             prompt={t("prompts.delete_lesson")}
           />

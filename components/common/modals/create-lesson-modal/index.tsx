@@ -95,8 +95,9 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
       if (count) throw new Error(t("error.lesson_overlaps"));
 
-      toast(t("success.lesson_created"));
       onClose(await createLesson(lesson));
+
+      toast(t("success.lesson_created"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -139,12 +140,12 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
-      title="Create lesson"
+      title={t("modal.titles.create_lesson")}
     >
       <form onSubmit={submitCreateLesson}>
         {!courseId && (
           <BasicSelect
-            label="Course"
+            label={t("labels.course")}
             defaultValue={selectedCourse}
             onChange={onCourseSelect}
             options={courses}
@@ -164,17 +165,17 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           onChange={onInputChange}
           name="title"
           StartIcon={<LessonsIcon size="xs" />}
-          placeholder="Lesson name"
+          placeholder={t("placeholders.lesson_name")}
           className="mb-4"
         />
         <DateInput
           date={new Date(lesson.starts)}
           onChange={onDateChange}
-          label="Starts at"
+          label={t("labels.starts_at")}
         />
         <BasicInput
           fullWidth
-          label="Duration"
+          label={t("labels.duration")}
           type="number"
           StartIcon={<LessonsIcon />}
           value={`${millisecondsToMinutes(duration)}`}
@@ -190,7 +191,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
           >
             {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-              Create
+              {t("buttons.create")}
             </span>
           </button>
         </div>

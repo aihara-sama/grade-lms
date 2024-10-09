@@ -426,7 +426,7 @@ const Assignments: FunctionComponent<Props> = ({
           title={t("modal.titles.delete_assignment")}
           prompt={`${t("prompts.delete_assignment")}`}
           record={assignments.find(({ id }) => id === assignmentId).title}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onClose={() => setIsDelAssignmentModal(false)}
           onConfirm={submitDeleteAssignment}
         />
@@ -437,7 +437,7 @@ const Assignments: FunctionComponent<Props> = ({
           prompt={`${t("prompts.delete_assignments", {
             count: assignmentsIds.length,
           })}`}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onClose={() => setIsDelAssignmentsModal(false)}
           onConfirm={submitDeleteAssignments}
         />

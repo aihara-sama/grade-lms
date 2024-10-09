@@ -307,7 +307,9 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                   className="outline-button flex font-semibold gap-2 items-center"
                 >
                   {isSelectedAll ? coursesCount : coursesIds.length}{" "}
-                  {isSelectedAll ? `Deselect` : "Select all"}{" "}
+                  {isSelectedAll
+                    ? t("buttons.deselect")
+                    : t("buttons.select_all")}{" "}
                   <CheckIcon size="xs" />
                 </button>
                 <button

@@ -436,7 +436,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       {isDeleteUserModal && (
         <PromptDeleteRecordModal
           title={t("modal.titles.delete_user")}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onConfirm={submitDeleteUser}
           prompt={`${t("prompts.delete_user")}`}
           record={users.find(({ id }) => id === userId).name}
@@ -449,7 +449,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
           prompt={`${t("prompts.delete_users", {
             count: usersIds.length,
           })}`}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onClose={() => setIsDeleteUsersModal(false)}
           onConfirm={submitDeleteUsers}
         />

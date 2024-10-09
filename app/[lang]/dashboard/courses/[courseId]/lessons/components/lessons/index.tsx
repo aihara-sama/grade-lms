@@ -4,7 +4,6 @@ import Table from "@/components/common/table";
 import Total from "@/components/common/total";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import SearchIcon from "@/components/icons/search-icon";
-import metadata from "@/data/metadata.json";
 import { format } from "date-fns";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -34,7 +33,6 @@ import {
   getCourseLessons,
 } from "@/db/client/lesson";
 import type { getCourse } from "@/db/server/course";
-import { Role } from "@/enums/role.enum";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
@@ -165,8 +163,6 @@ const Lessons: FunctionComponent<Props> = ({
       revalidatePageAction();
 
       lessonsOffsetRef.current -= 1;
-
-      toast.success(t("success.lesson_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -189,8 +185,6 @@ const Lessons: FunctionComponent<Props> = ({
       revalidatePageAction();
 
       lessonsOffsetRef.current -= lessonsIds.length;
-
-      toast.success(t("success.lessons_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -261,16 +255,16 @@ const Lessons: FunctionComponent<Props> = ({
       onScrollEnd={throttleFetch(fetchLock("lessons", fetchMoreLessons))}
     >
       <Header course={course} />
-      <p className="section-title">Lessons</p>
+      <p className="section-title">{t("lessons.title")}</p>
 
       <div className="mb-6">
         <div className="flex flex-wrap gap-6">
           <Total
-            title="Total lessons"
+            title={t("cards.titles.total_lessons")}
             total={lessonsCount}
             Icon={<LessonsIcon size="lg" />}
           />
-          {user.role === Role.Teacher && (
+          {user.role === "teacher" && (
             <div className="card">
               <CreateLessonIcon size="lg" />
               <hr className="w-full my-3" />
@@ -278,7 +272,7 @@ const Lessons: FunctionComponent<Props> = ({
                 className="primary-button px-8"
                 onClick={() => setIsCreateLessonModal(true)}
               >
-                Create
+                {t("buttons.create")}
               </button>
             </div>
           )}
@@ -291,19 +285,20 @@ const Lessons: FunctionComponent<Props> = ({
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? lessonsCount : lessonsIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+            {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
+            <CheckIcon size="xs" />
           </button>
           <button
             onClick={() => setIsDelLessonsModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Delete <DeleteIcon size="xs" />
+            {t("buttons.delete")} <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
         <BasicInput
           StartIcon={<SearchIcon size="xs" />}
-          placeholder="Search"
+          placeholder={t("placeholders.search")}
           className="w-auto"
           onChange={(e) => setSearchText(e.target.value)}
           value={searchText}
@@ -322,14 +317,14 @@ const Lessons: FunctionComponent<Props> = ({
                 title={lesson.title}
                 subtitle=""
                 onToggle={
-                  user.role === Role.Teacher
+                  user.role === "teacher"
                     ? (checked) => onLessonToggle(checked, lesson.id)
                     : undefined
                 }
               />
             ),
             Starts: format(new Date(lesson.starts), "EEEE, MMM d"),
-            "": user.role === Role.Teacher && !isLessonOngoing(lesson) && (
+            "": user.role === "teacher" && !isLessonOngoing(lesson) && (
               <BasicPopper
                 placement={
                   lessons.length > 7 && lessons.length - idx < 4
@@ -351,7 +346,7 @@ const Lessons: FunctionComponent<Props> = ({
                     className="popper-list-item"
                     onClick={() => setIsDeleteLessonModal(true)}
                   >
-                    <DeleteIcon size="xs" /> Delete
+                    <DeleteIcon size="xs" /> {t("buttons.delete")}
                   </li>
                 </ul>
               </BasicPopper>
@@ -361,14 +356,14 @@ const Lessons: FunctionComponent<Props> = ({
       )}
       {isNoData && (
         <NoData
-          body={metadata.lessons}
+          body={t("lessons.description")}
           action={
             <button
               className="primary-button"
               disabled={user.role !== "teacher"}
               onClick={() => setIsCreateLessonModal(true)}
             >
-              Create lesson
+              {t("buttons.create_lesson")}
             </button>
           }
         />
@@ -380,7 +375,7 @@ const Lessons: FunctionComponent<Props> = ({
               className="outline-button"
               onClick={() => setSearchText("")}
             >
-              Clear filters
+              {t("buttons.clear_filters")}
             </button>
           }
         />
@@ -398,7 +393,7 @@ const Lessons: FunctionComponent<Props> = ({
           title={t("modal.titles.delete_lesson")}
           prompt={`${t("prompts.delete_lesson")}`}
           record={lessons.find(({ id }) => id === lessonId).title}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onClose={() => setIsDeleteLessonModal(false)}
           onConfirm={submitDeleteLesson}
         />
@@ -409,7 +404,7 @@ const Lessons: FunctionComponent<Props> = ({
           prompt={`${t("prompts.delete_lessons", {
             count: lessonsIds.length,
           })}`}
-          confirmText={t("actions.delete")}
+          confirmText={t("buttons.delete")}
           onClose={() => setIsDelLessonsModal(false)}
           onConfirm={submitDeleteLessons}
         />
