@@ -13,8 +13,11 @@
     "titles": {
       "total_courses": "Total courses",
       "total_users": "Total users",
+      "total_members": "Total members",
+      "total_lessons": "Total lessons",
       "total_assignments": "Total assignments",
-      "total_submissions": "Total submissions"
+      "total_submissions": "Total submissions",
+      "ongoing_lesson": "Ongoing lesson"
     }
   },
 
@@ -32,7 +35,8 @@
     "edit": "Edit",
     "save": "Save",
     "login": "Login",
-    "create_account": "Create account"
+    "create_account": "Create account",
+    "enter_class": "Enter class"
   },
 
   "links": {
@@ -103,6 +107,11 @@
     "sub_title": "View and manage courses",
     "description": "Create and manage courses effectively",
     "active": "Active"
+  },
+
+  "course": {
+    "title": "Overview",
+    "students": "Students"
   },
 
   "users": {

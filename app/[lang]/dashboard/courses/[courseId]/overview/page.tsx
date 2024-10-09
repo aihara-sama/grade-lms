@@ -21,8 +21,10 @@ interface Props {
 }
 
 const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
-  const course = await getCourse(courseId);
-  const ongoingLesson = await getOngoingLesson(courseId);
+  const [course, ongoingLesson] = await Promise.all([
+    getCourse(courseId),
+    getOngoingLesson(courseId),
+  ]);
 
   return <Overview course={course} ongoingLesson={ongoingLesson} />;
 };
