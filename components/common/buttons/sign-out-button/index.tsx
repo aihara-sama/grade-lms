@@ -30,8 +30,7 @@ const SignOutButton: FunctionComponent<PropsWithClassName> = ({
   // View
   return (
     <button className={`primary-button ${className}`} onClick={submitSignOut}>
-      <SignOutIcon />
-      Logout
+      <SignOutIcon /> {t("buttons.logout")}
     </button>
   );
 };

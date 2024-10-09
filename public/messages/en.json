@@ -41,6 +41,7 @@
     "edit": "Edit",
     "save": "Save",
     "login": "Login",
+    "logout": "Logout",
     "create_account": "Create account",
     "enter_class": "Enter class"
   },
