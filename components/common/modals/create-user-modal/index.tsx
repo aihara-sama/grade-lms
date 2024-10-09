@@ -74,14 +74,14 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
     <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
-      title="Create user"
+      title={t("modal.titles.create_user")}
     >
       <form noValidate>
         <BasicTabs
           tabs={[
             {
               tier: ["teacher"],
-              title: "General",
+              title: t("tabs.general.title"),
               Icon: <OverviewIcon />,
               content: (
                 <>
@@ -91,14 +91,14 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     fullWidth
                     name="name"
                     StartIcon={<AvatarIcon size="xs" />}
-                    label="Name"
+                    label={t("labels.name")}
                     autoFocus
                   />
                   <BasicInput
                     onChange={onInputChange}
                     value={user.email}
                     StartIcon={<EmailIcon size="xs" />}
-                    label="Email"
+                    label={t("labels.email")}
                     type="email"
                     name="email"
                     fullWidth
@@ -108,13 +108,13 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
                     value={user.password}
                     name="password"
                     StartIcon={<SecurityIcon size="xs" />}
-                    label="Password"
+                    label={t("labels.password")}
                     type="password"
                     fullWidth
                   />
                   <div>
                     <p className="mb-1 text-sm font-bold text-neutral-500">
-                      Timezone
+                      {t("labels.timezone")}
                     </p>
                     <TimezoneSelect
                       onChange={onTimezoneChange}
@@ -126,7 +126,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
             },
             {
               tier: ["teacher"],
-              title: "Avatar",
+              title: t("tabs.avatar.title"),
               Icon: <CameraIcon />,
               content: (
                 <div className="flex justify-center mx-[0] my-[23.5px]">
@@ -142,7 +142,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
         <hr className="mb-4" />
         <div className="flex justify-end gap-3">
           <button className="outline-button" onClick={() => onClose()}>
-            Cancel
+            {t("buttons.cancel")}
           </button>
           <button
             className="primary-button"
@@ -151,7 +151,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
           >
             {isSubmitting && <LoadingSpinner />}
             <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-              Create
+              {t("buttons.create")}
             </span>
           </button>
         </div>

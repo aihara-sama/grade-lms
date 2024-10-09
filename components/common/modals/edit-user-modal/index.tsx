@@ -86,7 +86,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
     <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
-      title="Edit user"
+      title={t("modal.titles.edit_user")}
     >
       {isLoading ? (
         <LoadingSkeleton />
@@ -96,7 +96,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
             tabs={[
               {
                 tier: ["teacher"],
-                title: "General",
+                title: t("tabs.general.title"),
                 Icon: <OverviewIcon />,
                 content: (
                   <>
@@ -106,14 +106,14 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                       fullWidth
                       name="name"
                       StartIcon={<AvatarIcon size="xs" />}
-                      label="Name"
+                      label={t("labels.name")}
                       autoFocus
                     />
                     <BasicInput
                       onChange={onInputChange}
                       value={user.email}
                       StartIcon={<EmailIcon size="xs" />}
-                      label="Email"
+                      label={t("labels.email")}
                       type="email"
                       name="email"
                       fullWidth
@@ -121,13 +121,13 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
                     <BasicInput
                       name="password"
                       StartIcon={<SecurityIcon size="xs" />}
-                      label="Password"
+                      label={t("labels.password")}
                       type="password"
                       fullWidth
                     />
                     <div>
                       <p className="mb-1 text-sm font-bold text-neutral-500">
-                        Timezone
+                        {t("labels.timezone")}
                       </p>
                       <TimezoneSelect
                         onChange={onTimezoneChange}
@@ -139,7 +139,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
               },
               {
                 tier: ["teacher"],
-                title: "Avatar",
+                title: t("tabs.avatar.title"),
                 Icon: <CameraIcon />,
                 content: (
                   <div className="flex justify-center mx-[0] my-[23.5px]">
@@ -157,7 +157,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
             <button className="primary-button" type="button">
               {isSubmitting && <LoadingSpinner />}
               <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-                Save
+                {t("buttons.save")}
               </span>
             </button>
           </div>

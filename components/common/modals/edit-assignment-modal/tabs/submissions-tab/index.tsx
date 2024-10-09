@@ -261,7 +261,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       ) : (
         <BasicInput
           StartIcon={<SearchIcon size="xs" />}
-          placeholder={t("search")}
+          placeholder={t("placeholders.search")}
           onChange={(e) => setSearchText(e.target.value)}
           className="w-auto"
           value={searchText}

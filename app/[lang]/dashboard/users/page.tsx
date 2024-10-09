@@ -1,19 +1,18 @@
 import Users from "@/app/[lang]/dashboard/users/components/users";
-import { getMyUsers } from "@/db/server/user";
-import { Role } from "@/enums/role.enum";
-import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import { getMyUsers, getProfile } from "@/db/server/user";
 import { redirect } from "next/navigation";
 
 const Page = async () => {
-  const {
-    data: { user },
-  } = await getServerDB().auth.getUser();
+  const [
+    {
+      data: { user },
+    },
+    myUsers,
+  ] = await Promise.all([getProfile(), getMyUsers()]);
 
-  if (user.user_metadata.role !== Role.Teacher) return redirect("/dashboard");
+  if (user.user_metadata.role !== "teacher") return redirect("/dashboard");
 
-  const users = await getMyUsers();
-
-  return <Users users={users} />;
+  return <Users users={myUsers} />;
 };
 
 export default Page;

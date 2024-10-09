@@ -1,14 +1,4 @@
 {
-  "users": "Users",
-  "lessons": "Lessons",
-  "members": "Members",
-  "assignments": "Assignments",
-  "submissions": "Submissions",
-  "search": "Search",
-  "profile": "Profile",
-  "deleted": "Deleted",
-  "login": "login",
-
   "days": {
     "sun": "Sun",
     "mon": "Mon",
@@ -35,9 +25,19 @@
     "create": "Create",
     "quick_lesson": "Quick lesson",
     "create_course": "Create course",
+    "create_user": "Create user",
     "clear_filters": "Clear filters",
     "select_all": "Select all",
-    "deselect": "Deselect"
+    "deselect": "Deselect",
+    "edit": "Edit",
+    "save": "Save",
+    "login": "Login",
+    "create_account": "Create account"
+  },
+
+  "links": {
+    "join": "Join",
+    "login": "Login"
   },
 
   "roles": {
@@ -46,11 +46,26 @@
     "guest": "Guest"
   },
 
+  "tabs": {
+    "general": {
+      "title": "General"
+    },
+    "avatar": {
+      "title": "Avatar"
+    }
+  },
+
+  "statuses": {
+    "active": "Active"
+  },
+
   "common": {
     "view_your_work_in_a_list": "View your work in a list",
     "no_results_found": "No results found",
     "try_using_different_keywords_or_change_some_filters": "Try using different keywords or change some filters",
-    "select_users_to_enroll": "Select users to enroll"
+    "select_users_to_enroll": "Select users to enroll",
+    "select_courses_to_enroll": "Select courses to enroll",
+    "deleted": "Deleted"
   },
 
   "dashboard": {
@@ -90,13 +105,19 @@
     "active": "Active"
   },
 
+  "users": {
+    "title": "Users",
+    "sub_title": "View and manage users",
+    "description": "Create and manage users effectively"
+  },
+
   "sign_in": {
-    "dont_have_an_account?": "Don't have an account?",
-    "join": "Join"
+    "title": "Login",
+    "dont_have_an_account?": "Don't have an account?"
   },
 
   "sign_up": {
-    "create_account": "Create account",
+    "title": "Create account",
     "already_have_an_account?": "Already have an account?"
   },
 
@@ -109,7 +130,11 @@
   },
 
   "labels": {
-    "course_name": "Course name"
+    "course_name": "Course name",
+    "name": "Name",
+    "email": "Email",
+    "password": "password",
+    "timezone": "Timezone"
   },
 
   "success": {
@@ -252,6 +277,8 @@
   "modal": {
     "titles": {
       "create_course": "Create course",
+      "create_user": "Create user",
+      "edit_user": "Edit user",
       "delete_user": "Delete user",
       "delete_users": "Delete users",
       "expel_member": "Expel member",

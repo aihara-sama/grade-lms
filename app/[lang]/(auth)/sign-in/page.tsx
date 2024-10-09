@@ -53,7 +53,7 @@ const Page: FunctionComponent = () => {
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
       <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
-        {t("login")}
+        {t("sign_in.title")}
       </p>
       <form onSubmit={handleSubmit}>
         <BasicInput
@@ -78,7 +78,7 @@ const Page: FunctionComponent = () => {
         >
           {isSubmitting && <LoadingSpinner />}
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-            {t("login")}
+            {t("buttons.login")}
           </span>
         </button>
       </form>
@@ -88,7 +88,7 @@ const Page: FunctionComponent = () => {
           href={`/sign-up/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
           className="underline"
         >
-          {t("sign_in.join")}
+          {t("links.join")}
         </Link>
       </p>
     </div>

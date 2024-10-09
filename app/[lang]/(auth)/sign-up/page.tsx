@@ -4,6 +4,7 @@ import BasicInput from "@/components/common/inputs/basic-input";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import EmailIcon from "@/components/icons/email-icon";
 import SecurityIcon from "@/components/icons/security-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { DEFAULT_AVATAR } from "@/constants";
 import { Role } from "@/enums/role.enum";
 import { DB } from "@/lib/supabase/db";
@@ -68,7 +69,7 @@ const Page: FunctionComponent = () => {
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
       <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
-        {t("sign_up.create_account")}
+        {t("sign_up.title")}
       </p>
       <form onSubmit={handleSubmit}>
         <BasicInput
@@ -104,15 +105,9 @@ const Page: FunctionComponent = () => {
           disabled={isSubmitting || isSuccess}
           className="primary-button w-full"
         >
-          {isSubmitting && (
-            <img
-              className="loading-spinner"
-              src="/assets/gif/loading-spinner.gif"
-              alt=""
-            />
-          )}
+          {isSubmitting && <LoadingSpinner />}
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-            {t("sign_up.create_account")}
+            {t("buttons.create_account")}
           </span>
         </button>
       </form>
@@ -122,7 +117,7 @@ const Page: FunctionComponent = () => {
           href={`/sign-in/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
           className="underline"
         >
-          {t("login")}
+          {t("links.login")}
         </Link>
       </p>
     </div>

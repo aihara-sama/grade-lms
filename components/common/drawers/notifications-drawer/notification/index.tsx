@@ -52,9 +52,9 @@ const Notification: FunctionComponent<Props> = ({
           </p>
           <p className="text-[15px]">
             {t(`notifications.${notification.type}.body`, {
-              course: notification.course?.title || t("deleted"),
-              assignment: notification.assignment?.title || t("deleted"),
-              lesson: notification.lesson?.title || t("deleted"),
+              course: notification.course?.title || t("common.deleted"),
+              assignment: notification.assignment?.title || t("common.deleted"),
+              lesson: notification.lesson?.title || t("common.deleted"),
             })}
           </p>
           <p className="text-sm text-neutral-500 mb-2">

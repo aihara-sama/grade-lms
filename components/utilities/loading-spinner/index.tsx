@@ -1,11 +1,12 @@
+import type { PropsWithClassName } from "@/types/props.type";
 import type { FunctionComponent } from "react";
 
-interface IProps {}
-
-const LoadingSpinner: FunctionComponent<IProps> = () => {
+const LoadingSpinner: FunctionComponent<PropsWithClassName> = ({
+  className = "",
+}) => {
   return (
     <img
-      className="loading-spinner"
+      className={`loading-spinner ${className}`}
       src="/assets/gif/loading-spinner.gif"
       alt=""
     />

@@ -7,7 +7,6 @@ import AvatarIcon from "@/components/icons/avatar-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
-import metadata from "@/data/metadata.json";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -159,8 +158,6 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       setIsDeleteUserModal(false);
 
       revalidatePageAction();
-
-      toast.success(t("success.user_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -181,8 +178,6 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       setIsDeleteUsersModal(false);
 
       revalidatePageAction();
-
-      toast.success(t("success.users_deleted"));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -281,15 +276,15 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       ref={contentWrapperRef}
       onScrollEnd={throttleFetch(fetchLock("users", fetchMoreUsers))}
     >
-      <p className="text-3xl font-bold text-neutral-600">Users</p>
-      <p className="text-neutral-500">View and manage users</p>
+      <p className="text-3xl font-bold text-neutral-600">{t("users.title")}</p>
+      <p className="text-neutral-500">{t("users.sub_title")}</p>
       <hr className="my-2 mb-4" />
       <div className="mb-6">
         <div className="flex flex-wrap gap-6">
           <Total
             Icon={<AvatarIcon size="lg" />}
             total={usersCount}
-            title="Total users"
+            title={t("cards.titles.total_users")}
           />
           <div className="card">
             <AddUserIcon size="lg" />
@@ -298,7 +293,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
               className="primary-button px-8"
               onClick={() => setIsCreateUserModal(true)}
             >
-              Create
+              {t("buttons.create")}
             </button>
           </div>
         </div>
@@ -311,25 +306,26 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? usersCount : usersIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+            {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
+            <CheckIcon size="xs" />
           </button>
           <button
             onClick={() => setIsEnrollUsersInCoursesModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Enroll <CoursesIcon />
+            {t("buttons.enroll")} <CoursesIcon />
           </button>
           <button
             onClick={() => setIsDeleteUsersModal(true)}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            Delete <DeleteIcon size="xs" />
+            {t("buttons.delete")} <DeleteIcon size="xs" />
           </button>
         </div>
       ) : (
         <BasicInput
           StartIcon={<SearchIcon size="xs" />}
-          placeholder={t("search")}
+          placeholder={t("placeholders.search")}
           onChange={(e) => setSearchText(e.target.value)}
           className="w-auto"
           value={searchText}
@@ -344,7 +340,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
                 checked={usersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
                 title={name}
-                subtitle={role}
+                subtitle={t(`roles.${role}`)}
                 onToggle={(checked) => onUserToggle(checked, id)}
               />
             ),
@@ -369,19 +365,19 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
                     className="popper-list-item"
                     onClick={() => setIsEditUserModal(true)}
                   >
-                    <AvatarIcon size="xs" /> Edit
+                    <AvatarIcon size="xs" /> {t("buttons.edit")}
                   </li>
                   <li
                     className="popper-list-item"
                     onClick={() => setIsEnrollUserInCoursesModal(true)}
                   >
-                    <UsersIcon /> Enroll
+                    <UsersIcon /> {t("buttons.enroll")}
                   </li>
                   <li
                     onClick={() => setIsDeleteUserModal(true)}
                     className="popper-list-item"
                   >
-                    <DeleteIcon size="xs" /> Delete
+                    <DeleteIcon size="xs" /> {t("buttons.delete")}
                   </li>
                 </ul>
               </BasicPopper>
@@ -391,14 +387,14 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       )}
       {isNoData && (
         <NoData
-          body={metadata.users}
+          body={t("users.description")}
           action={
             <button
               className="primary-button"
               disabled={user.role !== "teacher"}
               onClick={() => setIsCreateUserModal(true)}
             >
-              Create user
+              {t("buttons.create_user")}
             </button>
           }
         />
@@ -410,7 +406,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
               className="outline-button"
               onClick={() => setSearchText("")}
             >
-              Clear filters
+              {t("buttons.clear_filters")}
             </button>
           }
         />

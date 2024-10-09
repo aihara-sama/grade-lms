@@ -199,7 +199,9 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
       title="Enrollment"
       isFixedHeight={false}
     >
-      <p className="mb-3 text-neutral-500">Select courses to enroll</p>
+      <p className="mb-3 text-neutral-500">
+        {t("common.select_courses_to_enroll")}
+      </p>
       {coursesIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
@@ -207,7 +209,8 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? coursesCount : coursesIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+            {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
+            <CheckIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -216,7 +219,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           onChange={(e) => setSearchText(e.target.value)}
           StartIcon={<SearchIcon />}
           autoFocus
-          placeholder="Search..."
+          placeholder={t("placeholders.search")}
         />
       )}
 
@@ -233,7 +236,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
                 checked={coursesIds.includes(id)}
                 Icon={<CourseIcon />}
                 title={title}
-                subtitle="Active"
+                subtitle={t("statuses.active")}
                 onClick={() => {}}
                 onToggle={(checked) => onCourseToggle(checked, id)}
               />
@@ -248,7 +251,7 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
 
       <div className="flex justify-end gap-3 mt-auto">
         <button className="outline-button" onClick={() => onClose()}>
-          Cancel
+          {t("buttons.cancel")}
         </button>
         <button
           disabled={!coursesIds.length}
@@ -256,7 +259,9 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           onClick={submitEnrollUsers}
         >
           {isSubmitting && <LoadingSpinner />}
-          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Enroll</span>
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+            {t("buttons.enroll")}
+          </span>
         </button>
       </div>
     </BasicModal>

@@ -54,9 +54,9 @@ export const usePushNotifications = () => {
       lessonId: notification.lesson?.id,
     });
     const body = t(`notifications.${notification.type}.body`, {
-      course: notification.course?.title || t("deleted"),
-      assignment: notification.assignment?.title || t("deleted"),
-      lesson: notification.lesson?.title || t("deleted"),
+      course: notification.course?.title || t("common.deleted"),
+      assignment: notification.assignment?.title || t("common.deleted"),
+      lesson: notification.lesson?.title || t("common.deleted"),
     });
 
     const pushNotification = new Notification(title, {

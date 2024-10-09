@@ -1,6 +1,7 @@
 "use client";
 
 import CameraIcon from "@/components/icons/camera-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { MAX_AVATAR_SIZE } from "@/constants";
 import { DB } from "@/lib/supabase/db";
 import clsx from "clsx";
@@ -56,11 +57,7 @@ const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
       {isSubmitting && (
         <div>
           <div className="absolute inset-0 bg-neutral-950/20 rounded-[50%] z-10" />
-          <img
-            className="loading-spinner size-16"
-            src="/assets/gif/loading-spinner.gif"
-            alt=""
-          />
+          <LoadingSpinner className="size-16" />
         </div>
       )}
       <label>
