@@ -121,7 +121,24 @@
 
   "course": {
     "title": "Overview",
-    "students": "Students"
+    "students": "Students",
+    "breadcrumbs": {
+      "courses": "Courses"
+    },
+    "tabs": {
+      "overview": {
+        "title": "Overview"
+      },
+      "lessons": {
+        "title": "Lessons"
+      },
+      "members": {
+        "title": "Members"
+      },
+      "settings": {
+        "title": "Settings"
+      }
+    }
   },
 
   "lessons": {
@@ -131,6 +148,26 @@
   "members": {
     "title": "Members",
     "description": "Enroll and manage users effectively"
+  },
+
+  "lesson": {
+    "breadcrumbs": {
+      "courses": "Courses",
+      "lessons": "Lessons"
+    },
+    "tabs": {
+      "overview": {
+        "title": "Overview"
+      },
+      "assignments": {
+        "title": "Assignments"
+      },
+      "settings": {
+        "title": "Settings"
+      }
+    },
+    "whiteboard_preview": "Whiteboard preview",
+    "timeline": "Timeline"
   },
 
   "users": {

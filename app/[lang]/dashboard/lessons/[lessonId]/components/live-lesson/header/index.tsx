@@ -10,6 +10,7 @@ import LessonStatus from "@/components/lesson/lesson-status";
 import { useLesson } from "@/hooks/use-lesson";
 import type { MenuItem } from "@/interfaces/menu.interface";
 import type { Course } from "@/types/course.type";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 interface Props {
@@ -19,22 +20,23 @@ interface Props {
 const Header: FunctionComponent<PropsWithChildren<Props>> = ({ course }) => {
   // Hooks
   const lesson = useLesson((state) => state.lesson);
+  const t = useTranslations();
 
   const tabs: MenuItem[] = [
     {
-      title: "Overview",
+      title: t("lesson.tabs.overview.title"),
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
       Icon: <OverviewIcon />,
       tier: ["teacher", "student"],
     },
     {
-      title: "Assignments",
+      title: t("lesson.tabs.assignments.title"),
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
       Icon: <AssignmentsIcon />,
       tier: ["teacher", "student"],
     },
     {
-      title: "Settings",
+      title: t("lesson.tabs.settings.title"),
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
       Icon: <SettingsIcon />,
       tier: ["teacher"],
@@ -48,7 +50,7 @@ const Header: FunctionComponent<PropsWithChildren<Props>> = ({ course }) => {
         Icon={<CoursesIcon />}
         items={[
           {
-            title: "Courses",
+            title: t("lesson.breadcrumbs.courses"),
             href: `/dashboard/courses`,
           },
           {
@@ -56,7 +58,7 @@ const Header: FunctionComponent<PropsWithChildren<Props>> = ({ course }) => {
             href: `/dashboard/courses/${course.id}/overview`,
           },
           {
-            title: "Lessons",
+            title: t("lesson.breadcrumbs.lessons"),
             href: `/dashboard/courses/${course.id}/lessons`,
           },
           {

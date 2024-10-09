@@ -7,9 +7,9 @@ import OverviewIcon from "@/components/icons/dashboard-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import MembersIcon from "@/components/icons/members-icon";
 import SettingsIcon from "@/components/icons/settings-icon";
-import { Role } from "@/enums/role.enum";
 import type { MenuItem } from "@/interfaces/menu.interface";
 import type { Course } from "@/types/course.type";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 interface Props {
@@ -17,30 +17,33 @@ interface Props {
 }
 
 const Header: FunctionComponent<PropsWithChildren<Props>> = ({ course }) => {
+  // Hooks
+  const t = useTranslations();
+
   const tabs: MenuItem[] = [
     {
-      title: "Overview",
+      title: t("course.tabs.overview.title"),
       href: `/dashboard/courses/${course.id}/overview`,
       Icon: <OverviewIcon />,
-      tier: [Role.Teacher, Role.Student],
+      tier: ["teacher", "student"],
     },
     {
-      title: "Lessons",
+      title: t("course.tabs.lessons.title"),
       href: `/dashboard/courses/${course.id}/lessons`,
       Icon: <LessonsIcon />,
-      tier: [Role.Teacher, Role.Student],
+      tier: ["teacher", "student"],
     },
     {
-      title: "Members",
+      title: t("course.tabs.members.title"),
       href: `/dashboard/courses/${course.id}/members`,
       Icon: <MembersIcon />,
-      tier: [Role.Teacher, Role.Student],
+      tier: ["teacher", "student"],
     },
     {
-      title: "Settings",
+      title: t("course.tabs.settings.title"),
       href: `/dashboard/courses/${course.id}/settings`,
       Icon: <SettingsIcon />,
-      tier: [Role.Teacher],
+      tier: ["teacher"],
     },
   ];
 
@@ -51,7 +54,7 @@ const Header: FunctionComponent<PropsWithChildren<Props>> = ({ course }) => {
         Icon={<CoursesIcon />}
         items={[
           {
-            title: "Courses",
+            title: t("course.breadcrumbs.courses"),
             href: `/dashboard/courses`,
           },
           {

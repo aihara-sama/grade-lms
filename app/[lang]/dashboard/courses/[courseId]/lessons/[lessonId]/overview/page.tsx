@@ -176,10 +176,10 @@ const Page: FunctionComponent = () => {
             <div className="flex items-center gap-2">
               <WhiteboardIcon size="xs" />
               <p className="text-center text-neutral-600 font-bold text-sm">
-                Whiteboard preview
+                {t("lesson.whiteboard_preview")}
               </p>
             </div>
-            {user.role === Role.Teacher && (
+            {user.role === "teacher" && (
               <div
                 className="inter-active p-2 border rounded-md ml-auto mr-2"
                 onClick={submitUpdateWhiteboardData}
@@ -189,7 +189,7 @@ const Page: FunctionComponent = () => {
             )}
           </div>
           <div
-            className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-25px)] ${clsx(user.role !== Role.Teacher && "student-whiteboard")}`}
+            className={`relative border border-gray-200 [&>.excalidraw]:h-[calc(100%-25px)] ${clsx(user.role !== "teacher" && "student-whiteboard")}`}
             style={{
               height: `${whiteboardHeight}px`,
             }}
@@ -201,7 +201,7 @@ const Page: FunctionComponent = () => {
               }}
               initialData={whiteboardInitialData}
               onChange={
-                user.role === Role.Teacher ? onWhiteboardChange : undefined
+                user.role === "teacher" ? onWhiteboardChange : undefined
               }
             />
             <ResizeHandler
@@ -213,26 +213,26 @@ const Page: FunctionComponent = () => {
           </div>
         </main>
         <aside className="flex flex-col">
-          <p className="text-neutral-600 ">Timeline</p>
+          <p className="text-neutral-600 ">{t("lesson.timeline")}</p>
           <hr className="mb-6" />
           <DateInput
             date={starts}
             onChange={onDateChange}
-            label="Starts at"
+            label={t("labels.starts_at")}
             popperPlacement="bottom-start"
-            disabled={user.role !== Role.Teacher || isOngoing || isEnded}
+            disabled={user.role !== "teacher" || isOngoing || isEnded}
           />
           <BasicInput
             className="mt-3 mb-0"
-            label="Duration"
+            label={t("labels.duration")}
             fullWidth
             type="number"
             StartIcon={<LessonsIcon />}
             value={`${millisecondsToMinutes(duration)}`}
             onChange={changeDateDuration}
-            disabled={user.role !== Role.Teacher || isOngoing || isEnded}
+            disabled={user.role !== "teacher" || isOngoing || isEnded}
           />
-          {user.role === Role.Teacher && (
+          {user.role === "teacher" && (
             <button
               className="primary-button"
               disabled={isSaveButtonDisabled()}
@@ -242,7 +242,7 @@ const Page: FunctionComponent = () => {
               <span
                 className={`${clsx(isSubmittingUpdateLessonDate && "opacity-0")}`}
               >
-                Save
+                {t("buttons.save")}
               </span>
             </button>
           )}
@@ -251,7 +251,7 @@ const Page: FunctionComponent = () => {
               href={`/dashboard/lessons/${lesson.id}`}
               className={`button warning-button ${clsx(!isOngoing && "disabled")} `}
             >
-              Enter class
+              {t("buttons.enter_class")}
             </Link>
           </div>
         </aside>
