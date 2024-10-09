@@ -30,10 +30,12 @@ import type { Tab } from "@/interfaces/tabs.interface";
 import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";
 import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
 import { isLessonEnding } from "@/utils/lesson/is-lesson-ending";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
 const LiveLesson: FunctionComponent = () => {
   // Hooks
+  const t = useTranslations();
   const { lesson, isEnded, setIsEnding, setIsEnded } = useLesson(
     (state) => state
   );
@@ -69,7 +71,7 @@ const LiveLesson: FunctionComponent = () => {
   // Vars
   const tabs: Tab[] = [
     {
-      title: "Cameras",
+      title: t("class_room.tabs.cameras.title"),
       content: (
         <div
           className={`flex flex-col flex-1 ${clsx({
@@ -80,7 +82,7 @@ const LiveLesson: FunctionComponent = () => {
           <div className="flex flex-col gap-3">
             {isEnded ? (
               <div className="mt-5 flex flex-col items-center gap-4 text-neutral-500">
-                <div> This session has ended</div>
+                <div>{t("common.this_session_has_ended")}</div>
                 <TimeIcon size="md" />
               </div>
             ) : (
@@ -104,7 +106,7 @@ const LiveLesson: FunctionComponent = () => {
   if (lesson.course_id) {
     tabs.push(
       {
-        title: "Messages",
+        title: t("class_room.tabs.messages.title"),
         content: <Chat lesson={lesson} />,
         Icon: (
           <div className="relative">
@@ -117,7 +119,7 @@ const LiveLesson: FunctionComponent = () => {
         tier: ["teacher", "student", "guest"],
       },
       {
-        title: "Assignments",
+        title: t("class_room.tabs.assignments.title"),
         content: <AssignmentsTab lessonId={lesson.id} />,
         Icon: <AssignmentsIcon />,
         tier: ["teacher"],
@@ -135,7 +137,7 @@ const LiveLesson: FunctionComponent = () => {
       endSession();
       stopExecAtStartOfMin();
 
-      toast.success("The lesson has ended");
+      toast.success(t("common.the_lesson_has_ended"));
     }
   }, [isEnded]);
 
@@ -157,7 +159,7 @@ const LiveLesson: FunctionComponent = () => {
           Icon={<CoursesIcon />}
           items={[
             {
-              title: "Courses",
+              title: t("class_room.breadcrumbs.courses"),
               href: `/dashboard/courses`,
             },
             {
@@ -165,7 +167,7 @@ const LiveLesson: FunctionComponent = () => {
               href: `/dashboard/courses/${lesson.course.id}/overview`,
             },
             {
-              title: "Lessons",
+              title: t("class_room.breadcrumbs.lessons"),
               href: `/dashboard/courses/${lesson.course.id}/lessons`,
             },
             {

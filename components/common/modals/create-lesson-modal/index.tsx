@@ -97,7 +97,7 @@ const CreateLessonModal: FunctionComponent<Props> = ({
 
       onClose(await createLesson(lesson));
 
-      toast(t("success.lesson_created"));
+      toast.success(t("success.lesson_created"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {

@@ -49,7 +49,8 @@
     "logout": "Logout",
     "create_account": "Create account",
     "enter_class": "Enter class",
-    "submit": "Submit"
+    "submit": "Submit",
+    "extend?": "Extend?"
   },
 
   "links": {
@@ -73,7 +74,9 @@
   },
 
   "statuses": {
-    "active": "Active"
+    "active": "Active",
+    "ongoing": "Ongoing",
+    "ended": "Ended"
   },
 
   "common": {
@@ -82,7 +85,10 @@
     "try_using_different_keywords_or_change_some_filters": "Try using different keywords or change some filters",
     "select_users_to_enroll": "Select users to enroll",
     "select_courses_to_enroll": "Select courses to enroll",
-    "deleted": "Deleted"
+    "deleted": "Deleted",
+    "this_session_has_ended": "This session has ended",
+    "the_lesson_has_ended": "The lesson has ended",
+    "left": "Left"
   },
 
   "dashboard": {
@@ -173,6 +179,24 @@
     "timeline": "Timeline"
   },
 
+  "class_room": {
+    "breadcrumbs": {
+      "courses": "Courses",
+      "lessons": "Lessons"
+    },
+    "tabs": {
+      "cameras": {
+        "title": "Cameras"
+      },
+      "messages": {
+        "title": "Messages"
+      },
+      "assignments": {
+        "title": "Assignments"
+      }
+    }
+  },
+
   "assignments": {
     "title": "Assignments",
     "description": "Create and manage assignments effectively"
@@ -221,7 +245,9 @@
     "starts_at": "Starts at",
     "duration": "Duration",
     "description": "Description",
-    "due_date": "Due date"
+    "due_date": "Due date",
+    "starts_in": "Starts in",
+    "add_minutes": "Add minutes"
   },
 
   "success": {
@@ -402,6 +428,9 @@
       },
       "edit_submission": {
         "title": "Edit submission"
+      },
+      "extend_lesson": {
+        "title": "Extend lesson"
       }
     }
   },

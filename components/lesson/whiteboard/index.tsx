@@ -144,9 +144,9 @@ const Whiteboard: FunctionComponent = () => {
         // Teacher's cursor
         collaborators: new Map([
           [
-            Role.Teacher,
+            t("roles.teacher"),
             {
-              username: Role.Teacher,
+              username: t("roles.teacher"),
               pointer: payload.payload.pointerEvent?.pointer,
               button: payload.payload.pointerEvent?.button,
             },
@@ -211,15 +211,15 @@ const Whiteboard: FunctionComponent = () => {
         </div>
         <div className="flex gap-3 items-center flex-shrink-0">
           <LessonStatus showTimeLeft />
-          {isOngoing && user.role === Role.Teacher && (
+          {isOngoing && user.role === "teacher" && (
             <button
               className="text-link"
               onClick={() => setIsExtendLessonModal(true)}
             >
-              Extend?
+              {t("buttons.extend?")}
             </button>
           )}
-          {user.role === Role.Teacher && !lesson.course_id && (
+          {user.role === "teacher" && !lesson.course_id && (
             <button className="icon-button" onClick={copyInviteLink}>
               <InviteIcon size="sm" />
             </button>
@@ -236,11 +236,9 @@ const Whiteboard: FunctionComponent = () => {
         <Excalidraw
           isCollaborating
           onPointerUpdate={
-            user.role === Role.Teacher ? onPointerUpdate : undefined
+            user.role === "teacher" ? onPointerUpdate : undefined
           }
-          onChange={
-            user.role === Role.Teacher ? fireWhiteboardChange : undefined
-          }
+          onChange={user.role === "teacher" ? fireWhiteboardChange : undefined}
           excalidrawAPI={(api) => {
             excalidrawAPIRef.current = api;
           }}

@@ -4,17 +4,17 @@ import { getOngoingLesson } from "@/db/server/lesson";
 import type { Metadata } from "next";
 import type { FunctionComponent } from "react";
 
-export async function generateMetadata({
+export const generateMetadata = async ({
   params: { courseId },
 }: {
   params: { courseId: string };
-}): Promise<Metadata> {
+}): Promise<Metadata> => {
   const { title } = await getCourse(courseId);
 
   return {
     title,
   };
-}
+};
 
 interface Props {
   params: { courseId: string };

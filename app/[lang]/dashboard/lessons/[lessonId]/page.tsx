@@ -2,10 +2,22 @@ import LiveLesson from "@/app/[lang]/dashboard/lessons/[lessonId]/components/liv
 import ChatProvider from "@/components/providers/chat-provider";
 import LessonProvider from "@/components/providers/lesson-provider";
 import { getLessonWithCourse } from "@/db/server/lesson";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { type FunctionComponent } from "react";
 
+export const generateMetadata = async ({
+  params: { lessonId },
+}: {
+  params: { lessonId: string };
+}): Promise<Metadata> => {
+  const { title } = await getLessonWithCourse(lessonId);
+
+  return {
+    title,
+  };
+};
 interface Props {
   params: {
     lessonId: string;

@@ -1,6 +1,7 @@
 import { LESSONS_GET_LIMIT } from "@/constants";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { addDays, format, startOfDay } from "date-fns";
+import { cache } from "react";
 
 export const getLesson = async (id: string) => {
   const result = await getServerDB()
@@ -12,7 +13,7 @@ export const getLesson = async (id: string) => {
   return result.data;
 };
 
-export const getLessonWithCourse = async (id: string) => {
+export const getLessonWithCourse = cache(async (id: string) => {
   const result = await getServerDB()
     .from("lessons")
     .select("*, course:courses(*)")
@@ -20,7 +21,7 @@ export const getLessonWithCourse = async (id: string) => {
     .single();
 
   return result.data;
-};
+});
 
 export const getOngoingLesson = async (courseId: string) => {
   const result = await getServerDB()

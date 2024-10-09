@@ -75,7 +75,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ onClose }) => {
   return (
     <BasicModal
       isFixedHeight={false}
-      title="Extend lesson"
+      title={t("modal.titles.extend_lesson.title")}
       onClose={() => onClose()}
     >
       <div>
@@ -87,7 +87,7 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ onClose }) => {
             fullWidth
             StartIcon={<TimeIcon />}
             type="number"
-            label="Add minutes"
+            label={t("labels.add_minutes")}
           />
         </div>
         <div className="flex gap-3">
@@ -95,14 +95,16 @@ const ExtendLessonModal: FunctionComponent<Props> = ({ onClose }) => {
             className="outline-button ml-auto w-auto"
             onClick={() => onClose()}
           >
-            Cancel
+            {t("buttons.cancel")}
           </button>
           <button
             className="primary-button w-auto"
             onClick={submitExtendLesson}
           >
             {isSubmitting && <LoadingSpinner />}
-            <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              {t("buttons.save")}
+            </span>
           </button>
         </div>
       </div>

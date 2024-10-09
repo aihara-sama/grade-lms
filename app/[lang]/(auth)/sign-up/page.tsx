@@ -58,7 +58,7 @@ const Page: FunctionComponent = () => {
 
     setIsSubmitting(false);
 
-    if (error) toast(t(serverErrToIntlKey(error.message)));
+    if (error) toast.error(t(serverErrToIntlKey(error.message)));
     else {
       setIsSuccess(true);
       router.push(searchParams.get("redirect") || `/dashboard`);

@@ -139,7 +139,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
       onClose(usersIds);
 
-      toast(t("success.users_enrolled"));
+      toast.success(t("success.users_enrolled"));
       DB.functions.invoke("check-events");
     } catch (error: any) {
       toast.error(error.message);

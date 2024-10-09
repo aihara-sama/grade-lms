@@ -4,6 +4,7 @@ import { useLesson } from "@/hooks/use-lesson";
 import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
 import { isLessonOngoing } from "@/utils/lesson/is-lesson-ongoing";
 import { formatDistanceToNowStrict } from "date-fns";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 
 interface Props {
@@ -12,13 +13,10 @@ interface Props {
 
 const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft = false }) => {
   // Hooks
-  const {
-    lesson,
-    isEnded,
-    isOngoing,
-    setIsEnded: setisEnded,
-    setIsOngoing: setisOngoing,
-  } = useLesson((state) => state);
+  const t = useTranslations();
+  const { lesson, isEnded, isOngoing, setIsEnded, setIsOngoing } = useLesson(
+    (state) => state
+  );
 
   // State
   const [liveDate, setLiveDate] = useState<string>();
@@ -43,8 +41,8 @@ const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft = false }) => {
     intervalIdRef.current = setInterval(() => {
       setLiveDate(formatDistanceToNowStrict(lesson.ends));
 
-      if (isLessonOngoing(lesson)) setisOngoing(isLessonOngoing(lesson));
-      if (isLessonEnded(lesson)) setisEnded(isLessonEnded(lesson));
+      if (isLessonOngoing(lesson)) setIsOngoing(isLessonOngoing(lesson));
+      if (isLessonEnded(lesson)) setIsEnded(isLessonEnded(lesson));
     }, 1000);
 
     return () => {
@@ -59,14 +57,17 @@ const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft = false }) => {
         <div className={`size-2 rounded-[50%] ${getStatusColor()}`}></div>
         {isOngoing &&
           (showTimeLeft ? (
-            <span className="font-bold">{liveDate} left</span>
+            <span className="font-bold">
+              {liveDate} {t("common.left")}
+            </span>
           ) : (
-            <span className="font-bold">Ongoing</span>
+            <span className="font-bold">{t("statuses.ongoing")}</span>
           ))}
-        {isEnded && <span className="font-bold">Ended</span>}
+        {isEnded && <span className="font-bold">{t("statuses.ended")}</span>}
         {!isOngoing && !isEnded && (
           <div>
-            Starts in: <span className="font-bold">{liveDate}</span>
+            {t("labels.starts_in")}:{" "}
+            <span className="font-bold">{liveDate}</span>
           </div>
         )}
       </div>

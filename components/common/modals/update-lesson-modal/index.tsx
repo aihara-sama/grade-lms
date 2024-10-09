@@ -99,7 +99,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
       try {
         onClose(await updateLesson(lesson));
 
-        toast(t("success.lesson_updated"));
+        toast.success(t("success.lesson_updated"));
       } catch (error: any) {
         toast.error(error.message);
       } finally {
