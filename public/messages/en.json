@@ -9,6 +9,12 @@
     "sat": "Sat"
   },
 
+  "sections": {
+    "insights": {
+      "title": "Insights"
+    }
+  },
+
   "cards": {
     "titles": {
       "total_courses": "Total courses",
@@ -143,7 +149,11 @@
     "name": "Name",
     "email": "Email",
     "password": "password",
-    "timezone": "Timezone"
+    "timezone": "Timezone",
+    "lessons": "Lessons",
+    "new_members": "New members",
+    "courses": "Courses",
+    "users": "Users"
   },
 
   "success": {
@@ -181,6 +191,7 @@
     "password_changed": "Password successfully changed"
   },
   "error": {
+    "failed_to_load_members_insights": "Failed to load members insights",
     "failed_to_load_users_insights": "Failed to load users insights",
     "failed_to_load_user": "Failed to load user",
     "failed_to_load_users": "Failed to load users",
@@ -202,6 +213,7 @@
     "failed_to_delete_course": "Failed to delete course",
     "failed_to_delete_courses": "Failed to delete courses",
 
+    "failed_to_load_lessons_insights": "Failed to load lessons insights",
     "failed_to_load_lesson": "Failed to load lesson",
     "failed_to_load_lessons": "Failed to load lessons",
     "failed_to_load_lessons_count": "Failed to load lessons count",

@@ -63,6 +63,22 @@ export const getUsersInsights = async () => {
 
   return { data, count };
 };
+export const getMembersInsights = async (courseId: string) => {
+  const t = await loadMessages();
+
+  const { data, count, error } = await DB.from("user_courses")
+    .select("timestamp:created_at")
+    .eq("course_id", courseId)
+    .gte(
+      "created_at",
+      format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+
+  if (error) throw new Error(t("error.failed_to_load_members_insights"));
+
+  return { data, count };
+};
 
 export const getCourseUsers = async (
   courseId: string,

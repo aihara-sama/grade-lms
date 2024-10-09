@@ -4,11 +4,11 @@ import Insight from "@/components/common/insight";
 import ChartSkeleton from "@/components/utilities/skeletons/chart-skeleton";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
-import { addDays, format, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-import { DB } from "@/lib/supabase/db";
+import { getLessonsInsights } from "@/db/client/lesson";
+import { getMembersInsights } from "@/db/client/user";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
@@ -19,54 +19,25 @@ interface Props {
 const Insights: FunctionComponent<Props> = ({ courseId }) => {
   // State
   const [lessonsInsights, setLessonsInsights] = useState<number[]>([]);
-  const [usersInsights, setUsersInsights] = useState<number[]>([]);
+  const [membersInsights, setMembersInsights] = useState<number[]>([]);
 
   // Hooks
   const t = useTranslations();
-
-  // Handlers
-  const getLessonsInsights = async () => {
-    const result = await DB.from("courses")
-      .select("lessons(timestamp:ends)")
-      .eq("id", courseId)
-      .gte(
-        "lessons.ends",
-        format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .lte("lessons.ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
-      .single();
-
-    if (result.error)
-      throw new Error(t("error.failed_lo_load_lessons_insights"));
-
-    return result.data.lessons;
-  };
-  const getUsersInsights = async () => {
-    const result = await DB.from("user_courses")
-      .select("timestamp:created_at")
-      .eq("course_id", courseId)
-      .gte(
-        "created_at",
-        format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
-      )
-      .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-
-    if (result.error) throw new Error(t("error.failed_lo_load_users_insights"));
-
-    return result.data;
-  };
 
   // Effects
   useEffect(() => {
     (async () => {
       try {
-        const [usersInsightsData, lessonsInsightsData] = await Promise.all([
-          getUsersInsights(),
-          getLessonsInsights(),
+        const [
+          { data: fetchedMembersInsights },
+          { data: fetchedLessonsInsights },
+        ] = await Promise.all([
+          getMembersInsights(courseId),
+          getLessonsInsights(courseId),
         ]);
 
-        setUsersInsights(parseInsights(usersInsightsData));
-        setLessonsInsights(parseInsights(lessonsInsightsData));
+        setMembersInsights(parseInsights(fetchedMembersInsights));
+        setLessonsInsights(parseInsights(fetchedLessonsInsights));
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -75,28 +46,28 @@ const Insights: FunctionComponent<Props> = ({ courseId }) => {
 
   return (
     <div>
-      <p className="section-title">Insights</p>
+      <p className="section-title">{t("sections.insights.title")}</p>
       <div className="flex gap-5 flex-col md:flex-row">
         {lessonsInsights.length ? (
           <Insight
-            label="Lessons"
+            label={t("labels.lessons")}
             data={lessonsInsights}
             labels={getWeekNames()}
           />
         ) : (
           <div className="flex-1">
-            <ChartSkeleton record="Lessons" />
+            <ChartSkeleton record={t("labels.lessons")} />
           </div>
         )}
-        {usersInsights.length ? (
+        {membersInsights.length ? (
           <Insight
-            label="New members"
-            data={usersInsights}
+            label={t("labels.new_members")}
+            data={membersInsights}
             labels={getWeekNames()}
           />
         ) : (
           <div className="flex-1">
-            <ChartSkeleton record="New members" />
+            <ChartSkeleton record={t("labels.new_members")} />
           </div>
         )}
       </div>

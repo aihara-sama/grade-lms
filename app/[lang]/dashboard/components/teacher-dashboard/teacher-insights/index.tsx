@@ -33,14 +33,18 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
   useEffect(() => {
     (async () => {
       try {
-        const [{ data: newUsersInsights }, { data: newCoursesInsights }] =
-          await Promise.all([getUsersInsights(), getCoursesInsights()]);
+        const [
+          { data: fetchedUsersInsights },
+          { data: fetchedCoursesInsights },
+        ] = await Promise.all([getUsersInsights(), getCoursesInsights()]);
 
-        if (newUsersInsights.length) {
-          setUsersInsights(Object.values(parseInsights(newUsersInsights)));
+        if (fetchedUsersInsights.length) {
+          setUsersInsights(Object.values(parseInsights(fetchedUsersInsights)));
         }
-        if (newCoursesInsights.length) {
-          setCoursesInsights(Object.values(parseInsights(newCoursesInsights)));
+        if (fetchedCoursesInsights.length) {
+          setCoursesInsights(
+            Object.values(parseInsights(fetchedCoursesInsights))
+          );
         }
       } catch (error: any) {
         toast.error(error.message);
@@ -54,26 +58,26 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
       <div className="flex gap-5 flex-col md:flex-row">
         {coursesInsights.length ? (
           <Insight
-            label={t("dashboard.users")}
+            label={t("labels.users")}
             shouldCalcRightSide={false}
             data={usersInsights}
             labels={getWeekNames(user.preferred_locale as Locale)}
           />
         ) : (
           <div className="flex-1">
-            <ChartSkeleton record={t("dashboard.users")} />
+            <ChartSkeleton record={t("labels.users")} />
           </div>
         )}
         {coursesInsights.length ? (
           <Insight
-            label={t("dashboard.courses")}
+            label={t("labels.courses")}
             shouldCalcRightSide={false}
             data={coursesInsights}
             labels={getWeekNames(user.preferred_locale as Locale)}
           />
         ) : (
           <div className="flex-1">
-            <ChartSkeleton record={t("dashboard.courses")} />
+            <ChartSkeleton record={t("labels.courses")} />
           </div>
         )}
       </div>

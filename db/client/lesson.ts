@@ -3,7 +3,7 @@ import { DB } from "@/lib/supabase/db";
 import type { Lesson } from "@/types/lesson.type";
 import type { TablesInsert, TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
-import { addDays, format, startOfDay } from "date-fns";
+import { addDays, format, startOfDay, subWeeks } from "date-fns";
 
 // GET
 export const getLesson = async (id: string) => {
@@ -52,6 +52,22 @@ export const getCourseLessons = async (
     .order("created_at", { ascending: true });
 
   if (error) throw new Error(t("error.failed_to_load_lessons"));
+
+  return { data, count };
+};
+export const getLessonsInsights = async (courseId: string) => {
+  const t = await loadMessages();
+
+  const { data, count, error } = await DB.from("lessons")
+    .select("timestamp:ends")
+    .eq("courseId", courseId)
+    .gte(
+      "ends",
+      format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
+    )
+    .lte("ends", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+
+  if (error) throw new Error(t("error.failed_to_load_lessons_insights"));
 
   return { data, count };
 };
