@@ -28,6 +28,7 @@
   },
 
   "buttons": {
+    "close": "Close",
     "change_password": "Change password",
     "delete": "Delete",
     "expel": "Expel",
@@ -218,6 +219,12 @@
     "enable_disable_emails": "Enable/Disable emails",
     "enable_disable_browser_notifications": "Enable/Disable browser notifications",
     "security": "Security"
+  },
+
+  "schedule": {
+    "title": "Schedule",
+    "sub_title": "View and manage your schedule",
+    "daylight_saving_time": "Daylight Saving Time"
   },
 
   "sign_in": {
@@ -445,6 +452,9 @@
       },
       "extend_lesson": {
         "title": "Extend lesson"
+      },
+      "view_lesson": {
+        "title": "View lesson"
       }
     }
   },

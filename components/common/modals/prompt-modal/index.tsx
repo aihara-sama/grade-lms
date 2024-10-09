@@ -1,4 +1,5 @@
 import BasicModal from "@/components/common/modals/basic-modal";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import clsx from "clsx";
 import type { FunctionComponent } from "react";
 
@@ -34,13 +35,7 @@ const PromptModal: FunctionComponent<Props> = ({
           Cancel
         </button>
         <button className="primary-button" onClick={actionHandler}>
-          {isSubmitting && (
-            <img
-              className="loading-spinner"
-              src="/assets/gif/loading-spinner.gif"
-              alt=""
-            />
-          )}
+          {isSubmitting && <LoadingSpinner />}
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>
             {action}
           </span>

@@ -15,6 +15,7 @@ import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import BasicInput from "@/components/common/inputs/basic-input";
 import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import BasicSelect from "@/components/common/selects/basic-select";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { COURSES_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getCourses } from "@/db/client/course";
@@ -114,8 +115,6 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
         onClose();
 
         revalidatePageAction();
-
-        toast.success("Lesson deleted");
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -178,7 +177,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
       <BasicModal
         isFixedHeight={false}
         onClose={() => onClose()}
-        title="View lesson"
+        title={t("modal.titles.view_lesson.title")}
         headerButtons={
           <>
             <button
@@ -188,17 +187,15 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
             >
               <LessonsIcon />
             </button>
-            {lesson &&
-              !isLessonOngoing(lesson) &&
-              user.role === Role.Teacher && (
-                <button
-                  disabled={!lesson}
-                  className="icon-button"
-                  onClick={() => setIsDeleteLessonModalOpen(true)}
-                >
-                  <DeleteIcon />
-                </button>
-              )}
+            {lesson && !isLessonOngoing(lesson) && user.role === "teacher" && (
+              <button
+                disabled={!lesson}
+                className="icon-button"
+                onClick={() => setIsDeleteLessonModalOpen(true)}
+              >
+                <DeleteIcon />
+              </button>
+            )}
           </>
         }
       >
@@ -206,7 +203,7 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
           <form onSubmit={submitUpdateLesson}>
             {user.role === Role.Teacher && (
               <BasicSelect
-                label="Course"
+                label={t("labels.course")}
                 defaultValue={selectedCourse}
                 onChange={onCourseSelect}
                 options={courses}
@@ -222,26 +219,26 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
               name="title"
               fullWidth
               StartIcon={<LessonsIcon size="xs" />}
-              placeholder="Lesson name"
+              placeholder={t("placeholders.lesson_name")}
               onChange={onInputChange}
               value={lesson.title}
               className="mt-3"
-              disabled={user.role !== Role.Teacher}
+              disabled={user.role !== "teacher"}
             />
             <DateInput
               date={new Date(lesson.starts)}
               onChange={onDateChange}
-              label="Starts at"
-              disabled={isLessonOngoing(lesson) || user.role !== Role.Teacher}
+              label={t("labels.starts_at")}
+              disabled={isLessonOngoing(lesson) || user.role !== "teacher"}
             />
             <BasicInput
               fullWidth
-              label="Duration:"
+              label={`${t("labels.duration")}:`}
               type="number"
               StartIcon={<TimeIcon />}
               value={`${millisecondsToMinutes(getLessonDuration(lesson))}`}
               onChange={onChangeDuration}
-              disabled={isLessonOngoing(lesson) || user.role !== Role.Teacher}
+              disabled={isLessonOngoing(lesson) || user.role !== "teacher"}
             />
             <hr className="my-3" />
             <div className="flex justify-end">
@@ -251,22 +248,16 @@ const UpdateLessonModal: FunctionComponent<Props> = memo(
                   type="submit"
                   className="primary-button"
                 >
-                  {isSubmittingUpdateLesson && (
-                    <img
-                      className="loading-spinner"
-                      src="/assets/gif/loading-spinner.gif"
-                      alt=""
-                    />
-                  )}
+                  {isSubmittingUpdateLesson && <LoadingSpinner />}
                   <span
                     className={`${clsx(isSubmittingUpdateLesson && "opacity-0")}`}
                   >
-                    Save
+                    {t("buttons.save")}
                   </span>
                 </button>
               ) : (
                 <button className="outline-button" onClick={() => onClose()}>
-                  Close
+                  {t("buttons.close")}
                 </button>
               )}
             </div>

@@ -31,14 +31,17 @@ import { getWeekLessons, upsertLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
+import type { Locale } from "@/i18n";
 import type { SelectItem } from "@/interfaces/select.interface";
 import type { Lesson } from "@/types/lesson.type";
 import type { ResultOf } from "@/types/utils.type";
 import { getEventElFromPoints } from "@/utils/DOM/get-event-el-from-points";
 import { getEventPlaceholderElFromPoints } from "@/utils/DOM/get-event-placeholder-el-from-points";
 import { getEventWidth } from "@/utils/DOM/get-event-width";
+import { getDateLocale } from "@/utils/date/get-date-locale";
 import { getWeekDays } from "@/utils/date/get-week-days";
 import { execAtStartOfMin } from "@/utils/date/interval-at-start-of-min";
+import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -323,8 +326,8 @@ const Schedule: FunctionComponent<Props> = ({
   return (
     <Container>
       <div onMouseUp={onMouseUp}>
-        <h1 className="page-title">Schedule</h1>
-        <p className="text-neutral-500">View and manage your schedule</p>
+        <h1 className="page-title">{t("schedule.title")}</h1>
+        <p className="text-neutral-500">{t("schedule.sub_title")}</p>
         <hr className="my-2 mb-8" />
         <div className="flex justify-between items-center mb-2">
           <div className="mt-1 flex items-center gap-3">
@@ -351,7 +354,7 @@ const Schedule: FunctionComponent<Props> = ({
             </div>
           </div>
           <BasicSelect
-            label="Course"
+            label={t("labels.course")}
             options={courses}
             onChange={(item) => setSelectedCourse(item)}
             defaultValue={selectedCourse}
@@ -374,7 +377,11 @@ const Schedule: FunctionComponent<Props> = ({
               key={idx}
               className="flex-[1] text-center text-sm font-bold py-4"
             >
-              {format(new Date(day), "EE")}
+              {toCapitalCase(
+                format(new Date(day), "EE", {
+                  locale: getDateLocale(user.preferred_locale as Locale),
+                })
+              )}
             </div>
           ))}
         </div>

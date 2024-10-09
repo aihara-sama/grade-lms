@@ -19,6 +19,7 @@ import {
   millisecondsToMinutes,
   startOfDay,
 } from "date-fns";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { memo } from "react";
 
@@ -49,6 +50,7 @@ const Hour: FunctionComponent<Props> = ({
   );
 
   // Hooks
+  const t = useTranslations();
   const user = useUser((state) => state.user);
   const setSelectedLesson = useSchedule((state) => state.setSelectedLesson);
 
@@ -86,7 +88,7 @@ const Hour: FunctionComponent<Props> = ({
       {index > 0 &&
         isSummerDaylight(addHours(day, index), addHours(day, index - 1)) && (
           <div className="h-[81px] text-xs pl-1 pt-1 text-orange-400 border border-r-neutral-100 border-t-neutral-100 relative">
-            Daylight Saving Time
+            {t("schedule.daylight_saving_time")}
           </div>
         )}
       <div

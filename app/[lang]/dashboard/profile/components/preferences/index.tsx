@@ -61,6 +61,10 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
     })();
   }, [pushNotificationsState]);
 
+  useUpdateEffect(() => {
+    setPushNotificationsState(user.push_notifications_state);
+  }, [user.push_notifications_state]);
+
   // View
   return (
     <div className={className}>

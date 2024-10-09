@@ -2,6 +2,7 @@ import File from "@/components/common/file";
 import BasicInput from "@/components/common/inputs/basic-input";
 import BasicModal from "@/components/common/modals/basic-modal";
 import MessagesIcon from "@/components/icons/messages-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { MAX_CHAT_FILE_SIZE } from "@/constants";
 import { uploadChatFile } from "@/db/client/storage";
@@ -161,13 +162,7 @@ const CreateFileMessageModal: FunctionComponent<Props> = ({
               className="w-full mb-auto"
             />
             <button className="primary-button" onClick={submitCreateMessage}>
-              {isSubmittingCreateMessage && (
-                <img
-                  className="loading-spinner"
-                  src="/assets/gif/loading-spinner.gif"
-                  alt=""
-                />
-              )}
+              {isSubmittingCreateMessage && <LoadingSpinner />}
               <span
                 className={`${clsx(isSubmittingCreateMessage && "opacity-0")}`}
               >
