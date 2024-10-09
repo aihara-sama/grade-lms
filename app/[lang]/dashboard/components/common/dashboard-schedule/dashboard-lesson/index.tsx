@@ -2,10 +2,14 @@ import AssignmentsIcon from "@/components/icons/assignments-icon";
 import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import type { getDayLessons } from "@/db/client/lesson";
+import { useUser } from "@/hooks/use-user";
+import type { Locale } from "@/i18n";
 import type { ResultOf } from "@/types/utils.type";
+import { getDateLocale } from "@/utils/date/get-date-locale";
 import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { format, formatDistanceToNow } from "date-fns";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 
@@ -14,13 +18,18 @@ interface Props {
 }
 
 const DashboardLesson: FunctionComponent<Props> = ({ lesson }) => {
+  // Hooks
+  const t = useTranslations();
+  const user = useUser((state) => state.user);
+
   // Handlers
   const getLessonStatus = () => {
-    if (isLessonEnded(lesson)) return "Ended";
+    if (isLessonEnded(lesson)) return t("dashboard.ended");
 
     return toCapitalCase(
       formatDistanceToNow(new Date(lesson.ends), {
         addSuffix: true,
+        locale: getDateLocale(user.preferred_locale as Locale),
       })
     );
   };
@@ -65,7 +74,7 @@ const DashboardLesson: FunctionComponent<Props> = ({ lesson }) => {
           className="flex items-center gap-2 border border-gray-200 py-[6px] px-3 rounded-lg hover:bg-gray-100 active:bg-gray-200 hover:text-primary"
         >
           <AssignmentsIcon size="xs" />
-          Assignments
+          {t("dashboard.assignments")}
         </Link>
         <Link
           href={`/dashboard/courses/${lesson.course_id}/lessons/${lesson.id}/overview`}

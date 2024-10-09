@@ -4,6 +4,7 @@ import PlusIcon from "@/components/icons/plus-icon";
 import type { createCourse } from "@/db/client/course";
 import type { CourseWithRefsCount } from "@/types/course.type";
 import type { ResultOf } from "@/types/utils.type";
+import { useTranslations } from "next-intl";
 import { useState, type FunctionComponent } from "react";
 
 interface Props {
@@ -15,8 +16,13 @@ const LatestCourses: FunctionComponent<Props> = ({
   courses,
   onCourseCreated,
 }) => {
+  // Hooks
+  const t = useTranslations();
+
+  // State
   const [isCreateCourseModal, setIsCreateCourseModal] = useState(false);
 
+  // Handlers
   const onCreateCourseModalClose = (
     maybeCourse?: ResultOf<typeof createCourse>
   ) => {
@@ -25,9 +31,10 @@ const LatestCourses: FunctionComponent<Props> = ({
     if (maybeCourse) onCourseCreated(maybeCourse);
   };
 
+  // View
   return (
     <div>
-      <h2 className="font-bold text-lg">Latest courses</h2>
+      <h2 className="font-bold text-lg">{t("dashboard.latest_courses")}</h2>
       <div className="overflow-x-auto flex gap-4 mt-2 whitespace-nowrap pb-3">
         {courses.map((course) => (
           <CourseCard key={course.id} course={course} />

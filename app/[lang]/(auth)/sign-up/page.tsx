@@ -68,7 +68,7 @@ const Page: FunctionComponent = () => {
   return (
     <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
       <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
-        {t("sign-up.create_account")}
+        {t("sign_up.create_account")}
       </p>
       <form onSubmit={handleSubmit}>
         <BasicInput
@@ -112,12 +112,12 @@ const Page: FunctionComponent = () => {
             />
           )}
           <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-            {t("sign-up.create_account")}
+            {t("sign_up.create_account")}
           </span>
         </button>
       </form>
       <p className="text-sm">
-        {t("sign-up.already_have_an_account?")}{" "}
+        {t("sign_up.already_have_an_account?")}{" "}
         <Link
           href={`/sign-in/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
           className="underline"

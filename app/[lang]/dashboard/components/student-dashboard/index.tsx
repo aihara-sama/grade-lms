@@ -14,6 +14,7 @@ import type { getLatestAssignments } from "@/db/server/assignment";
 import type { getDayLessons } from "@/db/server/lesson";
 import type { ResultOf } from "@/types/utils.type";
 import { parseInsights } from "@/utils/parse/parse-insights";
+import { useTranslations } from "next-intl";
 import { useEffect, useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
@@ -30,6 +31,9 @@ const StudentDashboard: FunctionComponent<Props> = ({
   latestAssignments,
   dayLessons,
 }) => {
+  // Hooks
+  const t = useTranslations();
+
   // State
   const [assignmentsInsights, setAssignmentsInsights] = useState<number[]>([]);
   const [submissionsInsights, setSubmissionsInsights] = useState<number[]>([]);
@@ -77,8 +81,8 @@ const StudentDashboard: FunctionComponent<Props> = ({
   // View
   return (
     <Container>
-      <p className="page-title">Dashboard</p>
-      <p className="text-neutral-500 mb-4">Your LMS Command Center</p>
+      <p className="page-title">{t("dashboard.title")}</p>
+      <p className="text-neutral-500 mb-4">{t("dashboard.sub_title")}</p>
       <div className="sm:flex-row flex gap-8 flex-col">
         <div className="flex-1 overflow-hidden">
           <div className="flex flex-wrap gap-6 [&>*]:[@media(min-width:919px)]:w-64">
@@ -86,13 +90,13 @@ const StudentDashboard: FunctionComponent<Props> = ({
               adaptive={false}
               Icon={<AssignmentsIcon size="lg" />}
               total={assignmentsCount}
-              title="Total assignments"
+              title={t("cards.titles.total_assignments")}
             />
             <Total
               adaptive={false}
               Icon={<SubmissionsIcon size="lg" />}
               total={submissionsCount}
-              title="Total submissions"
+              title={t("cards.titles.total_submissions")}
             />
           </div>
           <hr className="my-4" />

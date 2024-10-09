@@ -5,6 +5,7 @@ import { createCourse } from "@/db/client/course";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { ResultOf } from "@/types/utils.type";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -14,6 +15,9 @@ interface Props {
 }
 
 const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
+  // Hooks
+  const t = useTranslations();
+
   // State
   const [course, setCourse] = useState<TablesInsert<"courses">>({
     title: "",
@@ -49,7 +53,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
     <BasicModal
       isFixedHeight={false}
       onClose={() => onClose()}
-      title="Create course"
+      title={t("modal.titles.create_course")}
     >
       <BasicInput
         fullWidth

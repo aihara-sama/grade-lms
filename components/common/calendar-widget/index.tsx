@@ -12,6 +12,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
+import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 
 interface Props {
@@ -19,11 +20,22 @@ interface Props {
 }
 
 const CalendarWidget: React.FC<Props> = ({ onChange }) => {
+  // Hooks
+  const t = useTranslations();
+
   const today = new Date();
   const [currentDate, setCurrentDate] = useState<Date>(today);
   const [selectedDate, setSelectedDate] = useState<Date | null>(today);
 
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const daysOfWeek = [
+    t("days.sun"),
+    t("days.mon"),
+    t("days.tue"),
+    t("days.wed"),
+    t("days.thu"),
+    t("days.fri"),
+    t("days.sat"),
+  ];
 
   const startMonth = startOfMonth(currentDate);
   const endMonth = endOfMonth(currentDate);

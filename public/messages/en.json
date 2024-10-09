@@ -10,6 +10,25 @@
   "deleted": "Deleted",
   "login": "login",
 
+  "days": {
+    "sun": "Sun",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  },
+
+  "cards": {
+    "titles": {
+      "total_courses": "Total courses",
+      "total_users": "Total users",
+      "total_assignments": "Total assignments",
+      "total_submissions": "Total submissions"
+    }
+  },
+
   "dashboard": {
     "header": {
       "enable_browser_notifications": "Do you want to enable browser notifications?",
@@ -23,15 +42,29 @@
         "profile": "Profile",
         "quick_lesson": "Quick lesson"
       }
-    }
+    },
+
+    "title": "Dashboard",
+    "sub_title": "Your LMS Command Center",
+    "latest_courses": "Latest courses",
+    "latest_assignments": "Latest assignments",
+    "insights": "Insights",
+    "users": "Users",
+    "courses": "Courses",
+    "my_schedule": "My schedule",
+    "your_schedule_will_show_here": "Your schedule will show here",
+    "your_assignments_will_show_here": "Your assignments will show here",
+    "ended": "Ended",
+    "assignments": "Assignments",
+    "submissions": "Submissions"
   },
 
-  "sign-in": {
+  "sign_in": {
     "dont_have_an_account?": "Don't have an account?",
     "join": "Join"
   },
 
-  "sign-up": {
+  "sign_up": {
     "create_account": "Create account",
     "already_have_an_account?": "Already have an account?"
   },
@@ -179,6 +212,7 @@
   },
   "modal": {
     "titles": {
+      "create_course": "Create course",
       "delete_user": "Delete user",
       "delete_users": "Delete users",
       "expel_member": "Expel member",

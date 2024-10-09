@@ -83,12 +83,12 @@ const Page: FunctionComponent = () => {
         </button>
       </form>
       <p className="text-sm">
-        {t("sign-in.dont_have_an_account?")}{" "}
+        {t("sign_in.dont_have_an_account?")}{" "}
         <Link
           href={`/sign-up/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
           className="underline"
         >
-          {t("sign-in.join")}
+          {t("sign_in.join")}
         </Link>
       </p>
     </div>

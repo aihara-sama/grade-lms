@@ -10,6 +10,7 @@ import type { ResultOf } from "@/types/utils.type";
 import { isCloseToBottom } from "@/utils/DOM/is-document-close-to-bottom";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { startOfDay } from "date-fns";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent, UIEventHandler } from "react";
 import { useCallback, useState } from "react";
 
@@ -22,6 +23,9 @@ interface Props {
 const DashboardSchedule: FunctionComponent<Props> = ({
   dayLessons: initDayLessons,
 }) => {
+  // Hooks
+  const t = useTranslations();
+
   // State
   const [day, setDay] = useState(startOfDay(new Date()));
   const [dayLessons, setDayLessons] = useState(initDayLessons.data);
@@ -72,7 +76,7 @@ const DashboardSchedule: FunctionComponent<Props> = ({
     <div>
       <CalendarWidget onChange={(date) => setDay(startOfDay(date))} />
       <div className="mt-4">
-        <h2 className="font-bold text-lg">My schedule</h2>
+        <h2 className="font-bold text-lg">{t("dashboard.my_schedule")}</h2>
         <div
           className="flex flex-col gap-4 max-h-[800px] [@media(min-width:768px)]:max-h-[492px] [@media(min-width:897px)]:max-h-[300px] overflow-auto pr-2"
           onScroll={onScroll}
@@ -80,7 +84,9 @@ const DashboardSchedule: FunctionComponent<Props> = ({
           {!dayLessons.length && (
             <div className="flex gap-2 flex-col items-center mt-8">
               <NoDataIcon size="xl" />
-              <p className="text-neutral-500">Your schedule will show here</p>
+              <p className="text-neutral-500">
+                {t("dashboard.your_schedule_will_show_here")}
+              </p>
             </div>
           )}
           {dayLessons.map((lesson) => (

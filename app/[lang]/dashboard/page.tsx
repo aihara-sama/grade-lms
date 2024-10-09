@@ -9,7 +9,6 @@ import {
 import { getDayLessons } from "@/db/server/lesson";
 import { getSubmissions } from "@/db/server/submission";
 import { getMyUsers, getProfile, getUsersInsights } from "@/db/server/user";
-import { Role } from "@/enums/role.enum";
 import { parseInsights } from "@/utils/parse/parse-insights";
 import { startOfDay } from "date-fns";
 import type { NextPage } from "next";
@@ -19,7 +18,7 @@ const Page: NextPage = async () => {
     data: { user },
   } = await getProfile();
 
-  if (user.user_metadata.role === Role.Teacher) {
+  if (user.user_metadata.role === "Teacher") {
     const [
       users,
       courses,
@@ -48,7 +47,7 @@ const Page: NextPage = async () => {
     );
   }
 
-  if (user.user_metadata.role === Role.Student) {
+  if (user.user_metadata.role === "Student") {
     const [assignments, submissions, latestAssignments, dayLessons] =
       await Promise.all([
         getAssignments({ head: true }),

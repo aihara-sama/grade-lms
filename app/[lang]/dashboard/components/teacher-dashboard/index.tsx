@@ -10,6 +10,7 @@ import Container from "@/components/layout/container";
 import type { createCourse, getLatestCourses } from "@/db/client/course";
 import type { getDayLessons } from "@/db/server/lesson";
 import type { ResultOf } from "@/types/utils.type";
+import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 import { useState } from "react";
 
@@ -28,6 +29,9 @@ const TeacherDashboard: FunctionComponent<Props> = ({
   latestCourses: initLatestCourses,
   dayLessons,
 }) => {
+  // Hooks
+  const t = useTranslations();
+
   const [usersCount] = useState(initUsersCount);
   const [coursesCount, setCoursesCount] = useState(initCoursesCount);
   const [latestCourses, setLatestCourses] = useState(initLatestCourses.data);
@@ -39,8 +43,8 @@ const TeacherDashboard: FunctionComponent<Props> = ({
 
   return (
     <Container>
-      <p className="page-title">Dashboard</p>
-      <p className="text-neutral-500 mb-4">Your LMS Command Center</p>
+      <p className="page-title">{t("dashboard.title")}</p>
+      <p className="text-neutral-500 mb-4">{t("dashboard.sub_title")}</p>
       <div className="sm:flex-row flex gap-8 flex-col">
         <div className="flex-1 overflow-hidden">
           <div className="mb-6">
@@ -49,13 +53,13 @@ const TeacherDashboard: FunctionComponent<Props> = ({
                 adaptive={false}
                 Icon={<CoursesIcon size="lg" />}
                 total={coursesCount}
-                title="Total courses"
+                title={t("cards.titles.total_courses")}
               />
               <Total
                 adaptive={false}
                 Icon={<AvatarIcon size="lg" />}
                 total={usersCount}
-                title="Total users"
+                title={t("cards.titles.total_users")}
               />
             </div>
           </div>

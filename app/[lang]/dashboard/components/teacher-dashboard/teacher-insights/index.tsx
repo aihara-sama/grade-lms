@@ -5,9 +5,12 @@ import ChartSkeleton from "@/components/utilities/skeletons/chart-skeleton";
 import type { getCourses } from "@/db/client/course";
 import { getCoursesInsights } from "@/db/client/course";
 import { getUsersInsights } from "@/db/client/user";
+import { useUser } from "@/hooks/use-user";
+import type { Locale } from "@/i18n";
 import type { ResultOf } from "@/types/utils.type";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import type { FunctionComponent } from "react";
@@ -18,6 +21,10 @@ interface Props {
 }
 
 const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
+  // Hooks
+  const t = useTranslations();
+  const user = useUser((state) => state.user);
+
   // State
   const [usersInsights, setUsersInsights] = useState([]);
   const [coursesInsights, setCoursesInsights] = useState([]);
@@ -43,30 +50,30 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
 
   return (
     <div>
-      <p className="section-title">Insights</p>
+      <p className="section-title">{t("dashboard.insights")}</p>
       <div className="flex gap-5 flex-col md:flex-row">
         {coursesInsights.length ? (
           <Insight
-            label="Users"
+            label={t("dashboard.users")}
             shouldCalcRightSide={false}
             data={usersInsights}
-            labels={getWeekNames()}
+            labels={getWeekNames(user.preferred_locale as Locale)}
           />
         ) : (
           <div className="flex-1">
-            <ChartSkeleton record="Users" />
+            <ChartSkeleton record={t("dashboard.users")} />
           </div>
         )}
         {coursesInsights.length ? (
           <Insight
-            label="Courses"
+            label={t("dashboard.courses")}
             shouldCalcRightSide={false}
             data={coursesInsights}
-            labels={getWeekNames()}
+            labels={getWeekNames(user.preferred_locale as Locale)}
           />
         ) : (
           <div className="flex-1">
-            <ChartSkeleton record="Courses" />
+            <ChartSkeleton record={t("dashboard.courses")} />
           </div>
         )}
       </div>

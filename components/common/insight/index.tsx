@@ -36,8 +36,10 @@ const Insight: FunctionComponent<Props> = ({
   label,
   shouldCalcRightSide = true,
 }) => {
+  // State
   const [chartWidth, setChartWidth] = useState(0);
 
+  // Effects
   useEffect(() => {
     const calculateChartWidth = () => {
       const contentPadding = 48;
@@ -83,17 +85,16 @@ const Insight: FunctionComponent<Props> = ({
     return () => window.removeEventListener("resize", calculateChartWidth);
   }, [shouldCalcRightSide]);
 
+  // View
   return (
-    <div className="flex-[1] h-[300px]" suppressHydrationWarning>
+    <div className="flex-[1] h-[300px]">
       <div
-        suppressHydrationWarning
         className="h-[300px] overflow-hidden relative"
         style={{
           width: `${chartWidth}px`,
         }}
       >
         <Line
-          suppressHydrationWarning
           data={{
             labels,
             datasets: [
