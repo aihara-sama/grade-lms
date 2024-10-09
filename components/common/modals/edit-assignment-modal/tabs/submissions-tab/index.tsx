@@ -92,7 +92,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsLoading(true);
 
     try {
-      const { data, count } = await (user.role === "Teacher"
+      const { data, count } = await (user.role === "teacher"
         ? getAssignmentSubmissions(assignmentId)
         : getAssignmentSubmissions(assignmentId));
 
@@ -110,7 +110,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsSearching(true);
 
     try {
-      const { data, count } = await (user.role === "Teacher"
+      const { data, count } = await (user.role === "teacher"
         ? getAssignmentSubmissions(assignmentId, search)
         : getAssignmentSubmissions(assignmentId, search));
 
@@ -129,7 +129,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
       const from = submissionsOffsetRef.current;
       const to = submissionsOffsetRef.current + SUBMISSIONS_GET_LIMIT - 1;
 
-      const { data } = await (user.role === "Teacher"
+      const { data } = await (user.role === "teacher"
         ? getAssignmentSubmissions(assignmentId, searchText, from, to)
         : getAssignmentSubmissions(assignmentId, searchText, from, to));
 
@@ -201,11 +201,11 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   const onSubmissionClick = (_submissionId: string) => {
     setSubmissionId(_submissionId);
 
-    if (user.role === "Teacher") {
+    if (user.role === "teacher") {
       setIsViewSubmissionModal(true);
     }
 
-    if (user.role === "Student") {
+    if (user.role === "student") {
       setIsEditSubmissionModal(true);
     }
   };
@@ -287,7 +287,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                   subtitle=""
                   onClick={() => onSubmissionClick(id)}
                   onToggle={
-                    user.role === "Student"
+                    user.role === "student"
                       ? (checked) => onSubmissionToggle(checked, id)
                       : undefined
                   }
@@ -304,7 +304,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                   {format(new Date(created_at), "EEEE, MMM d")}
                 </p>
               ),
-              "": user.role === "Student" && (
+              "": user.role === "student" && (
                 <BasicPopper
                   placement={
                     submissions.length > 7 && submissions.length - idx < 4
@@ -361,13 +361,13 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
         />
       )}
 
-      {user.role === "Teacher" && isViewSubmissionModal && (
+      {user.role === "teacher" && isViewSubmissionModal && (
         <ViewSubmissionModal
           onClose={onViewSubmissionModalClose}
           submissionId={submissionId}
         />
       )}
-      {user.role === "Student" && isEditSubmissionModal && (
+      {user.role === "student" && isEditSubmissionModal && (
         <EditSubmissionModal
           onClose={onEditSubmissionModalClose}
           submissionId={submissionId}

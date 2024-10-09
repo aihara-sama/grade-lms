@@ -187,7 +187,7 @@ const Whiteboard: FunctionComponent = () => {
     }
   }, [isEnding]);
   useEffect(() => {
-    if (user.role !== "Teacher") {
+    if (user.role !== "teacher") {
       const excalidrawCanvas = document.querySelector(".student-whiteboard");
 
       excalidrawCanvas.addEventListener("contextmenu", (event) => {

@@ -92,7 +92,7 @@ const NotificationsDrawer: FunctionComponent<Props> = ({ className }) => {
 
       notificationsOffsetRef.current += 1;
 
-      if (user.push_notifications_state === "On") firePushNotification(data);
+      if (user.push_notifications_state === "on") firePushNotification(data);
     } catch (error: any) {
       toast.error(error.message);
     }

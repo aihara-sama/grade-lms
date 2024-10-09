@@ -6,6 +6,6 @@ export const navigation: MenuItem[] = [
     Icon: <ProfileIcon />,
     title: "profile",
     href: "/dashboard/profile",
-    tier: ["Teacher", "Student"],
+    tier: ["teacher", "student"],
   },
 ];

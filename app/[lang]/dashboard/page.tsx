@@ -11,14 +11,23 @@ import { getSubmissions } from "@/db/server/submission";
 import { getMyUsers, getProfile, getUsersInsights } from "@/db/server/user";
 import { parseInsights } from "@/utils/parse/parse-insights";
 import { startOfDay } from "date-fns";
-import type { NextPage } from "next";
+import type { Metadata, NextPage } from "next";
+import { getTranslations } from "next-intl/server";
+
+export const generateMetadata = async (): Promise<Metadata> => {
+  const t = await getTranslations();
+
+  return {
+    title: t("dashboard.title"),
+  };
+};
 
 const Page: NextPage = async () => {
   const {
     data: { user },
   } = await getProfile();
 
-  if (user.user_metadata.role === "Teacher") {
+  if (user.user_metadata.role === "teacher") {
     const [
       users,
       courses,
@@ -47,7 +56,7 @@ const Page: NextPage = async () => {
     );
   }
 
-  if (user.user_metadata.role === "Student") {
+  if (user.user_metadata.role === "student") {
     const [assignments, submissions, latestAssignments, dayLessons] =
       await Promise.all([
         getAssignments({ head: true }),

@@ -32,7 +32,7 @@ const GuestPrompt: FunctionComponent<Props> = () => {
       preferred_locale: "en",
       timezone: getTimeZone(),
       is_emails_on: false,
-      push_notifications_state: "Off",
+      push_notifications_state: "off",
     });
   };
 

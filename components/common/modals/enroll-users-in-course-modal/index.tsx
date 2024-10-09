@@ -9,6 +9,7 @@ import BasicInput from "@/components/common/inputs/basic-input";
 import NotFound from "@/components/common/not-found";
 import CheckIcon from "@/components/icons/check-icon";
 import SearchIcon from "@/components/icons/search-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
 import { THROTTLE_SEARCH_WAIT, USERS_GET_LIMIT } from "@/constants";
 import {
@@ -177,8 +178,13 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
   // View
   return (
-    <BasicModal onClose={() => onClose([])} title="Enrollment">
-      <p className="mb-3 text-neutral-500">Select users to enroll</p>
+    <BasicModal
+      onClose={() => onClose([])}
+      title={t("modal.titles.enrollment")}
+    >
+      <p className="mb-3 text-neutral-500">
+        {t("common.select_users_to_enroll")}
+      </p>
       {usersIds.length ? (
         <div className="mb-3 flex gap-3">
           <button
@@ -186,7 +192,8 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
             className="outline-button flex font-semibold gap-2 items-center"
           >
             {isSelectedAll ? usersCount : usersIds.length}{" "}
-            {isSelectedAll ? `Deselect` : "Select all"} <CheckIcon size="xs" />
+            {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
+            <CheckIcon size="xs" />
           </button>
         </div>
       ) : (
@@ -195,7 +202,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           onChange={(e) => setSearchText(e.target.value)}
           StartIcon={<SearchIcon />}
           autoFocus
-          placeholder="Search..."
+          placeholder={t("placeholders.search")}
         />
       )}
       {isLoading && <LoadingSkeleton className="h-[222px]" />}
@@ -212,7 +219,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
                 checked={usersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
                 title={name}
-                subtitle={role}
+                subtitle={t(`roles.${role}`)}
                 onClick={() => {}}
                 onToggle={(checked) => onUserToggle(checked, id)}
               />
@@ -227,21 +234,17 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
 
       <div className="flex justify-end gap-3 mt-auto">
         <button className="outline-button" onClick={() => onClose([])}>
-          Cancel
+          {t("buttons.cancel")}
         </button>
         <button
           disabled={!usersIds.length}
           className="primary-button"
           onClick={submitEnrollUsers}
         >
-          {isSubmitting && (
-            <img
-              className="loading-spinner"
-              src="/assets/gif/loading-spinner.gif"
-              alt=""
-            />
-          )}
-          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Enroll</span>
+          {isSubmitting && <LoadingSpinner />}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+            {t("buttons.enroll")}
+          </span>
         </button>
       </div>
     </BasicModal>

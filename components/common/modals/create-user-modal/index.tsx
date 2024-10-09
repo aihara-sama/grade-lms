@@ -80,7 +80,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
         <BasicTabs
           tabs={[
             {
-              tier: ["Teacher"],
+              tier: ["teacher"],
               title: "General",
               Icon: <OverviewIcon />,
               content: (
@@ -125,7 +125,7 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
               ),
             },
             {
-              tier: ["Teacher"],
+              tier: ["teacher"],
               title: "Avatar",
               Icon: <CameraIcon />,
               content: (

@@ -26,7 +26,7 @@ const ViewAssignmentModal: FunctionComponent<Props> = ({
         <BasicTabs
           tabs={[
             {
-              tier: ["Teacher", "Student"],
+              tier: ["teacher", "student"],
               title: "Overview",
               Icon: <OverviewIcon />,
               content: (
@@ -38,7 +38,7 @@ const ViewAssignmentModal: FunctionComponent<Props> = ({
               ),
             },
             {
-              tier: ["Teacher", "Student"],
+              tier: ["teacher", "student"],
               title: "Submissions",
               Icon: <SubmissionsIcon />,
               content: <SubmissionsTab assignmentId={assignmentId} />,

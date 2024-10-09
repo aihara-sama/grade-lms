@@ -1,6 +1,7 @@
 import BasicInput from "@/components/common/inputs/basic-input";
 import BasicModal from "@/components/common/modals/basic-modal";
 import CoursesIcon from "@/components/icons/courses-icon";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { createCourse } from "@/db/client/course";
 import type { TablesInsert } from "@/types/supabase.type";
 import type { ResultOf } from "@/types/utils.type";
@@ -33,7 +34,7 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
       const data = await createCourse(course);
       onClose(data);
 
-      toast.success("Course created");
+      toast.success(t("success.course_created"));
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -58,16 +59,16 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
       <BasicInput
         fullWidth
         name="title"
-        label="Course name"
+        label={t("labels.course_name")}
         value={course.title}
         StartIcon={<CoursesIcon />}
-        placeholder="My course..."
+        placeholder={t("placeholders.my_course")}
         onChange={onInputChange}
         autoFocus
       />
       <div className="flex justify-end gap-3">
         <button className="outline-button" onClick={() => onClose()}>
-          Cancel
+          {t("buttons.cancel")}
         </button>
         <button
           type="button"
@@ -75,14 +76,10 @@ const CreateCourseModal: FunctionComponent<Props> = ({ onClose }) => {
           disabled={!course.title || isSubmitting}
           className="primary-button"
         >
-          {isSubmitting && (
-            <img
-              className="loading-spinner"
-              src="/assets/gif/loading-spinner.gif"
-              alt=""
-            />
-          )}
-          <span className={`${clsx(isSubmitting && "opacity-0")}`}>Create</span>
+          {isSubmitting && <LoadingSpinner />}
+          <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+            {t("buttons.create")}
+          </span>
         </button>
       </div>
     </BasicModal>

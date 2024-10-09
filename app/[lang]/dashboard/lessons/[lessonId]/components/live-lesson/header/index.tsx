@@ -25,19 +25,19 @@ const Header: FunctionComponent<PropsWithChildren<Props>> = ({ course }) => {
       title: "Overview",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/overview`,
       Icon: <OverviewIcon />,
-      tier: ["Teacher", "Student"],
+      tier: ["teacher", "student"],
     },
     {
       title: "Assignments",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/assignments`,
       Icon: <AssignmentsIcon />,
-      tier: ["Teacher", "Student"],
+      tier: ["teacher", "student"],
     },
     {
       title: "Settings",
       href: `/dashboard/courses/${course.id}/lessons/${lesson.id}/settings`,
       Icon: <SettingsIcon />,
-      tier: ["Teacher"],
+      tier: ["teacher"],
     },
   ];
 

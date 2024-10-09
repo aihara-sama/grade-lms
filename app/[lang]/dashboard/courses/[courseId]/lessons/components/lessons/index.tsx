@@ -365,7 +365,7 @@ const Lessons: FunctionComponent<Props> = ({
           action={
             <button
               className="primary-button"
-              disabled={user.role !== "Teacher"}
+              disabled={user.role !== "teacher"}
               onClick={() => setIsCreateLessonModal(true)}
             >
               Create lesson

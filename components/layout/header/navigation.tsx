@@ -9,24 +9,24 @@ export const navigation: MenuItem[] = [
     title: "dashboard",
     href: "/dashboard",
     Icon: <OverviewIcon />,
-    tier: ["Teacher", "Student"],
+    tier: ["teacher", "student"],
   },
   {
     title: "courses",
     href: "/dashboard/courses",
     Icon: <CoursesIcon />,
-    tier: ["Teacher", "Student"],
+    tier: ["teacher", "student"],
   },
   {
     title: "users",
     href: "/dashboard/users",
     Icon: <UsersIcon />,
-    tier: ["Teacher"],
+    tier: ["teacher"],
   },
   {
     title: "schedule",
     href: "/dashboard/schedule",
     Icon: <CalendarIcon />,
-    tier: ["Teacher", "Student"],
+    tier: ["teacher", "student"],
   },
 ];

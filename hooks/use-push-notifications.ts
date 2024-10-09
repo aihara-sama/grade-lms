@@ -33,13 +33,13 @@ export const usePushNotifications = () => {
 
         const { error } = await DB.auth.updateUser({
           data: {
-            push_notifications_state: "On",
+            push_notifications_state: "on",
           } as UserMetadata,
         });
 
         if (error) throw new Error(t("error.something_went_wrong"));
 
-        setUser({ ...user, push_notifications_state: "On" });
+        setUser({ ...user, push_notifications_state: "on" });
       }
     } catch (err: any) {
       toast.error(err.message);

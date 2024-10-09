@@ -97,7 +97,7 @@ const LiveLesson: FunctionComponent = () => {
         </div>
       ),
       Icon: <CameraIcon />,
-      tier: ["Teacher", "Student", "Guest"],
+      tier: ["teacher", "student", "guest"],
     },
   ];
 
@@ -114,13 +114,13 @@ const LiveLesson: FunctionComponent = () => {
             )}
           </div>
         ),
-        tier: ["Teacher", "Student", "Guest"],
+        tier: ["teacher", "student", "guest"],
       },
       {
         title: "Assignments",
         content: <AssignmentsTab lessonId={lesson.id} />,
         Icon: <AssignmentsIcon />,
-        tier: ["Teacher"],
+        tier: ["teacher"],
       }
     );
   }

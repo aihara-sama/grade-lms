@@ -374,7 +374,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
           action={
             <button
               className="primary-button"
-              disabled={user.role !== "Teacher"}
+              disabled={user.role !== "teacher"}
               onClick={() => setIsEnrollUsersModal(true)}
             >
               Enroll users

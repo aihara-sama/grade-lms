@@ -395,7 +395,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
           action={
             <button
               className="primary-button"
-              disabled={user.role !== "Teacher"}
+              disabled={user.role !== "teacher"}
               onClick={() => setIsCreateUserModal(true)}
             >
               Create user

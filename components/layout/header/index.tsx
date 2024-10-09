@@ -26,11 +26,11 @@ const Header: FunctionComponent = () => {
     try {
       const { error } = await DB.auth.updateUser({
         data: {
-          push_notifications_state: "Off",
+          push_notifications_state: "off",
         } as UserMetadata,
       });
 
-      setUser({ ...user, push_notifications_state: "Off" });
+      setUser({ ...user, push_notifications_state: "off" });
       if (error) throw new Error(t("error.failed_to_update_user"));
     } catch (error: any) {
       toast.error(error.message);
@@ -41,7 +41,7 @@ const Header: FunctionComponent = () => {
   return (
     <>
       <div className="fixed inset-x-0 top-0 z-[99]">
-        {user.push_notifications_state === "Idle" && (
+        {user.push_notifications_state === "idle" && (
           <Alert onClose={disablePushNotifications}>
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
@@ -61,7 +61,7 @@ const Header: FunctionComponent = () => {
         )}
         <div className="flex p-4 items-center shadow-lg bg-white ">
           <Logo />
-          {(["Student", "Teacher"] as View[]).includes(user.role) && (
+          {(["student", "teacher"] as View[]).includes(user.role) && (
             <>
               <Nav className="mr-auto" />
               <NotificationsDrawer className="ml-auto" />
@@ -72,7 +72,7 @@ const Header: FunctionComponent = () => {
         </div>
       </div>
       <div
-        className={`${user.push_notifications_state === "Idle" ? "h-[114px]" : "h-[68px]"}`}
+        className={`${user.push_notifications_state === "idle" ? "h-[114px]" : "h-[68px]"}`}
       ></div>
     </>
   );

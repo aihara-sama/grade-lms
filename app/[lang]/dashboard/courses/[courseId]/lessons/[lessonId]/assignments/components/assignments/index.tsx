@@ -387,7 +387,7 @@ const Assignments: FunctionComponent<Props> = ({
           action={
             <button
               className="primary-button"
-              disabled={user.role !== "Teacher"}
+              disabled={user.role !== "teacher"}
               onClick={() => setIsCreateAssignmentModal(true)}
             >
               Create assignment

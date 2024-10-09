@@ -28,7 +28,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
           </Link>
         ))}
 
-      {user.role === "Teacher" && <QuickLessonButton />}
+      {user.role === "teacher" && <QuickLessonButton />}
     </div>
   );
 };

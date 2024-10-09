@@ -99,7 +99,7 @@ const OverviewTab: FunctionComponent<Props> = ({
       {assignment ? (
         <div>
           <BasicInput
-            disabled={user.role !== "Teacher"}
+            disabled={user.role !== "teacher"}
             fullWidth
             StartIcon={<LessonsIcon size="xs" />}
             placeholder="Assignment name"
@@ -116,7 +116,7 @@ const OverviewTab: FunctionComponent<Props> = ({
                 setAssignment((_) => ({ ..._, body: JSON.stringify(data) }))
               }
               data={JSON.parse(assignment.body)}
-              readOnly={user.role !== "Teacher"}
+              readOnly={user.role !== "teacher"}
             />
           </div>
 
@@ -132,10 +132,10 @@ const OverviewTab: FunctionComponent<Props> = ({
                 onChange={onChangeDate}
                 label="Due date"
                 popperPlacement="top-start"
-                disabled={user.role !== "Teacher"}
+                disabled={user.role !== "teacher"}
               />
             </div>
-            {user.role === "Teacher" ? (
+            {user.role === "teacher" ? (
               <button
                 className="primary-button"
                 onClick={submitUpdateAssignment}
@@ -161,7 +161,7 @@ const OverviewTab: FunctionComponent<Props> = ({
               </button>
             )}
           </div>
-          {user.role !== "Teacher" && isCreateSubmissionModal && (
+          {user.role !== "teacher" && isCreateSubmissionModal && (
             <CreateSubmissionModal
               onClose={onCreateSubmissionModalClose}
               assignmentId={assignment.id}

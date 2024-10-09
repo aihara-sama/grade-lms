@@ -3,8 +3,8 @@
 * USERS
 * Note: This table contains user data. Users should only be able to view and update their own data.
 */
-CREATE TYPE public.Role AS ENUM ('Teacher', 'Student', 'Guest');
-CREATE TYPE public.Push_Notifications_State AS ENUM ('Idle', 'On', 'Off');
+CREATE TYPE public.Role AS ENUM ('teacher', 'student', 'guest');
+CREATE TYPE public.Push_Notifications_State AS ENUM ('idle', 'on', 'off');
 CREATE TYPE public.NotificationType AS ENUM ('enrollment', 'submission', 'assignment');
 create table users (
   -- UUID from auth.users
@@ -17,7 +17,7 @@ create table users (
   preferred_locale text not null,
   timezone text not null,
   is_emails_on boolean not null default true,
-  push_notifications_state Push_Notifications_State not null default 'Idle',
+  push_notifications_state Push_Notifications_State not null default 'idle',
   created_at timestamp not null default now()
 );
 
@@ -516,11 +516,11 @@ create policy "Update own" on fcm_tokens for update using ( auth.uid() = user_id
 -- Courses' policies
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 
--- Policy: Insert allowed for any authenticated user with the role 'Teacher'
+-- Policy: Insert allowed for any authenticated user with the role 'teacher'
 CREATE POLICY "Can insert for teachers" ON public.courses
 FOR INSERT
 TO authenticated
-WITH CHECK ((SELECT role FROM public.users WHERE id = auth.uid()) = 'Teacher');
+WITH CHECK ((SELECT role FROM public.users WHERE id = auth.uid()) = 'teacher');
 
 -- Policy: Select allowed for any authenticated user assigned to the course
 CREATE POLICY "Can select authenticated" ON public.courses
@@ -648,8 +648,8 @@ USING (
       AND uc.course_id = lessons.course_id
   )
 );
--- Create a policy to allow update if the user is assigned to the course and is a Teacher
-CREATE POLICY "Can update if assigned and Teacher"
+-- Create a policy to allow update if the user is assigned to the course and is a teacher
+CREATE POLICY "Can update if assigned and teacher"
 ON lessons
 FOR UPDATE
 USING (
@@ -659,11 +659,11 @@ USING (
     JOIN users u ON uc.user_id = u.id
     WHERE uc.user_id = auth.uid()
       AND uc.course_id = lessons.course_id
-      AND u.role = 'Teacher'
+      AND u.role = 'teacher'
   )
 );
--- Create a policy to allow delete if the user is assigned to the course and is a Teacher
-CREATE POLICY "Can delete if assigned and Teacher"
+-- Create a policy to allow delete if the user is assigned to the course and is a teacher
+CREATE POLICY "Can delete if assigned and teacher"
 ON lessons
 FOR DELETE
 USING (
@@ -673,14 +673,14 @@ USING (
     JOIN users u ON uc.user_id = u.id
     WHERE uc.user_id = auth.uid()
       AND uc.course_id = lessons.course_id
-      AND u.role = 'Teacher'
+      AND u.role = 'teacher'
   )
 );
 
 -- Assignments' policies
 ALTER TABLE assignments ENABLE ROW LEVEL SECURITY;
--- Create a policy to allow insert if the user is assigned to the course the lesson is assigned to and is a Teacher
-CREATE POLICY "Can insert if assigned to course and Teacher"
+-- Create a policy to allow insert if the user is assigned to the course the lesson is assigned to and is a teacher
+CREATE POLICY "Can insert if assigned to course and teacher"
 ON assignments
 FOR INSERT
 with check (
@@ -691,7 +691,7 @@ with check (
     JOIN users u ON uc.user_id = u.id
     WHERE uc.user_id = auth.uid()
       AND l.id = assignments.lesson_id
-      AND u.role = 'Teacher'
+      AND u.role = 'teacher'
   )
 );
 -- Create a policy to allow select if the user is assigned to the course the lesson is assigned to
@@ -708,8 +708,8 @@ USING (
   )
 );
 
--- Create a policy to allow update if the user is assigned to the course the lesson is assigned to and is a Teacher
-CREATE POLICY "Can update if assigned to course and Teacher"
+-- Create a policy to allow update if the user is assigned to the course the lesson is assigned to and is a teacher
+CREATE POLICY "Can update if assigned to course and teacher"
 ON assignments
 FOR UPDATE
 USING (
@@ -720,11 +720,11 @@ USING (
     JOIN users u ON uc.user_id = u.id
     WHERE uc.user_id = auth.uid()
       AND l.id = assignments.lesson_id
-      AND u.role = 'Teacher'
+      AND u.role = 'teacher'
   )
 );
--- Create a policy to allow delete if the user is assigned to the course the lesson is assigned to and is a Teacher
-CREATE POLICY "Can delete if assigned to course and Teacher"
+-- Create a policy to allow delete if the user is assigned to the course the lesson is assigned to and is a teacher
+CREATE POLICY "Can delete if assigned to course and teacher"
 ON assignments
 FOR DELETE
 USING (
@@ -735,15 +735,15 @@ USING (
     JOIN users u ON uc.user_id = u.id
     WHERE uc.user_id = auth.uid()
       AND l.id = assignments.lesson_id
-      AND u.role = 'Teacher'
+      AND u.role = 'teacher'
   )
 );
 
 -- Submissions' policies
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
 
--- Create a policy to allow insert if the user is assigned to the course the lesson is assigned to and is a Student
-CREATE POLICY "Can insert if assigned to course and Student"
+-- Create a policy to allow insert if the user is assigned to the course the lesson is assigned to and is a student
+CREATE POLICY "Can insert if assigned to course and student"
 ON submissions
 FOR INSERT
 with check (
@@ -755,11 +755,11 @@ with check (
     JOIN users u ON uc.user_id = u.id
     WHERE uc.user_id = auth.uid()
       AND a.id = submissions.assignment_id
-      AND u.role = 'Student'
+      AND u.role = 'student'
   )
 );
--- Create a policy to allow select if the user owns the submission or is assigned to the course the lesson is assigned to and is a Teacher
-CREATE POLICY "Can select if owns or assigned to course and Teacher"
+-- Create a policy to allow select if the user owns the submission or is assigned to the course the lesson is assigned to and is a teacher
+CREATE POLICY "Can select if owns or assigned to course and teacher"
 ON submissions
 FOR SELECT
 USING (
@@ -770,7 +770,7 @@ USING (
     JOIN assignments a ON a.lesson_id = l.id
     JOIN users u ON uc.user_id = u.id
     WHERE (submissions.user_id = auth.uid()  -- Owns the submission
-           OR (uc.user_id = auth.uid() AND u.role = 'Teacher'))  -- Assigned to the course and is a Teacher
+           OR (uc.user_id = auth.uid() AND u.role = 'teacher'))  -- Assigned to the course and is a teacher
       AND a.id = submissions.assignment_id
   )
 );

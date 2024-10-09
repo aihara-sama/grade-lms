@@ -1,5 +1,4 @@
 {
-  "courses": "Courses",
   "users": "Users",
   "lessons": "Lessons",
   "members": "Members",
@@ -27,6 +26,31 @@
       "total_assignments": "Total assignments",
       "total_submissions": "Total submissions"
     }
+  },
+
+  "buttons": {
+    "delete": "Delete",
+    "enroll": "Enroll",
+    "cancel": "Cancel",
+    "create": "Create",
+    "quick_lesson": "Quick lesson",
+    "create_course": "Create course",
+    "clear_filters": "Clear filters",
+    "select_all": "Select all",
+    "deselect": "Deselect"
+  },
+
+  "roles": {
+    "teacher": "Teacher",
+    "student": "Student",
+    "guest": "Guest"
+  },
+
+  "common": {
+    "view_your_work_in_a_list": "View your work in a list",
+    "no_results_found": "No results found",
+    "try_using_different_keywords_or_change_some_filters": "Try using different keywords or change some filters",
+    "select_users_to_enroll": "Select users to enroll"
   },
 
   "dashboard": {
@@ -59,6 +83,13 @@
     "submissions": "Submissions"
   },
 
+  "courses": {
+    "title": "Courses",
+    "sub_title": "View and manage courses",
+    "description": "Create and manage courses effectively",
+    "active": "Active"
+  },
+
   "sign_in": {
     "dont_have_an_account?": "Don't have an account?",
     "join": "Join"
@@ -72,7 +103,13 @@
   "placeholders": {
     "name": "Name",
     "email": "Email",
-    "password": "password"
+    "password": "password",
+    "search": "Search",
+    "my_course": "My course..."
+  },
+
+  "labels": {
+    "course_name": "Course name"
   },
 
   "success": {
@@ -84,6 +121,8 @@
     "members_expelled": "Members successfully expelled",
     "user_deleted": "User successfully deleted",
     "users_deleted": "Users successfully deleted",
+
+    "course_created": "Course successfully created",
 
     "lesson_created": "Lesson successfully created",
     "lesson_updated": "Lesson successfully updated",
@@ -224,7 +263,8 @@
       "delete_assignment": "Delete assignment",
       "delete_assignments": "Delete assignments",
       "delete_submission": "Delete submission",
-      "delete_submissions": "Delete submissions"
+      "delete_submissions": "Delete submissions",
+      "enrollment": "Enrollment"
     }
   },
   "actions": {

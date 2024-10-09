@@ -612,8 +612,8 @@ export type Database = {
     };
     Enums: {
       notificationtype: "enrollment" | "submission" | "assignment";
-      push_notifications_state: "Idle" | "On" | "Off";
-      role: "Teacher" | "Student" | "Guest";
+      push_notifications_state: "idle" | "on" | "off";
+      role: "teacher" | "student" | "guest";
     };
     CompositeTypes: {
       [_ in never]: never;

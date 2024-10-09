@@ -8,7 +8,6 @@ import CourseIcon from "@/components/icons/course-icon";
 import CoursesIcon from "@/components/icons/courses-icon";
 import DeleteIcon from "@/components/icons/delete-icon";
 import SearchIcon from "@/components/icons/search-icon";
-import metadata from "@/data/metadata.json";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -160,8 +159,6 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
       revalidatePageAction();
 
       coursesOffsetRef.current -= 1;
-
-      toast.success("Success");
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -184,8 +181,6 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
       revalidatePageAction();
 
       coursesOffsetRef.current -= coursesIds.length;
-
-      toast.success("success");
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -275,17 +270,19 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
       onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreCourses))}
     >
       <div className="flex flex-col flex-1">
-        <p className="text-3xl font-bold text-neutral-600">{t("courses")}</p>
-        <p className="text-neutral-500">View and manage courses</p>
+        <p className="text-3xl font-bold text-neutral-600">
+          {t("courses.title")}
+        </p>
+        <p className="text-neutral-500">{t("courses.sub_title")}</p>
         <hr className="my-2 mb-4" />
         <div className="mb-6">
           <div className="flex flex-wrap gap-6">
             <Total
               Icon={<CoursesIcon size="lg" />}
               total={coursesCount}
-              title="Total courses"
+              title={t("cards.titles.total_courses")}
             />
-            {user.role === "Teacher" && (
+            {user.role === "teacher" && (
               <div className="card">
                 <AddCourseIcon />
                 <hr className="w-full my-3" />
@@ -293,7 +290,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                   className="primary-button px-8"
                   onClick={() => setIsCreateCourseModal(true)}
                 >
-                  Create
+                  {t("buttons.create")}
                 </button>
               </div>
             )}
@@ -317,13 +314,13 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                   onClick={() => setIsDeleteCoursesModal(true)}
                   className="outline-button flex font-semibold gap-2 items-center"
                 >
-                  Delete <DeleteIcon size="xs" />
+                  {t("buttons.delete")} <DeleteIcon size="xs" />
                 </button>
               </div>
             ) : (
               <BasicInput
                 StartIcon={<SearchIcon size="xs" />}
-                placeholder={t("search")}
+                placeholder={t("placeholders.search")}
                 className="w-auto"
                 onChange={(e) => setSearchText(e.target.value)}
                 value={searchText}
@@ -341,9 +338,9 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                       checked={coursesIds.includes(id)}
                       Icon={<CourseIcon />}
                       title={title}
-                      subtitle="Active"
+                      subtitle={t("courses.active")}
                       onToggle={
-                        user.role === "Teacher"
+                        user.role === "teacher"
                           ? (checked) => onCourseToggle(checked, id)
                           : undefined
                       }
@@ -351,7 +348,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                   ),
                   Lessons: lessons[0].count,
                   Members: members[0].count,
-                  "": user.role === "Teacher" && (
+                  "": user.role === "teacher" && (
                     <BasicPopper
                       placement={
                         courses.length > 7 && courses.length - idx < 4
@@ -373,13 +370,13 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                           className="popper-list-item"
                           onClick={() => setIsEnrollUsersModal(true)}
                         >
-                          <UsersIcon /> Enroll
+                          <UsersIcon /> {t("buttons.enroll")}
                         </li>
                         <li
                           className="popper-list-item"
                           onClick={() => setIsDeleteCourseModal(true)}
                         >
-                          <DeleteIcon size="xs" /> Delete
+                          <DeleteIcon size="xs" /> {t("buttons.delete")}
                         </li>
                       </ul>
                     </BasicPopper>
@@ -390,14 +387,14 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
           )}
           {isNoData && (
             <NoData
-              body={metadata.courses}
+              body={t("courses.description")}
               action={
                 <button
-                  disabled={user.role !== "Teacher"}
+                  disabled={user.role !== "teacher"}
                   className="primary-button"
                   onClick={() => setIsCreateCourseModal(true)}
                 >
-                  Create course
+                  {t("buttons.create_course")}
                 </button>
               }
             />
@@ -409,7 +406,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                   className="outline-button"
                   onClick={() => setSearchText("")}
                 >
-                  Clear filters
+                  {t("buttons.clear_filters")}
                 </button>
               }
             />
@@ -428,7 +425,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
             <PromptDeleteRecordModal
               title={t("modal.titles.delete_course")}
               prompt={`${t("prompts.delete_course")}`}
-              confirmText={t("actions.delete")}
+              confirmText={t("buttons.delete")}
               record={courses.find(({ id }) => id === courseId).title}
               onClose={() => setIsDeleteCourseModal(false)}
               onConfirm={submitDeleteCourse}
@@ -440,7 +437,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
               prompt={`${t("prompts.delete_courses", {
                 count: coursesIds.length,
               })}`}
-              confirmText={t("actions.delete")}
+              confirmText={t("buttons.delete")}
               onConfirm={submitDeleteCourses}
               onClose={() => setIsDeleteCoursesModal(false)}
             />

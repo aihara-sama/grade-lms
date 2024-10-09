@@ -40,17 +40,17 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   useUpdateEffect(() => {
     (async () => {
       try {
-        if (pushNotificationsState === "On") enablePushNotifications();
-        if (pushNotificationsState === "Off") {
+        if (pushNotificationsState === "on") enablePushNotifications();
+        if (pushNotificationsState === "off") {
           await DB.auth.updateUser({
             data: {
-              push_notifications_state: "Off",
+              push_notifications_state: "off",
             } as UserMetadata,
           });
 
           setUser({
             ...user,
-            push_notifications_state: "Off",
+            push_notifications_state: "off",
           });
         }
       } catch (err: any) {
@@ -70,9 +70,9 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
         </div>
         <div className="flex items-center gap-3">
           <Switch
-            isChecked={pushNotificationsState === "On"}
+            isChecked={pushNotificationsState === "on"}
             setIsChecked={(checked) =>
-              setPushNotificationsState(checked ? "On" : "Off")
+              setPushNotificationsState(checked ? "on" : "off")
             }
           />
           <span>Enable/Disable push notifications</span>
