@@ -135,7 +135,7 @@ const Page: FunctionComponent = () => {
         whiteboard_data: JSON.stringify(whiteboardDataRef.current),
       });
 
-      toast.success("Saved!");
+      toast.success(t("common.saved"));
     } catch (error: any) {
       toast.error(error.message);
     }

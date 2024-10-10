@@ -29,7 +29,7 @@ const UserPopper: FunctionComponent<PropsWithClassName> = ({
         <Avatar avatar={user.avatar} />
         <div className="flex flex-col justify-between flex-1">
           <div className="font-bold text-base">{user.name}</div>
-          <div className="text-sm text-light">{user.role}</div>
+          <div className="text-sm text-light">{t(`roles.${user.role}`)}</div>
         </div>
       </div>
 

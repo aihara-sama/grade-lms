@@ -75,7 +75,13 @@ create table submissions (
   user_id uuid references public.users on delete cascade not null default auth.uid(),
   body text not null,
   title text not null,
-  grade int,
+  created_at timestamp not null default now()
+);
+create table grades (
+  id uuid not null primary key DEFAULT gen_random_uuid(),
+  creator_id text not null default auth.uid(),
+  submissions_id uuid references public.submissions on delete cascade not null,
+  title text not null,
   created_at timestamp not null default now()
 );
 
@@ -788,6 +794,41 @@ FOR DELETE
 USING (
   submissions.user_id = auth.uid()  -- Owns the submission
 );
+
+
+-- Submissions' policies
+ALTER TABLE grades ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "insert_grade" ON grades
+    FOR INSERT
+    with check (
+        EXISTS (
+            SELECT 1
+            FROM courses c
+            JOIN lessons l ON l.course_id = c.id
+            JOIN assignments a ON a.lesson_id = l.id
+            JOIN submissions s ON s.assignment_id = a.id
+            WHERE s.id = grades.submissions_id
+            AND c.creator_id = auth.uid()::text -- Teacher assigned to the course
+        )
+    );
+
+CREATE POLICY "update_grade" ON grades
+    FOR UPDATE
+    USING (creator_id = auth.uid()::text);
+
+CREATE POLICY select_grade ON grades
+    FOR SELECT
+    USING (
+        creator_id = auth.uid()::text -- The teacher who created the grade
+        OR EXISTS (
+            SELECT 1
+            FROM submissions s
+            WHERE s.id = grades.submissions_id
+            AND s.user_id = auth.uid() -- The user who submitted the assignment
+        )
+    );
+
 
 -- Notifications' policies
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;

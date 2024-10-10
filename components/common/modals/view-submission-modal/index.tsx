@@ -6,8 +6,9 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import StarIcon from "@/components/icons/star-icon";
 import LoadingSpinner from "@/components/utilities/loading-spinner";
 import LoadingSkeleton from "@/components/utilities/skeletons/loading-skeleton";
-import { getSubmission, updateSubmission } from "@/db/client/submission";
-import type { SubmissionWithAuthor } from "@/types/submission.type";
+import { upsertGrade } from "@/db/client/grade";
+import { getSubmission } from "@/db/client/submission";
+import type { ResultOf } from "@/types/utils.type";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
@@ -26,8 +27,9 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
   submissionId,
   onClose,
 }) => {
-  const [grade, setGrade] = useState<number>();
-  const [submission, setSubmission] = useState<SubmissionWithAuthor>();
+  const [grade, setGrade] = useState<string>();
+  const [submission, setSubmission] =
+    useState<ResultOf<typeof getSubmission>>();
   const [hoveredGrade, setHoveredGrade] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,7 +38,11 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
   const submitUpdateGrade = async () => {
     setIsSubmitting(true);
     try {
-      await updateSubmission({ ...submission, grade });
+      await upsertGrade({
+        id: submission.grades?.[0]?.id,
+        title: `${grade}`,
+        submissions_id: submission.id,
+      });
 
       onClose(true);
       toast.success(t("success.grade_updated"));
@@ -51,7 +57,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
     try {
       const submissionData = await getSubmission(submissionId);
       setSubmission(submissionData);
-      setGrade(submissionData.grade);
+      setGrade(submissionData.grades?.[0]?.title);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -104,12 +110,12 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
                 <div
                   key={idx}
                   className="flex"
-                  onClick={() => setGrade(idx + 1)}
+                  onClick={() => setGrade(`${idx + 1}`)}
                   onMouseEnter={() => setHoveredGrade(idx + 1)}
                   onMouseLeave={() => setHoveredGrade(undefined)}
                 >
                   <StarIcon
-                    className={`hover:text-amber-400 cursor-pointer ${idx + 1 <= hoveredGrade || idx + 1 <= grade ? "text-amber-400" : ""} `}
+                    className={`hover:text-amber-400 cursor-pointer ${idx + 1 <= hoveredGrade || idx + 1 <= +grade ? "text-amber-400" : ""} `}
                     key={idx}
                   />
                 </div>
@@ -117,7 +123,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
             </div>
             <button
               onClick={submitUpdateGrade}
-              disabled={submission.grade === grade}
+              disabled={submission.grades?.[0]?.title === grade}
               className="primary-button w-[100px]"
             >
               {isSubmitting && <LoadingSpinner />}

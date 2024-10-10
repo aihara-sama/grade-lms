@@ -56,7 +56,7 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
     <div>
       <p className="section-title">{t("dashboard.insights")}</p>
       <div className="flex gap-5 flex-col md:flex-row">
-        {coursesInsights.length ? (
+        {usersInsights.length ? (
           <Insight
             label={t("labels.users")}
             shouldCalcRightSide={false}

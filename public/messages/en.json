@@ -52,7 +52,8 @@
     "create_account": "Create account",
     "enter_class": "Enter class",
     "submit": "Submit",
-    "extend?": "Extend?"
+    "extend?": "Extend?",
+    "view_all": "View all"
   },
 
   "links": {
@@ -82,6 +83,40 @@
     "ended": "Ended"
   },
 
+  "tables": {
+    "courses": {
+      "name": "Name",
+      "lessons": "Lessons",
+      "members": "Members"
+    },
+    "enroll_users": {
+      "name": "Name"
+    },
+    "enrolll_courses": {
+      "name": "Name"
+    },
+    "users": {
+      "name": "Name",
+      "email": "Email"
+    },
+    "lessons": {
+      "name": "Name",
+      "starts": "Starts"
+    },
+    "members": {
+      "name": "Name"
+    },
+    "assignments": {
+      "name": "Name"
+    },
+    "submissions": {
+      "name": "Name",
+      "author": "Author",
+      "grade": "Grade",
+      "submitted": "Submitted"
+    }
+  },
+
   "common": {
     "view_your_work_in_a_list": "View your work in a list",
     "no_results_found": "No results found",
@@ -91,7 +126,9 @@
     "deleted": "Deleted",
     "this_session_has_ended": "This session has ended",
     "the_lesson_has_ended": "The lesson has ended",
-    "left": "Left"
+    "left": "Left",
+    "settings": "Settings",
+    "saved": "Saved"
   },
 
   "dashboard": {
@@ -240,11 +277,12 @@
   "placeholders": {
     "name": "Name",
     "email": "Email",
-    "password": "password",
+    "password": "Password",
     "search": "Search",
     "my_course": "My course...",
     "lesson_name": "Lesson name",
     "submission_name": "Submission name",
+    "assignment_name": "Assignment name",
     "start_here": "Start here...",
     "enter_a_header": "Enter a Header"
   },
@@ -252,10 +290,11 @@
   "labels": {
     "language": "Language",
     "course_name": "Course name",
+    "lesson_name": "Lesson name",
     "assignment_name": "Assignment name",
     "name": "Name",
     "email": "Email",
-    "password": "password",
+    "password": "Password",
     "timezone": "Timezone",
     "lessons": "Lessons",
     "new_members": "New members",
@@ -319,6 +358,9 @@
     "failed_to_delete_user": "Failed to delete user",
     "failed_to_delete_users": "Failed to delete users",
     "failed_to_update_user": "Failed to update user",
+
+    "failed_to_create_grade": "Failed to create grade",
+    "failed_to_update_grade": "Failed to update grade",
 
     "failed_to_load_courses_insights": "Failed to load courses insights",
     "failed_to_load_courses": "Failed to load course",

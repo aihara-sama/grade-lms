@@ -50,6 +50,7 @@ export const getDayLessons = async (day: Date) => {
   const { data, count } = await getServerDB()
     .from("lessons")
     .select("*, course:courses(title)")
+    .filter("course_id", "not.is", null)
     .gte("starts", format(day, "yyyy-MM-dd'T'HH:mm:ss"))
     .lt(
       "starts",

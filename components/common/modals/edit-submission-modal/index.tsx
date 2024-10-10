@@ -27,7 +27,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
 }) => {
   const [submission, setSubmission] =
     useState<ResultOf<typeof getSubmission>>();
-  const [isSubmitting, setIsSUbmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const t = useTranslations();
 
@@ -44,7 +44,9 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
   };
 
   const submitUpdateSubmission = async () => {
-    setIsSUbmitting(true);
+    console.log("submitUpdateSubmission");
+
+    setIsSubmitting(true);
     try {
       await updateSubmission({
         body: submission.body,
@@ -57,7 +59,7 @@ const EditSubmissionModal: FunctionComponent<Props> = ({
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSUbmitting(false);
+      setIsSubmitting(false);
     }
   };
 

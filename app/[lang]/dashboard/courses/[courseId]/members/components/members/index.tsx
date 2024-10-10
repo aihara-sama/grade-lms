@@ -87,7 +87,9 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
 
   // Handlers
   const selectAllMembers = () => {
-    setMembersIds(members.map(({ id }) => id));
+    setMembersIds(
+      members.filter(({ id }) => id !== user.id).map(({ id }) => id)
+    );
     setIsSelectedAll(true);
   };
   const deselectAllMembers = () => {
@@ -174,8 +176,8 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
     try {
       if (isSelectedAll) {
         await deleteAllUsersFromCourse(courseId, searchText);
-        setMembers([]);
-        setMembersCount(0);
+        setMembers((prev) => prev.filter(({ id }) => id === user.id));
+        setMembersCount(1);
       } else {
         await deleteUsersFromCourse(courseId, membersIds);
         setMembers((prev) => prev.filter(({ id }) => !membersIds.includes(id)));
@@ -198,10 +200,10 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
   const onMemberToggle = (checked: boolean, _memberId: string) => {
     if (checked) {
       setMembersIds((prev) => [...prev, _memberId]);
-      setIsSelectedAll(membersCount === membersIds.length + 1);
+      setIsSelectedAll(membersCount - 1 === membersIds.length + 1);
     } else {
       setMembersIds((prev) => prev.filter((_id) => _id !== _memberId));
-      setIsSelectedAll(membersCount === membersIds.length - 1);
+      setIsSelectedAll(membersCount - 1 === membersIds.length - 1);
     }
   };
 
@@ -229,14 +231,15 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
   useUpdateEffect(() => throttledSearch(searchText), [searchText]);
 
   useEffect(() => {
-    if (membersCount) setIsSelectedAll(membersCount === membersIds.length);
+    if (membersCount - 1)
+      setIsSelectedAll(membersCount - 1 === membersIds.length);
   }, [membersCount]);
 
   useEffect(() => {
     // Tall screens may fit more than 20 records
     // This will fit the screen with records
     const fn = throttle(() => {
-      if (Members.length && membersCount !== Members.length) {
+      if (members.length && membersCount !== members.length) {
         if (
           containerRef.current.scrollHeight ===
           containerRef.current.clientHeight
@@ -252,7 +255,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
     return () => {
       window.removeEventListener("resize", fn);
     };
-  }, [Members, membersCount]);
+  }, [members, membersCount]);
 
   // View
   return (
@@ -289,7 +292,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
             onClick={isSelectedAll ? deselectAllMembers : selectAllMembers}
             className="outline-button flex font-semibold gap-2 items-center"
           >
-            {isSelectedAll ? membersCount : membersIds.length}{" "}
+            {isSelectedAll ? membersCount - 1 : membersIds.length}{" "}
             {isSelectedAll ? t("buttons.deselect") : t("buttons.select_all")}{" "}
             <CheckIcon size="xs" />
           </button>
@@ -313,23 +316,20 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       {isData && (
         <Table
           data={members.map(({ name, role, id, avatar }, idx) => ({
-            Name:
-              user.id === id ? (
+            [t("tables.members.name")]:
+              user.id === id && user.role === "teacher" ? (
                 <IconTitle
                   Icon={<Avatar avatar={avatar} />}
                   key={id}
                   title={name}
                   subtitle={t(`roles.${role}`)}
-                  href={`/users/${id}`}
                 />
               ) : (
                 <TitleCard
-                  href={`/users/${id}`}
                   checked={membersIds.includes(id)}
                   Icon={<Avatar avatar={avatar} />}
                   title={name}
                   subtitle={t(`roles.${role}`)}
-                  onClick={() => {}}
                   onToggle={
                     user.role === "teacher"
                       ? (checked) => onMemberToggle(checked, id)

@@ -41,8 +41,8 @@ const LessonStatus: FunctionComponent<Props> = ({ showTimeLeft = false }) => {
     intervalIdRef.current = setInterval(() => {
       setLiveDate(formatDistanceToNowStrict(lesson.ends));
 
-      if (isLessonOngoing(lesson)) setIsOngoing(isLessonOngoing(lesson));
-      if (isLessonEnded(lesson)) setIsEnded(isLessonEnded(lesson));
+      setIsOngoing(isLessonOngoing(lesson));
+      setIsEnded(isLessonEnded(lesson));
     }, 1000);
 
     return () => {

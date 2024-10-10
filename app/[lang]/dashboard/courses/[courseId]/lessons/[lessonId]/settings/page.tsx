@@ -43,23 +43,25 @@ const Page: FunctionComponent = () => {
   return (
     <Container>
       <Header course={lesson.course} />
-      <p className="section-title">Settings</p>
+      <p className="section-title">{t("common.settings")}</p>
       <div className="rename-wrapper">
         <div className="flex gap-1 items-end">
           <BasicInput
             onChange={(e) => setTitle(e.target.value)}
-            label="Lesson name"
+            label={t("labels.lesson_name")}
             StartIcon={<CoursesIcon size="xs" />}
             value={title}
             className="mb-auto"
           />
           <button
-            disabled={!title || isSubmitting}
+            disabled={!title || isSubmitting || lesson.title === title}
             className="primary-button w-24"
             onClick={submitUpdateLesson}
           >
             {isSubmitting && <LoadingSpinner />}
-            <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              {t("buttons.save")}
+            </span>
           </button>
         </div>
       </div>

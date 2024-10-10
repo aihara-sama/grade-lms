@@ -8,10 +8,9 @@ import { useEffect, useState } from "react";
 import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import CreateAssignmentModal from "@/components/common/modals/create-assignment-modal";
 import ViewAssignmentModal from "@/components/common/modals/edit-assignment-modal";
-import PromptModal from "@/components/common/modals/prompt-modal";
+import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import type { createAssignment } from "@/db/client/assignment";
-import { deleteAssignment } from "@/db/client/assignment";
-import { DB } from "@/lib/supabase/db";
+import { deleteAssignment, getLessonAssignments } from "@/db/client/assignment";
 import type { Assignment } from "@/types/assignment.type";
 import type { ResultOf } from "@/types/utils.type";
 import { useTranslations } from "next-intl";
@@ -24,53 +23,48 @@ interface Props {
 
 const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
   // States
-  const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] =
-    useState(false);
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string>();
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [isCreateAssignmentModalOpen, setIsCreateAssignmentModalOpen] =
-    useState(false);
-  const [isDeleteAssignmentModalOpen, setIsDeleteAssignmentModalOpen] =
-    useState(false);
-  const [isSubmittingDeleteAssignments, setIsSubmittingDeleteAssignments] =
-    useState(false);
+  const [isEditAssignmentModal, setIsEditAssignmentModal] = useState(false);
+  const [isCreateAssignmentModal, setIsCreateAssignmentModal] = useState(false);
+  const [isDeleteAssignmentModal, setIsDeleteAssignmentModal] = useState(false);
 
+  const [assignmentId, setAssignmentId] = useState<string>();
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+
+  // Hooks
   const t = useTranslations();
 
-  const openEditAssignmentModal = (assignmentId: string) => {
-    setSelectedAssignmentId(assignmentId);
-    setIsEditAssignmentModalOpen(true);
+  // Handlers
+  const openEditAssignmentModal = (_assignmentId: string) => {
+    setAssignmentId(_assignmentId);
+    setIsEditAssignmentModal(true);
   };
-  const openDeleteAssignmentModal = (assignmentId: string) => {
-    setSelectedAssignmentId(assignmentId);
-    setIsDeleteAssignmentModalOpen(true);
+  const openDeleteAssignmentModal = (_assignmentId: string) => {
+    setAssignmentId(_assignmentId);
+    setIsDeleteAssignmentModal(true);
   };
 
   const fetchAssignments = async () => {
-    const data = await DB.from("assignments")
-      .select("*")
-      .eq("lesson_id", lessonId);
+    const { data } = await getLessonAssignments(lessonId);
 
-    setAssignments(data.data);
+    setAssignments(data);
   };
 
   const submitDeleteAssignment = async () => {
-    setIsSubmittingDeleteAssignments(true);
     try {
-      await deleteAssignment(selectedAssignmentId);
-      setIsDeleteAssignmentModalOpen(false);
-      fetchAssignments();
+      await deleteAssignment(assignmentId);
+
+      setAssignments((_) => _.filter(({ id }) => id !== assignmentId));
+
+      setIsDeleteAssignmentModal(false);
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setIsSubmittingDeleteAssignments(false);
     }
   };
 
   const onCreateAssignmentModalClose = (
     maybeAssignment?: ResultOf<typeof createAssignment>
   ) => {
-    setIsCreateAssignmentModalOpen(false);
+    setIsCreateAssignmentModal(false);
 
     if (maybeAssignment) {
       revalidatePageAction();
@@ -79,7 +73,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
   };
 
   const onEditAssignmentModalClose = (mutated?: boolean) => {
-    setIsEditAssignmentModalOpen(false);
+    setIsEditAssignmentModal(false);
 
     if (mutated) {
       fetchAssignments();
@@ -100,7 +94,7 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
             <TitleCard
               Icon={<AssignmentsIcon size="sm" />}
               title={assignment.title}
-              subtitle="Due date: Tomorrow"
+              subtitle=""
               onClick={() => openEditAssignmentModal(assignment.id)}
             />
             <div
@@ -117,31 +111,31 @@ const AssignmentsTab: FunctionComponent<Props> = ({ lessonId }) => {
       <div className="mt-auto">
         <button
           className="outline-button w-full"
-          onClick={() => setIsCreateAssignmentModalOpen(true)}
+          onClick={() => setIsCreateAssignmentModal(true)}
         >
           Create
         </button>
       </div>
-      {isCreateAssignmentModalOpen && (
+      {isCreateAssignmentModal && (
         <CreateAssignmentModal
           onClose={onCreateAssignmentModalClose}
           lessonId={lessonId}
         />
       )}
-      {isEditAssignmentModalOpen && (
+      {isEditAssignmentModal && (
         <ViewAssignmentModal
-          assignmentId={selectedAssignmentId}
+          assignmentId={assignmentId}
           onClose={onEditAssignmentModalClose}
         />
       )}
-      {isDeleteAssignmentModalOpen && (
-        <PromptModal
-          isSubmitting={isSubmittingDeleteAssignments}
-          onClose={() => setIsDeleteAssignmentModalOpen(false)}
-          title="Delete assignment"
-          action="Delete"
-          body={t("prompts.delete_assignment")}
-          actionHandler={submitDeleteAssignment}
+      {isDeleteAssignmentModal && (
+        <PromptDeleteRecordModal
+          title={t("modal.titles.delete_assignment")}
+          prompt={`${t("prompts.delete_assignment")}`}
+          confirmText={t("buttons.delete")}
+          record={assignments.find(({ id }) => id === assignmentId).title}
+          onClose={() => setIsDeleteAssignmentModal(false)}
+          onConfirm={submitDeleteAssignment}
         />
       )}
     </div>

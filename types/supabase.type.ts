@@ -178,6 +178,38 @@ export type Database = {
           },
         ];
       };
+      grades: {
+        Row: {
+          created_at: string;
+          creator_id: string;
+          id: string;
+          submissions_id: string;
+          title: string;
+        };
+        Insert: {
+          created_at?: string;
+          creator_id?: string;
+          id?: string;
+          submissions_id: string;
+          title: string;
+        };
+        Update: {
+          created_at?: string;
+          creator_id?: string;
+          id?: string;
+          submissions_id?: string;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "grades_submissions_id_fkey";
+            columns: ["submissions_id"];
+            isOneToOne: false;
+            referencedRelation: "submissions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       lessons: {
         Row: {
           course_id: string | null;
@@ -339,7 +371,6 @@ export type Database = {
           assignment_id: string;
           body: string;
           created_at: string;
-          grade: number | null;
           id: string;
           title: string;
           user_id: string;
@@ -348,7 +379,6 @@ export type Database = {
           assignment_id: string;
           body: string;
           created_at?: string;
-          grade?: number | null;
           id?: string;
           title: string;
           user_id?: string;
@@ -357,7 +387,6 @@ export type Database = {
           assignment_id?: string;
           body?: string;
           created_at?: string;
-          grade?: number | null;
           id?: string;
           title?: string;
           user_id?: string;

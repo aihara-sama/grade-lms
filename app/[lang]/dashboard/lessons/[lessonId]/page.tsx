@@ -12,10 +12,10 @@ export const generateMetadata = async ({
 }: {
   params: { lessonId: string };
 }): Promise<Metadata> => {
-  const { title } = await getLessonWithCourse(lessonId);
+  const lesson = await getLessonWithCourse(lessonId);
 
   return {
-    title,
+    title: lesson?.title,
   };
 };
 interface Props {

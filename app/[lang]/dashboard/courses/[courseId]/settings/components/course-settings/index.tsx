@@ -9,6 +9,7 @@ import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { updateCourse } from "@/db/client/course";
 import type { Course } from "@/types/course.type";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
@@ -17,6 +18,9 @@ interface Props {
 }
 
 const CourseSettings: FunctionComponent<Props> = ({ course: initCourse }) => {
+  // Hooks
+  const t = useTranslations();
+
   // State
   const [course, setCourse] = useState(initCourse);
   const [title, setTitle] = useState(initCourse.title);
@@ -43,23 +47,25 @@ const CourseSettings: FunctionComponent<Props> = ({ course: initCourse }) => {
   return (
     <Container>
       <Header course={course} />
-      <p className="section-title">Settings</p>
+      <p className="section-title">{t("common.settings")}</p>
       <div>
         <div className="flex items-end gap-[4px]">
           <BasicInput
-            label="Course name"
+            label={t("labels.course_name")}
             StartIcon={<CoursesIcon size="xs" />}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="mb-auto"
           />
           <button
-            disabled={!title || isSubmitting}
+            disabled={!title || isSubmitting || course.title === title}
             className="primary-button w-[100px]"
             onClick={submitUpdateCourse}
           >
             {isSubmitting && <LoadingSpinner />}
-            <span className={`${clsx(isSubmitting && "opacity-0")}`}>Save</span>
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              {t("buttons.save")}
+            </span>
           </button>
         </div>
       </div>

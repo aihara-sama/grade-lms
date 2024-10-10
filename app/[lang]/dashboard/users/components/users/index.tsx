@@ -335,7 +335,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       {isData && (
         <Table
           data={users.map(({ name, role, id, avatar, email }, idx) => ({
-            Name: (
+            [t("tables.users.name")]: (
               <TitleCard
                 checked={usersIds.includes(id)}
                 Icon={<Avatar avatar={avatar} />}
@@ -344,7 +344,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
                 onToggle={(checked) => onUserToggle(checked, id)}
               />
             ),
-            Email: email,
+            [t("tables.users.email")]: email,
             "": (
               <BasicPopper
                 placement={

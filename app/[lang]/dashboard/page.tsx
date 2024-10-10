@@ -44,6 +44,8 @@ const Page: NextPage = async () => {
       getCoursesInsights(),
     ]);
 
+    console.log({ latestCourses });
+
     return (
       <TeacherDashboard
         dayLessons={dayLessons}

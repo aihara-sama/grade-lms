@@ -276,13 +276,13 @@ const Assignments: FunctionComponent<Props> = ({
       onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreAssignments))}
     >
       <Header course={lesson.course} />
-      <p className="section-title">Assignments</p>
+      <p className="section-title">{t("assignments.title")}</p>
       <div className="mb-6">
         <div className="flex flex-wrap gap-6">
           <Total
             Icon={<AssignmentsIcon size="md" />}
             total={assignmentsCount}
-            title="Total assignments"
+            title={t("cards.titles.total_assignments")}
           />
           {user.role === "teacher" && (
             <div className="card">
@@ -293,7 +293,7 @@ const Assignments: FunctionComponent<Props> = ({
                 className="primary-button px-8"
                 onClick={() => setIsCreateAssignmentModal(true)}
               >
-                Create
+                {t("buttons.create")}
               </button>
             </div>
           )}
@@ -332,7 +332,7 @@ const Assignments: FunctionComponent<Props> = ({
       {isData && (
         <Table
           data={assignments.map(({ id, title }, idx) => ({
-            Name: (
+            [t("tables.assignments.name")]: (
               <TitleCard
                 onClick={() => onAssignmentClick(id)}
                 checked={assignmentsIds.includes(id)}

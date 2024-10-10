@@ -50,7 +50,7 @@ const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
   return (
     <div className="flex relative">
       <img
-        alt="avatar"
+        alt=""
         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
         className="rounded-[50%] w-40 h-40 border border-neutral-200 object-cover"
       />

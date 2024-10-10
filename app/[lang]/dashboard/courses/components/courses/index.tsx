@@ -334,7 +334,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
             <Table
               data={courses.map(
                 ({ id, title, lessons, users: members }, idx) => ({
-                  Name: (
+                  [t("tables.courses.name")]: (
                     <TitleCard
                       href={`/dashboard/courses/${id}/overview`}
                       checked={coursesIds.includes(id)}
@@ -348,8 +348,8 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                       }
                     />
                   ),
-                  Lessons: lessons[0].count,
-                  Members: members[0].count,
+                  [t("tables.courses.lessons")]: lessons[0].count,
+                  [t("tables.courses.members")]: members[0].count,
                   "": user.role === "teacher" && (
                     <BasicPopper
                       placement={

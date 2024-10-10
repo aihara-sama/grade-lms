@@ -22,10 +22,12 @@ import {
 } from "@/db/client/submission";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useUser } from "@/hooks/use-user";
-import type { SubmissionWithAuthor } from "@/types/submission.type";
+import type { Locale } from "@/i18n";
+import type { ResultOf } from "@/types/utils.type";
+import { getDateLocale } from "@/utils/date/get-date-locale";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import { format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
@@ -55,7 +57,9 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
   const [isEditSubmissionModal, setIsEditSubmissionModal] = useState(false);
   const [isViewSubmissionModal, setIsViewSubmissionModal] = useState(false);
 
-  const [submissions, setSubmissions] = useState<SubmissionWithAuthor[]>([]);
+  const [submissions, setSubmissions] = useState<
+    ResultOf<typeof getAssignmentSubmissions>["data"]
+  >([]);
   const [submissionsCount, setSubmissionsCount] = useState(0);
 
   const [submissionId, setSubmissionId] = useState<string>();
@@ -92,9 +96,7 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
     setIsLoading(true);
 
     try {
-      const { data, count } = await (user.role === "teacher"
-        ? getAssignmentSubmissions(assignmentId)
-        : getAssignmentSubmissions(assignmentId));
+      const { data, count } = await getAssignmentSubmissions(assignmentId);
 
       setSubmissions(data);
       setSubmissionsCount(count);
@@ -273,8 +275,8 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
           )}
           compact
           data={submissions.map(
-            ({ id, author, title, grade, created_at }, idx) => ({
-              Name: (
+            ({ id, author, title, grades, created_at }, idx) => ({
+              [t("tables.submissions.name")]: (
                 <TitleCard
                   checkboxSize="sm"
                   checked={submissionsIds.includes(id)}
@@ -290,15 +292,26 @@ const SubmissionsTab: FunctionComponent<Props> = ({ assignmentId }) => {
                   }
                 />
               ),
-              Author: (
+              [t("tables.submissions.author")]: (
                 <Link className="text-sm" href={`/users/${author.id}`}>
                   {author.name}
                 </Link>
               ),
-              Grade: <p className="text-sm">{grade}</p>,
-              Submitted: (
-                <p className="text-sm">
-                  {format(new Date(created_at), "EEEE, MMM d")}
+              [t("tables.submissions.grade")]: (
+                <p className="text-sm">{grades?.[0]?.title}</p>
+              ),
+              [t("tables.submissions.submitted")]: (
+                <p
+                  className="text-sm truncate"
+                  title={formatDistanceToNow(new Date(created_at), {
+                    addSuffix: true,
+                    locale: getDateLocale(user.preferred_locale as Locale),
+                  })}
+                >
+                  {formatDistanceToNow(new Date(created_at), {
+                    addSuffix: true,
+                    locale: getDateLocale(user.preferred_locale as Locale),
+                  })}
                 </p>
               ),
               "": user.role === "student" && (

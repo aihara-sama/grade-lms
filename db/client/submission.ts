@@ -9,7 +9,7 @@ export const getSubmission = async (id: string) => {
   const t = await loadMessages();
 
   const result = await DB.from("submissions")
-    .select("*, author:users(*), assignment:assignments(due_date)")
+    .select("*, author:users(*), assignment:assignments(due_date), grades(*)")
     .eq("id", id)
     .single();
 
@@ -26,7 +26,7 @@ export const getAssignmentSubmissions = async (
   const t = await loadMessages();
 
   const { data, count, error } = await DB.from("submissions")
-    .select("*, author:users(*)", { count: "exact" })
+    .select("*, author:users(*), grades(*)", { count: "exact" })
     .eq("assignment_id", assignmentId)
     .ilike("title", `%${title}%`)
     .range(from, to)

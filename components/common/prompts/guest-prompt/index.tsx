@@ -22,7 +22,7 @@ const GuestPrompt: FunctionComponent<Props> = () => {
 
   const createGuestUser = () => {
     setUser({
-      id: undefined,
+      id: Math.random().toString(36).substr(2, 6),
       avatar: process.env.DEFAULT_AVATAR,
       created_at: new Date().toISOString(),
       creator_id: null,

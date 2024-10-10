@@ -1,7 +1,9 @@
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { format } from "date-fns";
 
-export const parseInsights = (arr: { timestamp: string }[]) => {
+export const parseInsights = (arr: { timestamp: string }[] | null) => {
+  if (arr === null) return [];
+
   const weekNamesRec: Record<string, number> = {};
 
   getWeekNames().forEach((name) => {

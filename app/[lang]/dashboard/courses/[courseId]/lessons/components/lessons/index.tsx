@@ -309,7 +309,7 @@ const Lessons: FunctionComponent<Props> = ({
       {isData && (
         <Table
           data={lessons.map((lesson, idx) => ({
-            Name: (
+            [t("tables.lessons.name")]: (
               <TitleCard
                 href={`/dashboard/courses/${courseId}/lessons/${lesson.id}/overview`}
                 checked={lessonsIds.includes(lesson.id)}
@@ -323,7 +323,10 @@ const Lessons: FunctionComponent<Props> = ({
                 }
               />
             ),
-            Starts: format(new Date(lesson.starts), "EEEE, MMM d"),
+            [t("tables.lessons.starts")]: format(
+              new Date(lesson.starts),
+              "EEEE, MMM d"
+            ),
             "": user.role === "teacher" && !isLessonOngoing(lesson) && (
               <BasicPopper
                 placement={

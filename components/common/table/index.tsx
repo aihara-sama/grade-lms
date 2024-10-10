@@ -32,7 +32,7 @@ const Table: FunctionComponent<PropsWithClassName<Props>> = memo(
               <div className="flex gap-3 px-4 py-3 font-bold bg-gray-200 rounded-md">
                 {keys.map((key) => (
                   <div
-                    className="text-sm flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3]"
+                    className="text-sm flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[2]"
                     key={key}
                   >
                     {key}
@@ -51,7 +51,7 @@ const Table: FunctionComponent<PropsWithClassName<Props>> = memo(
                     >
                       {keys.map((key, i) => (
                         <div
-                          className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[3] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
+                          className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[2] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
                           key={i}
                         >
                           {row[key]}

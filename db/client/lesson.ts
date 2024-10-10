@@ -60,7 +60,7 @@ export const getLessonsInsights = async (courseId: string) => {
 
   const { data, count, error } = await DB.from("lessons")
     .select("timestamp:ends")
-    .eq("courseId", courseId)
+    .eq("course_id", courseId)
     .gte(
       "ends",
       format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
@@ -80,6 +80,7 @@ export const getDayLessons = async (
 
   const { data, count, error } = await DB.from("lessons")
     .select("*, course:courses(title)")
+    .filter("course_id", "not.is", null)
     .range(from, to)
     .gte("starts", format(day, "yyyy-MM-dd'T'HH:mm:ss"))
     .lt(

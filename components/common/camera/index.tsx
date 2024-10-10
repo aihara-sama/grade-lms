@@ -7,6 +7,7 @@ import VideoDisabledIcon from "@/components/icons/video-disabled-icon";
 import VideoIcon from "@/components/icons/video-icon";
 import { useUser } from "@/hooks/use-user";
 import type { Camera as ICamera } from "@/interfaces/camera.interface";
+import { useTranslations } from "next-intl";
 import { type FunctionComponent } from "react";
 
 interface Props {
@@ -20,8 +21,11 @@ const Camera: FunctionComponent<Props> = ({
   toggleAudio,
   toggleCamera,
 }) => {
+  // Hooks
+  const t = useTranslations();
   const user = useUser((state) => state.user);
 
+  // View
   return (
     <div className="relative flex group">
       <StreamVideo
@@ -30,7 +34,9 @@ const Camera: FunctionComponent<Props> = ({
       />
       <div className="group-hover:h-[70px] absolute top-[0] left-[0] right-[0] h-[0] flex gap-[6px] text-[white] flex-col justify-center pl-[12px] overflow-hidden [transition:0.2s_height] bg-black bg-opacity-50">
         <p className="text-sm">{camera.user.name}</p>
-        <p className="text-xs text-slate-200">{camera.user.role}</p>
+        <p className="text-xs text-slate-200">
+          {t(`roles.${camera.user.role}`)}
+        </p>
       </div>
       {camera.user.id === user.id && (
         <div className="group-hover:h-[70px] absolute left-[0] right-[0] h-[0] bottom-[0] flex gap-[12px] items-center justify-center [transition:0.2s_height] overflow-hidden bg-black bg-opacity-50">

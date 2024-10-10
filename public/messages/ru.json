@@ -1,15 +1,316 @@
 {
-  "courses": "Курсы",
-  "users": "Пользователи",
-  "lessons": "Уроки",
-  "members": "Участники",
-  "assignments": "Задания",
-  "submissions": "Работы",
-  "search": "Поиск",
-  "profile": "Профиль",
-  "deleted": "Удалено",
+  "days": {
+    "sun": "Вск",
+    "mon": "Пн",
+    "tue": "Вт",
+    "wed": "Ср",
+    "thu": "Чт",
+    "fri": "Пт",
+    "sat": "Сб"
+  },
+
+  "sections": {
+    "insights": {
+      "title": "Аналитика"
+    }
+  },
+
+  "cards": {
+    "titles": {
+      "total_courses": "Всего курсов",
+      "total_users": "Всего пользователей",
+      "total_members": "Всего участников",
+      "total_lessons": "Всего уроков",
+      "total_assignments": "Всего заданий",
+      "total_submissions": "Всего сдач",
+      "ongoing_lesson": "Идёт урок"
+    }
+  },
+
+  "buttons": {
+    "close": "Закрыть",
+    "change_password": "Сменить пароль",
+    "delete": "Удалить",
+    "expel": "Исключить",
+    "enroll": "Записать",
+    "cancel": "Отмена",
+    "create": "Создать",
+    "quick_lesson": "Быстрый урок",
+    "create_course": "Создать курс",
+    "enroll_users": "Записать пользователей",
+    "create_lesson": "Создать урок",
+    "create_assignment": "Создать задание",
+    "create_submission": "Создать сдачу",
+    "create_user": "Создать пользователя",
+    "clear_filters": "Сбросить фильтры",
+    "select_all": "Выбрать все",
+    "deselect": "Отменить выбор",
+    "edit": "Редактировать",
+    "save": "Сохранить",
+    "login": "Войти",
+    "logout": "Выйти",
+    "create_account": "Создать аккаунт",
+    "enter_class": "Войти в класс",
+    "submit": "Отправить",
+    "extend?": "Продлить?",
+    "view_all": "Посмотреть все"
+  },
+
+  "links": {
+    "join": "Присоединиться",
+    "login": "Войти",
+    "upgrade": "Обновить"
+  },
+
+  "roles": {
+    "teacher": "Учитель",
+    "student": "Студент",
+    "guest": "Гость"
+  },
+
+  "tabs": {
+    "general": {
+      "title": "Общее"
+    },
+    "avatar": {
+      "title": "Аватар"
+    }
+  },
+
+  "statuses": {
+    "active": "Активен",
+    "ongoing": "В процессе",
+    "ended": "Завершён"
+  },
+
+  "tables": {
+    "courses": {
+      "name": "Название",
+      "lessons": "Уроки",
+      "members": "Участники"
+    },
+    "enroll_users": {
+      "name": "Имя"
+    },
+    "enrolll_courses": {
+      "name": "Название"
+    },
+    "users": {
+      "name": "Имя",
+      "email": "Электронная почта"
+    },
+    "lessons": {
+      "name": "Название",
+      "starts": "Начинается"
+    },
+    "members": {
+      "name": "Имя"
+    },
+    "assignments": {
+      "name": "Название"
+    },
+    "submissions": {
+      "name": "Название",
+      "author": "Автор",
+      "grade": "Оценка",
+      "submitted": "Сдано"
+    }
+  },
+
+  "common": {
+    "view_your_work_in_a_list": "Просмотреть свою работу в списке",
+    "no_results_found": "Результатов не найдено",
+    "try_using_different_keywords_or_change_some_filters": "Попробуйте использовать другие ключевые слова или изменить фильтры",
+    "select_users_to_enroll": "Выберите пользователей для записи",
+    "select_courses_to_enroll": "Выберите курсы для записи",
+    "deleted": "Удалено",
+    "this_session_has_ended": "Сессия завершена",
+    "the_lesson_has_ended": "Урок завершён",
+    "left": "Покинул",
+    "settings": "Настройки",
+    "saved": "Сохраненно"
+  },
+
+  "dashboard": {
+    "header": {
+      "enable_browser_notifications": "Хотите включить уведомления в браузере?",
+      "enable": "Включить",
+      "notifications": "Уведомления",
+      "navigation": {
+        "dashboard": "Панель управления",
+        "courses": "Курсы",
+        "users": "Пользователи",
+        "schedule": "Расписание",
+        "profile": "Профиль",
+        "quick_lesson": "Быстрый урок"
+      }
+    },
+
+    "title": "Панель управления",
+    "sub_title": "Ваш командный центр LMS",
+    "latest_courses": "Последние курсы",
+    "latest_assignments": "Последние задания",
+    "insights": "Аналитика",
+    "users": "Пользователи",
+    "courses": "Курсы",
+    "my_schedule": "Моё расписание",
+    "your_schedule_will_show_here": "Ваше расписание появится здесь",
+    "your_assignments_will_show_here": "Ваши задания появятся здесь",
+    "ended": "Завершено",
+    "assignments": "Задания",
+    "submissions": "Сдачи"
+  },
+
+  "courses": {
+    "title": "Курсы",
+    "sub_title": "Просмотр и управление курсами",
+    "description": "Создавайте и управляйте курсами эффективно",
+    "active": "Активен"
+  },
+
+  "course": {
+    "title": "Обзор",
+    "students": "Студенты",
+    "breadcrumbs": {
+      "courses": "Курсы"
+    },
+    "tabs": {
+      "overview": {
+        "title": "Обзор"
+      },
+      "lessons": {
+        "title": "Уроки"
+      },
+      "members": {
+        "title": "Участники"
+      },
+      "settings": {
+        "title": "Настройки"
+      }
+    }
+  },
+
+  "lessons": {
+    "title": "Уроки",
+    "description": "Создавайте и управляйте уроками эффективно"
+  },
+  "members": {
+    "title": "Участники",
+    "description": "Записывайте и управляйте пользователями эффективно"
+  },
+
+  "lesson": {
+    "breadcrumbs": {
+      "courses": "Курсы",
+      "lessons": "Уроки"
+    },
+    "tabs": {
+      "overview": {
+        "title": "Обзор"
+      },
+      "assignments": {
+        "title": "Задания"
+      },
+      "settings": {
+        "title": "Настройки"
+      }
+    },
+    "whiteboard_preview": "Предпросмотр доски",
+    "timeline": "Хронология"
+  },
+
+  "class_room": {
+    "breadcrumbs": {
+      "courses": "Курсы",
+      "lessons": "Уроки"
+    },
+    "tabs": {
+      "cameras": {
+        "title": "Камеры"
+      },
+      "messages": {
+        "title": "Сообщения"
+      },
+      "assignments": {
+        "title": "Задания"
+      }
+    }
+  },
+
+  "assignments": {
+    "title": "Задания",
+    "description": "Создавайте и управляйте заданиями эффективно"
+  },
+
+  "users": {
+    "title": "Пользователи",
+    "sub_title": "Просмотр и управление пользователями",
+    "description": "Создавайте и управляйте пользователями эффективно"
+  },
+
+  "profile": {
+    "title": "Профиль",
+    "plan": "План",
+    "your_plan_is basic": "Ваш план <b>базовый</b>",
+    "preferences": "Предпочтения",
+    "enable_disable_emails": "Включить/отключить письма",
+    "enable_disable_browser_notifications": "Включить/отключить уведомления в браузере",
+    "security": "Безопасность"
+  },
+
+  "schedule": {
+    "title": "Расписание",
+    "sub_title": "Просмотр и управление расписанием",
+    "daylight_saving_time": "Летнее время"
+  },
+
+  "sign_in": {
+    "title": "Вход",
+    "dont_have_an_account?": "Нет аккаунта?"
+  },
+
+  "sign_up": {
+    "title": "Создание аккаунта",
+    "already_have_an_account?": "Уже есть аккаунт?"
+  },
+
+  "placeholders": {
+    "name": "Имя",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "search": "Поиск",
+    "my_course": "Мой курс...",
+    "lesson_name": "Название урока",
+    "assignment_name": "Название задания",
+    "submission_name": "Название сдачи",
+    "start_here": "Начните здесь...",
+    "enter_a_header": "Введите заголовок"
+  },
+
+  "labels": {
+    "language": "Язык",
+    "course_name": "Название курса",
+    "lesson_name": "Название урока",
+    "assignment_name": "Название задания",
+    "name": "Имя",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "timezone": "Часовой пояс",
+    "lessons": "Уроки",
+    "new_members": "Новые участники",
+    "courses": "Курсы",
+    "users": "Пользователи",
+    "course": "Курс",
+    "starts_at": "Начало в",
+    "duration": "Длительность",
+    "description": "Описание",
+    "due_date": "Срок сдачи",
+    "starts_in": "Начнётся через",
+    "add_minutes": "Добавить минуты"
+  },
 
   "success": {
+    "avatar_changed": "Аватар изменен",
     "user_created": "Пользователь успешно создан",
     "user_updated": "Пользователь успешно обновлен",
     "user_enrolled": "Пользователь успешно зачислен",
@@ -18,6 +319,8 @@
     "members_expelled": "Участники успешно исключены",
     "user_deleted": "Пользователь успешно удален",
     "users_deleted": "Пользователи успешно удалены",
+
+    "course_created": "Курс успешно создан",
 
     "lesson_created": "Урок успешно создан",
     "lesson_updated": "Урок успешно обновлен",
@@ -38,43 +341,51 @@
     "submission_deleted": "Работа успешно удалена",
     "submissions_deleted": "Работы успешно удалены",
 
-    "invite_copied": "Ссылка для приглашения успешно скопирована в буфер обмена",
+    "invite_copied": "Ссылка на приглашение успешно скопирована в буфер обмена",
     "password_changed": "Пароль успешно изменен"
   },
   "error": {
+    "failed_to_load_members_insights": "Не удалось загрузить данные участников",
+    "failed_to_load_users_insights": "Не удалось загрузить данные пользователей",
     "failed_to_load_user": "Не удалось загрузить пользователя",
     "failed_to_load_users": "Не удалось загрузить пользователей",
     "failed_to_load_users_count": "Не удалось загрузить количество пользователей",
-    "failed_lo_load_users_insights": "Не удалось загрузить данные о пользователях",
+    "failed_lo_load_users_insights": "Не удалось загрузить данные пользователей",
     "failed_to_enroll_user": "Не удалось зачислить пользователя",
     "failed_to_enroll_users": "Не удалось зачислить пользователей",
-    "failed_to_expel_member": "Не удалось исключить пользователя",
-    "failed_to_expel_members": "Не удалось исключить пользователей",
+    "failed_to_expel_member": "Не удалось исключить участника",
+    "failed_to_expel_members": "Не удалось исключить участников",
     "failed_to_delete_user": "Не удалось удалить пользователя",
     "failed_to_delete_users": "Не удалось удалить пользователей",
     "failed_to_update_user": "Не удалось обновить пользователя",
 
-    "failed_to_load_courses": "Не удалось загрузить курсы",
+    "failed_to_create_grade": "Не удалось обновить создать оценку",
+    "failed_to_update_grade": "Не удалось обновить оценку",
+
+    "failed_to_load_courses_insights": "Не удалось загрузить данные курсов",
+    "failed_to_load_courses": "Не удалось загрузить курс",
     "failed_to_load_courses_count": "Не удалось загрузить количество курсов",
     "failed_to_create_course": "Не удалось создать курс",
     "failed_to_update_course": "Не удалось обновить курс",
     "failed_to_delete_course": "Не удалось удалить курс",
     "failed_to_delete_courses": "Не удалось удалить курсы",
 
+    "failed_to_load_lessons_insights": "Не удалось загрузить данные уроков",
     "failed_to_load_lesson": "Не удалось загрузить урок",
     "failed_to_load_lessons": "Не удалось загрузить уроки",
     "failed_to_load_lessons_count": "Не удалось загрузить количество уроков",
-    "failed_lo_load_lessons_insights": "Не удалось загрузить данные об уроках",
+    "failed_lo_load_lessons_insights": "Не удалось загрузить данные уроков",
     "failed_to_create_lesson": "Не удалось создать урок",
     "failed_to_update_lesson": "Не удалось обновить урок",
     "failed_to_update_lesson_date": "Не удалось обновить дату урока",
     "failed_to_save_lesson": "Не удалось сохранить урок",
     "failed_to_save_whiteboar_data": "Не удалось сохранить данные на доске",
-    "lesson_overlaps": "Урок, который вы пытаетесь запланировать, пересекается с другим уроком",
+    "lesson_overlaps": "Урок пересекается с другим запланированным уроком",
     "failed_to_extend_lesson": "Не удалось продлить урок",
     "failed_to_delete_lesson": "Не удалось удалить урок",
     "failed_to_delete_lessons": "Не удалось удалить уроки",
 
+    "failed_to_load_assignments_insights": "Не удалось загрузить данные заданий",
     "failed_to_load_assignment": "Не удалось загрузить задание",
     "failed_to_load_assignments": "Не удалось загрузить задания",
     "failed_to_load_assignments_count": "Не удалось загрузить количество заданий",
@@ -83,6 +394,7 @@
     "failed_to_delete_assignment": "Не удалось удалить задание",
     "failed_to_delete_assignments": "Не удалось удалить задания",
 
+    "failed_to_load_submissions_insights": "Не удалось загрузить данные работ",
     "failed_to_load_submission": "Не удалось загрузить работу",
     "failed_to_load_submissions": "Не удалось загрузить работы",
     "failed_to_create_submission": "Не удалось создать работу",
@@ -123,25 +435,31 @@
     "delete_assignments": "Вы уверены, что хотите удалить выбранные задания ({count})?"
   },
   "auth": {
-    "unauthorized": "Неавторизован",
+    "unauthorized": "Неавторизовано",
     "forbidden": "Запрещено",
-    "an_email_address_is_too_long": "Адрес электронной почты слишком длинный",
+    "an_email_address_is_too_long": "Электронная почта слишком длинная",
     "user_not_found": "Пользователь не найден",
     "name_is_required": "Имя обязательно",
-    "a_user_with_this_email_address_has_already_been_registered": "Пользователь с таким адресом электронной почты уже зарегистрирован",
+    "a_user_with_this_email_address_has_already_been_registered": "Пользователь с этим адресом электронной почты уже зарегистрирован",
     "user_already_registered": "Пользователь уже зарегистрирован",
     "new_password_should_be_different_from_the_old_password": "Новый пароль должен отличаться от старого",
     "signup_requires_a_valid_password": "Для регистрации требуется действительный пароль",
     "password_should_be_at_least_6_characters": "Пароль должен содержать не менее 6 символов",
     "password_too_short": "Пароль слишком короткий",
-    "password_cannot_be_longer_than_72_characters": "Пароль не может содержать более 72 символов",
-    "unable_to_validate_email_address_invalid_format": "Невозможно подтвердить адрес электронной почты: неверный формат",
+    "password_cannot_be_longer_than_72_characters": "Пароль не может быть длиннее 72 символов",
+    "unable_to_validate_email_address_invalid_format": "Не удалось проверить адрес электронной почты: неверный формат",
     "invalid_email": "Неверный адрес электронной почты",
-    "to_signup_please_provide_your_email_or_phone_number": "Для регистрации укажите адрес электронной почты",
+    "to_signup_please_provide_your_email_or_phone_number": "Для регистрации укажите свою электронную почту",
     "invalid_login_credentials": "Неверные учетные данные"
   },
+
   "modal": {
     "titles": {
+      "create_assignment": "Создать задание",
+      "create_lesson": "Создать урок",
+      "create_course": "Создать курс",
+      "create_user": "Создать пользователя",
+      "edit_user": "Редактировать пользователя",
       "delete_user": "Удалить пользователя",
       "delete_users": "Удалить пользователей",
       "expel_member": "Исключить участника",
@@ -152,30 +470,53 @@
       "delete_lessons": "Удалить уроки",
       "delete_assignment": "Удалить задание",
       "delete_assignments": "Удалить задания",
-      "delete_submission": "Удалить работу",
-      "delete_submissions": "Удалить работы"
+      "delete_submission": "Удалить отправку",
+      "delete_submissions": "Удалить отправки",
+      "enrollment": "Запись на курс",
+      "view_assignment": {
+        "title": "Просмотр задания",
+        "tabs": {
+          "overview": {
+            "title": "Обзор"
+          },
+          "submissions": {
+            "title": "Отправки"
+          }
+        }
+      },
+      "create_submission": {
+        "title": "Создать отправку"
+      },
+      "view_submission": {
+        "title": "Просмотр отправки"
+      },
+      "edit_submission": {
+        "title": "Редактировать отправку"
+      },
+      "extend_lesson": {
+        "title": "Продлить урок"
+      },
+      "view_lesson": {
+        "title": "Просмотр урока"
+      }
     }
-  },
-  "actions": {
-    "delete": "Удалить",
-    "expel": "Исключить"
   },
   "notifications": {
     "submission": {
-      "title": "Новое задание",
-      "body": "Ваш студент создал новое задание для работы {assignment}",
-      "textHref": "Посмотреть в заданиях",
+      "title": "Новая отправка",
+      "body": "Ваш ученик создал новую отправку для задания {assignment}",
+      "textHref": "Посмотреть задания",
       "href": "/dashboard/courses/{courseId}/lessons/{lessonId}/assignments"
     },
     "assignment": {
       "title": "Новое задание",
       "body": "Ваш преподаватель создал задание {assignment} для урока {lesson}",
-      "textHref": "Посмотреть в заданиях",
+      "textHref": "Посмотреть задания",
       "href": "/dashboard/courses/{courseId}/lessons/{lessonId}/assignments"
     },
     "enrollment": {
-      "title": "Вы записаны на новый курс",
-      "body": "Вы записаны на курс {course}",
+      "title": "Вы зачислены на новый курс",
+      "body": "Вы зачислены на курс {course}",
       "textHref": "Посмотреть курсы",
       "href": "/dashboard/courses"
     }
