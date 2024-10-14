@@ -74,7 +74,9 @@ const Page: NextPage = () => {
               target="_blank"
               href="/subscription"
             >
-              <CrownIcon />
+              <span className="text-white">
+                <CrownIcon />
+              </span>
               {t("links.upgrade")}
             </a>
           </div>

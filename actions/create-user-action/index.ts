@@ -42,7 +42,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { error } = await adminDB.auth.admin.createUser({
+  const { error, data } = await adminDB.auth.admin.createUser({
     email: payload.email,
     password: payload.password,
     user_metadata: {
@@ -60,7 +60,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
 
   return {
     error: error ? error.message : null,
-    data: null,
+    data: data.user,
   };
 };
 

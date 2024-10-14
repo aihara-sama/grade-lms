@@ -44,6 +44,18 @@ export const getMyUsers = async (
 
   return { data, count };
 };
+export const getMytUsersCount = async () => {
+  const { count } = await DB.rpc(
+    "get_my_users",
+    {},
+    {
+      count: "exact",
+      head: true,
+    }
+  );
+
+  return { count };
+};
 export const getUsersInsights = async () => {
   const t = await loadMessages();
 

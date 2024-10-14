@@ -18,6 +18,7 @@ import EditUserModal from "@/components/common/modals/edit-user-modal";
 import EnrollUsersInCoursesModal from "@/components/common/modals/enroll-users-in-courses-modal";
 import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
+import UpgradeToProModal from "@/components/common/modals/upgrade-to-pro-modal";
 import NoData from "@/components/common/no-data";
 import NotFound from "@/components/common/not-found";
 import BasicPopper from "@/components/common/poppers/basic-popper";
@@ -33,6 +34,7 @@ import {
   deleteAllUsers,
   deleteUser,
   deleteUsers,
+  getMytUsersCount,
   getMyUsers,
 } from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
@@ -41,6 +43,7 @@ import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
+import { parseUser } from "@/utils/user/parse-user";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -65,6 +68,8 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     useState(false);
   const [isEnrollUsersInCoursesModal, setIsEnrollUsersInCoursesModal] =
     useState(false);
+
+  const [isUpgradeToProModal, setIsUpgradeToProModal] = useState(false);
 
   const [users, setUsers] = useState(initUsers.data);
   const [usersCount, setUsersCount] = useState(initUsers.count);
@@ -91,6 +96,12 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
   const isNotFound = !isLoading && !users.length && !!searchText.length;
 
   // Handlers
+  const openCreateCourseModal = async () => {
+    const { count } = await getMytUsersCount();
+    if (user.isPro || count < 3) setIsCreateUserModal(true);
+    else if (count === 3) setIsUpgradeToProModal(true);
+  };
+
   const selectAllUsers = () => {
     setUsersIds(users.map(({ id }) => id));
     setIsSelectedAll(true);
@@ -197,8 +208,14 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     setIsCreateUserModal(false);
 
     if (maybeUser) {
-      revalidatePageAction();
-      fetchUsersBySearch(searchText);
+      const parsedUser = parseUser(maybeUser.data);
+
+      if (parsedUser.name.includes(searchText)) {
+        setUsers((prev) => [...prev, parsedUser]);
+        setUsersCount((prev) => prev + 1);
+
+        usersOffsetRef.current += 1;
+      }
     }
   };
 
@@ -221,11 +238,13 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
 
     if (updatedUser) {
       setUsers((prev) => {
-        return prev.map(({ id, ...rest }) => {
-          if (id === updatedUser.id) return updatedUser;
+        return prev
+          .map(({ id, ...rest }) => {
+            if (id === updatedUser.id) return updatedUser;
 
-          return { id, ...rest };
-        });
+            return { id, ...rest };
+          })
+          .filter(({ name }) => name.includes(searchText));
       });
     }
   };
@@ -291,7 +310,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
             <hr className="w-full my-3" />
             <button
               className="primary-button px-8"
-              onClick={() => setIsCreateUserModal(true)}
+              onClick={openCreateCourseModal}
             >
               {t("buttons.create")}
             </button>
@@ -453,6 +472,10 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
           onClose={() => setIsDeleteUsersModal(false)}
           onConfirm={submitDeleteUsers}
         />
+      )}
+
+      {isUpgradeToProModal && (
+        <UpgradeToProModal onClose={() => setIsUpgradeToProModal(false)} />
       )}
     </Container>
   );

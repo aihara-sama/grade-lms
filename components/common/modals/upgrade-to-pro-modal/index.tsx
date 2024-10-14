@@ -19,7 +19,10 @@ const UpgradeToProModal: FunctionComponent<Props> = ({ onClose }) => {
       onClose={() => onClose()}
       title={t("modal.titles.upgrade_to_pro")}
     >
-      <p className="text-center text-xl font-bold my-2">Upgrade to Pro</p>
+      <div className="flex justify-center text-neutral-500">
+        <CrownIcon />
+      </div>
+      <p className="text-center text-xl font-bold my-1">Upgrade to Pro</p>
       <p className="text-center text-neutral-500 mb-4">
         Get access to all features
       </p>

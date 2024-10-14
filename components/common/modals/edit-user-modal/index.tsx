@@ -52,6 +52,8 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
   };
 
   const submitUpdateUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     setIsSubmitting(true);
     try {
       const payload = new FormData(e.currentTarget);
@@ -154,7 +156,7 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
           />
           <hr className="mb-4" />
           <div className="flex justify-end gap-3">
-            <button className="primary-button" type="button">
+            <button className="primary-button" type="submit">
               {isSubmitting && <LoadingSpinner />}
               <span className={`${clsx(isSubmitting && "opacity-0")}`}>
                 {t("buttons.save")}
