@@ -129,6 +129,8 @@ export const createLesson = async (lesson: TablesInsert<"lessons">) => {
 
 // UPDATE
 export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
+  console.log({ lesson });
+
   const t = await loadMessages();
 
   const result = await DB.from("lessons")
@@ -138,6 +140,8 @@ export const extendLesson = async (lesson: Lesson, miliseconds: number) => {
     .eq("id", lesson.id)
     .select("*, course:courses(*)")
     .single();
+
+  console.log({ result });
 
   if (result.error) throw new Error(t("error.failed_to_extend_lesson"));
 

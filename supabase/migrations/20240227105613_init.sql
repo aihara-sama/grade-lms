@@ -659,28 +659,14 @@ CREATE POLICY "Can update if assigned and teacher"
 ON lessons
 FOR UPDATE
 USING (
-  EXISTS (
-    SELECT 1
-    FROM user_courses uc
-    JOIN users u ON uc.user_id = u.id
-    WHERE uc.user_id = auth.uid()
-      AND uc.course_id = lessons.course_id
-      AND u.role = 'teacher'
-  )
+  creator_id = auth.uid()
 );
 -- Create a policy to allow delete if the user is assigned to the course and is a teacher
 CREATE POLICY "Can delete if assigned and teacher"
 ON lessons
 FOR DELETE
 USING (
-  EXISTS (
-    SELECT 1
-    FROM user_courses uc
-    JOIN users u ON uc.user_id = u.id
-    WHERE uc.user_id = auth.uid()
-      AND uc.course_id = lessons.course_id
-      AND u.role = 'teacher'
-  )
+  creator_id = auth.uid()
 );
 
 -- Assignments' policies

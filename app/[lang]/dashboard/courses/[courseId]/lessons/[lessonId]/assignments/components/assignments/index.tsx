@@ -168,6 +168,8 @@ const Assignments: FunctionComponent<Props> = ({
       setIsDelAssignmentModal(false);
 
       revalidatePageAction();
+
+      assignmentsOffsetRef.current -= 1;
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -190,6 +192,8 @@ const Assignments: FunctionComponent<Props> = ({
       setIsDelAssignmentsModal(false);
 
       revalidatePageAction();
+
+      assignmentsOffsetRef.current -= assignmentsIds.length;
     } catch (error: any) {
       toast.error(error.message);
     }
