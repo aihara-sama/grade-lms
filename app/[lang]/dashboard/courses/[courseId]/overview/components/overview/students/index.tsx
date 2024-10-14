@@ -2,12 +2,13 @@
 
 import Avatar from "@/components/common/avatar";
 import IconTitle from "@/components/common/icon-title";
-import type { User } from "@/types/user.type";
+import type { getCourse } from "@/db/server/course";
+import type { ResultOf } from "@/types/utils.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
 
 interface Props {
-  users: User[];
+  users: ResultOf<typeof getCourse>["users"];
 }
 
 const Students: FunctionComponent<Props> = ({ users }) => {

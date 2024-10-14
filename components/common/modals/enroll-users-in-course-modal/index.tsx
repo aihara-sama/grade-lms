@@ -19,7 +19,7 @@ import {
 } from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { DB } from "@/lib/supabase/db";
-import type { User } from "@/types/user.type";
+import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
 import clsx from "clsx";
@@ -36,7 +36,9 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
   onClose,
 }) => {
   // State
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<
+    ResultOf<typeof getUsersNotInCourse>["data"]
+  >([]);
   const [usersIds, setUsersIds] = useState<string[]>([]);
 
   const [searchText, setSearchText] = useState("");

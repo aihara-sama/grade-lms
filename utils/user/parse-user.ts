@@ -16,5 +16,6 @@ export const parseUser = (user: SupabaseUser | null): User | null => {
     timezone: user.user_metadata.timezone,
     is_emails_on: user.user_metadata.is_emails_on,
     push_notifications_state: user.user_metadata.push_notifications_state,
+    isPro: user.user_metadata.isPro,
   };
 };

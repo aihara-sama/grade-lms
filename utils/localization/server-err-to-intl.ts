@@ -6,6 +6,7 @@ type ServerErr = Record<
 >;
 
 const serverErrors: ServerErr = {
+  "You've reached your users limit": "error.you_ve_reached_your_users_limit",
   "New password should be different from the old password.":
     "auth.new_password_should_be_different_from_the_old_password",
   "Password too short": "auth.password_too_short",

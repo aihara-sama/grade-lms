@@ -345,6 +345,7 @@
     "password_changed": "Password successfully changed"
   },
   "error": {
+    "you_ve_reached_your_users_limit": "You've reached your users limit",
     "failed_to_load_members_insights": "Failed to load members insights",
     "failed_to_load_users_insights": "Failed to load users insights",
     "failed_to_load_user": "Failed to load user",
@@ -454,6 +455,7 @@
   },
   "modal": {
     "titles": {
+      "upgrade_to_pro": "Upgrade to Pro",
       "create_assignment": "Create assignment",
       "create_lesson": "Create lesson",
       "create_course": "Create course",

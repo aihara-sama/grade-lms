@@ -11,5 +11,6 @@ export declare module "@supabase/auth-js" {
     timezone: string;
     push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
     is_emails_on: boolean;
+    isPro: boolean;
   }
 }

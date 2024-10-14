@@ -22,6 +22,13 @@ create table users (
 );
 
 
+CREATE TABLE user_settings (
+  id uuid not null primary key DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES public.users ON DELETE CASCADE NOT NULL default auth.uid(),
+  isPro boolean NOT NULL,
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now()
+);
 CREATE TABLE fcm_tokens (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES public.users ON DELETE CASCADE NOT NULL default auth.uid(),
@@ -159,6 +166,67 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_updated
   after update on auth.users
   for each row execute procedure public.handle_update_user();
+
+
+CREATE OR REPLACE FUNCTION is_pro() 
+RETURNS boolean AS $$
+DECLARE
+  current_user_id uuid;
+  is_pro boolean;
+BEGIN
+  -- Get the ID of the currently authenticated user
+  SELECT auth.uid() INTO current_user_id;
+
+  -- Check if the current user has a Pro status in the user_settings table
+  SELECT us.isPro
+  INTO is_pro
+  FROM user_settings us
+  WHERE us.user_id = current_user_id;
+
+  -- If no record is found, default to false
+  IF is_pro IS NULL THEN
+    RETURN false;
+  END IF;
+
+  RETURN is_pro;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION can_create_course()
+RETURNS BOOLEAN AS $$
+DECLARE
+  current_user_id uuid;
+  is_pro BOOLEAN;
+  course_count INT;
+BEGIN
+  -- Get the ID of the currently authenticated user
+  SELECT auth.uid() INTO current_user_id;
+
+  -- Check if the user has Pro status
+  SELECT us.isPro
+  INTO is_pro
+  FROM user_settings us
+  WHERE us.user_id = current_user_id;
+
+  -- Get the number of courses created by the user
+  SELECT COUNT(*)
+  INTO course_count
+  FROM courses c
+  WHERE c.creator_id = current_user_id::text;
+
+  IF (SELECT role FROM public.users WHERE id = auth.uid()) != 'teacher'
+    return FALSE
+
+  -- If the user is not Pro and has created 3 or more courses, deny creation
+  IF is_pro = FALSE AND course_count >= 3 THEN
+    RETURN FALSE;
+  END IF;
+
+  RETURN true;
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 
 create or replace function public.get_my_users()
@@ -526,7 +594,7 @@ ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Can insert for teachers" ON public.courses
 FOR INSERT
 TO authenticated
-WITH CHECK ((SELECT role FROM public.users WHERE id = auth.uid()) = 'teacher');
+WITH CHECK (can_create_course());
 
 -- Policy: Select allowed for any authenticated user assigned to the course
 CREATE POLICY "Can select authenticated" ON public.courses

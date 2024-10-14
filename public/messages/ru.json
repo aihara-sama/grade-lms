@@ -345,6 +345,7 @@
     "password_changed": "Пароль успешно изменен"
   },
   "error": {
+    "you_ve_reached_your_users_limit": "Вы достигли предела пользователей",
     "failed_to_load_members_insights": "Не удалось загрузить данные участников",
     "failed_to_load_users_insights": "Не удалось загрузить данные пользователей",
     "failed_to_load_user": "Не удалось загрузить пользователя",
@@ -455,6 +456,7 @@
 
   "modal": {
     "titles": {
+      "upgrade_to_pro": "Перейти на Pro",
       "create_assignment": "Создать задание",
       "create_lesson": "Создать урок",
       "create_course": "Создать курс",

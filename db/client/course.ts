@@ -25,6 +25,15 @@ export const getCourses = async (
   return { data, count };
 };
 
+export const getCoursesCount = async () => {
+  const { count } = await DB.from("courses").select("*", {
+    count: "exact",
+    head: true,
+  });
+
+  return { count };
+};
+
 export const getLatestCourses = async (
   from = 0,
   to = COURSES_GET_LIMIT - 1

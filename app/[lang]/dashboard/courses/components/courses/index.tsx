@@ -17,6 +17,7 @@ import CreateCourseModal from "@/components/common/modals/create-course-modal";
 import EnrollUsersInCourseModal from "@/components/common/modals/enroll-users-in-course-modal";
 import PromptDeleteRecordModal from "@/components/common/modals/prompt-delete-record-modal";
 import PromptDeleteRecordsModal from "@/components/common/modals/prompt-delete-records-modal";
+import UpgradeToProModal from "@/components/common/modals/upgrade-to-pro-modal";
 import NoData from "@/components/common/no-data";
 import NotFound from "@/components/common/not-found";
 import BasicPopper from "@/components/common/poppers/basic-popper";
@@ -32,6 +33,7 @@ import {
   deleteCourse,
   deleteCourses,
   getCourses,
+  getCoursesCount,
 } from "@/db/client/course";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
@@ -53,6 +55,8 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
   const [isDeleteCourseModal, setIsDeleteCourseModal] = useState(false);
   const [isDeleteCoursesModal, setIsDeleteCoursesModal] = useState(false);
   const [isCreateCourseModal, setIsCreateCourseModal] = useState(false);
+
+  const [isUpgradeToProModal, setIsUpgradeToProModal] = useState(false);
 
   const [courses, setCourses] = useState(initCourses.data);
   const [coursesCount, setCoursesCount] = useState(initCourses.count);
@@ -85,6 +89,13 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
   const isNotFound = !isLoading && !courses.length && !!searchText.length;
 
   // Handdlers
+
+  const openCreateCourseModal = async () => {
+    const { count } = await getCoursesCount();
+    if (user.isPro || count < 3) setIsCreateCourseModal(true);
+    else if (count === 3) setIsUpgradeToProModal(true);
+  };
+
   const selectAllCourses = () => {
     setCoursesIds(courses.map(({ id }) => id));
     setIsSelectedAll(true);
@@ -217,9 +228,11 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
   ) => {
     setIsCreateCourseModal(false);
 
-    if (maybeCourse) {
-      revalidatePageAction();
-      fetchCoursesBySearch(searchText);
+    if (maybeCourse && maybeCourse.title.includes(searchText)) {
+      setCourses((prev) => [...prev, maybeCourse]);
+      setCoursesCount((prev) => prev + 1);
+
+      coursesOffsetRef.current += 1;
     }
   };
 
@@ -288,7 +301,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                 <hr className="w-full my-3" />
                 <button
                   className="primary-button px-8"
-                  onClick={() => setIsCreateCourseModal(true)}
+                  onClick={openCreateCourseModal}
                 >
                   {t("buttons.create")}
                 </button>
@@ -443,6 +456,10 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
               onConfirm={submitDeleteCourses}
               onClose={() => setIsDeleteCoursesModal(false)}
             />
+          )}
+
+          {isUpgradeToProModal && (
+            <UpgradeToProModal onClose={() => setIsUpgradeToProModal(false)} />
           )}
         </div>
       </div>

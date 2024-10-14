@@ -72,7 +72,7 @@ const Page: NextPage = () => {
             <a
               className="button link-button w-40 mt-1"
               target="_blank"
-              href={`/${user.preferred_locale}/subscription`}
+              href="/subscription"
             >
               <CrownIcon />
               {t("links.upgrade")}

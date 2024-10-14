@@ -2,7 +2,7 @@
 
 import { CreateUser } from "@/actions/create-user-action/schema";
 import type { InputType, ReturnType } from "@/actions/create-user-action/types";
-import { Role } from "@/enums/role.enum";
+import { getMyUsers } from "@/db/server/user";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/validation/create-safe-action";
@@ -20,9 +20,24 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
-  if (user.user_metadata.role !== Role.Teacher) {
+  if (user.user_metadata.role !== "teacher") {
     return {
       error: "Forbidden",
+      data: null,
+    };
+  }
+
+  const { count } = await getMyUsers({ head: true });
+
+  if (user.user_metadata.isPro && count >= 20) {
+    return {
+      error: "You've reached your users limit",
+      data: null,
+    };
+  }
+  if (!user.user_metadata.isPro && count >= 3) {
+    return {
+      error: "You've reached your users limit",
       data: null,
     };
   }
@@ -33,7 +48,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     user_metadata: {
       name: payload.name,
       creator_id: user.id,
-      role: Role.Student,
+      role: "student",
       avatar: payload.avatar,
       preferred_locale: user.user_metadata.preferred_locale,
       timezone: payload.timezone,
