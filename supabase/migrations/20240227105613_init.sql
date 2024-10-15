@@ -16,7 +16,6 @@ create table users (
   avatar text not null,
   preferred_locale text not null,
   timezone text not null,
-  is_emails_on boolean not null default true,
   push_notifications_state Push_Notifications_State not null default 'idle',
   created_at timestamp not null default now()
 );
@@ -25,7 +24,8 @@ create table users (
 CREATE TABLE user_settings (
   id uuid not null primary key DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES public.users ON DELETE CASCADE NOT NULL default auth.uid(),
-  isPro boolean NOT NULL,
+  is_pro boolean NOT NULL,
+  is_emails_on boolean not null,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()
 );
@@ -137,6 +137,7 @@ returns trigger as $$
 begin
   insert into public.users (id, email, name, role, avatar, preferred_locale, creator_id, timezone, push_notifications_state)
   values (new.id, new.email, new.raw_user_meta_data->>'name', (new.raw_user_meta_data->>'role')::public.Role, new.raw_user_meta_data->>'avatar', new.raw_user_meta_data->>'preferred_locale', new.raw_user_meta_data->>'creator_id', new.raw_user_meta_data->>'timezone', (new.raw_user_meta_data->>'push_notifications_state')::public.Push_Notifications_State);
+  insert into user_settings (is_emails_on, is_pro, user_id) values ( false, false, new.id );
   return new;
 end;
 $$ language plpgsql security definer;
@@ -157,7 +158,6 @@ begin
     avatar = new.raw_user_meta_data->>'avatar',
     preferred_locale = new.raw_user_meta_data->>'preferred_locale',
     timezone = new.raw_user_meta_data->>'timezone',
-    is_emails_on = (new.raw_user_meta_data->>'is_emails_on')::boolean,
     push_notifications_state = (new.raw_user_meta_data->>'push_notifications_state')::public.Push_Notifications_State
   where id = new.id;
   return new;
@@ -168,29 +168,29 @@ create trigger on_auth_user_updated
   for each row execute procedure public.handle_update_user();
 
 
-CREATE OR REPLACE FUNCTION is_pro() 
-RETURNS boolean AS $$
-DECLARE
-  current_user_id uuid;
-  is_pro boolean;
-BEGIN
-  -- Get the ID of the currently authenticated user
-  SELECT auth.uid() INTO current_user_id;
+-- CREATE OR REPLACE FUNCTION is_pro() 
+-- RETURNS boolean AS $$
+-- DECLARE
+--   current_user_id uuid;
+--   is_pro boolean;
+-- BEGIN
+--   -- Get the ID of the currently authenticated user
+--   SELECT auth.uid() INTO current_user_id;
 
-  -- Check if the current user has a Pro status in the user_settings table
-  SELECT us.isPro
-  INTO is_pro
-  FROM user_settings us
-  WHERE us.user_id = current_user_id;
+--   -- Check if the current user has a Pro status in the user_settings table
+--   SELECT us.is_pro
+--   INTO is_pro
+--   FROM user_settings us
+--   WHERE us.user_id = current_user_id;
 
-  -- If no record is found, default to false
-  IF is_pro IS NULL THEN
-    RETURN false;
-  END IF;
+--   -- If no record is found, default to false
+--   IF is_pro IS NULL THEN
+--     RETURN false;
+--   END IF;
 
-  RETURN is_pro;
-END;
-$$ LANGUAGE plpgsql;
+--   RETURN is_pro;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION can_create_course()
 RETURNS BOOLEAN AS $$
@@ -203,7 +203,7 @@ BEGIN
   SELECT auth.uid() INTO current_user_id;
 
   -- Check if the user has Pro status
-  SELECT us.isPro
+  SELECT us.is_pro
   INTO is_pro
   FROM user_settings us
   WHERE us.user_id = current_user_id;
@@ -214,8 +214,10 @@ BEGIN
   FROM courses c
   WHERE c.creator_id = current_user_id::text;
 
-  IF (SELECT role FROM public.users WHERE id = auth.uid()) != 'teacher'
-    return FALSE
+  IF (SELECT role FROM public.users WHERE id = auth.uid()) != 'teacher' THEN
+    return FALSE;
+  END IF;
+
 
   -- If the user is not Pro and has created 3 or more courses, deny creation
   IF is_pro = FALSE AND course_count >= 3 THEN
@@ -441,12 +443,13 @@ AS $$
     u.email,
     COALESCE(ft.fcm_token, '') AS fcm_token,
     l.id AS lesson_id,
-    u.is_emails_on,
+    us.is_emails_on,
     u.push_notifications_state
   FROM lessons l
   INNER JOIN user_courses uc ON l.course_id = uc.course_id
   INNER JOIN public.users u ON uc.user_id = u.id
   LEFT JOIN fcm_tokens ft ON u.id = ft.user_id
+  LEFT JOIN user_settings us ON u.id = us.user_id
   WHERE l.starts BETWEEN NOW() AND NOW() + INTERVAL '5 minutes'
     AND l.id NOT IN (
       SELECT sn.lesson_id
@@ -1000,6 +1003,25 @@ USING (
       WHERE cm.id = chat_files.message_id) IS NULL
   )
 );
+
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Can insert only with service role"
+ON public.user_settings
+FOR insert
+TO service_role;
+CREATE POLICY "Can update only with service role"
+ON public.user_settings
+FOR update
+TO service_role;
+CREATE POLICY "Can select only with service role"
+ON public.user_settings
+FOR select
+TO service_role;
+CREATE POLICY "Can delete only with service role"
+ON public.user_settings
+FOR delete
+TO service_role;
 
 -- 
 ALTER TABLE sent_announcements ENABLE ROW LEVEL SECURITY;

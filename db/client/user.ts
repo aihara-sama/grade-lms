@@ -2,6 +2,7 @@ import { createUserAction } from "@/actions/create-user-action";
 import type { InputType as CreateUserInputType } from "@/actions/create-user-action/types";
 import { deleteAllUsersAction } from "@/actions/delete-all-users-action";
 import { deleteUsersAction } from "@/actions/delete-users-action";
+import { toggleUserEmailsAction } from "@/actions/toggle-user-emails";
 import { updateUserAction } from "@/actions/update-user-action";
 import type { InputType as UpdateUserInputType } from "@/actions/update-user-action/types";
 import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
@@ -152,6 +153,14 @@ export const updateUser = async (userDetails: UpdateUserInputType) => {
   const t = await loadMessages();
 
   const result = await updateUserAction(userDetails);
+
+  if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
+};
+
+export const toggleUserEmails = async () => {
+  const t = await loadMessages();
+
+  const result = await toggleUserEmailsAction();
 
   if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
 };

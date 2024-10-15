@@ -445,21 +445,24 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
-          ispro: boolean;
+          is_emails_on: boolean;
+          is_pro: boolean;
           updated_at: string;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
-          ispro: boolean;
+          is_emails_on?: boolean;
+          is_pro: boolean;
           updated_at?: string;
           user_id?: string;
         };
         Update: {
           created_at?: string;
           id?: string;
-          ispro?: boolean;
+          is_emails_on?: boolean;
+          is_pro?: boolean;
           updated_at?: string;
           user_id?: string;
         };
@@ -480,7 +483,6 @@ export type Database = {
           creator_id: string | null;
           email: string;
           id: string;
-          is_emails_on: boolean;
           name: string;
           preferred_locale: string;
           push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
@@ -493,7 +495,6 @@ export type Database = {
           creator_id?: string | null;
           email: string;
           id: string;
-          is_emails_on?: boolean;
           name: string;
           preferred_locale: string;
           push_notifications_state?: Database["public"]["Enums"]["push_notifications_state"];
@@ -506,7 +507,6 @@ export type Database = {
           creator_id?: string | null;
           email?: string;
           id?: string;
-          is_emails_on?: boolean;
           name?: string;
           preferred_locale?: string;
           push_notifications_state?: Database["public"]["Enums"]["push_notifications_state"];
@@ -528,6 +528,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      can_create_course: {
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
       delete_assignments_by_ids: {
         Args: {
           p_assignments_ids: string[];
@@ -596,7 +600,6 @@ export type Database = {
           creator_id: string | null;
           email: string;
           id: string;
-          is_emails_on: boolean;
           name: string;
           preferred_locale: string;
           push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
@@ -655,7 +658,6 @@ export type Database = {
           creator_id: string | null;
           email: string;
           id: string;
-          is_emails_on: boolean;
           name: string;
           preferred_locale: string;
           push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];

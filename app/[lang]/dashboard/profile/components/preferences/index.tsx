@@ -1,5 +1,7 @@
 import SelectLocale from "@/app/[lang]/dashboard/profile/components/preferences/select-locale";
+import UpgradeToProModal from "@/components/common/modals/upgrade-to-pro-modal";
 import Switch from "@/components/common/switch";
+import { toggleUserEmails } from "@/db/client/user";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
@@ -19,6 +21,8 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   const { enablePushNotifications } = usePushNotifications();
 
   // State
+  const [isUpgradeToProModal, setIsUpgradeToProModal] = useState(false);
+
   const [isEmailsOn, setIsEmailsOn] = useState(user.is_emails_on);
   const [pushNotificationsState, setPushNotificationsState] = useState(
     user.push_notifications_state
@@ -28,12 +32,8 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   useUpdateEffect(() => {
     (async () => {
       try {
-        await DB.auth.updateUser({
-          data: {
-            is_emails_on: isEmailsOn,
-          },
-        });
-        setUser({ ...user, is_emails_on: true });
+        await toggleUserEmails();
+        setUser({ ...user, is_emails_on: !isEmailsOn });
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -73,7 +73,13 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
       </p>
       <div className="flex flex-col gap-2 mt-3 mb-8">
         <div className="flex items-center gap-3">
-          <Switch isChecked={isEmailsOn} setIsChecked={setIsEmailsOn} />
+          <Switch
+            isChecked={isEmailsOn}
+            setIsChecked={() => {
+              if (user.isPro) setIsEmailsOn((prev) => !prev);
+              else setIsUpgradeToProModal(true);
+            }}
+          />
           <span>{t("profile.enable_disable_emails")}</span>
         </div>
         <div className="flex items-center gap-3">
@@ -87,6 +93,9 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
         </div>
       </div>
       <SelectLocale />
+      {isUpgradeToProModal && (
+        <UpgradeToProModal onClose={() => setIsUpgradeToProModal(false)} />
+      )}
     </div>
   );
 };
