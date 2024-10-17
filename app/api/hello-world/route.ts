@@ -7,7 +7,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(req: Request) {
-  console.log({ body: req.body });
+  const { searchParams } = new URL(req.url);
+
+  console.log({ body: req.body, searchParams });
 
   return Response.json({ status: "ok" });
 }
