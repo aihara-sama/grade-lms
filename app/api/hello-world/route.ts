@@ -1,11 +1,13 @@
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
-  return Response.json({ searchParams, status: "ok" });
+  console.log({ searchParams });
+
+  return Response.json({ status: "ok" });
 }
 
 export async function POST(req: Request) {
-  const data = req.body;
+  console.log({ body: req.body });
 
-  return Response.json({ ...data, status: "ok" });
+  return Response.json({ status: "ok" });
 }
