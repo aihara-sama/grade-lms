@@ -1,7 +1,11 @@
-import { NextResponse } from "next/server";
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
 
-export async function GET() {
-  return NextResponse.json({
-    status: "ok",
-  });
+  return Response.json({ searchParams, status: "ok" });
+}
+
+export async function POST(req: Request) {
+  const data = req.body;
+
+  return Response.json({ ...data, status: "ok" });
 }
