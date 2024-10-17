@@ -101,7 +101,7 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
               <IconTitle
                 Icon={<AvatarIcon size="md" />}
                 title={submission.author.name}
-                subtitle={t(`roles.${submission.author.role}`)}
+                subtitle={t(`roles.${submission.author.user_settings.role}`)}
                 href={`/users/${submission.author.id}`}
               />
             </div>

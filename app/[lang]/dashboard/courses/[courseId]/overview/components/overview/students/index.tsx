@@ -27,7 +27,7 @@ const Students: FunctionComponent<Props> = ({ users }) => {
                 Icon={<Avatar avatar={user.avatar} />}
                 href={`/users/${user.id}`}
                 title={user.name}
-                subtitle={t(`roles.${user.role}`)}
+                subtitle={t(`roles.${user.user_settings.role}`)}
               />
             </div>
             {idx !== arr.length - 1 && <hr />}

@@ -13,12 +13,11 @@ export const generateMetadata = async (): Promise<Metadata> => {
 };
 
 const Page = async () => {
-  const [
-    {
-      data: { user },
-    },
-    myUsers,
-  ] = await Promise.all([getProfile(), getMyUsers()]);
+  const {
+    data: { user },
+  } = await getProfile();
+
+  const myUsers = await getMyUsers(user.id);
 
   if (user.user_metadata.role !== "teacher") return redirect("/dashboard");
 

@@ -26,7 +26,7 @@ import { MEMBERS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import {
   deleteAllUsersFromCourse,
   deleteUsersFromCourse,
-  getCourseUsers,
+  getMembers,
 } from "@/db/client/user";
 import type { getCourse } from "@/db/server/course";
 import useFetchLock from "@/hooks/use-fetch-lock";
@@ -45,7 +45,7 @@ import toast from "react-hot-toast";
 
 interface Props {
   course: ResultOf<typeof getCourse>;
-  users: ResultOf<typeof getCourseUsers>;
+  users: ResultOf<typeof getMembers>;
 }
 
 const Members: FunctionComponent<Props> = ({ course, users }) => {
@@ -101,7 +101,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
     setIsLoading(true);
 
     try {
-      const { data, count } = await getCourseUsers(course.id);
+      const { data, count } = await getMembers(course.id);
 
       setMembers(data);
       setMembersCount(count);
@@ -118,7 +118,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
     setIsSearching(true);
 
     try {
-      const { data, count } = await getCourseUsers(course.id, search);
+      const { data, count } = await getMembers(course.id, search);
 
       setMembers(data);
       setMembersCount(count);
@@ -138,7 +138,7 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       const from = membersOffsetRef.current;
       const to = membersOffsetRef.current + MEMBERS_GET_LIMIT - 1;
 
-      const { data } = await getCourseUsers(courseId, searchText, from, to);
+      const { data } = await getMembers(courseId, searchText, from, to);
 
       setMembers((prev) => [...prev, ...data]);
 
@@ -315,56 +315,58 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       {isLoading && <LoadingSkeleton />}
       {isData && (
         <Table
-          data={members.map(({ name, role, id, avatar }, idx) => ({
-            [t("tables.members.name")]:
-              user.id === id && user.role === "teacher" ? (
-                <IconTitle
-                  Icon={<Avatar avatar={avatar} />}
-                  key={id}
-                  title={name}
-                  subtitle={t(`roles.${role}`)}
-                />
-              ) : (
-                <TitleCard
-                  checked={membersIds.includes(id)}
-                  Icon={<Avatar avatar={avatar} />}
-                  title={name}
-                  subtitle={t(`roles.${role}`)}
-                  onToggle={
-                    user.role === "teacher"
-                      ? (checked) => onMemberToggle(checked, id)
-                      : undefined
+          data={members.map(
+            ({ name, id, avatar, user_settings: { role } }, idx) => ({
+              [t("tables.members.name")]:
+                user.id === id && user.role === "teacher" ? (
+                  <IconTitle
+                    Icon={<Avatar avatar={avatar} />}
+                    key={id}
+                    title={name}
+                    subtitle={t(`roles.${role}`)}
+                  />
+                ) : (
+                  <TitleCard
+                    checked={membersIds.includes(id)}
+                    Icon={<Avatar avatar={avatar} />}
+                    title={name}
+                    subtitle={t(`roles.${role}`)}
+                    onToggle={
+                      user.role === "teacher"
+                        ? (checked) => onMemberToggle(checked, id)
+                        : undefined
+                    }
+                  />
+                ),
+              "": user.role === "teacher" && role !== "teacher" && (
+                <BasicPopper
+                  placement={
+                    members.length > 7 && members.length - idx < 4
+                      ? "top"
+                      : "bottom"
                   }
-                />
+                  width="sm"
+                  trigger={
+                    <button
+                      className="icon-button text-neutral-500"
+                      onClick={() => setMemberId(id)}
+                    >
+                      <DotsIcon />
+                    </button>
+                  }
+                >
+                  <ul className="flex flex-col">
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsExpelMemberModal(true)}
+                    >
+                      <DeleteIcon size="xs" /> {t("buttons.expel")}
+                    </li>
+                  </ul>
+                </BasicPopper>
               ),
-            "": user.role === "teacher" && role !== "teacher" && (
-              <BasicPopper
-                placement={
-                  members.length > 7 && members.length - idx < 4
-                    ? "top"
-                    : "bottom"
-                }
-                width="sm"
-                trigger={
-                  <button
-                    className="icon-button text-neutral-500"
-                    onClick={() => setMemberId(id)}
-                  >
-                    <DotsIcon />
-                  </button>
-                }
-              >
-                <ul className="flex flex-col">
-                  <li
-                    className="popper-list-item"
-                    onClick={() => setIsExpelMemberModal(true)}
-                  >
-                    <DeleteIcon size="xs" /> {t("buttons.expel")}
-                  </li>
-                </ul>
-              </BasicPopper>
-            ),
-          }))}
+            })
+          )}
         />
       )}
       {isNoData && (

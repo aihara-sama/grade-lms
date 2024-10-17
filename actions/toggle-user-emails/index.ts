@@ -11,11 +11,6 @@ const handler = async (): Promise<ReturnType> => {
     data: { user },
   } = await serverDB.auth.getUser();
 
-  const { data: profile } = await serverDB
-    .from("users")
-    .select("role, user_settings(*)")
-    .single();
-
   if (!user) {
     return {
       error: "Unauthorized",
@@ -23,14 +18,27 @@ const handler = async (): Promise<ReturnType> => {
     };
   }
 
-  if (profile?.role !== "teacher") {
+  const { data: userSettings, error } = await serverDB
+    .from("user_settings")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!userSettings || error) {
+    return {
+      error: "Something went wrong",
+      data: null,
+    };
+  }
+
+  if (userSettings.role !== "teacher") {
     return {
       error: "Forbidden",
       data: null,
     };
   }
 
-  if (!profile.user_settings[0]?.is_pro) {
+  if (!userSettings.is_pro) {
     return {
       error: "Forbidden",
       data: null,
@@ -41,11 +49,11 @@ const handler = async (): Promise<ReturnType> => {
     [
       serverDB.auth.updateUser({
         data: {
-          is_emails_on: !profile.user_settings[0].is_emails_on,
+          is_emails_on: !userSettings.is_emails_on,
         } as UserMetadata,
       }),
       serverDB.from("user_settings").update({
-        is_emails_on: !profile.user_settings[0].is_emails_on,
+        is_emails_on: !userSettings.is_emails_on,
       }),
     ]
   );

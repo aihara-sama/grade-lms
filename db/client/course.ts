@@ -73,14 +73,11 @@ export const getUnenrolledCourses = async (
 ) => {
   const t = await loadMessages();
 
-  const { data, count, error } = await DB.rpc(
-    "get_unenrolled_courses",
-    {
-      p_user_id: userId,
-      p_course_title: title,
-    },
-    { count: "exact" }
-  )
+  const { data, count, error } = await DB.from("courses")
+    .select("*, user_courses(*)", { count: "exact" })
+    .eq("user_courses.user_id", userId)
+    .ilike("title", `%${title}%`)
+    .filter("user_courses", "is", null)
     .range(from, to)
     .order("created_at", { ascending: true })
     .returns<CourseWithRefsCount[]>();

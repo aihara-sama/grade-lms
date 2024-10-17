@@ -8,7 +8,7 @@ export const getProfile = cache(() => getServerDB().auth.getUser());
 export const getMembers = async (courseId: string) => {
   const { data, count } = await getServerDB()
     .from("users")
-    .select("*, courses!inner(id)", { count: "exact" })
+    .select("*, courses!inner(id), user_settings(role)", { count: "exact" })
     .eq("courses.id", courseId)
     .range(0, MEMBERS_GET_LIMIT - 1)
     .order("created_at", { ascending: true });
@@ -16,16 +16,17 @@ export const getMembers = async (courseId: string) => {
   return { data, count };
 };
 
-export const getMyUsers = async (options?: { head?: boolean }) => {
+export const getMyUsers = async (
+  meId: string,
+  options?: { head?: boolean }
+) => {
   const { data, count } = await getServerDB()
-    .rpc(
-      "get_my_users",
-      {},
-      {
-        count: "exact",
-        ...options,
-      }
-    )
+    .from("users")
+    .select("*, user_settings(role)", {
+      count: "exact",
+      ...options,
+    })
+    .neq("id", meId)
     .range(0, USERS_GET_LIMIT - 1)
     .order("created_at", { ascending: true });
 
@@ -34,13 +35,13 @@ export const getMyUsers = async (options?: { head?: boolean }) => {
 
 export const getUsersInsights = async () => {
   const { data, count } = await getServerDB()
-    .rpc("get_my_users", {}, { count: "exact" })
+    .from("users")
+    .select("timestamp:created_at", { count: "exact" })
     .gte(
       "created_at",
       format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
     )
-    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
-    .select("timestamp:created_at");
+    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 
   return { data, count };
 };

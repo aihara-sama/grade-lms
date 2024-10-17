@@ -9,7 +9,9 @@ export const getSubmission = async (id: string) => {
   const t = await loadMessages();
 
   const result = await DB.from("submissions")
-    .select("*, author:users(*), assignment:assignments(due_date), grades(*)")
+    .select(
+      "*, author:users(*, user_settings(role)), assignment:assignments(due_date), grades(*)"
+    )
     .eq("id", id)
     .single();
 

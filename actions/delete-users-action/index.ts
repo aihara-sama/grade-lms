@@ -1,23 +1,37 @@
 "use server";
 
 import type { ReturnType } from "@/actions/delete-users-action/types";
-import { Role } from "@/enums/role.enum";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 
 const handler = async (usersIds: string[]): Promise<ReturnType> => {
   const serverDB = getServerDB();
 
-  const user = await serverDB.auth.getUser();
+  const {
+    data: { user },
+  } = await getServerDB().auth.getUser();
 
-  if (!user.data.user) {
+  if (!user) {
     return {
       error: "Unauthorized",
       data: null,
     };
   }
 
-  if (user.data.user.user_metadata.role !== Role.Teacher) {
+  const { data: userSettings, error: userSettingsError } = await getServerDB()
+    .from("user_settings")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!userSettings || userSettingsError) {
+    return {
+      error: "Something went wrong",
+      data: null,
+    };
+  }
+
+  if (userSettings.role !== "teacher") {
     return {
       error: "Forbidden",
       data: null,
@@ -29,7 +43,7 @@ const handler = async (usersIds: string[]): Promise<ReturnType> => {
     .from("users")
     .select("id")
     .in("id", usersIds)
-    .neq("id", user.data.user.id);
+    .neq("id", user.id);
 
   const result = await Promise.all(
     users.data.map(({ id }) => adminDB.auth.admin.deleteUser(id))

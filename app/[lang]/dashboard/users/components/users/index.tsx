@@ -34,8 +34,8 @@ import {
   deleteAllUsers,
   deleteUser,
   deleteUsers,
-  getMytUsersCount,
   getMyUsers,
+  getMyUsersCount,
 } from "@/db/client/user";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
@@ -43,7 +43,6 @@ import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import { parseUser } from "@/utils/user/parse-user";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -97,7 +96,8 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
 
   // Handlers
   const openCreateCourseModal = async () => {
-    const { count } = await getMytUsersCount();
+    const { count } = await getMyUsersCount(user.id);
+
     if (user.isPro || count < 3) setIsCreateUserModal(true);
     else if (count === 3) setIsUpgradeToProModal(true);
   };
@@ -115,7 +115,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     setIsLoading(true);
 
     try {
-      const { data, count } = await getMyUsers();
+      const { data, count } = await getMyUsers(user.id);
 
       setUsers(data);
       setUsersCount(count);
@@ -148,7 +148,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       const from = usersOffsetRef.current;
       const to = usersOffsetRef.current + USERS_GET_LIMIT - 1;
 
-      const { data } = await getMyUsers(searchText, from, to);
+      const { data } = await getMyUsers(user.id, searchText, from, to);
 
       setUsers(data);
 
@@ -208,10 +208,8 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     setIsCreateUserModal(false);
 
     if (maybeUser) {
-      const parsedUser = parseUser(maybeUser.data);
-
-      if (parsedUser.name.includes(searchText)) {
-        setUsers((prev) => [...prev, parsedUser]);
+      if (maybeUser.name.includes(searchText)) {
+        setUsers((prev) => [...prev, maybeUser]);
         setUsersCount((prev) => prev + 1);
 
         usersOffsetRef.current += 1;
@@ -353,55 +351,59 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       {isLoading && <LoadingSkeleton />}
       {isData && (
         <Table
-          data={users.map(({ name, role, id, avatar, email }, idx) => ({
-            [t("tables.users.name")]: (
-              <TitleCard
-                checked={usersIds.includes(id)}
-                Icon={<Avatar avatar={avatar} />}
-                title={name}
-                subtitle={t(`roles.${role}`)}
-                onToggle={(checked) => onUserToggle(checked, id)}
-              />
-            ),
-            [t("tables.users.email")]: email,
-            "": (
-              <BasicPopper
-                placement={
-                  users.length > 7 && users.length - idx < 4 ? "top" : "bottom"
-                }
-                width="sm"
-                trigger={
-                  <button
-                    className="icon-button text-neutral-500"
-                    onClick={() => setUserId(id)}
-                  >
-                    <DotsIcon />
-                  </button>
-                }
-              >
-                <ul className="flex flex-col">
-                  <li
-                    className="popper-list-item"
-                    onClick={() => setIsEditUserModal(true)}
-                  >
-                    <AvatarIcon size="xs" /> {t("buttons.edit")}
-                  </li>
-                  <li
-                    className="popper-list-item"
-                    onClick={() => setIsEnrollUserInCoursesModal(true)}
-                  >
-                    <UsersIcon /> {t("buttons.enroll")}
-                  </li>
-                  <li
-                    onClick={() => setIsDeleteUserModal(true)}
-                    className="popper-list-item"
-                  >
-                    <DeleteIcon size="xs" /> {t("buttons.delete")}
-                  </li>
-                </ul>
-              </BasicPopper>
-            ),
-          }))}
+          data={users.map(
+            ({ name, id, avatar, email, user_settings: { role } }, idx) => ({
+              [t("tables.users.name")]: (
+                <TitleCard
+                  checked={usersIds.includes(id)}
+                  Icon={<Avatar avatar={avatar} />}
+                  title={name}
+                  subtitle={t(`roles.${role}`)}
+                  onToggle={(checked) => onUserToggle(checked, id)}
+                />
+              ),
+              [t("tables.users.email")]: email,
+              "": (
+                <BasicPopper
+                  placement={
+                    users.length > 7 && users.length - idx < 4
+                      ? "top"
+                      : "bottom"
+                  }
+                  width="sm"
+                  trigger={
+                    <button
+                      className="icon-button text-neutral-500"
+                      onClick={() => setUserId(id)}
+                    >
+                      <DotsIcon />
+                    </button>
+                  }
+                >
+                  <ul className="flex flex-col">
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsEditUserModal(true)}
+                    >
+                      <AvatarIcon size="xs" /> {t("buttons.edit")}
+                    </li>
+                    <li
+                      className="popper-list-item"
+                      onClick={() => setIsEnrollUserInCoursesModal(true)}
+                    >
+                      <UsersIcon /> {t("buttons.enroll")}
+                    </li>
+                    <li
+                      onClick={() => setIsDeleteUserModal(true)}
+                      className="popper-list-item"
+                    >
+                      <DeleteIcon size="xs" /> {t("buttons.delete")}
+                    </li>
+                  </ul>
+                </BasicPopper>
+              ),
+            })
+          )}
         />
       )}
       {isNoData && (

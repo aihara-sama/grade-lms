@@ -5,7 +5,6 @@ import type {
   InputType,
   ReturnType,
 } from "@/actions/delete-all-users-action/types";
-import { Role } from "@/enums/role.enum";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { createSafeAction } from "@/utils/validation/create-safe-action";
@@ -13,16 +12,30 @@ import { createSafeAction } from "@/utils/validation/create-safe-action";
 const handler = async (payload: InputType): Promise<ReturnType> => {
   const serverDB = getServerDB();
 
-  const user = await serverDB.auth.getUser();
+  const {
+    data: { user },
+  } = await serverDB.auth.getUser();
 
-  if (!user.data.user) {
+  if (!user) {
     return {
       error: "Unauthorized",
       data: null,
     };
   }
+  const { data: userSettings, error: userSettingsError } = await getServerDB()
+    .from("user_settings")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
 
-  if (user.data.user.user_metadata.role !== Role.Teacher) {
+  if (!userSettings || userSettingsError) {
+    return {
+      error: "Something went wrong",
+      data: null,
+    };
+  }
+
+  if (userSettings.role !== "teacher") {
     return {
       error: "Forbidden",
       data: null,
@@ -34,7 +47,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     .from("users")
     .select("id")
     .ilike("name", `%${payload.userName}%`)
-    .neq("id", user.data.user.id);
+    .neq("id", user.id);
 
   const result = await Promise.all(
     users.data.map(({ id }) => adminDB.auth.admin.deleteUser(id))

@@ -6,7 +6,7 @@ import { addDays, format, subWeeks } from "date-fns";
 export const getCourse = async (id: string) => {
   const result = await getServerDB()
     .from("courses")
-    .select("*, users(*), lessons(*)")
+    .select("*, users(*, user_settings(role)), lessons(*)")
     .eq("id", id)
     .single();
 

@@ -20,22 +20,35 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
-  if (user.user_metadata.role !== "teacher") {
+  const { data: userSettings, error: userSettingsError } = await getServerDB()
+    .from("user_settings")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!userSettings || userSettingsError) {
+    return {
+      error: "Something went wrong",
+      data: null,
+    };
+  }
+
+  if (userSettings.role !== "teacher") {
     return {
       error: "Forbidden",
       data: null,
     };
   }
 
-  const { count } = await getMyUsers({ head: true });
+  const { count } = await getMyUsers(user.id, { head: true });
 
-  if (user.user_metadata.isPro && count >= 20) {
+  if (userSettings.is_pro && count >= 20) {
     return {
       error: "You've reached your users limit",
       data: null,
     };
   }
-  if (!user.user_metadata.isPro && count >= 3) {
+  if (!userSettings.is_pro && count >= 3) {
     return {
       error: "You've reached your users limit",
       data: null,
@@ -52,7 +65,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       avatar: payload.avatar,
       preferred_locale: user.user_metadata.preferred_locale,
       timezone: payload.timezone,
-      is_emails_on: true,
+      is_emails_on: userSettings.is_emails_on,
       push_notifications_state: "idle",
     } as UserMetadata,
     email_confirm: true,
@@ -60,7 +73,19 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
 
   return {
     error: error ? error.message : null,
-    data: data.user,
+    data: {
+      avatar: data.user.user_metadata.avatar,
+      created_at: data.user.created_at,
+      creator_id: data.user.user_metadata.creator_id,
+      email: data.user.email,
+      id: data.user.id,
+      name: data.user.user_metadata.name,
+      preferred_locale: data.user.user_metadata.preferred_locale,
+      push_notifications_state:
+        data.user.user_metadata.push_notifications_state,
+      timezone: data.user.user_metadata.timezone,
+      user_settings: { role: data.user.user_metadata.role },
+    },
   };
 };
 

@@ -11,7 +11,6 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import Container from "@/components/layout/container";
 import type { getCourse } from "@/db/server/course";
 import type { getOngoingLesson } from "@/db/server/lesson";
-import { Role } from "@/enums/role.enum";
 import type { ResultOf } from "@/types/utils.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -28,7 +27,9 @@ const Overview: FunctionComponent<Props> = ({
   // Hooks
   const t = useTranslations();
 
-  const teacher = users.find(({ role }) => role === "teacher");
+  const teacher = users.find(
+    ({ user_settings: { role } }) => role === "teacher"
+  );
 
   return (
     <Container>
@@ -59,7 +60,11 @@ const Overview: FunctionComponent<Props> = ({
         </div>
         <div className="[flex-basis:300px] self-stretch xl:flex flex-col hidden">
           <Teacher teacher={teacher} />
-          <Students users={users.filter(({ role }) => role === Role.Student)} />
+          <Students
+            users={users.filter(
+              ({ user_settings: { role } }) => role === "student"
+            )}
+          />
         </div>
       </div>
     </Container>

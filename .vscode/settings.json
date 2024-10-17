@@ -30,5 +30,9 @@
   },
   "spellright.documentTypes": ["markdown", "latex", "plaintext"],
   "spellright.language": ["en"],
-  "tailwindCSS.emmetCompletions": true
+  "tailwindCSS.emmetCompletions": true,
+  "[sql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+  },
+  "typescript.referencesCodeLens.enabled": true
 }

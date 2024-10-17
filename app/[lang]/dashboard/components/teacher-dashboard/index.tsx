@@ -9,10 +9,11 @@ import CoursesIcon from "@/components/icons/courses-icon";
 import Container from "@/components/layout/container";
 import type { createCourse, getLatestCourses } from "@/db/client/course";
 import type { getDayLessons } from "@/db/server/lesson";
+import { DB } from "@/lib/supabase/db";
 import type { ResultOf } from "@/types/utils.type";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   usersCount: number;
@@ -40,6 +41,16 @@ const TeacherDashboard: FunctionComponent<Props> = ({
     setLatestCourses((prev) => [course, ...prev]);
     setCoursesCount((prev) => prev + 1);
   };
+
+  useEffect(() => {
+    (async () => {
+      const result = await DB.from("courses")
+        .select("*, user_courses(*)")
+        .eq("user_courses.user_id", "c534de42-0aa2-4c80-97c6-663389d9b8fe")
+        .filter("user_courses", "is", null);
+      console.log({ result });
+    })();
+  }, []);
 
   return (
     <Container>

@@ -36,15 +36,13 @@ const Page: NextPage = async () => {
       usersInsights,
       coursesInsights,
     ] = await Promise.all([
-      getMyUsers({ head: true }),
+      getMyUsers(user.id, { head: true }),
       getCourses({ head: true }),
       getLatestCourses(),
       getDayLessons(startOfDay(new Date())),
       getUsersInsights(),
       getCoursesInsights(),
     ]);
-
-    console.log({ latestCourses });
 
     return (
       <TeacherDashboard

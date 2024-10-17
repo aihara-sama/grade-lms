@@ -214,7 +214,7 @@ const EnrollUsersInCourseModal: FunctionComponent<Props> = ({
           className="mb-2"
           onScrollEnd={throttleFetch(fetchLock("courses", fetchMoreUsers))}
           compact
-          data={users.map(({ id, avatar, name, role }) => ({
+          data={users.map(({ id, avatar, name, user_settings: { role } }) => ({
             Name: (
               <TitleCard
                 href={`/users/${id}`}

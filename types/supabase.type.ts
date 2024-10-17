@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          created_at: string;
+          id: string;
+          lesson_id: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          lesson_id?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          lesson_id?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "announcements_lesson_id_fkey";
+            columns: ["lesson_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "announcements_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       assignments: {
         Row: {
           body: string;
@@ -46,6 +82,7 @@ export type Database = {
       };
       chat_files: {
         Row: {
+          created_at: string;
           ext: string;
           id: string;
           message_id: string;
@@ -54,6 +91,7 @@ export type Database = {
           size: number;
         };
         Insert: {
+          created_at?: string;
           ext: string;
           id?: string;
           message_id: string;
@@ -62,6 +100,7 @@ export type Database = {
           size: number;
         };
         Update: {
+          created_at?: string;
           ext?: string;
           id?: string;
           message_id?: string;
@@ -81,6 +120,7 @@ export type Database = {
       };
       chat_messages: {
         Row: {
+          created_at: string;
           creator_id: string;
           id: string;
           lesson_id: string;
@@ -88,6 +128,7 @@ export type Database = {
           text: string | null;
         };
         Insert: {
+          created_at?: string;
           creator_id?: string;
           id?: string;
           lesson_id: string;
@@ -95,6 +136,7 @@ export type Database = {
           text?: string | null;
         };
         Update: {
+          created_at?: string;
           creator_id?: string;
           id?: string;
           lesson_id?: string;
@@ -151,21 +193,18 @@ export type Database = {
           created_at: string;
           fcm_token: string;
           id: string;
-          updated_at: string;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           fcm_token: string;
           id?: string;
-          updated_at?: string;
           user_id?: string;
         };
         Update: {
           created_at?: string;
           fcm_token?: string;
           id?: string;
-          updated_at?: string;
           user_id?: string;
         };
         Relationships: [
@@ -268,7 +307,7 @@ export type Database = {
           lesson_id: string | null;
           recipient_id: string;
           submission_id: string | null;
-          type: Database["public"]["Enums"]["notificationtype"];
+          type: Database["public"]["Enums"]["notification_type"];
           user_id: string | null;
         };
         Insert: {
@@ -280,7 +319,7 @@ export type Database = {
           lesson_id?: string | null;
           recipient_id: string;
           submission_id?: string | null;
-          type: Database["public"]["Enums"]["notificationtype"];
+          type: Database["public"]["Enums"]["notification_type"];
           user_id?: string | null;
         };
         Update: {
@@ -292,7 +331,7 @@ export type Database = {
           lesson_id?: string | null;
           recipient_id?: string;
           submission_id?: string | null;
-          type?: Database["public"]["Enums"]["notificationtype"];
+          type?: Database["public"]["Enums"]["notification_type"];
           user_id?: string | null;
         };
         Relationships: [
@@ -326,39 +365,6 @@ export type Database = {
           },
           {
             foreignKeyName: "notifications_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      sent_announcements: {
-        Row: {
-          id: string;
-          lesson_id: string | null;
-          user_id: string | null;
-        };
-        Insert: {
-          id?: string;
-          lesson_id?: string | null;
-          user_id?: string | null;
-        };
-        Update: {
-          id?: string;
-          lesson_id?: string | null;
-          user_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "sent_announcements_lesson_id_fkey";
-            columns: ["lesson_id"];
-            isOneToOne: false;
-            referencedRelation: "lessons";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "sent_announcements_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";
@@ -447,15 +453,15 @@ export type Database = {
           id: string;
           is_emails_on: boolean;
           is_pro: boolean;
-          updated_at: string;
+          role: Database["public"]["Enums"]["role"];
           user_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
-          is_emails_on?: boolean;
+          is_emails_on: boolean;
           is_pro: boolean;
-          updated_at?: string;
+          role: Database["public"]["Enums"]["role"];
           user_id?: string;
         };
         Update: {
@@ -463,14 +469,14 @@ export type Database = {
           id?: string;
           is_emails_on?: boolean;
           is_pro?: boolean;
-          updated_at?: string;
+          role?: Database["public"]["Enums"]["role"];
           user_id?: string;
         };
         Relationships: [
           {
             foreignKeyName: "user_settings_user_id_fkey";
             columns: ["user_id"];
-            isOneToOne: false;
+            isOneToOne: true;
             referencedRelation: "users";
             referencedColumns: ["id"];
           },
@@ -486,7 +492,6 @@ export type Database = {
           name: string;
           preferred_locale: string;
           push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
-          role: Database["public"]["Enums"]["role"];
           timezone: string;
         };
         Insert: {
@@ -498,7 +503,6 @@ export type Database = {
           name: string;
           preferred_locale: string;
           push_notifications_state?: Database["public"]["Enums"]["push_notifications_state"];
-          role: Database["public"]["Enums"]["role"];
           timezone: string;
         };
         Update: {
@@ -510,7 +514,6 @@ export type Database = {
           name?: string;
           preferred_locale?: string;
           push_notifications_state?: Database["public"]["Enums"]["push_notifications_state"];
-          role?: Database["public"]["Enums"]["role"];
           timezone?: string;
         };
         Relationships: [
@@ -592,21 +595,6 @@ export type Database = {
         };
         Returns: undefined;
       };
-      get_my_users: {
-        Args: Record<PropertyKey, never>;
-        Returns: {
-          avatar: string;
-          created_at: string;
-          creator_id: string | null;
-          email: string;
-          id: string;
-          name: string;
-          preferred_locale: string;
-          push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
-          role: Database["public"]["Enums"]["role"];
-          timezone: string;
-        }[];
-      };
       get_overlapping_lesson: {
         Args: {
           p_starts: string;
@@ -624,18 +612,6 @@ export type Database = {
           whiteboard_data: string;
         }[];
       };
-      get_unenrolled_courses: {
-        Args: {
-          p_user_id: string;
-          p_course_title: string;
-        };
-        Returns: {
-          created_at: string;
-          creator_id: string;
-          id: string;
-          title: string;
-        }[];
-      };
       get_upcoming_lessons_users: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -647,24 +623,6 @@ export type Database = {
           push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
         }[];
       };
-      get_users_not_in_course: {
-        Args: {
-          p_course_id: string;
-          p_user_name: string;
-        };
-        Returns: {
-          avatar: string;
-          created_at: string;
-          creator_id: string | null;
-          email: string;
-          id: string;
-          name: string;
-          preferred_locale: string;
-          push_notifications_state: Database["public"]["Enums"]["push_notifications_state"];
-          role: Database["public"]["Enums"]["role"];
-          timezone: string;
-        }[];
-      };
       is_in_course: {
         Args: {
           p_course_id: string;
@@ -674,7 +632,7 @@ export type Database = {
       };
     };
     Enums: {
-      notificationtype: "enrollment" | "submission" | "assignment";
+      notification_type: "enrollment" | "submission" | "assignment";
       push_notifications_state: "idle" | "on" | "off";
       role: "teacher" | "student" | "guest";
     };

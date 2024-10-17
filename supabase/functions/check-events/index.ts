@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
           });
         }
 
-        const { error } = await browserDB.from("sent_announcements").insert({
+        const { error } = await browserDB.from("announcements").insert({
           user_id: user.id,
           lesson_id: user.lesson_id,
         });

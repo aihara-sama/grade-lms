@@ -16,7 +16,10 @@ import { addDays, format, subWeeks } from "date-fns";
 export const getUser = async (id: string) => {
   const t = await loadMessages();
 
-  const result = await DB.from("users").select("*").eq("id", id).single();
+  const result = await DB.from("users")
+    .select("*, user_settings(role)")
+    .eq("id", id)
+    .single();
 
   if (result.error || !result.data)
     throw new Error(t("error.failed_to_load_user"));
@@ -24,19 +27,18 @@ export const getUser = async (id: string) => {
   return result.data;
 };
 export const getMyUsers = async (
+  meId: string,
   userName = "",
   from = 0,
   to = USERS_GET_LIMIT - 1
 ) => {
   const t = await loadMessages();
 
-  const { data, count, error } = await DB.rpc(
-    "get_my_users",
-    {},
-    {
+  const { data, count, error } = await DB.from("users")
+    .select("*, user_settings(role)", {
       count: "exact",
-    }
-  )
+    })
+    .neq("id", meId)
     .ilike("name", `%${userName}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
@@ -45,32 +47,27 @@ export const getMyUsers = async (
 
   return { data, count };
 };
-export const getMytUsersCount = async () => {
-  const { count } = await DB.rpc(
-    "get_my_users",
-    {},
-    {
+export const getMyUsersCount = async (meId: string) => {
+  const { count } = await DB.from("users")
+    .select("*", {
       count: "exact",
       head: true,
-    }
-  );
+    })
+    .neq("id", meId);
 
   return { count };
 };
-export const getUsersInsights = async () => {
+export const getUsersInsights = async (meId: string) => {
   const t = await loadMessages();
 
-  const { data, count, error } = await DB.rpc(
-    "get_my_users",
-    {},
-    { count: "exact" }
-  )
+  const { data, count, error } = await DB.from("users")
+    .select("timestamp:created_at", { count: "exact" })
+    .neq("id", meId)
     .gte(
       "created_at",
       format(addDays(subWeeks(new Date(), 1), 1), "yyyy-MM-dd'T'HH:mm:ss")
     )
-    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"))
-    .select("timestamp:created_at");
+    .lte("created_at", format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 
   if (error) throw new Error(t("error.failed_to_load_users"));
 
@@ -93,7 +90,7 @@ export const getMembersInsights = async (courseId: string) => {
   return { data, count };
 };
 
-export const getCourseUsers = async (
+export const getMembers = async (
   courseId: string,
   userName = "",
   from = 0,
@@ -102,7 +99,7 @@ export const getCourseUsers = async (
   const t = await loadMessages();
 
   const { data, count, error } = await DB.from("users")
-    .select("*, courses!inner(id)", { count: "exact" })
+    .select("*, courses!inner(id), user_settings(role)", { count: "exact" })
     .eq("courses.id", courseId)
     .ilike("name", `%${userName}%`)
     .range(from, to)
@@ -121,14 +118,11 @@ export const getUsersNotInCourse = async (
 ) => {
   const t = await loadMessages();
 
-  const { data, count, error } = await DB.rpc(
-    "get_users_not_in_course",
-    {
-      p_course_id: courseId,
-      p_user_name: userName,
-    },
-    { count: "exact" }
-  )
+  const { data, count, error } = await DB.from("users")
+    .select("*, user_settings(role), user_courses(*)", { count: "exact" })
+    .eq("user_courses.course_id", courseId)
+    .filter("user_courses", "is", null)
+    .ilike("name", `%${userName}%`)
     .range(from, to)
     .order("created_at", { ascending: true });
 
@@ -145,7 +139,7 @@ export const createUser = async (userDetails: CreateUserInputType) => {
 
   if (error) throw new Error(t(serverErrToIntlKey(error)));
 
-  return { data };
+  return data;
 };
 
 // UPDATE

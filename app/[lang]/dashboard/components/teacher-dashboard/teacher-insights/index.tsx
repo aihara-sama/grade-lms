@@ -36,7 +36,10 @@ const TeacherInsights: FunctionComponent<Props> = ({ courses }) => {
         const [
           { data: fetchedUsersInsights },
           { data: fetchedCoursesInsights },
-        ] = await Promise.all([getUsersInsights(), getCoursesInsights()]);
+        ] = await Promise.all([
+          getUsersInsights(user.id),
+          getCoursesInsights(),
+        ]);
 
         if (fetchedUsersInsights.length) {
           setUsersInsights(Object.values(parseInsights(fetchedUsersInsights)));
