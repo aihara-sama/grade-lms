@@ -1,4 +1,5 @@
 import { adminDB } from "@/lib/supabase/db/admin-db";
+import crc32 from "buffer-crc32";
 import crypto from "crypto";
 import fetch from "node-fetch";
 
@@ -41,7 +42,10 @@ async function verifySignature(event: string, headers: Headers) {
   const transmissionId = headers.get("paypal-transmission-id");
   const timeStamp = headers.get("paypal-transmission-time");
 
-  const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${event}`;
+  /* eslint-disable-next-line radix */
+  const crc = parseInt(`0x${crc32(event).toString("hex")}`); // hex crc32 of raw event data, parsed to decimal form
+
+  const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${crc}`;
   console.log(`Original signed message ${message}`);
 
   const certPem = await downloadAndCache(headers.get("paypal-cert-url"));
