@@ -1,6 +1,7 @@
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import crc32 from "buffer-crc32";
 import crypto from "crypto";
+import fetch from "node-fetch";
 
 const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "80R34936DP353712T" } =
   process.env;
