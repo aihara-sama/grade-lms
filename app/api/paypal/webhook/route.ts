@@ -99,9 +99,3 @@ export async function POST(req: Request) {
   // Return a 200 response to mark successful webhook delivery
   return Response.json({ status: "ok" });
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
