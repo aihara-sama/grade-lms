@@ -29,7 +29,7 @@ async function downloadAndCache(url: string, cacheKey?: string) {
   return data;
 }
 
-async function verifySignature(event: any, headers: Headers) {
+async function verifySignature(event: string, headers: Headers) {
   const transmissionId = headers.get("paypal-transmission-id");
   const timeStamp = headers.get("paypal-transmission-time");
 
@@ -59,8 +59,7 @@ async function verifySignature(event: any, headers: Headers) {
 export async function POST(req: Request) {
   const { headers } = req;
 
-  const event = await req.json();
-  const data = event;
+  const body = await req.json();
 
   console.log({ paypaltransmissionid: headers.get("paypal-transmission-id") });
   console.log({ paypalcerturl: headers.get("paypal-cert-url") });
@@ -71,19 +70,19 @@ export async function POST(req: Request) {
     paypaltransmissionsig: headers.get("paypal-transmission-sig"),
   });
   console.log(`headers`, headers);
-  console.log(`parsed json`, JSON.stringify(data, null, 2));
-  console.log(`raw event: ${event}`);
+  console.log(`parsed json`, JSON.stringify(body, null, 2));
+  console.log(`raw event: ${body}`);
 
-  const isSignatureValid = await verifySignature(event, headers);
+  const isSignatureValid = await verifySignature(JSON.stringify(body), headers);
 
   if (isSignatureValid) {
     console.log("Signature is valid.");
 
     // Successful receipt of webhook, do something with the webhook data here to process it, e.g. write to database
-    console.log(`Received event`, JSON.stringify(data, null, 2));
+    console.log(`Received event`, JSON.stringify(body, null, 2));
   } else {
     console.log(
-      `Signature is not valid for ${data?.id} ${headers.get("correlation-id")}`
+      `Signature is not valid for ${body?.id} ${headers.get("correlation-id")}`
     );
     // Reject processing the webhook event. May wish to log all headers+data for debug purposes.
   }
