@@ -49,6 +49,7 @@ async function verifySignature(event: string, headers: Headers) {
   console.log(`Original signed message ${message}`);
 
   const certPem = await downloadAndCache(headers.get("paypal-cert-url"));
+  console.log({ certPem });
 
   // Create buffer from base64-encoded signature
   const signatureBuffer = Buffer.from(
