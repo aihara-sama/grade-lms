@@ -80,8 +80,8 @@ export async function POST(req: Request) {
     paypaltransmissionsig: headers.get("paypal-transmission-sig"),
   });
   console.log(`headers`, headers);
-  console.log(`parsed json`, JSON.stringify(body, null, 2));
-  console.log(`raw event: ${body}`);
+  console.log(`parsed json`, body);
+  console.log(`raw event: ${JSON.stringify(body)}`);
 
   const isSignatureValid = await verifySignature(JSON.stringify(body), headers);
 
