@@ -2,10 +2,8 @@ import { adminDB } from "@/lib/supabase/db/admin-db";
 import crc32 from "buffer-crc32";
 import crypto from "crypto";
 
-const {
-  SUPABASE_BUCKET = "paypal-certs",
-  WEBHOOK_ID = "WH-19973937YW279670F-02S63370HL636500Y",
-} = process.env;
+const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "80R34936DP353712T" } =
+  process.env;
 
 async function downloadAndCache(url: string, cacheKey?: string) {
   if (!cacheKey) {
