@@ -2,7 +2,7 @@ import { adminDB } from "@/lib/supabase/db/admin-db";
 import crypto from "crypto";
 import fetch from "node-fetch";
 
-const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "80R34936DP353712T" } =
+const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "6HN15449TD174563T" } =
   process.env;
 
 async function downloadAndCache(url: string, cacheKey?: string) {
