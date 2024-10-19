@@ -22,6 +22,8 @@ async function downloadAndCache(url: string, cacheKey?: string) {
   // Download the file if not cached
   const response = await fetch(url);
   const data = await response.text();
+  console.log("cache data", { data });
+
   await fs.writeFile(filePath, data);
 
   return data;
@@ -60,6 +62,14 @@ export async function POST(req: Request) {
   const event = await req.json();
   const data = event;
 
+  console.log({ paypaltransmissionid: headers.get("paypal-transmission-id") });
+  console.log({ paypalcerturl: headers.get("paypal-cert-url") });
+  console.log({
+    paypaltransmissiontime: headers.get("paypal-transmission-time"),
+  });
+  console.log({
+    paypaltransmissionsig: headers.get("paypal-transmission-sig"),
+  });
   console.log(`headers`, headers);
   console.log(`parsed json`, JSON.stringify(data, null, 2));
   console.log(`raw event: ${event}`);
