@@ -3,7 +3,7 @@ import crc32 from "buffer-crc32";
 import crypto from "crypto";
 import fetch from "node-fetch";
 
-const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "1W961991YL5990026" } =
+const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "6HN15449TD174563T" } =
   process.env;
 
 async function downloadAndCache(url: string, cacheKey?: string) {
@@ -66,9 +66,8 @@ async function verifySignature(event: string, headers: Headers) {
 }
 
 export async function POST(req: Request) {
-  const { headers } = req;
-
   const body = await req.text();
+  const { headers } = req;
 
   console.log({ paypaltransmissionid: headers.get("paypal-transmission-id") });
   console.log({ paypalcerturl: headers.get("paypal-cert-url") });
@@ -99,3 +98,9 @@ export async function POST(req: Request) {
   // Return a 200 response to mark successful webhook delivery
   return Response.json({ status: "ok" });
 }
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
