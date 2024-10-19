@@ -604,3 +604,19 @@ TO public
 WITH CHECK (
   bucket_id = 'avatars'
 );
+
+CREATE POLICY "Allow selection of objects in 'paypal-certs' bucket for service role"
+ON storage.objects
+FOR SELECT
+TO service_role
+USING (
+  bucket_id = 'paypal-certs'
+);
+
+CREATE POLICY "Allow insertion of objects in 'paypal-certs' bucket for service role"
+ON storage.objects
+FOR INSERT
+TO service_role
+WITH CHECK (
+  bucket_id = 'paypal-certs'
+);

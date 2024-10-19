@@ -1,22 +1,27 @@
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import crc32 from "buffer-crc32";
 import crypto from "crypto";
-import fs from "fs/promises";
 
 const {
-  CACHE_DIR = ".",
+  SUPABASE_BUCKET = "paypal-certs",
   WEBHOOK_ID = "WH-19973937YW279670F-02S63370HL636500Y",
 } = process.env;
 
 async function downloadAndCache(url: string, cacheKey?: string) {
+  const DB = getServerDB();
+
   if (!cacheKey) {
     cacheKey = url.replace(/\W+/g, "-");
   }
-  const filePath = `${CACHE_DIR}/${cacheKey}`;
 
-  // Check if cached file exists
-  const cachedData = await fs.readFile(filePath, "utf-8").catch(() => null);
-  if (cachedData) {
-    return cachedData;
+  // Check if cached file exists in Supabase Storage
+  const { data: cachedData, error: cachedError } = await DB.storage
+    .from(SUPABASE_BUCKET)
+    .download(cacheKey);
+
+  if (cachedData && !cachedError) {
+    const cachedText = await cachedData.text(); // Convert the Blob to text
+    return cachedText;
   }
 
   // Download the file if not cached
@@ -24,7 +29,14 @@ async function downloadAndCache(url: string, cacheKey?: string) {
   const data = await response.text();
   console.log("cache data", { data });
 
-  await fs.writeFile(filePath, data);
+  // Store the file in Supabase Storage
+  const { error: uploadError } = await DB.storage
+    .from(SUPABASE_BUCKET)
+    .upload(cacheKey, new Blob([data]), { contentType: "text/plain" });
+
+  if (uploadError) {
+    console.error("Error uploading to Supabase Storage:", uploadError);
+  }
 
   return data;
 }
