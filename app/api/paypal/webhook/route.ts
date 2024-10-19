@@ -1,4 +1,4 @@
-import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import { adminDB } from "@/lib/supabase/db/admin-db";
 import crc32 from "buffer-crc32";
 import crypto from "crypto";
 
@@ -8,14 +8,12 @@ const {
 } = process.env;
 
 async function downloadAndCache(url: string, cacheKey?: string) {
-  const DB = getServerDB();
-
   if (!cacheKey) {
     cacheKey = url.replace(/\W+/g, "-");
   }
 
   // Check if cached file exists in Supabase Storage
-  const { data: cachedData, error: cachedError } = await DB.storage
+  const { data: cachedData, error: cachedError } = await adminDB.storage
     .from(SUPABASE_BUCKET)
     .download(cacheKey);
 
@@ -30,7 +28,7 @@ async function downloadAndCache(url: string, cacheKey?: string) {
   console.log("cache data", { data });
 
   // Store the file in Supabase Storage
-  const { error: uploadError } = await DB.storage
+  const { error: uploadError } = await adminDB.storage
     .from(SUPABASE_BUCKET)
     .upload(cacheKey, new Blob([data]), { contentType: "text/plain" });
 
