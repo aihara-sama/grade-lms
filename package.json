@@ -40,6 +40,7 @@
     "@paypal/react-paypal-js": "^7.8.3",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.41.1",
+    "buffer-crc32": "^1.0.0",
     "chart.js": "^4.4.1",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",

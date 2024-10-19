@@ -1,5 +1,9 @@
 "use client";
 
+import type {
+  OnApproveActions,
+  OnApproveData,
+} from "@paypal/paypal-js/types/components/buttons";
 import {
   PayPalButtons,
   SCRIPT_LOADING_STATE,
@@ -8,23 +12,44 @@ import {
 import { useEffect } from "react";
 
 export default function Home() {
-  const [, paypalDispatch] = usePayPalScriptReducer();
+  const [
+    { isInitial, isPending, isRejected, isResolved, options },
+    paypalDispatch,
+  ] = usePayPalScriptReducer();
+
+  console.log({ isInitial, isPending, isRejected, isResolved, options });
 
   function createSubscription(_: any, actions: any): Promise<string> {
     return actions.subscription
       .create({
-        plan_id: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID,
+        plan_id: "P-3TH91731HG320143WM4ITYCA",
       })
       .then((orderID: string) => {
         return orderID;
       });
   }
+  // function createSubscription(_: any, actions: any): Promise<string> {
+  //   return actions.subscription
+  //     .create({
+  //       plan_id: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID,
+  //     })
+  //     .then((orderID: string) => {
+  //       return orderID;
+  //     });
+  // }
 
-  function onApprove(_: any, actions: any): Promise<void> {
-    return actions.order.subscription().then(async function (details: any) {
-      console.log({ details });
-    });
+  async function onApprove(data: OnApproveData, detail: OnApproveActions) {
+    console.log({ data, detail });
+
+    // return actions.order.subscription().then(async function (details: any) {
+    //   console.log({ details });
+    // });
   }
+  // function onApprove(_: any, actions: any): Promise<void> {
+  //   return actions.order.subscription().then(async function (details: any) {
+  //     console.log({ details });
+  //   });
+  // }
   function onError(err: any) {
     console.log({ err });
   }

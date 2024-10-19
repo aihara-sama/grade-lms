@@ -2,7 +2,7 @@ CREATE TABLE public.users (
   id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   creator_id TEXT,
   name TEXT NOT NULL,
-  email TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
   avatar TEXT NOT NULL,
   preferred_locale TEXT NOT NULL,
   timezone TEXT NOT NULL,
@@ -19,6 +19,15 @@ CREATE TABLE public.user_settings (
   user_id UUID UNIQUE REFERENCES public.users ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE public.subscriptions (
+  id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+  subscription_id TEXT,
+  user_id UUID REFERENCES public.users ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
+  ends TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE public.fcm_tokens (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.users ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
