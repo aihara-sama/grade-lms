@@ -24,7 +24,6 @@ async function downloadAndCache(url: string, cacheKey?: string) {
   // Download the file if not cached
   const response = await fetch(url);
   const data = await response.text();
-  console.log("cache data", { data });
 
   // Store the file in Supabase Storage
   const { error: uploadError } = await adminDB.storage
@@ -69,18 +68,6 @@ async function verifySignature(event: string, headers: Headers) {
 export async function POST(req: Request) {
   const body = await req.text();
   const { headers } = req;
-
-  console.log({ paypaltransmissionid: headers.get("paypal-transmission-id") });
-  console.log({ paypalcerturl: headers.get("paypal-cert-url") });
-  console.log({
-    paypaltransmissiontime: headers.get("paypal-transmission-time"),
-  });
-  console.log({
-    paypaltransmissionsig: headers.get("paypal-transmission-sig"),
-  });
-  console.log(`headers`, headers);
-  console.log(`parsed json`, JSON.parse(body));
-  console.log(`raw event: ${body}`);
 
   const isSignatureValid = await verifySignature(body, headers);
 

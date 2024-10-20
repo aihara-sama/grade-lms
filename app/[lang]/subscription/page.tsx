@@ -1,6 +1,7 @@
 "use client";
 
 import type {
+  CreateSubscriptionActions,
   OnApproveActions,
   OnApproveData,
 } from "@paypal/paypal-js/types/components/buttons";
@@ -19,10 +20,14 @@ export default function Home() {
 
   console.log({ isInitial, isPending, isRejected, isResolved, options });
 
-  function createSubscription(_: any, actions: any): Promise<string> {
+  function createSubscription(
+    _: any,
+    actions: CreateSubscriptionActions
+  ): Promise<string> {
     return actions.subscription
       .create({
         plan_id: "P-3TH91731HG320143WM4ITYCA",
+        custom_id: "my-custom-id",
       })
       .then((orderID: string) => {
         return orderID;
