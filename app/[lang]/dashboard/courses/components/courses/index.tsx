@@ -41,6 +41,7 @@ import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
+import { addMonths } from "date-fns";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
@@ -275,6 +276,10 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
       window.removeEventListener("resize", fn);
     };
   }, [courses, coursesCount]);
+
+  useEffect(() => {
+    console.log(addMonths("2024-10-20T12:26:37Z", 1));
+  }, []);
 
   // View
   return (

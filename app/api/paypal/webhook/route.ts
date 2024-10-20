@@ -1,6 +1,7 @@
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import crc32 from "buffer-crc32";
 import crypto from "crypto";
+import { addMonths } from "date-fns";
 import fetch from "node-fetch";
 
 const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "6HN15449TD174563T" } =
@@ -85,21 +86,29 @@ export async function POST(req: Request) {
       });
 
       if (error) {
+        console.log("error saving sub", { error });
+
         return Response.json({}, { status: 500 });
       }
     }
 
     if (body.event_type === "BILLING.SUBSCRIPTION.CANCELLED") {
       console.log("billing_info", body.resource.billing_info);
+      console.log("billing_info", body.resource.billing_info.last_payment);
 
-      // const { error } = await adminDB.from("subscriptions").delete({
-      //   subscription_id: body.resource.id,
-      //   user_id: body.resource.custom_id,
-      // });
+      const { error } = await adminDB
+        .from("subscriptions")
+        .update({
+          end_date: addMonths(
+            body.resource.billing_info.last_payment as string,
+            1
+          ).toISOString(),
+        })
+        .eq("subscription_id", body.resource.id);
 
-      // if (error) {
-      //   return Response.json({}, { status: 500 });
-      // }
+      if (error) {
+        return Response.json({}, { status: 500 });
+      }
     }
   } else {
     console.log(
