@@ -22,7 +22,7 @@ CREATE TABLE public.user_settings (
 
 CREATE TABLE public.subscriptions (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
-  subscription_id TEXT,
+  subscription_id TEXT NOT NULL,
   user_id UUID REFERENCES public.users ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
   end_date TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()

@@ -66,23 +66,49 @@ async function verifySignature(event: string, headers: Headers) {
 }
 
 export async function POST(req: Request) {
-  const body = await req.text();
+  const rawBody = await req.text();
+  const body = await req.json();
   const { headers } = req;
 
-  const isSignatureValid = await verifySignature(body, headers);
+  const isSignatureValid = await verifySignature(rawBody, headers);
 
   if (isSignatureValid) {
     console.log("Signature is valid.");
 
     // Successful receipt of webhook, do something with the webhook data here to process it, e.g. write to database
-    console.log(`Received event`, JSON.parse(body));
+    console.log(`Received event`, body);
+
+    if (body.event_type === "BILLING.SUBSCRIPTION.CREATED") {
+      const { error } = await adminDB.from("subscriptions").insert({
+        subscription_id: body.resource.id,
+        user_id: body.resource.custom_id,
+      });
+
+      if (error) {
+        return Response.json({}, { status: 500 });
+      }
+    }
+
+    if (body.event_type === "BILLING.SUBSCRIPTION.CANCELLED") {
+      console.log("billing_info", body.resource.billing_info);
+
+      // const { error } = await adminDB.from("subscriptions").delete({
+      //   subscription_id: body.resource.id,
+      //   user_id: body.resource.custom_id,
+      // });
+
+      // if (error) {
+      //   return Response.json({}, { status: 500 });
+      // }
+    }
   } else {
     console.log(
-      `Signature is not valid for ${JSON.parse(body)?.id} ${headers.get("correlation-id")}`
+      `Signature is not valid for ${JSON.parse(rawBody)?.id} ${headers.get("correlation-id")}`
     );
     // Reject processing the webhook event. May wish to log all headers+data for debug purposes.
+    return Response.json({}, { status: 400 });
   }
 
   // Return a 200 response to mark successful webhook delivery
-  return Response.json({ status: "ok" });
+  return Response.json({});
 }

@@ -11,8 +11,8 @@ import type { NextPage } from "next";
 
 const Page: NextPage = () => {
   // Hooks
-  const user = useUser((state) => state.user);
   const [{ isPending }] = usePayPalScriptReducer();
+  const { user, setUser } = useUser((state) => state);
 
   // Handlers
   const createSubscription = async (
@@ -30,6 +30,7 @@ const Page: NextPage = () => {
 
   const onApprove = async (data: OnApproveData, detail: OnApproveActions) => {
     console.log({ data, detail });
+    setUser({ ...user, isPro: true });
   };
   const onError = (err: any) => {
     console.log({ err });
@@ -37,21 +38,16 @@ const Page: NextPage = () => {
 
   // View
   return (
-    <div className="mx-4">
-      <h1 className="text-xl font-bold">Subscription</h1>
-
-      <div className="flex justify-between">
-        <h1 className="text-lg">Benefits</h1>
-        {isPending ? (
-          "Loading"
-        ) : (
-          <PayPalButtons
-            createSubscription={createSubscription}
-            onApprove={onApprove}
-            onError={onError}
-          ></PayPalButtons>
-        )}
-      </div>
+    <div>
+      {isPending ? (
+        "Loading"
+      ) : (
+        <PayPalButtons
+          createSubscription={createSubscription}
+          onApprove={onApprove}
+          onError={onError}
+        ></PayPalButtons>
+      )}
     </div>
   );
 };

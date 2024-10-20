@@ -1,3 +1,4 @@
+import Page from "@/app/[lang]/subscription/page";
 import BasicModal from "@/components/common/modals/basic-modal";
 import CheckIcon from "@/components/icons/check-icon";
 import CrownIcon from "@/components/icons/crown-icon";
@@ -43,17 +44,7 @@ const UpgradeToProModal: FunctionComponent<Props> = ({ onClose }) => {
         </p>
       </div>
       <hr className="my-3" />
-      <div className="flex justify-between">
-        <div className="text-sm">
-          <sup>$</sup>
-          <span className="text-xl">8</span> /mo (<span>billed monthly</span>)
-        </div>
-
-        <a className="button link-button" target="_blank" href="/subscription">
-          <CrownIcon />
-          {t("links.upgrade")}
-        </a>
-      </div>
+      <Page />
     </BasicModal>
   );
 };
