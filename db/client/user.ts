@@ -154,6 +154,7 @@ export const toggleUserEmails = async () => {
   const t = await loadMessages();
 
   const result = await toggleUserEmailsAction();
+  console.log({ result });
 
   if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
 };

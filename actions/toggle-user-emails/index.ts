@@ -2,11 +2,12 @@
 
 import type { ReturnType } from "@/actions/delete-all-users-action/types";
 import { adminDB } from "@/lib/supabase/db/admin-db";
+import { getServerDB } from "@/lib/supabase/db/get-server-db";
 
 const handler = async (): Promise<ReturnType> => {
   const {
     data: { user },
-  } = await adminDB.auth.getUser();
+  } = await getServerDB().auth.getUser();
 
   if (!user) {
     return {
