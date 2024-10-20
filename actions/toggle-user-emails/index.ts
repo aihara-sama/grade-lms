@@ -1,14 +1,12 @@
 "use server";
 
 import type { ReturnType } from "@/actions/delete-all-users-action/types";
-import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import { adminDB } from "@/lib/supabase/db/admin-db";
 
 const handler = async (): Promise<ReturnType> => {
-  const serverDB = getServerDB();
-
   const {
     data: { user },
-  } = await serverDB.auth.getUser();
+  } = await adminDB.auth.getUser();
 
   if (!user) {
     return {
@@ -21,12 +19,12 @@ const handler = async (): Promise<ReturnType> => {
     { data: userSettings, error: userSettingsError },
     { data: isPro, error: isProError },
   ] = await Promise.all([
-    serverDB
+    adminDB
       .from("user_settings")
       .select("role, is_emails_on")
       .eq("user_id", user.id)
       .single(),
-    serverDB.rpc("is_pro", { user_uuid: user.id }),
+    adminDB.rpc("is_pro", { user_uuid: user.id }),
   ]);
 
   if (!userSettings || userSettingsError || isProError) {
@@ -51,7 +49,7 @@ const handler = async (): Promise<ReturnType> => {
   }
 
   const [{ error: settingsError }] = await Promise.all([
-    serverDB.from("user_settings").update({
+    adminDB.from("user_settings").update({
       is_emails_on: !userSettings.is_emails_on,
     }),
   ]);
