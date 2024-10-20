@@ -19,7 +19,9 @@ export const getProfile = async (id: string) => {
       .select("*, user_settings(role, is_emails_on)")
       .eq("id", id)
       .single(),
-    serverDB.rpc("is_pro"),
+    serverDB.rpc("is_pro", {
+      user_uuid: id,
+    }),
   ]);
 
   return {

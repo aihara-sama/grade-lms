@@ -159,7 +159,7 @@ CREATE FUNCTION is_pro(
 ) 
 RETURNS BOOLEAN AS $$
 DECLARE
-    is_pro BOOLEAN := FALSE;
+    is_pro BOOLEAN;
 BEGIN
     -- Check if the user has an active subscription (end_date is either NULL or in the future)
     SELECT EXISTS (
@@ -169,7 +169,7 @@ BEGIN
           AND (end_date IS NULL OR end_date > NOW())
     ) INTO is_pro;
 
-    RETURN COALESCE(is_pro, FALSE);
+    RETURN is_pro;
 END;
 $$ LANGUAGE plpgsql;
 

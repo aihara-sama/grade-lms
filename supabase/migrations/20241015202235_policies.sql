@@ -536,6 +536,27 @@ ON public.user_settings
 FOR UPDATE
 TO service_role;
 
+-- Subcriptions' policies
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow service role to insert subscriptions"
+ON public.subscriptions
+FOR INSERT
+TO service_role;
+
+CREATE POLICY "Allow current users to select subscriptions"
+ON public.subscriptions
+FOR SELECT
+TO authenticated
+using (
+  auth.uid() = public.subscriptions.user_id
+);
+
+CREATE POLICY "Allow service role to update subscriptions"
+ON public.user_settings
+FOR UPDATE
+TO service_role;
+
 -- Announcements' policies 
 ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
 
