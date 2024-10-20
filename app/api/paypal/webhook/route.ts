@@ -100,7 +100,7 @@ export async function POST(req: Request) {
         .from("subscriptions")
         .update({
           end_date: addMonths(
-            body.resource.billing_info.last_payment as string,
+            body.resource.billing_info.last_payment.time as string,
             1
           ).toISOString(),
         })
