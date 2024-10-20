@@ -3,7 +3,7 @@ import crc32 from "buffer-crc32";
 import crypto from "crypto";
 import fetch from "node-fetch";
 
-const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "WEBHOOK_ID" } =
+const { SUPABASE_BUCKET = "paypal-certs", WEBHOOK_ID = "6HN15449TD174563T" } =
   process.env;
 
 async function downloadAndCache(url: string, cacheKey?: string) {
