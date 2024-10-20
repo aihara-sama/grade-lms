@@ -419,21 +419,21 @@ export type Database = {
           created_at: string;
           end_date: string | null;
           id: string;
-          subscription_id: string;
+          paypal_subscription_id: string;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           end_date?: string | null;
           id?: string;
-          subscription_id: string;
+          paypal_subscription_id: string;
           user_id?: string;
         };
         Update: {
           created_at?: string;
           end_date?: string | null;
           id?: string;
-          subscription_id?: string;
+          paypal_subscription_id?: string;
           user_id?: string;
         };
         Relationships: [
@@ -484,7 +484,6 @@ export type Database = {
           created_at: string;
           id: string;
           is_emails_on: boolean;
-          is_pro: boolean;
           role: Database["public"]["Enums"]["role"];
           user_id: string;
         };
@@ -492,7 +491,6 @@ export type Database = {
           created_at?: string;
           id?: string;
           is_emails_on: boolean;
-          is_pro: boolean;
           role: Database["public"]["Enums"]["role"];
           user_id?: string;
         };
@@ -500,7 +498,6 @@ export type Database = {
           created_at?: string;
           id?: string;
           is_emails_on?: boolean;
-          is_pro?: boolean;
           role?: Database["public"]["Enums"]["role"];
           user_id?: string;
         };
@@ -659,6 +656,12 @@ export type Database = {
         Args: {
           p_course_id: string;
           p_user_id: string;
+        };
+        Returns: boolean;
+      };
+      is_pro: {
+        Args: {
+          user_uuid: string;
         };
         Returns: boolean;
       };

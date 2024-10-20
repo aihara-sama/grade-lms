@@ -1,10 +1,9 @@
 import { createFcmToken, getFcmToken } from "@/db/client/fcm-token";
 import type { getNotification } from "@/db/client/notification";
+import { updateUser } from "@/db/client/user";
 import { useUser } from "@/hooks/use-user";
 import { messaging } from "@/lib/firebase/messaging";
-import { DB } from "@/lib/supabase/db";
 import type { ResultOf } from "@/types/utils.type";
-import type { UserMetadata } from "@supabase/supabase-js";
 import { getToken } from "firebase/messaging";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -31,13 +30,10 @@ export const usePushNotifications = () => {
           await createFcmToken(token);
         }
 
-        const { error } = await DB.auth.updateUser({
-          data: {
-            push_notifications_state: "on",
-          } as UserMetadata,
+        await updateUser({
+          push_notifications_state: "on",
+          id: user.id,
         });
-
-        if (error) throw new Error(t("error.something_went_wrong"));
 
         setUser({ ...user, push_notifications_state: "on" });
       }

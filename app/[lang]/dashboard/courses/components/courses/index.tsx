@@ -93,7 +93,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
 
   const openCreateCourseModal = async () => {
     const { count } = await getCoursesCount();
-    if (user.isPro || count < 3) setIsCreateCourseModal(true);
+    if (user.is_pro || count < 3) setIsCreateCourseModal(true);
     else if (count === 3) setIsUpgradeToProModal(true);
   };
 

@@ -3,26 +3,27 @@
 import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import GuestPrompt from "@/components/common/prompts/guest-prompt";
 import { UserContext } from "@/contexts/user-context";
+import type { getProfile } from "@/db/server/user";
 import { DB } from "@/lib/supabase/db";
 import { createUserStore } from "@/stores/user-store";
-import type { User } from "@/types/user.type";
+import type { ResultOf } from "@/types/utils.type";
 import { useRouter } from "next/navigation";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import { useEffect, useRef, useState } from "react";
 
 interface Props {
-  user: User | null;
+  profile: ResultOf<typeof getProfile> | null;
 }
 
 const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
-  user: initUser,
+  profile: initProfile,
   children,
 }) => {
   // Hooks
   const router = useRouter();
-  const store = useRef(createUserStore(initUser)).current;
+  const store = useRef(createUserStore(initProfile)).current;
 
-  const [user, setUser] = useState(initUser);
+  const [user, setUser] = useState(initProfile);
   store.subscribe((state) => setUser(state.user));
 
   // Effects

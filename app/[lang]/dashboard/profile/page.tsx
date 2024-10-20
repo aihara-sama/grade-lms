@@ -9,10 +9,9 @@ import General from "@/app/[lang]/dashboard/profile/components/general";
 import Preferences from "@/app/[lang]/dashboard/profile/components/preferences";
 import Security from "@/app/[lang]/dashboard/profile/components/security";
 import Container from "@/components/layout/container";
+import { updateUser } from "@/db/client/user";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
-import type { UserMetadata } from "@supabase/supabase-js";
 import type { NextPage } from "next";
 import { useTranslations } from "next-intl";
 
@@ -28,11 +27,7 @@ const Page: NextPage = () => {
   useUpdateEffect(() => {
     (async () => {
       try {
-        await DB.auth.updateUser({
-          data: {
-            avatar,
-          } as UserMetadata,
-        });
+        await updateUser({ id: user.id, avatar });
 
         setUser({ ...user, avatar });
 

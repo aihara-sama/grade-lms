@@ -49,7 +49,6 @@ const Page: FunctionComponent = () => {
           avatar: DEFAULT_AVATAR,
           preferred_locale: "en",
           timezone: getTimeZone(),
-          push_notifications_state: "idle",
         } as UserMetadata,
       },
     });

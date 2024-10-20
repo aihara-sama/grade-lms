@@ -2,7 +2,6 @@
 
 import type { ReturnType } from "@/actions/delete-all-users-action/types";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
-import type { UserMetadata } from "@supabase/supabase-js";
 
 const handler = async (): Promise<ReturnType> => {
   const serverDB = getServerDB();
@@ -18,13 +17,19 @@ const handler = async (): Promise<ReturnType> => {
     };
   }
 
-  const { data: userSettings, error } = await serverDB
-    .from("user_settings")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
+  const [
+    { data: userSettings, error: userSettingsError },
+    { data: isPro, error: isProError },
+  ] = await Promise.all([
+    serverDB
+      .from("user_settings")
+      .select("role, is_emails_on")
+      .eq("user_id", user.id)
+      .single(),
+    serverDB.rpc("is_pro", { user_uuid: user.id }),
+  ]);
 
-  if (!userSettings || error) {
+  if (!userSettings || userSettingsError || isProError) {
     return {
       error: "Something went wrong",
       data: null,
@@ -38,28 +43,21 @@ const handler = async (): Promise<ReturnType> => {
     };
   }
 
-  if (!userSettings.is_pro) {
+  if (!isPro) {
     return {
       error: "Forbidden",
       data: null,
     };
   }
 
-  const [{ error: profileError }, { error: settingsError }] = await Promise.all(
-    [
-      serverDB.auth.updateUser({
-        data: {
-          is_emails_on: !userSettings.is_emails_on,
-        } as UserMetadata,
-      }),
-      serverDB.from("user_settings").update({
-        is_emails_on: !userSettings.is_emails_on,
-      }),
-    ]
-  );
+  const [{ error: settingsError }] = await Promise.all([
+    serverDB.from("user_settings").update({
+      is_emails_on: !userSettings.is_emails_on,
+    }),
+  ]);
 
   return {
-    error: profileError || settingsError ? "Something went wrong" : null,
+    error: settingsError ? "Something went wrong" : null,
     data: null,
   };
 };

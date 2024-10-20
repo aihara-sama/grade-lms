@@ -1,13 +1,11 @@
 import SelectLocale from "@/app/[lang]/dashboard/profile/components/preferences/select-locale";
 import UpgradeToProModal from "@/components/common/modals/upgrade-to-pro-modal";
 import Switch from "@/components/common/switch";
-import { toggleUserEmails } from "@/db/client/user";
+import { toggleUserEmails, updateUser } from "@/db/client/user";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
 import type { PropsWithClassName } from "@/types/props.type";
-import type { UserMetadata } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -41,22 +39,21 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   }, [isEmailsOn]);
   useUpdateEffect(() => {
     (async () => {
-      try {
-        if (pushNotificationsState === "on") enablePushNotifications();
-        if (pushNotificationsState === "off") {
-          await DB.auth.updateUser({
-            data: {
-              push_notifications_state: "off",
-            } as UserMetadata,
+      if (pushNotificationsState === "on") enablePushNotifications();
+      if (pushNotificationsState === "off") {
+        try {
+          await updateUser({
+            push_notifications_state: "off",
+            id: user.id,
           });
 
           setUser({
             ...user,
             push_notifications_state: "off",
           });
+        } catch (error: any) {
+          toast.error(error.message);
         }
-      } catch (err: any) {
-        console.error(err.message);
       }
     })();
   }, [pushNotificationsState]);
@@ -76,7 +73,7 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
           <Switch
             isChecked={isEmailsOn}
             setIsChecked={() => {
-              if (user.isPro) setIsEmailsOn((prev) => !prev);
+              if (user.is_pro) setIsEmailsOn((prev) => !prev);
               else setIsUpgradeToProModal(true);
             }}
           />

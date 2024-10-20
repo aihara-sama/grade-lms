@@ -98,7 +98,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
   const openCreateCourseModal = async () => {
     const { count } = await getMyUsersCount(user.id);
 
-    if (user.isPro || count < 3) setIsCreateUserModal(true);
+    if (user.is_pro || count < 3) setIsCreateUserModal(true);
     else if (count === 3) setIsUpgradeToProModal(true);
   };
 

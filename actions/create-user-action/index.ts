@@ -9,9 +9,10 @@ import { createSafeAction } from "@/utils/validation/create-safe-action";
 import type { UserMetadata } from "@supabase/supabase-js";
 
 const handler = async (payload: InputType): Promise<ReturnType> => {
+  const serverDB = getServerDB();
   const {
     data: { user },
-  } = await getServerDB().auth.getUser();
+  } = await serverDB.auth.getUser();
 
   if (!user) {
     return {
@@ -20,13 +21,19 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { data: userSettings, error: userSettingsError } = await getServerDB()
-    .from("user_settings")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
+  const [
+    { data: userSettings, error: userSettingsError },
+    { data: isPro, error: isProError },
+  ] = await Promise.all([
+    serverDB
+      .from("user_settings")
+      .select("role, is_emails_on")
+      .eq("user_id", user.id)
+      .single(),
+    serverDB.rpc("is_pro", { user_uuid: user.id }),
+  ]);
 
-  if (!userSettings || userSettingsError) {
+  if (!userSettings || userSettingsError || isProError) {
     return {
       error: "Something went wrong",
       data: null,
@@ -42,13 +49,13 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
 
   const { count } = await getMyUsers(user.id, { head: true });
 
-  if (userSettings.is_pro && count >= 20) {
+  if (isPro && count >= 20) {
     return {
       error: "You've reached your users limit",
       data: null,
     };
   }
-  if (!userSettings.is_pro && count >= 3) {
+  if (!isPro && count >= 3) {
     return {
       error: "You've reached your users limit",
       data: null,

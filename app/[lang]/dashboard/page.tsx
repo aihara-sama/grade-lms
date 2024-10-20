@@ -8,7 +8,7 @@ import {
 } from "@/db/server/course";
 import { getDayLessons } from "@/db/server/lesson";
 import { getSubmissions } from "@/db/server/submission";
-import { getMyUsers, getProfile, getUsersInsights } from "@/db/server/user";
+import { getCachedUser, getMyUsers, getUsersInsights } from "@/db/server/user";
 import { parseInsights } from "@/utils/parse/parse-insights";
 import { startOfDay } from "date-fns";
 import type { Metadata, NextPage } from "next";
@@ -25,7 +25,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
 const Page: NextPage = async () => {
   const {
     data: { user },
-  } = await getProfile();
+  } = await getCachedUser();
 
   if (user.user_metadata.role === "teacher") {
     const [

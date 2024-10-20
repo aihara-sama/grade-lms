@@ -3,10 +3,9 @@ import type { InputType as CreateUserInputType } from "@/actions/create-user-act
 import { deleteAllUsersAction } from "@/actions/delete-all-users-action";
 import { deleteUsersAction } from "@/actions/delete-users-action";
 import { toggleUserEmailsAction } from "@/actions/toggle-user-emails";
-import { updateUserAction } from "@/actions/update-user-action";
-import type { InputType as UpdateUserInputType } from "@/actions/update-user-action/types";
 import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
 import { DB } from "@/lib/supabase/db";
+import type { TablesUpdate } from "@/types/supabase.type";
 import { loadMessages } from "@/utils/localization/load-messages";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import { parseUsersCoursesIds } from "@/utils/parse/parse-users-courses-ids";
@@ -143,12 +142,12 @@ export const createUser = async (userDetails: CreateUserInputType) => {
 };
 
 // UPDATE
-export const updateUser = async (userDetails: UpdateUserInputType) => {
+export const updateUser = async (user: TablesUpdate<"users">) => {
   const t = await loadMessages();
 
-  const result = await updateUserAction(userDetails);
+  const result = await DB.from("users").update(user).eq("id", user.id);
 
-  if (result.error) throw new Error(t(serverErrToIntlKey(result.error)));
+  if (result.error) throw new Error(t("error.failed_to_update_user"));
 };
 
 export const toggleUserEmails = async () => {

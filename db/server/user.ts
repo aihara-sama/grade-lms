@@ -3,7 +3,32 @@ import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { addDays, format, subWeeks } from "date-fns";
 import { cache } from "react";
 
-export const getProfile = cache(() => getServerDB().auth.getUser());
+export const getCachedUser = cache(() => getServerDB().auth.getUser());
+
+export const getProfile = async (id: string) => {
+  const serverDB = getServerDB();
+
+  const [
+    {
+      data: { user_settings: userSettings, ...user },
+    },
+    { data: isPro },
+  ] = await Promise.all([
+    serverDB
+      .from("users")
+      .select("*, user_settings(role, is_emails_on)")
+      .eq("id", id)
+      .single(),
+    serverDB.rpc("is_pro"),
+  ]);
+
+  return {
+    ...user,
+    role: userSettings.role,
+    is_emails_on: userSettings.is_emails_on,
+    is_pro: isPro,
+  };
+};
 
 export const getMembers = async (courseId: string) => {
   const { data, count } = await getServerDB()

@@ -20,37 +20,20 @@ BEGIN
     NEW.raw_user_meta_data->>'preferred_locale',
     NEW.raw_user_meta_data->>'creator_id',
     NEW.raw_user_meta_data->>'timezone',
-    (NEW.raw_user_meta_data->>'push_notifications_state')::public.Push_Notifications_State
+   'idle'
   );
 
   INSERT INTO public.user_settings (
     is_emails_on,
-    is_pro,
     user_id,
     role
   )
   VALUES (
     FALSE,
-    FALSE,
     NEW.id,
     (NEW.raw_user_meta_data->>'role')::public.Role
   );
 
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE FUNCTION public.handle_update_user() 
-RETURNS TRIGGER as $$
-BEGIN
-  UPDATE public.users
-  SET
-    name = NEW.raw_user_meta_data->>'name',
-    avatar = NEW.raw_user_meta_data->>'avatar',
-    preferred_locale = NEW.raw_user_meta_data->>'preferred_locale',
-    timezone = NEW.raw_user_meta_data->>'timezone',
-    push_notifications_state = (NEW.raw_user_meta_data->>'push_notifications_state')::public.Push_Notifications_State
-  WHERE id = NEW.id;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -173,6 +156,25 @@ $$ LANGUAGE plpgsql;
 
 
 -- Helpers
+CREATE FUNCTION is_pro(
+  user_uuid UUID
+) 
+RETURNS BOOLEAN AS $$
+DECLARE
+    is_pro BOOLEAN;
+BEGIN
+    -- Check if the user has an active subscription (end_date is either NULL or in the future)
+    SELECT EXISTS (
+        SELECT 1 
+        FROM public.subscriptions
+        WHERE user_id = user_uuid
+          AND (end_date IS NULL OR end_date > NOW())
+    ) INTO is_pro;
+
+    RETURN is_pro;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION is_in_course(
   p_course_id UUID,
   p_user_id UUID
@@ -193,17 +195,10 @@ CREATE FUNCTION public.can_create_course()
 RETURNS BOOLEAN AS $$
 DECLARE
   current_user_id UUID;
-  is_pro BOOLEAN;
   course_count INT;
 BEGIN
   -- Get the ID of the currently authenticated user
   SELECT auth.uid() INTO current_user_id;
-
-  -- Check if the user has Pro status
-  SELECT us.is_pro
-  INTO is_pro
-  FROM public.user_settings us
-  WHERE us.user_id = current_user_id;
 
   -- Get the number of courses created by the user
   SELECT COUNT(*)
@@ -211,12 +206,12 @@ BEGIN
   FROM public.courses c
   WHERE c.creator_id = current_user_id::TEXT;
 
-  IF (SELECT role FROM public.user_settings WHERE user_id = auth.uid()) != 'teacher' THEN
+  IF (SELECT role FROM public.user_settings WHERE user_id = current_user_id) != 'teacher' THEN
     RETURN FALSE;
   END IF;
 
   -- If the user is not Pro AND has created 3 or more courses, deny creation
-  IF is_pro = FALSE AND course_count >= 3 THEN
+  IF is_pro(current_user_id) = FALSE AND course_count >= 3 THEN
     RETURN FALSE;
   END IF;
 

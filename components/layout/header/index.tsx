@@ -7,11 +7,10 @@ import Logo from "@/components/common/logo";
 import UserPopper from "@/components/common/poppers/user-popper";
 import NotificationsIcon from "@/components/icons/notifications-icon";
 import Nav from "@/components/layout/header/nav";
+import { updateUser } from "@/db/client/user";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
 import type { View } from "@/types/view.type";
-import type { UserMetadata } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -24,14 +23,12 @@ const Header: FunctionComponent = () => {
 
   const disablePushNotifications = async () => {
     try {
-      const { error } = await DB.auth.updateUser({
-        data: {
-          push_notifications_state: "off",
-        } as UserMetadata,
+      await updateUser({
+        push_notifications_state: "off",
+        id: user.id,
       });
 
       setUser({ ...user, push_notifications_state: "off" });
-      if (error) throw new Error(t("error.failed_to_update_user"));
     } catch (error: any) {
       toast.error(error.message);
     }

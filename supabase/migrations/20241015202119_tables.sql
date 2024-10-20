@@ -14,7 +14,6 @@ CREATE TABLE public.users (
 CREATE TABLE public.user_settings (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
   is_emails_on BOOLEAN NOT NULL,
-  is_pro BOOLEAN NOT NULL,
   role public.Role NOT NULL,
   user_id UUID UNIQUE REFERENCES public.users ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -22,7 +21,7 @@ CREATE TABLE public.user_settings (
 
 CREATE TABLE public.subscriptions (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
-  subscription_id TEXT NOT NULL,
+  paypal_subscription_id TEXT NOT NULL,
   user_id UUID REFERENCES public.users ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
   end_date TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()

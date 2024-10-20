@@ -30,7 +30,7 @@ const Page: NextPage = () => {
 
   const onApprove = async (data: OnApproveData, detail: OnApproveActions) => {
     console.log({ data, detail });
-    setUser({ ...user, isPro: true });
+    setUser({ ...user, is_pro: true });
   };
   const onError = (err: any) => {
     console.log({ err });

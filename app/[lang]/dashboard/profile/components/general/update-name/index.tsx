@@ -1,9 +1,8 @@
 import BasicInput from "@/components/common/inputs/basic-input";
 import AvatarIcon from "@/components/icons/avatar-icon";
 import LoadingSpinner from "@/components/utilities/loading-spinner";
+import { updateUser } from "@/db/client/user";
 import { useUser } from "@/hooks/use-user";
-import { DB } from "@/lib/supabase/db";
-import type { UserMetadata } from "@supabase/supabase-js";
 import { clsx } from "clsx";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";
@@ -23,19 +22,18 @@ const UpdateName: FunctionComponent = () => {
   // Handlers
   const submitUpdateName = async () => {
     setIsSubmitting(true);
-
-    const { error } = await DB.auth.updateUser({
-      data: {
+    try {
+      await updateUser({
+        id: user.id,
         name,
-      } as UserMetadata,
-    });
-
-    setIsSubmitting(false);
-
-    if (error) toast.error(t("error.something_went_wrong"));
-    else {
+      });
       setUser({ ...user, name });
+
       toast.success(t("success.user_updated"));
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

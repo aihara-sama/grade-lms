@@ -1,11 +1,11 @@
-import { getProfile } from "@/db/server/user";
+import { getCachedUser } from "@/db/server/user";
 import { redirect } from "next/navigation";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
   const {
     data: { user },
-  } = await getProfile();
+  } = await getCachedUser();
 
   if (user) return redirect("/dashboard");
 

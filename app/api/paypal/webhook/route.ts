@@ -81,7 +81,7 @@ export async function POST(req: Request) {
 
     if (body.event_type === "BILLING.SUBSCRIPTION.CREATED") {
       const { error } = await adminDB.from("subscriptions").insert({
-        subscription_id: body.resource.id,
+        paypal_subscription_id: body.resource.id,
         user_id: body.resource.custom_id,
       });
 
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
             1
           ).toISOString(),
         })
-        .eq("subscription_id", body.resource.id);
+        .eq("paypal_subscription_id", body.resource.id);
 
       if (error) {
         return Response.json({}, { status: 500 });
