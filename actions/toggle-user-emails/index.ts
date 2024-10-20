@@ -28,6 +28,8 @@ const handler = async (): Promise<ReturnType> => {
   ]);
 
   if (!userSettings || userSettingsError || isProError) {
+    console.log({ userSettingsError, isProError });
+
     return {
       error: "Something went wrong",
       data: null,
@@ -51,8 +53,11 @@ const handler = async (): Promise<ReturnType> => {
   const [{ error: settingsError }] = await Promise.all([
     adminDB.from("user_settings").update({
       is_emails_on: !userSettings.is_emails_on,
+      user_id: user.id,
     }),
   ]);
+
+  console.log({ settingsError });
 
   return {
     error: settingsError ? "Something went wrong" : null,
