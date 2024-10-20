@@ -79,6 +79,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
   // Hooks
   const t = useTranslations();
   const user = useUser((state) => state.user);
+  console.log({ user });
 
   const fetchLock = useFetchLock();
 
