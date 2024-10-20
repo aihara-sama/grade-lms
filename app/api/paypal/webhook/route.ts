@@ -67,7 +67,7 @@ async function verifySignature(event: string, headers: Headers) {
 
 export async function POST(req: Request) {
   const rawBody = await req.text();
-  const body = await req.json();
+  const body = JSON.parse(rawBody);
   const { headers } = req;
 
   const isSignatureValid = await verifySignature(rawBody, headers);
