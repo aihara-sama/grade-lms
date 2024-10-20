@@ -247,6 +247,11 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
     }
   };
 
+  const onSubscribed = () => {
+    setIsUpgradeToProModal(false);
+    setIsCreateUserModal(true);
+  };
+
   const throttledSearch = useCallback(
     throttleSearch((search) => {
       if (search) {
@@ -479,7 +484,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       {isUpgradeToProModal && (
         <UpgradeToProModal
           onClose={() => setIsUpgradeToProModal(false)}
-          onSubscribed={() => {}}
+          onSubscribed={onSubscribed}
         />
       )}
     </Container>

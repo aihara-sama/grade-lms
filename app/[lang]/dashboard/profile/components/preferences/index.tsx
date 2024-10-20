@@ -26,6 +26,12 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
     user.push_notifications_state
   );
 
+  // Handlers
+  const onSubscribed = () => {
+    setIsUpgradeToProModal(false);
+    setIsEmailsOn(true);
+  };
+
   // Effects
   useUpdateEffect(() => {
     (async () => {
@@ -93,7 +99,7 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
       {isUpgradeToProModal && (
         <UpgradeToProModal
           onClose={() => setIsUpgradeToProModal(false)}
-          onSubscribed={() => {}}
+          onSubscribed={onSubscribed}
         />
       )}
     </div>

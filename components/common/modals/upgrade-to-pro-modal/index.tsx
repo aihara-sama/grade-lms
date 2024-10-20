@@ -29,7 +29,7 @@ const UpgradeToProModal: FunctionComponent<Props> = ({
       </div>
       <p className="text-center text-xl font-bold my-1">Upgrade to Pro</p>
       <p className="text-center text-neutral-500 mb-4">
-        Get access to all features
+        Get access to all features for $4.99/mo
       </p>
 
       <p className="text-lg mb-1">What you get</p>
