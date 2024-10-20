@@ -50,12 +50,12 @@ const handler = async (): Promise<ReturnType> => {
     };
   }
 
-  const [{ error: settingsError }] = await Promise.all([
-    adminDB.from("user_settings").update({
+  const { error: settingsError } = await adminDB
+    .from("user_settings")
+    .update({
       is_emails_on: !userSettings.is_emails_on,
-      user_id: user.id,
-    }),
-  ]);
+    })
+    .eq("user_id", user.id);
 
   console.log({ settingsError });
 
