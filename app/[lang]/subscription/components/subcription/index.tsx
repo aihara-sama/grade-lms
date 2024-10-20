@@ -7,21 +7,19 @@ import type {
   OnApproveData,
 } from "@paypal/paypal-js/types/components/buttons";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
-import type { NextPage } from "next";
 
-const Page: NextPage = () => {
-  // Hooks
-  const user = useUser((state) => state.user);
+const Subscription = () => {
   const [{ isPending }] = usePayPalScriptReducer();
 
-  // Handlers
+  const user = useUser((state) => state.user);
+
   const createSubscription = async (
     _: Record<string, unknown>,
     actions: CreateSubscriptionActions
   ) => {
     const orderID = await actions.subscription.create({
-      // plan_id: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID,
-      plan_id: "P-3TH91731HG320143WM4ITYCA",
+      // plan_id: "P-3TH91731HG320143WM4ITYCA",
+      plan_id: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID,
       custom_id: user.id,
     });
 
@@ -35,7 +33,6 @@ const Page: NextPage = () => {
     console.log({ err });
   };
 
-  // View
   return (
     <div className="mx-4">
       <h1 className="text-xl font-bold">Subscription</h1>
@@ -56,4 +53,4 @@ const Page: NextPage = () => {
   );
 };
 
-export default Page;
+export default Subscription;

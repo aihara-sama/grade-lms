@@ -12,7 +12,6 @@ const PaypalProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
         intent: "subscription",
         vault: true,
       }}
-      deferLoading={true}
     >
       {children}
     </PayPalScriptProvider>

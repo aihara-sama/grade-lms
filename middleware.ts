@@ -7,7 +7,6 @@ const publicPages = [
   /\//,
   /\/sign-in/,
   /\/sign-up/,
-  /\/subscription/,
   /\/dashboard\/lessons\/[\w-]+/,
 ];
 
