@@ -1,15 +1,15 @@
 "use client";
 
 import { useUser } from "@/hooks/use-user";
-import type {
-  CreateSubscriptionActions,
-  OnApproveActions,
-  OnApproveData,
-} from "@paypal/paypal-js/types/components/buttons";
+import type { CreateSubscriptionActions } from "@paypal/paypal-js/types/components/buttons";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
-import type { NextPage } from "next";
+import type { FunctionComponent } from "react";
 
-const Page: NextPage = () => {
+interface Props {
+  onSubscribed: () => void;
+}
+
+const SubscribeButtons: FunctionComponent<Props> = ({ onSubscribed }) => {
   // Hooks
   const [{ isPending }] = usePayPalScriptReducer();
   const { user, setUser } = useUser((state) => state);
@@ -28,9 +28,9 @@ const Page: NextPage = () => {
     return orderID;
   };
 
-  const onApprove = async (data: OnApproveData, detail: OnApproveActions) => {
-    console.log({ data, detail });
+  const onApprove = async () => {
     setUser({ ...user, is_pro: true });
+    onSubscribed();
   };
   const onError = (err: any) => {
     console.log({ err });
@@ -52,4 +52,4 @@ const Page: NextPage = () => {
   );
 };
 
-export default Page;
+export default SubscribeButtons;

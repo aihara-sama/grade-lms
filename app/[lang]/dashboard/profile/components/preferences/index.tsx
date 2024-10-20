@@ -91,7 +91,10 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
       </div>
       <SelectLocale />
       {isUpgradeToProModal && (
-        <UpgradeToProModal onClose={() => setIsUpgradeToProModal(false)} />
+        <UpgradeToProModal
+          onClose={() => setIsUpgradeToProModal(false)}
+          onSubscribed={() => {}}
+        />
       )}
     </div>
   );

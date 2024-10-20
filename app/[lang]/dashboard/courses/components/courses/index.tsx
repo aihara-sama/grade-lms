@@ -237,6 +237,11 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
     }
   };
 
+  const onSubscribed = () => {
+    setIsUpgradeToProModal(false);
+    setIsCreateCourseModal(true);
+  };
+
   const throttledSearch = useCallback(
     throttleSearch((search) => {
       if (search) {
@@ -464,7 +469,10 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
           )}
 
           {isUpgradeToProModal && (
-            <UpgradeToProModal onClose={() => setIsUpgradeToProModal(false)} />
+            <UpgradeToProModal
+              onClose={() => setIsUpgradeToProModal(false)}
+              onSubscribed={onSubscribed}
+            />
           )}
         </div>
       </div>

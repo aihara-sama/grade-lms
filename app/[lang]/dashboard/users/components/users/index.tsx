@@ -477,7 +477,10 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       )}
 
       {isUpgradeToProModal && (
-        <UpgradeToProModal onClose={() => setIsUpgradeToProModal(false)} />
+        <UpgradeToProModal
+          onClose={() => setIsUpgradeToProModal(false)}
+          onSubscribed={() => {}}
+        />
       )}
     </Container>
   );

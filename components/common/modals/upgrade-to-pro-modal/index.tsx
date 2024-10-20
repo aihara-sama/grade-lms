@@ -1,4 +1,4 @@
-import Page from "@/app/[lang]/subscription/page";
+import SubscribeButtons from "@/components/common/buttons/subscribe-buttons";
 import BasicModal from "@/components/common/modals/basic-modal";
 import CheckIcon from "@/components/icons/check-icon";
 import CrownIcon from "@/components/icons/crown-icon";
@@ -7,9 +7,13 @@ import type { FunctionComponent } from "react";
 
 interface Props {
   onClose: () => void;
+  onSubscribed: () => void;
 }
 
-const UpgradeToProModal: FunctionComponent<Props> = ({ onClose }) => {
+const UpgradeToProModal: FunctionComponent<Props> = ({
+  onClose,
+  onSubscribed,
+}) => {
   // Hooks
   const t = useTranslations();
 
@@ -44,7 +48,7 @@ const UpgradeToProModal: FunctionComponent<Props> = ({ onClose }) => {
         </p>
       </div>
       <hr className="my-3" />
-      <Page />
+      <SubscribeButtons onSubscribed={onSubscribed} />
     </BasicModal>
   );
 };
