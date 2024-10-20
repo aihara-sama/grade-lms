@@ -9,8 +9,7 @@ BEGIN
     avatar,
     preferred_locale,
     creator_id,
-    timezone,
-    push_notifications_state
+    timezone
   )
   VALUES (
     NEW.id,
@@ -19,8 +18,7 @@ BEGIN
     NEW.raw_user_meta_data->>'avatar',
     NEW.raw_user_meta_data->>'preferred_locale',
     NEW.raw_user_meta_data->>'creator_id',
-    NEW.raw_user_meta_data->>'timezone',
-   'idle'
+    NEW.raw_user_meta_data->>'timezone'
   );
 
   INSERT INTO public.user_settings (
