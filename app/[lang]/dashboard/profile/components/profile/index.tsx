@@ -18,8 +18,11 @@ import { cancelSubscription } from "@/db/client/subscription";
 import { updateUser } from "@/db/client/user";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
+import type { Locale } from "@/i18n";
 import type { ResultOf } from "@/types/utils.type";
+import { getDateLocale } from "@/utils/date/get-date-locale";
 import clsx from "clsx";
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
 interface Props {
@@ -107,9 +110,15 @@ const Profile: FunctionComponent<Props> = ({
             </p>
             {!!canceledSubscription && (
               <p className="text-neutral-500 text-sm">
-                Your subscription will remain active until{" "}
+                {t("common.your_subscription_will_remain_active_until")}{" "}
                 <span className="font-bold">
-                  {canceledSubscription.end_date}
+                  {format(
+                    canceledSubscription.end_date,
+                    "MM/dd/yyyy | h:mm a",
+                    {
+                      locale: getDateLocale(user.preferred_locale as Locale),
+                    }
+                  )}
                 </span>
               </p>
             )}

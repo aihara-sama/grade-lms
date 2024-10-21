@@ -130,7 +130,8 @@
     "left": "Left",
     "settings": "Settings",
     "saved": "Saved",
-    "you_will_keep_your_plan_for_the_remaining_period": "You will keep your plan for the remaining period"
+    "you_will_keep_your_plan_for_the_remaining_period": "You will keep your plan for the remaining period",
+    "your_subscription_will_remain_active_until": "Your subscription will remain active until"
   },
 
   "dashboard": {

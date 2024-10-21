@@ -130,7 +130,8 @@
     "left": "Покинул",
     "settings": "Настройки",
     "saved": "Сохраненно",
-    "you_will_keep_your_plan_for_the_remaining_period": "Вы сохраните свой план на оставшийся период"
+    "you_will_keep_your_plan_for_the_remaining_period": "Вы сохраните свой план на оставшийся период",
+    "your_subscription_will_remain_active_until": "Ваша подписка останется активной до"
   },
 
   "dashboard": {

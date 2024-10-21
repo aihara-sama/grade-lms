@@ -41,6 +41,11 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     course_id: courseId,
     ...maybeLesson,
   });
+  console.log({
+    lessonStarts: lesson.starts,
+    lessonStartsISO: new Date(lesson.starts).toISOString(),
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [courses, setCourses] = useState<ResultOf<typeof getCourses>["data"]>(
     []
