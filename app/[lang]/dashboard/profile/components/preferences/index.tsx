@@ -44,10 +44,10 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   const submitTogglePushNotificationsState = async (
     state: Database["public"]["Enums"]["push_notifications_state"]
   ) => {
+    setIsSubmittingTogglePushNotificationsState(true);
+
     if (state === "on") enablePushNotifications();
     if (state === "off") {
-      setIsSubmittingTogglePushNotificationsState(true);
-
       try {
         await updateUser({
           push_notifications_state: "off",
@@ -60,10 +60,10 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
         });
       } catch (error: any) {
         toast.error(error.message);
-      } finally {
-        setIsSubmittingTogglePushNotificationsState(false);
       }
     }
+
+    setIsSubmittingTogglePushNotificationsState(false);
   };
 
   const onSubscribed = () => {

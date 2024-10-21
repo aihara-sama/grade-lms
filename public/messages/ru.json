@@ -28,7 +28,9 @@
   },
 
   "buttons": {
+    "upgrade": "Обновить",
     "close": "Закрыть",
+    "cancel_subscription": "Отменить подписку",
     "change_password": "Сменить пароль",
     "delete": "Удалить",
     "expel": "Исключить",
@@ -58,8 +60,7 @@
 
   "links": {
     "join": "Присоединиться",
-    "login": "Войти",
-    "upgrade": "Обновить"
+    "login": "Войти"
   },
 
   "roles": {
@@ -251,7 +252,8 @@
   "profile": {
     "title": "Профиль",
     "plan": "План",
-    "your_plan_is basic": "Ваш план <b>базовый</b>",
+    "your_plan_is_basic": "Ваш план <b>Базовый</b>",
+    "your_plan_is_pro": "Ваш план <b>Про</b>",
     "preferences": "Предпочтения",
     "enable_disable_emails": "Включить/отключить письма",
     "enable_disable_browser_notifications": "Включить/отключить уведомления в браузере",
@@ -345,9 +347,12 @@
     "password_changed": "Пароль успешно изменен"
   },
   "error": {
+    "failed_to_cancel_subscription": "Не удалось отменить подписку",
+
     "you_ve_reached_your_users_limit": "Вы достигли предела пользователей",
     "failed_to_load_members_insights": "Не удалось загрузить данные участников",
     "failed_to_load_users_insights": "Не удалось загрузить данные пользователей",
+
     "failed_to_load_user": "Не удалось загрузить пользователя",
     "failed_to_load_users": "Не удалось загрузить пользователей",
     "failed_to_load_users_count": "Не удалось загрузить количество пользователей",
@@ -456,6 +461,7 @@
 
   "modal": {
     "titles": {
+      "cancel_subscription": "Отменить подписку",
       "upgrade_to_pro": "Перейти на Pro",
       "create_assignment": "Создать задание",
       "create_lesson": "Создать урок",

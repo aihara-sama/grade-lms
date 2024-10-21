@@ -28,6 +28,8 @@
   },
 
   "buttons": {
+    "upgrade": "Upgrade",
+    "cancel_subscription": "Cancel subscription",
     "close": "Close",
     "change_password": "Change password",
     "delete": "Delete",
@@ -58,8 +60,7 @@
 
   "links": {
     "join": "Join",
-    "login": "Login",
-    "upgrade": "Upgrade"
+    "login": "Login"
   },
 
   "roles": {
@@ -251,7 +252,8 @@
   "profile": {
     "title": "Profile",
     "plan": "Plan",
-    "your_plan_is basic": "Your plan is <b>basic</b>",
+    "your_plan_is_pro": "Your plan is <b>Pro</b>",
+    "your_plan_is_basic": "Your plan is <b>Basic</b>",
     "preferences": "Preferences",
     "enable_disable_emails": "Enable/Disable emails",
     "enable_disable_browser_notifications": "Enable/Disable browser notifications",
@@ -345,6 +347,8 @@
     "password_changed": "Password successfully changed"
   },
   "error": {
+    "failed_to_cancel_subscription": "Failed to cancel subscription",
+
     "you_ve_reached_your_users_limit": "You've reached your users limit",
     "failed_to_load_members_insights": "Failed to load members insights",
     "failed_to_load_users_insights": "Failed to load users insights",
@@ -455,6 +459,7 @@
   },
   "modal": {
     "titles": {
+      "cancel_subscription": "Cancel subscription",
       "upgrade_to_pro": "Upgrade to Pro",
       "create_assignment": "Create assignment",
       "create_lesson": "Create lesson",

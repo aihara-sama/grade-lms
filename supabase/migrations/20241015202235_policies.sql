@@ -548,14 +548,18 @@ CREATE POLICY "Allow current users to select subscriptions"
 ON public.subscriptions
 FOR SELECT
 TO authenticated
-using (
+USING (
   auth.uid() = public.subscriptions.user_id
 );
 
 CREATE POLICY "Allow service role to update subscriptions"
-ON public.user_settings
+ON public.subscriptions
 FOR UPDATE
-TO service_role;
+TO service_role
+USING (
+  auth.uid() = public.subscriptions.user_id
+);
+
 
 -- Announcements' policies 
 ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
