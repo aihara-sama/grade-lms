@@ -129,7 +129,8 @@
     "the_lesson_has_ended": "The lesson has ended",
     "left": "Left",
     "settings": "Settings",
-    "saved": "Saved"
+    "saved": "Saved",
+    "you_will_keep_your_plan_for_the_remaining_period": "You will keep your plan for the remaining period"
   },
 
   "dashboard": {
@@ -427,6 +428,7 @@
     "something_went_wrong": "Something went wrong"
   },
   "prompts": {
+    "cancel_subscription": "Are you sure you want to cancel your subscription?",
     "delete_user": "Are you sure you want to delete this user?",
     "delete_users": "Are you sure you want to delete selected users ({count})?",
     "delete_course": "Are you sure you want to delete this course?",

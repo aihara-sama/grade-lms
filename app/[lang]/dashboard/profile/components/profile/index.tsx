@@ -153,18 +153,16 @@ const Profile: FunctionComponent<Props> = ({
             onClose={() => setIsCancelSubscriptionModal(false)}
             title={t("modal.titles.cancel_subscription")}
           >
-            <p className="mb-4">
-              Are you sure you want to cancel your subscription?
-            </p>
+            <p className="mb-4">{t("prompts.cancel_subscription")}</p>
             <p className="mb-4 text-neutral-500">
-              You will keep your plan for the remaining period
+              {t("common.you_will_keep_your_plan_for_the_remaining_period")}
             </p>
             <div className="flex justify-end gap-3">
               <button
                 className="outline-button"
                 onClick={() => setIsCancelSubscriptionModal(false)}
               >
-                Cancel
+                {t("buttons.cancel")}
               </button>
               <button
                 className="delete-button"
@@ -174,7 +172,7 @@ const Profile: FunctionComponent<Props> = ({
                 <span
                   className={`${clsx(isSubmittingCancelSubscription && "opacity-0")}`}
                 >
-                  Cancel subscription
+                  {t("buttons.cancel_subscription")}
                 </span>
               </button>
             </div>
