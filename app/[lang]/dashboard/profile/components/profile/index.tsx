@@ -118,7 +118,13 @@ const Profile: FunctionComponent<Props> = ({
                 }
               )}
             </p>
-            {user.is_pro ? (
+            {!!canceledSubscription && (
+              <p>
+                Your subscription will remain active until{" "}
+                {canceledSubscription.end_date}
+              </p>
+            )}
+            {user.is_pro && !canceledSubscription && (
               <button
                 disabled={
                   !!canceledSubscription || isSubmittingCancelSubscription
@@ -128,7 +134,8 @@ const Profile: FunctionComponent<Props> = ({
               >
                 {t("buttons.cancel_subscription")}
               </button>
-            ) : (
+            )}
+            {!user.is_pro && (
               <button
                 onClick={() => setIsUpgradeToProModal(true)}
                 className="link-button w-40 mt-1"
