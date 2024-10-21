@@ -64,6 +64,8 @@ const Profile: FunctionComponent<Props> = ({
     try {
       await cancelSubscription();
       await submitGetCanceledSubscription();
+
+      setIsCancelSubscriptionModal(false);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
