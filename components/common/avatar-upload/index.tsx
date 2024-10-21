@@ -15,12 +15,8 @@ interface Props {
   avatar: string;
 }
 
-const AvatarUpload: FunctionComponent<Props> = ({
-  onChange,
-  avatar: initAvatar,
-}) => {
+const AvatarUpload: FunctionComponent<Props> = ({ onChange, avatar }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [avatar, setAvatar] = useState(initAvatar);
 
   const t = useTranslations();
 
@@ -43,7 +39,6 @@ const AvatarUpload: FunctionComponent<Props> = ({
 
         if (error) throw new Error(t("error.something_went_wrong"));
         onChange(data.path);
-        setAvatar(URL.createObjectURL(file));
       }
     } catch (error: any) {
       toast.error(error.message);
@@ -56,7 +51,7 @@ const AvatarUpload: FunctionComponent<Props> = ({
     <div className="flex relative">
       <img
         alt=""
-        src={avatar}
+        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
         className="rounded-[50%] w-40 h-40 border border-neutral-200 object-cover"
       />
       {isSubmitting && (

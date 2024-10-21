@@ -80,10 +80,7 @@ const Profile: FunctionComponent<Props> = ({
     <div>
       <div className="mb-44 md:mb-24 relative h-40 bg-[url(/assets/svg/bubbled-bg.svg)] bg-cover bg-no-repeat bg-center">
         <div className="absolute top-[80px] md:left-96 left-1/2 transform -translate-x-1/2 flex items-end gap-8 md:flex-row flex-col">
-          <AvatarUpload
-            avatar={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`}
-            onChange={setAvatar}
-          />
+          <AvatarUpload avatar={avatar} onChange={setAvatar} />
           <div>
             <p className="text-2xl font-bold text-neutral-600">{user.name}</p>
             <p className="text-neutral-500">{user.email}</p>
