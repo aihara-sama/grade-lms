@@ -118,9 +118,6 @@ const Profile: FunctionComponent<Props> = ({
             )}
             {user.is_pro && !canceledSubscription && (
               <button
-                disabled={
-                  !!canceledSubscription || isSubmittingCancelSubscription
-                }
                 onClick={() => setIsCancelSubscriptionModal(true)}
                 className="delete-button mt-1"
               >
