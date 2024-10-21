@@ -21,28 +21,26 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   // State
   const [isUpgradeToProModal, setIsUpgradeToProModal] = useState(false);
 
-  const [isEmailsOn, setIsEmailsOn] = useState(user.is_emails_on);
   const [pushNotificationsState, setPushNotificationsState] = useState(
     user.push_notifications_state
   );
 
   // Handlers
+  const submitToggleUserEmails = async () => {
+    try {
+      await toggleUserEmails();
+      setUser({ ...user, is_emails_on: !user.is_emails_on });
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const onSubscribed = () => {
     setIsUpgradeToProModal(false);
-    setIsEmailsOn(true);
+    submitToggleUserEmails();
   };
 
   // Effects
-  useUpdateEffect(() => {
-    (async () => {
-      try {
-        await toggleUserEmails();
-        setUser({ ...user, is_emails_on: !isEmailsOn });
-      } catch (error: any) {
-        toast.error(error.message);
-      }
-    })();
-  }, [isEmailsOn]);
   useUpdateEffect(() => {
     (async () => {
       if (pushNotificationsState === "on") enablePushNotifications();
@@ -77,9 +75,9 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
       <div className="flex flex-col gap-2 mt-3 mb-8">
         <div className="flex items-center gap-3">
           <Switch
-            isChecked={isEmailsOn}
+            isChecked={user.is_emails_on}
             setIsChecked={() => {
-              if (user.is_pro) setIsEmailsOn((prev) => !prev);
+              if (user.is_pro) submitToggleUserEmails();
               else setIsUpgradeToProModal(true);
             }}
           />
