@@ -33,22 +33,22 @@ const handler = async (): Promise<ReturnType> => {
     };
   }
 
-  const { status, json } = await fetch(
+  const { status, statusText } = await fetch(
     `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${maybeSubscription.paypal_subscription_id}`,
     {
       method: "POST",
-      headers: new Headers({
-        Authorization: `Basic ${window.btoa(
+      headers: {
+        Authorization: `Basic ${Buffer.from(
           `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
-        )}`,
+        ).toString("base64")}`,
         "Content-Type": "application/json",
-      }),
+      },
       body: JSON.stringify({ reason: "Not satisfied with the service" }),
     }
   );
 
   if (status !== 204) {
-    console.error(await json());
+    console.error(statusText);
 
     return {
       error: "Something went wrong",
