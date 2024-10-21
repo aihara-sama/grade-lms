@@ -27,6 +27,7 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
     isSubmittingTogglePushNotificationsState,
     setIsSubmittingTogglePushNotificationsState,
   ] = useState(false);
+  console.log({ isSubmittingTogglePushNotificationsState });
 
   // Handlers
   const submitToggleUserEmails = async () => {
@@ -46,7 +47,7 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
   ) => {
     setIsSubmittingTogglePushNotificationsState(true);
 
-    if (state === "on") enablePushNotifications();
+    if (state === "on") await enablePushNotifications();
     if (state === "off") {
       try {
         await updateUser({

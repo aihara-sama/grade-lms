@@ -121,7 +121,7 @@ const Profile: FunctionComponent<Props> = ({ canceledSubscription }) => {
         {isUpgradeToProModal && (
           <UpgradeToProModal
             onClose={() => setIsUpgradeToProModal(false)}
-            onSubscribed={() => {}}
+            onSubscribed={() => setIsUpgradeToProModal(false)}
           />
         )}
 
@@ -145,7 +145,7 @@ const Profile: FunctionComponent<Props> = ({ canceledSubscription }) => {
                 Cancel
               </button>
               <button
-                className="primary-button"
+                className="delete-button"
                 onClick={submitCancelSubscription}
               >
                 {isSubmittingCancelSubscription && <LoadingSpinner />}
