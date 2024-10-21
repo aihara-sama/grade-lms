@@ -1,6 +1,7 @@
 import SelectLocale from "@/app/[lang]/dashboard/profile/components/preferences/select-locale";
 import UpgradeToProModal from "@/components/common/modals/upgrade-to-pro-modal";
 import Switch from "@/components/common/switch";
+import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { toggleUserEmails, updateUser } from "@/db/client/user";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
@@ -20,18 +21,23 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
 
   // State
   const [isUpgradeToProModal, setIsUpgradeToProModal] = useState(false);
-
+  const [isSubmittingTOggleUserEmails, setIsSubmittingTOggleUserEmails] =
+    useState(false);
   const [pushNotificationsState, setPushNotificationsState] = useState(
     user.push_notifications_state
   );
 
   // Handlers
   const submitToggleUserEmails = async () => {
+    setIsSubmittingTOggleUserEmails(true);
+
     try {
       await toggleUserEmails();
       setUser({ ...user, is_emails_on: !user.is_emails_on });
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsSubmittingTOggleUserEmails(false);
     }
   };
 
@@ -82,6 +88,11 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
             }}
           />
           <span>{t("profile.enable_disable_emails")}</span>
+          {isSubmittingTOggleUserEmails && (
+            <div className="relative size-6">
+              <LoadingSpinner />
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <Switch

@@ -3,6 +3,7 @@ import BasicSelect from "@/components/common/selects/basic-select";
 import { useUser } from "@/hooks/use-user";
 import { DEFAULT_LOCALE, locales, type Locale } from "@/i18n";
 import { DB } from "@/lib/supabase/db";
+import type { PropsWithClassName } from "@/types/props.type";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
@@ -10,7 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
 import toast from "react-hot-toast";
 
-const SelectLocale: FunctionComponent = () => {
+const SelectLocale: FunctionComponent<PropsWithClassName> = ({ className }) => {
   // Hooks
   const t = useTranslations();
 
@@ -53,7 +54,7 @@ const SelectLocale: FunctionComponent = () => {
 
   // View
   return (
-    <div className="flex">
+    <div className={`flex ${className}`}>
       <BasicSelect
         options={locales.map((_locale: Locale) => ({
           title: toCapitalCase(
