@@ -347,6 +347,7 @@
     "password_changed": "Пароль успешно изменен"
   },
   "error": {
+    "failed_to_load_canceled_subscription": "Не удалось загрузить отменёную подписку",
     "failed_to_cancel_subscription": "Не удалось отменить подписку",
 
     "you_ve_reached_your_users_limit": "Вы достигли предела пользователей",

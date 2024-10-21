@@ -13,9 +13,11 @@ import BasicModal from "@/components/common/modals/basic-modal";
 import UpgradeToProModal from "@/components/common/modals/upgrade-to-pro-modal";
 import Container from "@/components/layout/container";
 import LoadingSpinner from "@/components/utilities/loading-spinner";
-import { cancelSubscription } from "@/db/client/subscription";
+import {
+  cancelSubscription,
+  getCanceledSubscription,
+} from "@/db/client/subscription";
 import { updateUser } from "@/db/client/user";
-import type { getCanceledSubscription } from "@/db/server/subscription";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
@@ -26,13 +28,20 @@ interface Props {
   canceledSubscription: ResultOf<typeof getCanceledSubscription> | null;
 }
 
-const Profile: FunctionComponent<Props> = ({ canceledSubscription }) => {
+const Profile: FunctionComponent<Props> = ({
+  canceledSubscription: initCanceledSubscription,
+}) => {
   // Hooks
   const { user, setUser } = useUser((state) => state);
   const t = useTranslations();
 
   // State
   const [avatar, setAvatar] = useState(user.avatar);
+
+  const [canceledSubscription, setCanceledSubscription] = useState(
+    initCanceledSubscription
+  );
+
   const [isUpgradeToProModal, setIsUpgradeToProModal] = useState(false);
   const [isCancelSubscriptionModal, setIsCancelSubscriptionModal] =
     useState(false);
@@ -41,10 +50,20 @@ const Profile: FunctionComponent<Props> = ({ canceledSubscription }) => {
     useState(false);
 
   // Handlers
+  const submitGetCanceledSubscription = async () => {
+    try {
+      setCanceledSubscription(await getCanceledSubscription(user.id));
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const submitCancelSubscription = async () => {
     setIsSubmittingCancelSubscription(true);
+
     try {
       await cancelSubscription();
+      await submitGetCanceledSubscription();
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -67,6 +86,7 @@ const Profile: FunctionComponent<Props> = ({ canceledSubscription }) => {
     })();
   }, [avatar]);
 
+  // View
   return (
     <div>
       <div className="mb-44 md:mb-24 relative h-40 bg-[url(/assets/svg/bubbled-bg.svg)] bg-cover bg-no-repeat bg-center">
@@ -98,7 +118,9 @@ const Profile: FunctionComponent<Props> = ({ canceledSubscription }) => {
             </p>
             {user.is_pro ? (
               <button
-                disabled={!!canceledSubscription}
+                disabled={
+                  !!canceledSubscription || isSubmittingCancelSubscription
+                }
                 onClick={() => setIsCancelSubscriptionModal(true)}
                 className="delete-button mt-1"
               >

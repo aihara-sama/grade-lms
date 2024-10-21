@@ -347,6 +347,7 @@
     "password_changed": "Password successfully changed"
   },
   "error": {
+    "failed_to_load_canceled_subscription": "Failed to load canceled subscription",
     "failed_to_cancel_subscription": "Failed to cancel subscription",
 
     "you_ve_reached_your_users_limit": "You've reached your users limit",
