@@ -110,7 +110,7 @@ const Profile: FunctionComponent<Props> = ({
             {t("profile.plan")}
           </p>
           <div className="mt-3">
-            <p className="text-neutral-500">
+            <p className="text-neutral-600">
               {t.rich(
                 `profile.${user.is_pro ? "your_plan_is_pro" : "your_plan_is_basic"}`,
                 {
@@ -119,9 +119,11 @@ const Profile: FunctionComponent<Props> = ({
               )}
             </p>
             {!!canceledSubscription && (
-              <p>
+              <p className="text-neutral-500 text-sm">
                 Your subscription will remain active until{" "}
-                {canceledSubscription.end_date}
+                <span className="font-bold">
+                  {canceledSubscription.end_date}
+                </span>
               </p>
             )}
             {user.is_pro && !canceledSubscription && (
