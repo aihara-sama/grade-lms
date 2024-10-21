@@ -3,9 +3,7 @@ import { format } from "date-fns";
 
 // GET
 export const getCanceledSubscription = async (userId: string) => {
-  const serverDB = getServerDB();
-
-  const { data } = await serverDB
+  const { data } = await getServerDB()
     .from("subscriptions")
     .select("end_date")
     .eq("user_id", userId)

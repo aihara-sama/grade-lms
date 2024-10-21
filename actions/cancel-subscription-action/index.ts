@@ -3,6 +3,7 @@
 import type { ReturnType } from "@/actions/delete-all-users-action/types";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
+import fetch from "node-fetch";
 
 const handler = async (): Promise<ReturnType> => {
   const {
