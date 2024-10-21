@@ -4,9 +4,9 @@ import Switch from "@/components/common/switch";
 import LoadingSpinner from "@/components/utilities/loading-spinner";
 import { toggleUserEmails, updateUser } from "@/db/client/user";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
-import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
 import type { PropsWithClassName } from "@/types/props.type";
+import type { Database } from "@/types/supabase.type";
 import { useTranslations } from "next-intl";
 import { useState, type FunctionComponent } from "react";
 import toast from "react-hot-toast";
@@ -21,15 +21,16 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
 
   // State
   const [isUpgradeToProModal, setIsUpgradeToProModal] = useState(false);
-  const [isSubmittingTOggleUserEmails, setIsSubmittingTOggleUserEmails] =
+  const [isSubmittingToggleUserEmails, setIsSubmittingToggleUserEmails] =
     useState(false);
-  const [pushNotificationsState, setPushNotificationsState] = useState(
-    user.push_notifications_state
-  );
+  const [
+    isSubmittingTogglePushNotificationsState,
+    setIsSubmittingTogglePushNotificationsState,
+  ] = useState(false);
 
   // Handlers
   const submitToggleUserEmails = async () => {
-    setIsSubmittingTOggleUserEmails(true);
+    setIsSubmittingToggleUserEmails(true);
 
     try {
       await toggleUserEmails();
@@ -37,7 +38,31 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsSubmittingTOggleUserEmails(false);
+      setIsSubmittingToggleUserEmails(false);
+    }
+  };
+  const submitTogglePushNotificationsState = async (
+    state: Database["public"]["Enums"]["push_notifications_state"]
+  ) => {
+    if (state === "on") enablePushNotifications();
+    if (state === "off") {
+      setIsSubmittingTogglePushNotificationsState(true);
+
+      try {
+        await updateUser({
+          push_notifications_state: "off",
+          id: user.id,
+        });
+
+        setUser({
+          ...user,
+          push_notifications_state: "off",
+        });
+      } catch (error: any) {
+        toast.error(error.message);
+      } finally {
+        setIsSubmittingTogglePushNotificationsState(false);
+      }
     }
   };
 
@@ -45,32 +70,6 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
     setIsUpgradeToProModal(false);
     submitToggleUserEmails();
   };
-
-  // Effects
-  useUpdateEffect(() => {
-    (async () => {
-      if (pushNotificationsState === "on") enablePushNotifications();
-      if (pushNotificationsState === "off") {
-        try {
-          await updateUser({
-            push_notifications_state: "off",
-            id: user.id,
-          });
-
-          setUser({
-            ...user,
-            push_notifications_state: "off",
-          });
-        } catch (error: any) {
-          toast.error(error.message);
-        }
-      }
-    })();
-  }, [pushNotificationsState]);
-
-  useUpdateEffect(() => {
-    setPushNotificationsState(user.push_notifications_state);
-  }, [user.push_notifications_state]);
 
   // View
   return (
@@ -88,7 +87,7 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
             }}
           />
           <span>{t("profile.enable_disable_emails")}</span>
-          {isSubmittingTOggleUserEmails && (
+          {isSubmittingToggleUserEmails && (
             <div className="relative size-6">
               <LoadingSpinner />
             </div>
@@ -96,12 +95,17 @@ const Preferences: FunctionComponent<PropsWithClassName> = ({
         </div>
         <div className="flex items-center gap-3">
           <Switch
-            isChecked={pushNotificationsState === "on"}
+            isChecked={user.push_notifications_state === "on"}
             setIsChecked={(checked) =>
-              setPushNotificationsState(checked ? "on" : "off")
+              submitTogglePushNotificationsState(checked ? "on" : "off")
             }
           />
           <span>{t("profile.enable_disable_browser_notifications")}</span>
+          {isSubmittingTogglePushNotificationsState && (
+            <div className="relative size-6">
+              <LoadingSpinner />
+            </div>
+          )}
         </div>
       </div>
       <SelectLocale />
