@@ -13,10 +13,8 @@ import BasicModal from "@/components/common/modals/basic-modal";
 import UpgradeToProModal from "@/components/common/modals/upgrade-to-pro-modal";
 import Container from "@/components/layout/container";
 import LoadingSpinner from "@/components/utilities/loading-spinner";
-import {
-  cancelSubscription,
-  getCanceledSubscription,
-} from "@/db/client/subscription";
+import type { getCanceledSubscription } from "@/db/client/subscription";
+import { cancelSubscription } from "@/db/client/subscription";
 import { updateUser } from "@/db/client/user";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
@@ -50,20 +48,11 @@ const Profile: FunctionComponent<Props> = ({
     useState(false);
 
   // Handlers
-  const submitGetCanceledSubscription = async () => {
-    try {
-      setCanceledSubscription(await getCanceledSubscription(user.id));
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
   const submitCancelSubscription = async () => {
     setIsSubmittingCancelSubscription(true);
 
     try {
-      await cancelSubscription();
-      await submitGetCanceledSubscription();
+      setCanceledSubscription(await cancelSubscription());
 
       setIsCancelSubscriptionModal(false);
     } catch (error: any) {

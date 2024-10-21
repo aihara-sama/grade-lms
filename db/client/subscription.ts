@@ -22,7 +22,9 @@ export const getCanceledSubscription = async (userId: string) => {
 export const cancelSubscription = async () => {
   const t = await loadMessages();
 
-  const { error } = await cancelSubscriptionAction();
+  const { data, error } = await cancelSubscriptionAction();
 
   if (error) throw new Error(t("error.failed_to_cancel_subscription"));
+
+  return data;
 };
