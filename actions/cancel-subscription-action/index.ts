@@ -3,7 +3,7 @@
 import type { ReturnType } from "@/actions/delete-all-users-action/types";
 import { adminDB } from "@/lib/supabase/db/admin-db";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
-import fetch from "node-fetch";
+import fetch, { Headers } from "node-fetch";
 
 const handler = async (): Promise<ReturnType> => {
   const {
@@ -24,6 +24,8 @@ const handler = async (): Promise<ReturnType> => {
     .filter("end_date", "is", null)
     .maybeSingle();
 
+  console.log({ maybeSubscription });
+
   if (!maybeSubscription) {
     console.error(error);
 
@@ -34,15 +36,13 @@ const handler = async (): Promise<ReturnType> => {
   }
 
   const { status, statusText } = await fetch(
-    `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${maybeSubscription.paypal_subscription_id}`,
+    `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${maybeSubscription.paypal_subscription_id}/cancel`,
     {
       method: "POST",
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
-        ).toString("base64")}`,
+      headers: new Headers({
+        Authorization: `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`).toString("base64")}`,
         "Content-Type": "application/json",
-      },
+      }),
       body: JSON.stringify({ reason: "Not satisfied with the service" }),
     }
   );
