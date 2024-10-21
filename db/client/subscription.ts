@@ -1,4 +1,4 @@
-import { cancelSubscriptionAction } from "@/actions/cancel-subscription";
+import { cancelSubscriptionAction } from "@/actions/cancel-subscription-action";
 import { loadMessages } from "@/utils/localization/load-messages";
 
 // UPDATE

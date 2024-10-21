@@ -20,7 +20,7 @@ const handler = async (): Promise<ReturnType> => {
     .from("subscriptions")
     .select("id, paypal_subscription_id")
     .eq("user_id", user.id)
-    .eq("end_date", null)
+    .filter("end_date", "is", null)
     .maybeSingle();
 
   if (!maybeSubscription) {
