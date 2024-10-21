@@ -30,7 +30,7 @@ declare global {
       SUPABASE_SEND_EMAIL_LAMBDA_ENDPOINT: string;
       NEXT_PUBLIC_PAYPAL_PLAN_ID: string;
       PAYPAL_SECRET: string;
-      PAYPAL_CLIENT_ID: string;
+      NEXT_PUBLIC_PAYPAL_CLIENT_ID: string;
       NEXT_PUBLIC_DEFAULT_AVATAR: string;
     }
   }

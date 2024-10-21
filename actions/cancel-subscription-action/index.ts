@@ -40,7 +40,7 @@ const handler = async (): Promise<ReturnType> => {
     {
       method: "POST",
       headers: new Headers({
-        Authorization: `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`).toString("base64")}`,
+        Authorization: `Basic ${Buffer.from(`${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`).toString("base64")}`,
         "Content-Type": "application/json",
       }),
       body: JSON.stringify({ reason: "Not satisfied with the service" }),
