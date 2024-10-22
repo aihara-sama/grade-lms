@@ -27,24 +27,26 @@ const UpgradeToProModal: FunctionComponent<Props> = ({
       <div className="flex justify-center text-neutral-500">
         <CrownIcon />
       </div>
-      <p className="text-center text-xl font-bold my-1">Upgrade to Pro</p>
+      <p className="text-center text-xl font-bold my-1">
+        {t("modal.titles.upgrade_to_pro")}
+      </p>
       <p className="text-center text-neutral-500 mb-4">
-        Get access to all features for $4.99/mo
+        {t("common.get_access_to_all_features_for", { price: "4.99" })}
       </p>
 
-      <p className="text-lg mb-1">What you get</p>
+      <p className="text-lg mb-1">{t("common.what_you_get")}</p>
       <div className="flex items-center gap-2 mb-2">
         <CheckIcon size="xs" />
-        <p className="text-sm">Unlimited courses</p>
+        <p className="text-sm">{t("common.unlimited_courses")}</p>
       </div>
       <div className="flex items-center gap-2 mb-2">
         <CheckIcon size="xs" />
-        <p className="text-sm">Up to 20 users</p>
+        <p className="text-sm">{t("common.up_to_20_users")}</p>
       </div>
       <div className="flex items-center gap-2 mb-2">
         <CheckIcon size="xs" />
         <p className="text-sm">
-          Personal emails remainders for upcoming lessons
+          {t("common.personal_email_remainders_for_upcoming_lessons")}
         </p>
       </div>
       <hr className="my-3" />

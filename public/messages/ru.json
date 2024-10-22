@@ -131,7 +131,12 @@
     "settings": "Настройки",
     "saved": "Сохраненно",
     "you_will_keep_your_plan_for_the_remaining_period": "Вы сохраните свой план на оставшийся период",
-    "your_subscription_will_remain_active_until": "Ваша подписка останется активной до"
+    "your_subscription_will_remain_active_until": "Ваша подписка останется активной до",
+    "get_access_to_all_features_for": "Получите доступ ко всем функциям за {price}/мес",
+    "what_you_get": "Что вы получаете",
+    "unlimited_courses": "Неограниченные курсы",
+    "up_to_20_users": "До 20 пользователей",
+    "personal_email_remainders_for_upcoming_lessons": "Персональные напоминания по электронной почте о предстоящих уроках"
   },
 
   "dashboard": {

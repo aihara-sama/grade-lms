@@ -131,7 +131,12 @@
     "settings": "Settings",
     "saved": "Saved",
     "you_will_keep_your_plan_for_the_remaining_period": "You will keep your plan for the remaining period",
-    "your_subscription_will_remain_active_until": "Your subscription will remain active until"
+    "your_subscription_will_remain_active_until": "Your subscription will remain active until",
+    "get_access_to_all_features_for": "Get access to all features for {price}/mo",
+    "what_you_get": "What you get",
+    "unlimited_courses": "Unlimited courses",
+    "up_to_20_users": "Up to 20 users",
+    "personal_email_remainders_for_upcoming_lessons": "Personal email reminders for upcoming lessons"
   },
 
   "dashboard": {
