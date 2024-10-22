@@ -50,9 +50,24 @@ export const useVideoChat = () => {
     setCameras((prev) => {
       return prev.map((cam) => {
         if (cam.user.id === userId) {
+          if (cam.isCameraEnabled) {
+            localStreamRef.current?.getTracks().forEach((track) => {
+              track.stop();
+            });
+          } else {
+            navigator.mediaDevices
+              .getUserMedia({ audio: true, video: true })
+              .then((stream) => {
+                localStreamRef.current = stream;
+                cam.stream = stream;
+              })
+              .catch(console.error);
+          }
+
           cam.stream.getVideoTracks().forEach((track) => {
             track.enabled = !cam.isCameraEnabled;
           });
+
           cam.isCameraEnabled = !cam.isCameraEnabled;
         }
         return cam;
@@ -64,6 +79,9 @@ export const useVideoChat = () => {
       return prev.map((cam) => {
         if (cam.user.id === userId) {
           cam.stream.getAudioTracks().forEach((track) => {
+            track.enabled = !cam.isMicEnabled;
+          });
+          localStreamRef.current.getAudioTracks().forEach((track) => {
             track.enabled = !cam.isMicEnabled;
           });
           cam.isMicEnabled = !cam.isMicEnabled;

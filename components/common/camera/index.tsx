@@ -28,6 +28,13 @@ const Camera: FunctionComponent<Props> = ({
   // View
   return (
     <div className="relative flex group">
+      {!camera.isCameraEnabled && (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-24 bg-green-700 rounded-full flex items-center justify-center">
+          <span className="text-4xl text-white">
+            {camera.user.name[0].toUpperCase()}
+          </span>
+        </div>
+      )}
       <StreamVideo
         isMuted={camera.user.id === user.id}
         stream={camera.stream}
