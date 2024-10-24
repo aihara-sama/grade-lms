@@ -260,7 +260,7 @@ export const useVideoChat = () => {
   const onPeerCall = (incomingCall: MediaConnection) => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
-      console.log({ remoteStream });
+      console.log({ remoteStream, videoTracks: remoteStream.getVideoTracks() });
 
       addCamera(remoteStream, incomingCall.metadata.user);
     });
