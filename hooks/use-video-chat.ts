@@ -25,6 +25,7 @@ export const useVideoChat = () => {
   const peerRef = useRef<Peer>();
   const joinedOnceRef = useRef(false);
   const localStreamRef = useRef<MediaStream>();
+  const incomingCallRef = useRef<MediaConnection>();
   const channelRef = useRef(
     DB.channel(lessonId as string, {
       config: {
@@ -90,10 +91,14 @@ export const useVideoChat = () => {
       Object.keys(channelRef.current.presenceState())
         .filter((id) => id !== user.id)
         .forEach((id) => {
-          peerRef.current.call(id, stream, {
+          const outgoingCall = peerRef.current.call(id, stream, {
             metadata: {
               user,
             },
+          });
+
+          outgoingCall.on("close", () => {
+            setCameras((_) => _.filter((camera) => camera.user.id !== id));
           });
         });
     });
@@ -208,6 +213,10 @@ export const useVideoChat = () => {
               }>()[id][0].isMicEnabled
             );
           });
+
+          outgoingCall.on("close", () => {
+            setCameras((_) => _.filter((camera) => camera.user.id !== id));
+          });
         });
 
       joinedOnceRef.current = true;
@@ -251,11 +260,19 @@ export const useVideoChat = () => {
       });
   };
   const onPeerCall = (incomingCall: MediaConnection) => {
+    if (incomingCallRef.current) incomingCallRef.current.close();
+    incomingCallRef.current = incomingCall;
+
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
       console.log({ remoteStream, videoTracks: remoteStream.getVideoTracks() });
 
       addCamera(remoteStream, incomingCall.metadata.user);
+    });
+    incomingCall.on("close", () => {
+      setCameras((_) =>
+        _.filter((camera) => camera.user.id !== incomingCall.metadata.user.id)
+      );
     });
   };
 
