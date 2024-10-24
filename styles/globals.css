@@ -103,6 +103,14 @@
   }
 }
 @layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* Internet Explorer and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
   .container {
     @apply max-w-[1432px] [@media(min-width:1432px)]:mx-[auto];
   }

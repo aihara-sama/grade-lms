@@ -79,6 +79,7 @@ export const useVideoChat = () => {
 
   const renegotiate = (constraints: MediaStreamConstraints) => {
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+      localStreamRef.current = stream;
       addCamera(
         stream,
         user,

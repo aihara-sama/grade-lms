@@ -82,7 +82,7 @@ const LiveLesson: FunctionComponent = () => {
           className={`flex flex-col flex-1 ${clsx({
             "max-h-[calc(100vh-196px)]": !lesson.course_id,
             "max-h-[calc(100vh-216px)]": !!lesson.course_id,
-          })} overflow-auto`}
+          })} overflow-auto ${activeTab === 0 ? "no-scrollbar" : ""}`}
         >
           <div className="flex flex-col gap-3">
             {isEnded ? (
