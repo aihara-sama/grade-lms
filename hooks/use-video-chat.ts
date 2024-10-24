@@ -83,7 +83,7 @@ export const useVideoChat = () => {
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
         addCamera(stream, user, true, true);
-        console.log({ stream });
+        console.log({ stream, video: stream.getVideoTracks() });
 
         Object.keys(channelRef.current.presenceState())
           .filter((id) => id !== user.id)
