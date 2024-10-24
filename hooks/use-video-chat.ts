@@ -88,6 +88,7 @@ export const useVideoChat = () => {
           constraints.video as boolean,
           constraints.audio as boolean
         );
+        console.log({ stream });
 
         Object.keys(channelRef.current.presenceState())
           .filter((id) => id !== user.id)
