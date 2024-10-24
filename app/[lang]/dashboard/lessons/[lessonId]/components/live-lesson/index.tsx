@@ -40,8 +40,13 @@ const LiveLesson: FunctionComponent = () => {
     (state) => state
   );
 
-  const { cameras, toggleAudio, toggleCamera, endSession, startSession } =
-    useVideoChat();
+  const {
+    cameras,
+    fireToggleAudio,
+    fireToggleCamera,
+    endSession,
+    startSession,
+  } = useVideoChat();
   const { messages } = useChat();
 
   const stopExecAtStartOfMin = useMemo(
@@ -88,8 +93,8 @@ const LiveLesson: FunctionComponent = () => {
             ) : (
               cameras.map((camera, idx) => (
                 <Camera
-                  toggleCamera={toggleCamera}
-                  toggleAudio={toggleAudio}
+                  toggleCamera={fireToggleCamera}
+                  toggleAudio={fireToggleAudio}
                   camera={camera}
                   key={idx}
                 />

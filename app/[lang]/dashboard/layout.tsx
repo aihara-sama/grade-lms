@@ -2,6 +2,7 @@ import Header from "@/components/layout/header";
 import PushNotificationsProvider from "@/components/providers/push-notifications-provider";
 import UserProvider from "@/components/providers/user-provider";
 import { getCachedUser, getProfile } from "@/db/server/user";
+import type { ResultOf } from "@/types/utils.type";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
 const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
@@ -9,7 +10,11 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
     data: { user },
   } = await getCachedUser();
 
-  const profile = await getProfile(user.id);
+  let profile: ResultOf<typeof getProfile> | null = null;
+
+  if (user) {
+    profile = await getProfile(user.id);
+  }
 
   return (
     <UserProvider profile={profile}>

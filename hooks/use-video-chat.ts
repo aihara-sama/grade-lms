@@ -1,3 +1,4 @@
+import { Event } from "@/enums/event.enum";
 import { useUser } from "@/hooks/use-user";
 import type { Camera } from "@/interfaces/camera.interface";
 import { DB } from "@/lib/supabase/db";
@@ -19,55 +20,111 @@ export const useVideoChat = () => {
   // Hooks
   const user = useUser((state) => state.user);
   const { lessonId } = useParams();
-  const channel = DB.channel(lessonId as string, {
-    config: {
-      presence: {
-        key: user.id,
-      },
-    },
-  });
 
   // Refs
-  const localStreamRef = useRef<MediaStream>();
   const peerRef = useRef<Peer>();
-
+  const joinedOnceRef = useRef(false);
+  const localStreamRef = useRef<MediaStream>();
+  const channelRef = useRef(
+    DB.channel(lessonId as string, {
+      config: {
+        presence: {
+          key: user.id,
+        },
+        broadcast: {
+          self: false,
+        },
+      },
+    })
+  );
+  const incomingCallRef = useRef<MediaConnection>();
   // Handlers
-  const addCamera = (stream: MediaStream, _user: User) => {
+  const addCamera = (
+    stream: MediaStream,
+    _user: User,
+    isCameraEnabled = true,
+    isMicEnabled = true
+  ) => {
     setCameras((_) => {
+      const maybeCameraIndex = _.findIndex(
+        ({ user: { id } }) => id === _user.id
+      );
+
+      if (maybeCameraIndex !== -1) {
+        // If the camera exists, replace the stream and return the updated camera list
+        const updatedCamera = {
+          ..._[maybeCameraIndex],
+          stream,
+        };
+
+        return [
+          ..._.slice(0, maybeCameraIndex),
+          updatedCamera,
+          ..._.slice(maybeCameraIndex + 1),
+        ];
+      }
+
+      // If the camera does not exist, add a new camera
       return [
         ..._,
         {
           stream,
-          isCameraEnabled: true,
-          isMicEnabled: true,
+          isCameraEnabled,
+          isMicEnabled,
           user: _user,
         },
       ];
     });
   };
 
-  const toggleCamera = useCallback((userId: string) => {
+  const renegotiate = (constraints: MediaStreamConstraints) => {
+    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+      addCamera(
+        stream,
+        user,
+        constraints.video as boolean,
+        constraints.audio as boolean
+      );
+
+      Object.keys(channelRef.current.presenceState())
+        .filter((id) => id !== user.id)
+        .forEach((id) => {
+          const outgoingCall = peerRef.current.call(id, stream, {
+            metadata: {
+              user,
+            },
+          });
+
+          outgoingCall.on("close", () => {
+            setCameras((_) => _.filter((camera) => camera.user.id !== id));
+          });
+        });
+    });
+  };
+
+  const toggleCamera = useCallback(async (userId: string) => {
     setCameras((prev) => {
       return prev.map((cam) => {
         if (cam.user.id === userId) {
-          if (cam.isCameraEnabled) {
-            localStreamRef.current?.getTracks().forEach((track) => {
-              track.stop();
+          if (cam.user.id === user.id) {
+            channelRef.current.track({
+              user,
+              isCameraEnabled: !cam.isCameraEnabled,
+              isMicEnabled: cam.isMicEnabled,
             });
-          } else {
-            navigator.mediaDevices
-              .getUserMedia({ audio: true, video: true })
-              .then((stream) => {
-                localStreamRef.current = stream;
-                cam.stream = stream;
-              })
-              .catch(console.error);
+            if (cam.isCameraEnabled) {
+              //
+            } else {
+              renegotiate({
+                audio: true,
+                video: !cam.isCameraEnabled,
+              });
+            }
           }
-
           cam.stream.getVideoTracks().forEach((track) => {
-            track.enabled = !cam.isCameraEnabled;
+            track.enabled = !track.enabled;
+            track.stop();
           });
-
           cam.isCameraEnabled = !cam.isCameraEnabled;
         }
         return cam;
@@ -81,9 +138,15 @@ export const useVideoChat = () => {
           cam.stream.getAudioTracks().forEach((track) => {
             track.enabled = !cam.isMicEnabled;
           });
-          localStreamRef.current.getAudioTracks().forEach((track) => {
-            track.enabled = !cam.isMicEnabled;
-          });
+
+          if (cam.user.id === user.id) {
+            channelRef.current.track({
+              user,
+              isCameraEnabled: cam.isCameraEnabled,
+              isMicEnabled: !cam.isMicEnabled,
+            });
+          }
+
           cam.isMicEnabled = !cam.isMicEnabled;
         }
         return cam;
@@ -91,11 +154,31 @@ export const useVideoChat = () => {
     });
   }, []);
 
+  const fireToggleCamera = (userId: string) => {
+    toggleCamera(userId);
+    channelRef.current.send({
+      event: Event.ToggleCamera,
+      type: "broadcast",
+      payload: {
+        userId,
+      },
+    });
+  };
+  const fireToggleAudio = (userId: string) => {
+    channelRef.current.send({
+      event: Event.ToggleAudio,
+      type: "broadcast",
+      payload: {
+        userId,
+      },
+    });
+  };
+
   const onPresenceJoin = (
     payload: RealtimePresenceJoinPayload<{ user: User }>
   ) => {
-    if (payload.key === user.id) {
-      Object.keys(channel.presenceState())
+    if (joinedOnceRef.current === false && payload.key === user.id) {
+      Object.keys(channelRef.current.presenceState())
         .filter((id) => id !== user.id)
         .forEach((id) => {
           const outgoingCall = peerRef.current.call(
@@ -111,7 +194,21 @@ export const useVideoChat = () => {
           outgoingCall.once("stream", (remoteStream) => {
             addCamera(
               remoteStream,
-              channel.presenceState<{ user: User }>()[id][0].user
+              channelRef.current.presenceState<{
+                user: User;
+                isCameraEnabled: boolean;
+                isMicEnabled: boolean;
+              }>()[id][0].user,
+              channelRef.current.presenceState<{
+                user: User;
+                isCameraEnabled: boolean;
+                isMicEnabled: boolean;
+              }>()[id][0].isCameraEnabled,
+              channelRef.current.presenceState<{
+                user: User;
+                isCameraEnabled: boolean;
+                isMicEnabled: boolean;
+              }>()[id][0].isMicEnabled
             );
           });
 
@@ -119,21 +216,28 @@ export const useVideoChat = () => {
             setCameras((_) => _.filter((camera) => camera.user.id !== id));
           });
         });
+
+      joinedOnceRef.current = true;
     }
   };
   const onPresenceLeave = (
     payload: RealtimePresenceLeavePayload<{ user: User }>
   ) => {
-    setCameras((_) =>
-      _.filter((camera) => payload.leftPresences[0].user.id !== camera.user.id)
-    );
+    if (!channelRef.current.presenceState()[payload.leftPresences[0].user.id]) {
+      setCameras((_) =>
+        _.filter(
+          (camera) => payload.leftPresences[0].user.id !== camera.user.id
+        )
+      );
+    }
   };
   const onPresenceSubscribe = async (
     status: `${REALTIME_SUBSCRIBE_STATES}`
   ) => {
     if (status === "SUBSCRIBED") {
-      await channel.track({
+      await channelRef.current.track({
         user,
+        cameras,
       });
     }
   };
@@ -142,7 +246,7 @@ export const useVideoChat = () => {
     navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
-        channel
+        channelRef.current
           .on("presence", { event: "join" }, onPresenceJoin)
           .on("presence", { event: "leave" }, onPresenceLeave)
           .subscribe(onPresenceSubscribe);
@@ -157,6 +261,7 @@ export const useVideoChat = () => {
   const onPeerCall = (incomingCall: MediaConnection) => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
+      incomingCallRef.current = incomingCall;
       addCamera(remoteStream, incomingCall.metadata.user);
     });
     incomingCall.on("close", () => {
@@ -169,7 +274,7 @@ export const useVideoChat = () => {
   const startSession = () => {
     // Handle SSR for navigator
     import("peerjs").then(({ default: Peer }) => {
-      peerRef.current = new Peer(user.id);
+      peerRef.current = new Peer(user.id, {});
 
       peerRef.current.on("open", onPeerOpen);
       peerRef.current.on("call", onPeerCall);
@@ -184,8 +289,22 @@ export const useVideoChat = () => {
       track.stop();
     });
 
-    channel.unsubscribe();
+    channelRef.current.unsubscribe();
   };
+  useEffect(() => {
+    channelRef.current.on(
+      "broadcast",
+      { event: Event.ToggleCamera },
+      (payload) => {
+        toggleCamera(payload.payload.userId);
+      }
+    );
+    channelRef.current.on(
+      "broadcast",
+      { event: Event.ToggleAudio },
+      (payload) => toggleAudio(payload.payload.userId)
+    );
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -197,14 +316,14 @@ export const useVideoChat = () => {
       localStreamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
-      channel.unsubscribe();
+      channelRef.current.unsubscribe();
     };
   }, [lessonId]);
 
   return {
     cameras,
-    toggleAudio,
-    toggleCamera,
+    fireToggleAudio,
+    fireToggleCamera,
     endSession,
     startSession,
   };
