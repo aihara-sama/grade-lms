@@ -37,7 +37,7 @@ export const useVideoChat = () => {
       },
     })
   );
-  const incomingCallRef = useRef<MediaConnection>();
+
   // Handlers
   const addCamera = (
     stream: MediaStream,
@@ -123,7 +123,6 @@ export const useVideoChat = () => {
             }
           }
           cam.stream.getVideoTracks().forEach((track) => {
-            track.enabled = !track.enabled;
             track.stop();
           });
           cam.isCameraEnabled = !cam.isCameraEnabled;
@@ -238,7 +237,6 @@ export const useVideoChat = () => {
     if (status === "SUBSCRIBED") {
       await channelRef.current.track({
         user,
-        cameras,
       });
     }
   };
@@ -262,7 +260,6 @@ export const useVideoChat = () => {
   const onPeerCall = (incomingCall: MediaConnection) => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
-      incomingCallRef.current = incomingCall;
       addCamera(remoteStream, incomingCall.metadata.user);
     });
     incomingCall.on("close", () => {
