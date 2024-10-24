@@ -78,16 +78,11 @@ export const useVideoChat = () => {
     });
   };
 
-  const renegotiate = (constraints: MediaStreamConstraints) => {
+  const renegotiate = () => {
     navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
-        addCamera(
-          stream,
-          user,
-          constraints.video as boolean,
-          constraints.audio as boolean
-        );
+        addCamera(stream, user, true, true);
         console.log({ stream });
 
         Object.keys(channelRef.current.presenceState())
@@ -122,10 +117,7 @@ export const useVideoChat = () => {
             if (cam.isCameraEnabled) {
               //
             } else {
-              renegotiate({
-                audio: true,
-                video: !cam.isCameraEnabled,
-              });
+              renegotiate();
             }
           }
 
