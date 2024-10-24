@@ -82,7 +82,6 @@ export const useVideoChat = () => {
     navigator.mediaDevices
       .getUserMedia({ audio: true, video: true })
       .then((stream) => {
-        localStreamRef.current = stream;
         addCamera(
           stream,
           user,
