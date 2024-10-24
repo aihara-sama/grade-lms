@@ -1,11 +1,11 @@
-import AvatarIcon from "@/components/icons/avatar-icon";
-import { useState } from "react";
-
 import BasicInput from "@/components/common/inputs/basic-input";
+import AvatarIcon from "@/components/icons/avatar-icon";
 import { Role } from "@/enums/role.enum";
 import { useUser } from "@/hooks/use-user";
 import { getTimeZone } from "@/utils/localization/get-time-zone";
 import type { ChangeEvent, FunctionComponent } from "react";
+import { useState } from "react";
+import { v4 as uuid } from "uuid";
 
 interface Props {}
 
@@ -22,7 +22,7 @@ const GuestPrompt: FunctionComponent<Props> = () => {
 
   const createGuestUser = () => {
     setUser({
-      id: Math.random().toString(36).substr(2, 6),
+      id: uuid(),
       avatar: process.env.DEFAULT_AVATAR,
       created_at: new Date().toISOString(),
       creator_id: null,

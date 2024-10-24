@@ -79,30 +79,31 @@ export const useVideoChat = () => {
   };
 
   const renegotiate = (constraints: MediaStreamConstraints) => {
-    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-      outgoingCallRef.current.close();
-      localStreamRef.current = stream;
-      addCamera(
-        stream,
-        user,
-        constraints.video as boolean,
-        constraints.audio as boolean
-      );
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
+      .then((stream) => {
+        localStreamRef.current = stream;
+        addCamera(
+          stream,
+          user,
+          constraints.video as boolean,
+          constraints.audio as boolean
+        );
 
-      Object.keys(channelRef.current.presenceState())
-        .filter((id) => id !== user.id)
-        .forEach((id) => {
-          const outgoingCall = peerRef.current.call(id, stream, {
-            metadata: {
-              user,
-            },
-          });
+        Object.keys(channelRef.current.presenceState())
+          .filter((id) => id !== user.id)
+          .forEach((id) => {
+            const outgoingCall = peerRef.current.call(id, stream, {
+              metadata: {
+                user,
+              },
+            });
 
-          outgoingCall.on("close", () => {
-            setCameras((_) => _.filter((camera) => camera.user.id !== id));
+            outgoingCall.on("close", () => {
+              setCameras((_) => _.filter((camera) => camera.user.id !== id));
+            });
           });
-        });
-    });
+      });
   };
 
   const toggleCamera = useCallback(async (userId: string) => {
