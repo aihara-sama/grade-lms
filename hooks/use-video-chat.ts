@@ -107,7 +107,8 @@ export const useVideoChat = () => {
               isCameraEnabled: !cam.isCameraEnabled,
               isMicEnabled: cam.isMicEnabled,
             });
-            if (!cam.isCameraEnabled) renegotiate({ video: true, audio: true });
+            if (!cam.isCameraEnabled)
+              renegotiate({ video: true, audio: cam.isMicEnabled });
           }
 
           if (cam.isCameraEnabled) {
