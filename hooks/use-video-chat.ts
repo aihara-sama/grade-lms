@@ -39,7 +39,7 @@ export const useVideoChat = () => {
   );
 
   // Handlers
-  const addCamera = (
+  const addOrUpdateCamera = (
     stream: MediaStream,
     _user: User,
     isCameraEnabled = true,
@@ -77,45 +77,41 @@ export const useVideoChat = () => {
     });
   };
 
-  const renegotiate = () => {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then((stream) => {
-        addCamera(stream, user, true, true);
-        console.log({ stream, video: stream.getVideoTracks() });
-
-        Object.keys(channelRef.current.presenceState())
-          .filter((id) => id !== user.id)
-          .forEach((id) => {
-            const outgoingCall = peerRef.current.call(id, stream, {
-              metadata: {
-                user,
-              },
-            });
-
-            outgoingCall.on("close", () => {
-              setCameras((_) => _.filter((camera) => camera.user.id !== id));
-            });
+  const renegotiate = (constraints: MediaStreamConstraints) => {
+    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+      addOrUpdateCamera(stream, user, !!constraints.video, !!constraints.audio);
+      Object.keys(channelRef.current.presenceState())
+        .filter((id) => id !== user.id)
+        .forEach((id) => {
+          const outgoingCall = peerRef.current.call(id, stream, {
+            metadata: {
+              user,
+            },
           });
-      });
+
+          outgoingCall.on("close", () => {
+            setCameras((_) => _.filter((camera) => camera.user.id !== id));
+          });
+        });
+    });
   };
 
   const toggleCamera = useCallback(async (userId: string) => {
     setCameras((prev) => {
       return prev.map((cam) => {
         if (cam.user.id === userId) {
+          // If my camera
           if (cam.user.id === user.id) {
             channelRef.current.track({
               user,
               isCameraEnabled: !cam.isCameraEnabled,
               isMicEnabled: cam.isMicEnabled,
             });
-            if (!cam.isCameraEnabled) {
-              renegotiate();
-            }
+            if (!cam.isCameraEnabled) renegotiate({ video: true, audio: true });
           }
 
           if (cam.isCameraEnabled) {
+            // Completely stop camera streaming
             cam.stream.getVideoTracks().forEach((track) => {
               track.stop();
             });
@@ -132,7 +128,7 @@ export const useVideoChat = () => {
       return prev.map((cam) => {
         if (cam.user.id === userId) {
           cam.stream.getAudioTracks().forEach((track) => {
-            track.enabled = !cam.isMicEnabled;
+            track.enabled = !track.enabled;
           });
 
           if (cam.user.id === user.id) {
@@ -161,6 +157,7 @@ export const useVideoChat = () => {
     });
   };
   const fireToggleAudio = (userId: string) => {
+    toggleAudio(userId);
     channelRef.current.send({
       event: Event.ToggleAudio,
       type: "broadcast",
@@ -173,6 +170,7 @@ export const useVideoChat = () => {
   const onPresenceJoin = (
     payload: RealtimePresenceJoinPayload<{ user: User }>
   ) => {
+    // * Calling channel.track in succession triggers "join" event
     if (joinedOnceRef.current === false && payload.key === user.id) {
       Object.keys(channelRef.current.presenceState())
         .filter((id) => id !== user.id)
@@ -188,7 +186,7 @@ export const useVideoChat = () => {
           );
 
           outgoingCall.once("stream", (remoteStream) => {
-            addCamera(
+            addOrUpdateCamera(
               remoteStream,
               channelRef.current.presenceState<{
                 user: User;
@@ -219,20 +217,11 @@ export const useVideoChat = () => {
   const onPresenceLeave = (
     payload: RealtimePresenceLeavePayload<{ user: User }>
   ) => {
-    console.log({
-      payload,
-      presencesState: channelRef.current.presenceState(),
-      target:
-        channelRef.current.presenceState()[payload.leftPresences[0].user.id]
-          .length,
-    });
-
+    // * Calling channel.track in succession triggers "leave" event
     if (
       !channelRef.current.presenceState()[payload.leftPresences[0].user.id]
         .length
     ) {
-      console.log("filtereing cameras");
-
       setCameras((_) =>
         _.filter(
           (camera) => payload.leftPresences[0].user.id !== camera.user.id
@@ -259,7 +248,7 @@ export const useVideoChat = () => {
           .on("presence", { event: "leave" }, onPresenceLeave)
           .subscribe(onPresenceSubscribe);
 
-        addCamera(stream, user);
+        addOrUpdateCamera(stream, user);
         localStreamRef.current = stream;
       })
       .catch((error) => {
@@ -269,12 +258,7 @@ export const useVideoChat = () => {
   const onPeerCall = (incomingCall: MediaConnection) => {
     incomingCall.answer(localStreamRef.current);
     incomingCall.once("stream", (remoteStream) => {
-      console.log("on peer call stream", {
-        remoteStream,
-        videoTracks: remoteStream.getVideoTracks(),
-      });
-
-      addCamera(remoteStream, incomingCall.metadata.user);
+      addOrUpdateCamera(remoteStream, incomingCall.metadata.user);
     });
     incomingCall.on("close", () => {
       setCameras((_) =>

@@ -39,7 +39,7 @@ const Camera: FunctionComponent<Props> = ({
         isMuted={camera.user.id === user.id}
         stream={camera.stream}
       />
-      <div className="group-hover:h-[70px] absolute top-[0] left-[0] right-[0] h-[0] flex gap-[6px] text-[white] flex-col justify-center pl-[12px] overflow-hidden [transition:0.2s_height] bg-black bg-opacity-50">
+      <div className="rounded-[8px] group-hover:h-[70px] absolute top-[0] left-[0] right-[0] h-[0] flex gap-[6px] text-[white] flex-col justify-center pl-[12px] overflow-hidden [transition:0.2s_height] bg-black bg-opacity-50">
         <p className="text-sm">{camera.user.name}</p>
         <p className="text-xs text-slate-200">
           {t(`roles.${camera.user.role}`)}
