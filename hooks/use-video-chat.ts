@@ -171,6 +171,17 @@ export const useVideoChat = () => {
   const onPresenceJoin = (
     payload: RealtimePresenceJoinPayload<{ user: User }>
   ) => {
+    // Handle same user in session
+    // if (
+    //   joinedOnceRef.current === false &&
+    //   payload.key === user.id &&
+    //   channelRef.current.presenceState()[user.id].length
+    // ) {
+    //   return redirect("/dashboard");
+    // }
+
+    console.log({ state: channelRef.current.presenceState(), payload });
+
     // * Calling channel.track in succession triggers "join" event
     if (joinedOnceRef.current === false && payload.key === user.id) {
       Object.keys(channelRef.current.presenceState())
@@ -305,6 +316,8 @@ export const useVideoChat = () => {
 
   // Effects
   useEffect(() => {
+    console.log({ state: channelRef.current.presenceState() });
+
     return () => {
       if (peerRef.current) {
         peerRef.current.disconnect();
