@@ -3,8 +3,30 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
+  "[sql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
   "deno.enable": true,
-  "deno.enablePaths": ["./supabase/functions"],
+  "deno.enablePaths": ["supabase/functions"],
+  "deno.lint": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
   "editor.codeActionsOnSave": [
     "source.organizeImports",
     "source.addMissingImports",
@@ -31,8 +53,5 @@
   "spellright.documentTypes": ["markdown", "latex", "plaintext"],
   "spellright.language": ["en"],
   "tailwindCSS.emmetCompletions": true,
-  "[sql]": {
-    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-  },
   "typescript.referencesCodeLens.enabled": true
 }
