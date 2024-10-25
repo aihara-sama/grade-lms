@@ -219,7 +219,20 @@ export const useVideoChat = () => {
   const onPresenceLeave = (
     payload: RealtimePresenceLeavePayload<{ user: User }>
   ) => {
-    if (!channelRef.current.presenceState()[payload.leftPresences[0].user.id]) {
+    console.log({
+      payload,
+      presencesState: channelRef.current.presenceState(),
+      target:
+        channelRef.current.presenceState()[payload.leftPresences[0].user.id]
+          .length,
+    });
+
+    if (
+      !channelRef.current.presenceState()[payload.leftPresences[0].user.id]
+        .length
+    ) {
+      console.log("filtereing cameras");
+
       setCameras((_) =>
         _.filter(
           (camera) => payload.leftPresences[0].user.id !== camera.user.id
