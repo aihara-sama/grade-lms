@@ -3,6 +3,7 @@ import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { addDays, format, subWeeks } from "date-fns";
 import { cache } from "react";
 
+// GET
 export const getCachedUser = cache(() => getServerDB().auth.getUser());
 
 export const getProfile = async (id: string) => {

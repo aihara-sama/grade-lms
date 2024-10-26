@@ -315,8 +315,9 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
       {isLoading && <LoadingSkeleton />}
       {isData && (
         <Table
+          className="no-scrollbar"
           data={members.map(
-            ({ name, id, avatar, user_settings: { role } }, idx) => ({
+            ({ name, id, avatar, user_settings: { role } }) => ({
               [t("tables.members.name")]:
                 user.id === id && user.role === "teacher" ? (
                   <IconTitle
@@ -340,11 +341,6 @@ const Members: FunctionComponent<Props> = ({ course, users }) => {
                 ),
               "": user.role === "teacher" && role !== "teacher" && (
                 <BasicPopper
-                  placement={
-                    members.length > 7 && members.length - idx < 4
-                      ? "top"
-                      : "bottom"
-                  }
                   width="sm"
                   trigger={
                     <button

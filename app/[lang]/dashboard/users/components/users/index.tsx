@@ -84,7 +84,7 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
   // Refs
-  const usersOffsetRef = useRef(0);
+  const usersOffsetRef = useRef(initUsers.data.length);
   const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   // Vars
@@ -150,7 +150,11 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
 
       const { data } = await getMyUsers(user.id, searchText, from, to);
 
-      setUsers(data);
+      setUsers((prev) => [...prev, ...data]);
+
+      if (isSelectedAll) {
+        setUsersIds((prev) => [...prev, ...data.map(({ id }) => id)]);
+      }
 
       usersOffsetRef.current += data.length;
     } catch (error: any) {
@@ -356,8 +360,9 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
       {isLoading && <LoadingSkeleton />}
       {isData && (
         <Table
+          className="no-scrollbar"
           data={users.map(
-            ({ name, id, avatar, email, user_settings: { role } }, idx) => ({
+            ({ name, id, avatar, email, user_settings: { role } }) => ({
               [t("tables.users.name")]: (
                 <TitleCard
                   checked={usersIds.includes(id)}
@@ -370,11 +375,6 @@ const Users: FunctionComponent<Props> = ({ users: initUsers }) => {
               [t("tables.users.email")]: email,
               "": (
                 <BasicPopper
-                  placement={
-                    users.length > 7 && users.length - idx < 4
-                      ? "top"
-                      : "bottom"
-                  }
                   width="sm"
                   trigger={
                     <button

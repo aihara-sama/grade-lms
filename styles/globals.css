@@ -24,7 +24,7 @@
   input {
     @apply text-sm pl-8 pr-4 py-[7.5px] rounded-md border border-gray-500 outline-none;
   }
-  li {
+  ul > li {
     list-style-type: none; /* Remove prefix from unordered list */
   }
 

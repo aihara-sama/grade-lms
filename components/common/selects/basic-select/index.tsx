@@ -60,7 +60,7 @@ const BasicSelect: FunctionComponent<Props> = ({
 
   const onScroll: UIEventHandler<HTMLUListElement> = useCallback(
     throttle((e) => {
-      if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd(searchText);
+      if (isCloseToBottom(e.target as HTMLElement)) onScrollEnd?.(searchText);
     }, 300),
     [searchText]
   );

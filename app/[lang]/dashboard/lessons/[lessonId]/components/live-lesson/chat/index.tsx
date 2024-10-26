@@ -82,6 +82,8 @@ const Chat: FunctionComponent<Props> = ({ lesson }) => {
     if (e.target.files.length) {
       setFile(e.target.files[0]);
       setIsCreateFileMessageModalOpen(true);
+
+      e.target.value = "";
     }
   };
   const onCreateFileMessageModalClose = (mutated?: boolean) => {

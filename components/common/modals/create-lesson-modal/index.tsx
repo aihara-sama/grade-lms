@@ -38,12 +38,8 @@ const CreateLessonModal: FunctionComponent<Props> = ({
     title: "",
     starts: getNextMorning().toISOString(),
     ends: addMinutes(getNextMorning(), 30).toISOString(),
-    course_id: courseId,
     ...maybeLesson,
-  });
-  console.log({
-    lessonStarts: lesson.starts,
-    lessonStartsISO: new Date(lesson.starts).toISOString(),
+    course_id: courseId,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -190,7 +186,11 @@ const CreateLessonModal: FunctionComponent<Props> = ({
         <hr className="my-3" />
         <div className="flex justify-end">
           <button
-            disabled={!(lesson.title && lesson.course_id)}
+            disabled={
+              lesson.course_id
+                ? !lesson.title
+                : !(lesson.title && lesson.course_id)
+            }
             className="primary-button"
             type="submit"
           >

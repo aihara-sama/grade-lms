@@ -36,13 +36,27 @@ export const updateSession = async (
     }
   );
 
-  const { error, data } = await supabase.auth.getUser();
+  const {
+    error,
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (data.user) {
-    response.cookies.set(
-      "NEXT_LOCALE",
-      data.user.user_metadata.preferred_locale
-    );
+  if (user) {
+    const { data } = await supabase
+      .from("users")
+      .select("preferred_locale")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!data)
+      return NextResponse.redirect(
+        new URL(
+          `/sign-in?redirect=${encodeURIComponent(request.url)}`,
+          request.url
+        )
+      );
+
+    response.cookies.set("NEXT_LOCALE", data.preferred_locale);
   }
 
   const locale = getLocale(request);

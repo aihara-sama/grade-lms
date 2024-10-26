@@ -54,7 +54,6 @@ const Assignments: FunctionComponent<Props> = ({
   const t = useTranslations();
   const user = useUser((state) => state.user);
   const lesson = useLesson((state) => state.lesson);
-  const isEnded = useLesson((state) => state.isEnded);
 
   const fetchLock = useFetchLock();
 
@@ -293,7 +292,6 @@ const Assignments: FunctionComponent<Props> = ({
               <AddAssignmentIcon size="md" />
               <hr className="w-full my-3" />
               <button
-                disabled={isEnded}
                 className="primary-button px-8"
                 onClick={() => setIsCreateAssignmentModal(true)}
               >
@@ -335,7 +333,8 @@ const Assignments: FunctionComponent<Props> = ({
       {isLoading && <LoadingSkeleton />}
       {isData && (
         <Table
-          data={assignments.map(({ id, title }, idx) => ({
+          className="no-scrollbar"
+          data={assignments.map(({ id, title }) => ({
             [t("tables.assignments.name")]: (
               <TitleCard
                 onClick={() => onAssignmentClick(id)}
@@ -352,11 +351,6 @@ const Assignments: FunctionComponent<Props> = ({
             ),
             "": user.role === "teacher" && (
               <BasicPopper
-                placement={
-                  assignments.length > 7 && assignments.length - idx < 4
-                    ? "top"
-                    : "bottom"
-                }
                 width="sm"
                 trigger={
                   <button

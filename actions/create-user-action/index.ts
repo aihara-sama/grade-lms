@@ -24,6 +24,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
   const [
     { data: userSettings, error: userSettingsError },
     { data: isPro, error: isProError },
+    { data: profile, error: profileError },
   ] = await Promise.all([
     serverDB
       .from("user_settings")
@@ -31,9 +32,14 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       .eq("user_id", user.id)
       .single(),
     serverDB.rpc("is_pro", { user_uuid: user.id }),
+    serverDB
+      .from("users")
+      .select("preferred_locale")
+      .eq("id", user.id)
+      .single(),
   ]);
 
-  if (!userSettings || userSettingsError || isProError) {
+  if (!userSettings || userSettingsError || isProError || profileError) {
     return {
       error: "Something went wrong",
       data: null,
@@ -70,7 +76,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       creator_id: user.id,
       role: "student",
       avatar: payload.avatar,
-      preferred_locale: user.user_metadata.preferred_locale,
+      preferred_locale: profile.preferred_locale,
       timezone: payload.timezone,
       is_emails_on: userSettings.is_emails_on,
       push_notifications_state: "idle",
@@ -80,19 +86,21 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
 
   return {
     error: error ? error.message : null,
-    data: {
-      avatar: data.user.user_metadata.avatar,
-      created_at: data.user.created_at,
-      creator_id: data.user.user_metadata.creator_id,
-      email: data.user.email,
-      id: data.user.id,
-      name: data.user.user_metadata.name,
-      preferred_locale: data.user.user_metadata.preferred_locale,
-      push_notifications_state:
-        data.user.user_metadata.push_notifications_state,
-      timezone: data.user.user_metadata.timezone,
-      user_settings: { role: data.user.user_metadata.role },
-    },
+    data: error
+      ? null
+      : {
+          avatar: data.user.user_metadata.avatar,
+          created_at: data.user.created_at,
+          creator_id: data.user.user_metadata.creator_id,
+          email: data.user.email,
+          id: data.user.id,
+          name: data.user.user_metadata.name,
+          preferred_locale: data.user.user_metadata.preferred_locale,
+          push_notifications_state:
+            data.user.user_metadata.push_notifications_state,
+          timezone: data.user.user_metadata.timezone,
+          user_settings: { role: data.user.user_metadata.role },
+        },
   };
 };
 

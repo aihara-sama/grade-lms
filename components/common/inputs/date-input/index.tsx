@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import type { Placement } from "@floating-ui/utils/dist/floating-ui.utils";
 import type { FunctionComponent } from "react";
-import { forwardRef, useState } from "react";
+import { forwardRef, memo, useState } from "react";
 import { createPortal } from "react-dom";
 
 const CustomInput = forwardRef<
@@ -45,13 +45,13 @@ interface Props {
   disabled?: boolean;
 }
 
-const DateInput: FunctionComponent<Props> = ({
+const DateInput: FunctionComponent<Props> = memo(function DateInput({
   date,
   label,
   onChange,
   popperPlacement,
   disabled,
-}) => {
+}) {
   const [selectedDate, setSelectedDate] = useState(date);
 
   return (
@@ -88,5 +88,5 @@ const DateInput: FunctionComponent<Props> = ({
       />
     </div>
   );
-};
+});
 export default DateInput;

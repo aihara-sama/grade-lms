@@ -95,54 +95,56 @@ const Profile: FunctionComponent<Props> = ({
         <General className="mt-16" />
         <Preferences className="mt-16" />
         <Security className="mt-16" />
-        <div className="mt-16">
-          <p className="text-2xl font-bold text-neutral-600">
-            {t("profile.plan")}
-          </p>
-          <div className="mt-3">
-            <p className="text-neutral-600">
-              {t.rich(
-                `profile.${user.is_pro ? "your_plan_is_pro" : "your_plan_is_basic"}`,
-                {
-                  b: (chunks) => <span className="font-bold">{chunks}</span>,
-                }
-              )}
+        {user.role === "teacher" && (
+          <div className="mt-16">
+            <p className="text-2xl font-bold text-neutral-600">
+              {t("profile.plan")}
             </p>
-            {!!canceledSubscription && (
-              <p className="text-neutral-500 text-sm">
-                {t("common.your_subscription_will_remain_active_until")}{" "}
-                <span className="font-bold">
-                  {format(
-                    canceledSubscription.end_date,
-                    "MM/dd/yyyy | h:mm a",
-                    {
-                      locale: getDateLocale(user.preferred_locale as Locale),
-                    }
-                  )}
-                </span>
+            <div className="mt-3">
+              <p className="text-neutral-600">
+                {t.rich(
+                  `profile.${user.is_pro ? "your_plan_is_pro" : "your_plan_is_basic"}`,
+                  {
+                    b: (chunks) => <span className="font-bold">{chunks}</span>,
+                  }
+                )}
               </p>
-            )}
-            {user.is_pro && !canceledSubscription && (
-              <button
-                onClick={() => setIsCancelSubscriptionModal(true)}
-                className="delete-button mt-1"
-              >
-                {t("buttons.cancel_subscription")}
-              </button>
-            )}
-            {!user.is_pro && (
-              <button
-                onClick={() => setIsUpgradeToProModal(true)}
-                className="link-button w-40 mt-1"
-              >
-                <span className="text-white">
-                  <CrownIcon />
-                </span>
-                {t("buttons.upgrade")}
-              </button>
-            )}
+              {!!canceledSubscription && (
+                <p className="text-neutral-500 text-sm">
+                  {t("common.your_subscription_will_remain_active_until")}{" "}
+                  <span className="font-bold">
+                    {format(
+                      canceledSubscription.end_date,
+                      "MM/dd/yyyy | h:mm a",
+                      {
+                        locale: getDateLocale(user.preferred_locale as Locale),
+                      }
+                    )}
+                  </span>
+                </p>
+              )}
+              {user.is_pro && !canceledSubscription && (
+                <button
+                  onClick={() => setIsCancelSubscriptionModal(true)}
+                  className="delete-button mt-1"
+                >
+                  {t("buttons.cancel_subscription")}
+                </button>
+              )}
+              {!user.is_pro && (
+                <button
+                  onClick={() => setIsUpgradeToProModal(true)}
+                  className="link-button w-40 mt-1"
+                >
+                  <span className="text-white">
+                    <CrownIcon />
+                  </span>
+                  {t("buttons.upgrade")}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {isUpgradeToProModal && (
           <UpgradeToProModal

@@ -102,7 +102,6 @@ const ViewSubmissionModal: FunctionComponent<Props> = ({
                 Icon={<AvatarIcon size="md" />}
                 title={submission.author.name}
                 subtitle={t(`roles.${submission.author.user_settings.role}`)}
-                href={`/users/${submission.author.id}`}
               />
             </div>
             <div className="flex gap-2 items-center text-neutral-500">

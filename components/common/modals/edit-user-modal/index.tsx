@@ -60,7 +60,10 @@ const EditUserModal: FunctionComponent<Props> = ({ onClose, userId }) => {
       const password = String(payload.get("password"));
 
       await updateUser({
-        ...user,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        timezone: user.timezone,
         ...(password.length ? { password } : {}),
       });
       onClose(user);

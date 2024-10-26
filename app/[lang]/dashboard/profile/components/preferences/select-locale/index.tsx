@@ -1,8 +1,8 @@
 import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import BasicSelect from "@/components/common/selects/basic-select";
+import { updateUser } from "@/db/client/user";
 import { useUser } from "@/hooks/use-user";
 import { DEFAULT_LOCALE, locales, type Locale } from "@/i18n";
-import { DB } from "@/lib/supabase/db";
 import type { PropsWithClassName } from "@/types/props.type";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { useTranslations } from "next-intl";
@@ -18,7 +18,8 @@ const SelectLocale: FunctionComponent<PropsWithClassName> = ({ className }) => {
   const router = useRouter();
   const pathName = usePathname();
 
-  const { user } = useUser((state) => state);
+  const { user, setUser } = useUser((state) => state);
+  console.log({ user });
 
   // Vars
   const locale = locales.includes(pathName.split("/")[1] as Locale)
@@ -37,13 +38,12 @@ const SelectLocale: FunctionComponent<PropsWithClassName> = ({ className }) => {
 
   const submitUpdateLocale = async (_locale: Locale) => {
     try {
-      const { error } = await DB.auth.updateUser({
-        data: {
-          preferred_locale: _locale,
-        },
+      await updateUser({
+        preferred_locale: _locale,
+        id: user.id,
       });
 
-      if (error) throw new Error(t("error.failed_to_change_language"));
+      setUser({ ...user, preferred_locale: _locale });
 
       router.push(getRedirectedPathName(_locale as Locale));
       revalidatePageAction();

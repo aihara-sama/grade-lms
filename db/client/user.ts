@@ -3,6 +3,7 @@ import type { InputType as CreateUserInputType } from "@/actions/create-user-act
 import { deleteAllUsersAction } from "@/actions/delete-all-users-action";
 import { deleteUsersAction } from "@/actions/delete-users-action";
 import { toggleUserEmailsAction } from "@/actions/toggle-user-emails";
+import { updateUserAction } from "@/actions/update-user-action";
 import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
 import { DB } from "@/lib/supabase/db";
 import type { TablesUpdate } from "@/types/supabase.type";
@@ -145,7 +146,8 @@ export const createUser = async (userDetails: CreateUserInputType) => {
 export const updateUser = async (user: TablesUpdate<"users">) => {
   const t = await loadMessages();
 
-  const result = await DB.from("users").update(user).eq("id", user.id);
+  const result = await updateUserAction(user);
+  console.log({ result, user });
 
   if (result.error) throw new Error(t("error.failed_to_update_user"));
 };

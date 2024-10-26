@@ -308,7 +308,8 @@ const Lessons: FunctionComponent<Props> = ({
       {isLoading && <LoadingSkeleton />}
       {isData && (
         <Table
-          data={lessons.map((lesson, idx) => ({
+          className="no-scrollbar"
+          data={lessons.map((lesson) => ({
             [t("tables.lessons.name")]: (
               <TitleCard
                 href={`/dashboard/courses/${courseId}/lessons/${lesson.id}/overview`}
@@ -325,15 +326,10 @@ const Lessons: FunctionComponent<Props> = ({
             ),
             [t("tables.lessons.starts")]: format(
               new Date(lesson.starts),
-              "EEEE, MMM d"
+              "EEEE, MMM d | h:mm a"
             ),
             "": user.role === "teacher" && !isLessonOngoing(lesson) && (
               <BasicPopper
-                placement={
-                  lessons.length > 7 && lessons.length - idx < 4
-                    ? "top"
-                    : "bottom"
-                }
                 width="sm"
                 trigger={
                   <button

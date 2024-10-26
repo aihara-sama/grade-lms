@@ -232,7 +232,6 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
           data={courses.map(({ id, title }) => ({
             Name: (
               <TitleCard
-                href={`/dashboard/courses/${id}/overview`}
                 checked={coursesIds.includes(id)}
                 Icon={<CourseIcon />}
                 title={title}
@@ -241,7 +240,6 @@ const EnrollUsersInCoursesModal: FunctionComponent<Props> = ({
                 onToggle={(checked) => onCourseToggle(checked, id)}
               />
             ),
-            "": "",
           }))}
         />
       )}

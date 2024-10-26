@@ -4,7 +4,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import SaveIcon from "@/components/icons/save-icon";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { addMinutes, millisecondsToMinutes, subMinutes } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import type {
@@ -140,10 +140,13 @@ const Page: FunctionComponent = () => {
       toast.error(error.message);
     }
   };
-  const onDateChange = (date: Date) => {
-    setStarts(date);
-    setEnds(addMinutes(date, millisecondsToMinutes(duration)));
-  };
+  const onDateChange = useCallback(
+    (date: Date) => {
+      setStarts(date);
+      setEnds(addMinutes(date, millisecondsToMinutes(duration)));
+    },
+    [duration]
+  );
   const onWhiteboardChange: ExcalidrawProps["onChange"] = (
     elements,
     appState

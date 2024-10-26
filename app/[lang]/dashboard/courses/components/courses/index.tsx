@@ -356,59 +356,53 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
           {isLoading && <LoadingSkeleton />}
           {isData && (
             <Table
-              data={courses.map(
-                ({ id, title, lessons, users: members }, idx) => ({
-                  [t("tables.courses.name")]: (
-                    <TitleCard
-                      href={`/dashboard/courses/${id}/overview`}
-                      checked={coursesIds.includes(id)}
-                      Icon={<CourseIcon />}
-                      title={title}
-                      subtitle={t("courses.active")}
-                      onToggle={
-                        user.role === "teacher"
-                          ? (checked) => onCourseToggle(checked, id)
-                          : undefined
-                      }
-                    />
-                  ),
-                  [t("tables.courses.lessons")]: lessons[0].count,
-                  [t("tables.courses.members")]: members[0].count,
-                  "": user.role === "teacher" && (
-                    <BasicPopper
-                      placement={
-                        courses.length > 7 && courses.length - idx < 4
-                          ? "top"
-                          : "bottom"
-                      }
-                      width="sm"
-                      trigger={
-                        <button
-                          className="icon-button text-neutral-500"
-                          onClick={() => setCourseId(id)}
-                        >
-                          <DotsIcon />
-                        </button>
-                      }
-                    >
-                      <ul className="flex flex-col">
-                        <li
-                          className="popper-list-item"
-                          onClick={() => setIsEnrollUsersModal(true)}
-                        >
-                          <UsersIcon /> {t("buttons.enroll")}
-                        </li>
-                        <li
-                          className="popper-list-item"
-                          onClick={() => setIsDeleteCourseModal(true)}
-                        >
-                          <DeleteIcon size="xs" /> {t("buttons.delete")}
-                        </li>
-                      </ul>
-                    </BasicPopper>
-                  ),
-                })
-              )}
+              className="no-scrollbar"
+              data={courses.map(({ id, title, lessons, users: members }) => ({
+                [t("tables.courses.name")]: (
+                  <TitleCard
+                    href={`/dashboard/courses/${id}/overview`}
+                    checked={coursesIds.includes(id)}
+                    Icon={<CourseIcon />}
+                    title={title}
+                    subtitle={t("courses.active")}
+                    onToggle={
+                      user.role === "teacher"
+                        ? (checked) => onCourseToggle(checked, id)
+                        : undefined
+                    }
+                  />
+                ),
+                [t("tables.courses.lessons")]: lessons[0].count,
+                [t("tables.courses.members")]: members[0].count,
+                "": user.role === "teacher" && (
+                  <BasicPopper
+                    width="sm"
+                    trigger={
+                      <button
+                        className="icon-button text-neutral-500"
+                        onClick={() => setCourseId(id)}
+                      >
+                        <DotsIcon />
+                      </button>
+                    }
+                  >
+                    <ul className="flex flex-col">
+                      <li
+                        className="popper-list-item"
+                        onClick={() => setIsEnrollUsersModal(true)}
+                      >
+                        <UsersIcon /> {t("buttons.enroll")}
+                      </li>
+                      <li
+                        className="popper-list-item"
+                        onClick={() => setIsDeleteCourseModal(true)}
+                      >
+                        <DeleteIcon size="xs" /> {t("buttons.delete")}
+                      </li>
+                    </ul>
+                  </BasicPopper>
+                ),
+              }))}
             />
           )}
           {isNoData && (

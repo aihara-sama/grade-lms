@@ -51,7 +51,7 @@ const Table: FunctionComponent<PropsWithClassName<Props>> = memo(
                     >
                       {keys.map((key, i) => (
                         <div
-                          className="flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[2] last-of-type:flex last-of-type:justify-end last-of-type:overflow-visible"
+                          className={`flex-1 whitespace-nowrap overflow-ellipsis overflow-hidden first-of-type:flex-[2] last-of-type:flex-[2] ${clsx(!compact && "last-of-type:justify-end last-of-type:overflow-visible last-of-type:flex")} text-ellipsis`}
                           key={i}
                         >
                           {row[key]}

@@ -10,6 +10,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import type { InputType as UserInputType } from "@/actions/create-user-action/types";
+import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import BasicInput from "@/components/common/inputs/basic-input";
 import BasicModal from "@/components/common/modals/basic-modal";
 import TimezoneSelect from "@/components/common/selects/timezone-select";
@@ -50,6 +51,8 @@ const CreateUserModal: FunctionComponent<Props> = ({ onClose }) => {
 
     try {
       onClose(await createUser(user));
+
+      revalidatePageAction();
 
       toast.success(t("success.user_created"));
     } catch (error: any) {
