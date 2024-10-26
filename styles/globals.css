@@ -112,7 +112,7 @@
     scrollbar-width: none; /* Firefox */
   }
   .container {
-    @apply max-w-[1432px] [@media(min-width:1432px)]:mx-[auto];
+    @apply max-w-[1024px] [@media(min-width:1024px)]:mx-[auto] px-4;
   }
   .disabled {
     &.warning-button {

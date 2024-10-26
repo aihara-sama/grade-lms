@@ -176,6 +176,12 @@
     "active": "Active"
   },
 
+  "landing-page": {
+    "metadata": {
+      "title": "Live lessons, users and courses management"
+    }
+  },
+
   "course": {
     "title": "Overview",
     "students": "Students",
