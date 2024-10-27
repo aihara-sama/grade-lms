@@ -9,6 +9,7 @@ jobs:
       - name: Some famous build provider
         uses: actions/checkout@v4
       - run: echo "repo - ${{ github.repository }}"
+      - run: echo "branch - ${{ github.ref }}"
       - name: List
         run: |
           ls ${{ github.workspace }}
