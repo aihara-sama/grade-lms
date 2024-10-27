@@ -1,11 +1,22 @@
-name: Build
-run-name: Run by ${{ github.actor }}
+name: Build on Push
+
 on: [push]
+
 jobs:
-  Build:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: List
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "job status - ${{ job.status }}"
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18" # Specify your Node.js version
+
+      - name: Install dependencies
+        run: npm install # or 'yarn install' if you're using Yarn
+
+      - name: Run build
+        run: npm run build # or 'yarn build' if you're using Yarn
