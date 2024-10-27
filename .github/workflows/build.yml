@@ -1,0 +1,15 @@
+name: Build
+run-name: Run by ${{ github.actor }}
+on: [push]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Start Building by ${{ github.event_name }}"
+      - name: Some famous build provider
+        uses: actions/checkout@v4
+      - run: echo "repo - ${{ github.repository }}"
+      - name: List
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "job status - ${{ job.status }}"
