@@ -1,3 +1,5 @@
+import { createBrowserClient } from "npm:@supabase/ssr";
+
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":

@@ -1,5 +1,5 @@
 import admin from "npm:firebase-admin";
-import { adminDB } from "../_shared/admin-db";
+import { adminDB } from "../_shared/admin-db.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { firebaseAdminApp } from "../_shared/firebase-admin-app.ts";
 
@@ -8,10 +8,13 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+  console.log("starting");
+
   try {
     const { data: users, error: usersError } = await adminDB.rpc(
       "get_upcoming_lessons_users"
     );
+
     console.log({ users, usersError });
 
     if (usersError) throw new Error(usersError.message);
@@ -50,18 +53,20 @@ Deno.serve(async (req) => {
           });
         }
 
-        const { error } = await browserDB.from("announcements").insert({
-          user_id: user.id,
-          lesson_id: user.lesson_id,
-        });
+        if (user.is_emails_on || user.push_notifications_state === "on") {
+          const { error } = await adminDB.from("announcements").insert({
+            user_id: user.id,
+            lesson_id: user.lesson_id,
+          });
 
-        if (error) throw new Error(error.message);
+          if (error) throw new Error(error.message);
+        }
       } catch (err: any) {
         console.error(err);
       }
     }
 
-    return new Response(JSON.stringify({ users }), {
+    return new Response(JSON.stringify({ users, error: usersError }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
