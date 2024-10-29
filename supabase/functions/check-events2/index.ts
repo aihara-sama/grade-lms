@@ -1,4 +1,3 @@
-import admin from "npm:firebase-admin";
 import { adminDB } from "../_shared/admin-db";
 import { corsHeaders } from "../_shared/cors.ts";
 import { firebaseAdminApp } from "../_shared/firebase-admin-app.ts";
