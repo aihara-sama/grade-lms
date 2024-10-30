@@ -1,6 +1,5 @@
 import Overview from "@/app/[lang]/dashboard/courses/[courseId]/overview/components/overview";
 import { getCourse } from "@/db/server/course";
-import { getOngoingLesson } from "@/db/server/lesson";
 import type { Metadata } from "next";
 import type { FunctionComponent } from "react";
 
@@ -21,12 +20,9 @@ interface Props {
 }
 
 const Page: FunctionComponent<Props> = async ({ params: { courseId } }) => {
-  const [course, ongoingLesson] = await Promise.all([
-    getCourse(courseId),
-    getOngoingLesson(courseId),
-  ]);
+  const course = await getCourse(courseId);
 
-  return <Overview course={course} ongoingLesson={ongoingLesson} />;
+  return <Overview course={course} />;
 };
 
 export default Page;

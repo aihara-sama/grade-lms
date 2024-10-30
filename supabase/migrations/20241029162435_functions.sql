@@ -1,4 +1,3 @@
--- Triggers
 CREATE FUNCTION public.handle_new_user()
 RETURNS TRIGGER as $$
 BEGIN
@@ -208,14 +207,15 @@ BEGIN
     RETURN FALSE;
   END IF;
 
-  -- If the user is not Pro AND has created 3 or more courses, deny creation
-  IF is_pro(current_user_id) = FALSE AND course_count >= 3 THEN
+  -- Check if the user is Pro and has created 3 or more courses, deny creation if not
+  IF is_pro(ARRAY[current_user_id]) = FALSE AND course_count >= 3 THEN
     RETURN FALSE;
   END IF;
 
   RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- RPC
 CREATE FUNCTION public.delete_auth_users_by_ids(
