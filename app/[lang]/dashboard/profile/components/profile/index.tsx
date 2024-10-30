@@ -18,7 +18,7 @@ import { cancelSubscription } from "@/db/client/subscription";
 import { updateUser } from "@/db/client/user";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
-import type { Locale } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
 import type { ResultOf } from "@/types/utils.type";
 import { getDateLocale } from "@/utils/date/get-date-locale";
 import clsx from "clsx";

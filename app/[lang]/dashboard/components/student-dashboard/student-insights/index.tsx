@@ -3,7 +3,7 @@
 import Insight from "@/components/common/insight";
 import ChartSkeleton from "@/components/utilities/skeletons/chart-skeleton";
 import { useUser } from "@/hooks/use-user";
-import type { Locale } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { useTranslations } from "next-intl";
 import type { FunctionComponent } from "react";

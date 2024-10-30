@@ -3,7 +3,7 @@ import LessonsIcon from "@/components/icons/lessons-icon";
 import TimeIcon from "@/components/icons/time-icon";
 import type { getDayLessons } from "@/db/client/lesson";
 import { useUser } from "@/hooks/use-user";
-import type { Locale } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
 import type { ResultOf } from "@/types/utils.type";
 import { getDateLocale } from "@/utils/date/get-date-locale";
 import { isLessonEnded } from "@/utils/lesson/is-lesson-ended";

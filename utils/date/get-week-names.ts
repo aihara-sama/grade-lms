@@ -1,4 +1,4 @@
-import type { Locale } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
 import { getDateLocale } from "@/utils/date/get-date-locale";
 import { getWeekDays } from "@/utils/date/get-week-days";
 import { toCapitalCase } from "@/utils/string/to-capital-case";

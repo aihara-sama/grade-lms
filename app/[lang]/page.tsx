@@ -11,13 +11,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   const t = await getTranslations();
 
   return {
-    title: t("landing-page.metadata.title"),
-    description: t("landing-page.metadata.title"),
-    keywords:
-      "LMS, Learning Management System, Users, Courses, Lessons, Assignments, Submissions, Schedule, Live",
+    title: t("landing_page.metadata.title"),
+    description: t("landing_page.metadata.title"),
+    keywords: t("landing_page.metadata.keywords"),
     other: {
-      title: t("landing-page.metadata.title"),
-      description: t("landing-page.metadata.title"),
+      title: t("landing_page.metadata.title"),
+      description: t("landing_page.metadata.title"),
     },
   };
 };

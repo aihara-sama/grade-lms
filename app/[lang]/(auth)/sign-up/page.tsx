@@ -11,7 +11,7 @@ import { getTimeZone } from "@/utils/localization/get-time-zone";
 import { serverErrToIntlKey } from "@/utils/localization/server-err-to-intl";
 import type { UserMetadata } from "@supabase/supabase-js";
 import clsx from "clsx";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FunctionComponent } from "react";
@@ -21,6 +21,7 @@ const Page: FunctionComponent = () => {
   // Hooks
   const t = useTranslations();
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
 
   // State
@@ -47,7 +48,7 @@ const Page: FunctionComponent = () => {
           name,
           role: "teacher",
           avatar: DEFAULT_AVATAR,
-          preferred_locale: "en",
+          preferred_locale: locale,
           timezone: getTimeZone(),
         } as UserMetadata,
       },

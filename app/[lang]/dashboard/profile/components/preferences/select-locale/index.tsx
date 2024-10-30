@@ -2,7 +2,7 @@ import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import BasicSelect from "@/components/common/selects/basic-select";
 import { updateUser } from "@/db/client/user";
 import { useUser } from "@/hooks/use-user";
-import { DEFAULT_LOCALE, locales, type Locale } from "@/i18n";
+import { DEFAULT_LOCALE, locales, type Locale } from "@/i18n/routing";
 import type { PropsWithClassName } from "@/types/props.type";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { useTranslations } from "next-intl";
@@ -19,7 +19,6 @@ const SelectLocale: FunctionComponent<PropsWithClassName> = ({ className }) => {
   const pathName = usePathname();
 
   const { user, setUser } = useUser((state) => state);
-  console.log({ user });
 
   // Vars
   const locale = locales.includes(pathName.split("/")[1] as Locale)

@@ -28,6 +28,7 @@
   },
 
   "buttons": {
+    "get_started": "Get started",
     "upgrade": "Upgrade",
     "cancel_subscription": "Cancel subscription",
     "close": "Close",
@@ -50,6 +51,7 @@
     "edit": "Edit",
     "save": "Save",
     "login": "Login",
+    "sign_up": "Sign Up",
     "logout": "Logout",
     "create_account": "Create account",
     "enter_class": "Enter class",
@@ -176,9 +178,69 @@
     "active": "Active"
   },
 
-  "landing-page": {
+  "landing_page": {
     "metadata": {
-      "title": "Live lessons, users and courses management"
+      "title": "Live lessons, users and courses management",
+      "keywords": "LMS, Learning Management System, Users, Courses, Lessons, Assignments, Submissions, Schedule, Live"
+    },
+    "hero": {
+      "title": "Live lessons, users and courses management",
+      "subtitle": "Revolutionize your training experience"
+    },
+    "features": {
+      "title": "Our Features",
+      "cards": {
+        "0": {
+          "title": "Users management",
+          "description": "Create and manage users effectively"
+        },
+        "1": {
+          "title": "Real-time Lessons",
+          "description": "Attend live lessons and interact with your trainee in real-time"
+        },
+        "2": {
+          "title": "Personalized Schedules",
+          "description": "Manage your lessons and events with timezone-aware scheduling. Never miss a session!"
+        }
+      }
+    },
+    "advantages": {
+      "title": "Manage everything, all in one place",
+      "list": {
+        "0": {
+          "title": "Personalized training experience"
+        },
+        "1": {
+          "title": "Revolutionized scheduling method"
+        },
+        "2": {
+          "title": "Live updates to everything important"
+        },
+        "3": {
+          "title": "Simplicity and efficiency"
+        }
+      }
+    },
+    "services": {
+      "title": "A training platform that just works",
+      "cards": {
+        "0": {
+          "title": "Digital whiteboard",
+          "description": "Modern approach to collaboration"
+        },
+        "1": {
+          "title": "Control your workspace",
+          "description": "Dedicated tools to manage everything"
+        },
+        "2": {
+          "title": "Simplicity and efficiency",
+          "description": "All you need at hand"
+        }
+      }
+    },
+    "footer": {
+      "title": "Join Our Learning Platform Today!",
+      "subtitle": "Join for free and start your training journey"
     }
   },
 

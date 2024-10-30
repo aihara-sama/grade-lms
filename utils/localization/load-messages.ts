@@ -1,5 +1,5 @@
-import type { Locale } from "@/i18n";
-import { DEFAULT_LOCALE, locales } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
+import { DEFAULT_LOCALE, locales } from "@/i18n/routing";
 import { createTranslator } from "next-intl";
 
 export const loadMessages = async () => {

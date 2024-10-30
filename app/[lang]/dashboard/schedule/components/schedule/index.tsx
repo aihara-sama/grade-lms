@@ -31,7 +31,7 @@ import { getWeekLessons, upsertLesson } from "@/db/client/lesson";
 import { Role } from "@/enums/role.enum";
 import { useUpdateEffect } from "@/hooks/use-update-effect";
 import { useUser } from "@/hooks/use-user";
-import type { Locale } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
 import type { SelectItem } from "@/interfaces/select.interface";
 import type { Lesson } from "@/types/lesson.type";
 import type { ResultOf } from "@/types/utils.type";

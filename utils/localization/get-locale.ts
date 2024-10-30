@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, locales } from "@/i18n";
+import { DEFAULT_LOCALE, locales } from "@/i18n/routing";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
 import type { NextRequest } from "next/server";

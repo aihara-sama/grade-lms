@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, locales } from "@/i18n";
+import { locales, routing } from "@/i18n/routing";
 import { updateSession } from "@/lib/supabase/middlewares/update-session";
 import createMiddleware from "next-intl/middleware";
 import { type NextRequest } from "next/server";
@@ -7,16 +7,10 @@ const publicPages = [
   /\//,
   /\/sign-in/,
   /\/sign-up/,
-  /\/test/,
-  /\/peer/,
   /\/dashboard\/lessons\/[\w-]+/,
 ];
 
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale: DEFAULT_LOCALE,
-  localePrefix: "never",
-});
+const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
   const publicPathnameRegex = new RegExp(

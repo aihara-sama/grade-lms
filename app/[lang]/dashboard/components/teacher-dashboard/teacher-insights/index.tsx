@@ -6,7 +6,7 @@ import type { getCourses } from "@/db/client/course";
 import { getCoursesInsights } from "@/db/client/course";
 import { getUsersInsights } from "@/db/client/user";
 import { useUser } from "@/hooks/use-user";
-import type { Locale } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
 import type { ResultOf } from "@/types/utils.type";
 import { getWeekNames } from "@/utils/date/get-week-names";
 import { parseInsights } from "@/utils/parse/parse-insights";

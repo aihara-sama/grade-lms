@@ -11,7 +11,7 @@ import { SUBMISSIONS_GET_LIMIT, THROTTLE_SEARCH_WAIT } from "@/constants";
 import { getAssignmentSubmissions } from "@/db/client/submission";
 import useFetchLock from "@/hooks/use-fetch-lock";
 import { useUser } from "@/hooks/use-user";
-import type { Locale } from "@/i18n";
+import type { Locale } from "@/i18n/routing";
 import type { ResultOf } from "@/types/utils.type";
 import { getDateLocale } from "@/utils/date/get-date-locale";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
