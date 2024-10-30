@@ -3,7 +3,7 @@
 import Logo from "@/components/common/logo";
 import BasicSelect from "@/components/common/selects/basic-select";
 import type { Locale } from "@/i18n/routing";
-import { locales, usePathname, useRouter } from "@/i18n/routing";
+import { locales, useRouter } from "@/i18n/routing";
 import type { PropsWithClassName } from "@/types/props.type";
 import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { useLocale, useTranslations } from "next-intl";
@@ -15,11 +15,10 @@ const Header: FunctionComponent<PropsWithClassName> = ({ className }) => {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
-  console.log({ locale });
 
   const changeLocale = (_locale: Locale) => {
-    router.replace(pathname, { locale: _locale });
+    router.replace("/", { locale: _locale });
+    router.refresh();
   };
 
   // View
@@ -38,7 +37,7 @@ const Header: FunctionComponent<PropsWithClassName> = ({ className }) => {
           }))}
           label={t("labels.language")}
           onChange={({ id }) => {
-            changeLocale(id.toLocaleLowerCase() as Locale);
+            changeLocale(id.toLowerCase() as Locale);
           }}
           defaultValue={{
             title: toCapitalCase(
