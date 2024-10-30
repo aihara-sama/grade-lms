@@ -41,7 +41,6 @@ import { useUser } from "@/hooks/use-user";
 import type { ResultOf } from "@/types/utils.type";
 import { throttleFetch } from "@/utils/throttle/throttle-fetch";
 import { throttleSearch } from "@/utils/throttle/throttle-search";
-import { addMonths } from "date-fns";
 import throttle from "lodash.throttle";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
@@ -79,7 +78,6 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
   // Hooks
   const t = useTranslations();
   const user = useUser((state) => state.user);
-  console.log({ user });
 
   const fetchLock = useFetchLock();
 
@@ -283,10 +281,6 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
     };
   }, [courses, coursesCount]);
 
-  useEffect(() => {
-    console.log(addMonths("2024-10-20T12:26:37Z", 1));
-  }, []);
-
   // View
   return (
     <Container
@@ -412,7 +406,7 @@ const Courses: FunctionComponent<Props> = ({ courses: initCourses }) => {
                 <button
                   disabled={user.role !== "teacher"}
                   className="primary-button"
-                  onClick={() => setIsCreateCourseModal(true)}
+                  onClick={openCreateCourseModal}
                 >
                   {t("buttons.create_course")}
                 </button>
