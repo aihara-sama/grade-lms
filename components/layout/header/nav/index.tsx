@@ -16,7 +16,7 @@ const Nav: FunctionComponent<PropsWithClassName> = ({ className = "" }) => {
 
   // View
   return (
-    <div className={`hidden md:flex items-center gap-6 ml-9 ${className}`}>
+    <div className={`hidden big:flex items-center gap-6 ml-9 ${className}`}>
       {navigation
         .filter(({ tier }) => tier.includes(user.role))
         .map(({ title, href, Icon }, idx) => (

@@ -65,60 +65,62 @@ const Page: FunctionComponent = () => {
 
   // View
   return (
-    <div className="px-4 mx-auto max-w-64 h-screen translate-y-1/4">
-      <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
-        {t("sign_up.title")}
-      </p>
-      <form onSubmit={handleSubmit}>
-        <BasicInput
-          autoFocus
-          required
-          name="name"
-          type="text"
-          placeholder={t("placeholders.name")}
-          StartIcon={<AvatarIcon size="xs" />}
-          fullWidth
-          maxLength={76}
-          minLength={1}
-        />
-        <BasicInput
-          required
-          name="email"
-          type="email"
-          placeholder={t("placeholders.email")}
-          StartIcon={<EmailIcon />}
-          fullWidth
-        />
-        <BasicInput
-          required
-          name="password"
-          type="password"
-          placeholder={t("placeholders.password")}
-          StartIcon={<SecurityIcon />}
-          fullWidth
-          minLength={6}
-        />
-        <button
-          type="submit"
-          disabled={isSubmitting || isSuccess}
-          className="primary-button w-full"
-        >
-          {isSubmitting && <LoadingSpinner />}
-          <span className={`${clsx(isSubmitting && "opacity-0")}`}>
-            {t("buttons.create_account")}
-          </span>
-        </button>
-      </form>
-      <p className="text-sm">
-        {t("sign_up.already_have_an_account?")}{" "}
-        <Link
-          href={`/sign-in/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
-          className="underline"
-        >
-          {t("links.login")}
-        </Link>
-      </p>
-    </div>
+    <>
+      <div className="px-4 mx-auto h-screen translate-y-1/4">
+        <p className="text-3xl font-bold text-neutral-600 mb-6 text-center">
+          {t("sign_up.title")}
+        </p>
+        <form className="max-w-64 " onSubmit={handleSubmit}>
+          <BasicInput
+            autoFocus
+            required
+            name="name"
+            type="text"
+            placeholder={t("placeholders.name")}
+            StartIcon={<AvatarIcon size="xs" />}
+            fullWidth
+            maxLength={76}
+            minLength={1}
+          />
+          <BasicInput
+            required
+            name="email"
+            type="email"
+            placeholder={t("placeholders.email")}
+            StartIcon={<EmailIcon />}
+            fullWidth
+          />
+          <BasicInput
+            required
+            name="password"
+            type="password"
+            placeholder={t("placeholders.password")}
+            StartIcon={<SecurityIcon />}
+            fullWidth
+            minLength={6}
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting || isSuccess}
+            className="primary-button w-full"
+          >
+            {isSubmitting && <LoadingSpinner />}
+            <span className={`${clsx(isSubmitting && "opacity-0")}`}>
+              {t("buttons.create_account")}
+            </span>
+          </button>
+        </form>
+        <p className="text-sm">
+          {t("sign_up.already_have_an_account?")}{" "}
+          <Link
+            href={`/sign-in/${searchParams.get("redirect") ? `?redirect=${searchParams.get("redirect")}` : ""} `}
+            className="underline"
+          >
+            {t("links.login")}
+          </Link>
+        </p>
+      </div>
+    </>
   );
 };
 
