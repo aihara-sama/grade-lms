@@ -1,4 +1,3 @@
-import Editor from "@/components/common/editor";
 import BasicInput from "@/components/common/inputs/basic-input";
 import DateInput from "@/components/common/inputs/date-input";
 import CreateSubmissionModal from "@/components/common/modals/create-submission-modal";
@@ -11,9 +10,14 @@ import type { ResultOf } from "@/types/utils.type";
 import clsx from "clsx";
 import { format, isAfter } from "date-fns";
 import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
 import type { ChangeEvent, FunctionComponent } from "react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
+const Editor = dynamic(() => import("@/components/common/editor"), {
+  ssr: false,
+});
 
 interface Props {
   assignmentId: string;
@@ -111,6 +115,7 @@ const OverviewTab: FunctionComponent<Props> = ({
           />
           <p>{t("labels.description")}</p>
           <div className="min-h-[216px]">
+            {/* !Reason */}
             <Editor
               id="assignment-editor"
               height="sm"

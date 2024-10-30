@@ -46,7 +46,9 @@ const Whiteboard: FunctionComponent = () => {
   const [isExtendLessonModal, setIsExtendLessonModal] = useState(false);
   const [whiteboardHeight, setWhiteboardHeight] = useState(500);
   const [whiteboardInitialHeight] = useState(
-    window.innerHeight - (lesson.course_id ? 205 : 185)
+    typeof window !== "undefined"
+      ? window.innerHeight - (lesson.course_id ? 205 : 185)
+      : 0
   );
   const [whiteboardInitialData, setWhiteboardInitialData] =
     useState<ExcalidrawInitialDataState>();
@@ -168,7 +170,7 @@ const Whiteboard: FunctionComponent = () => {
   }, []);
   useEffect(() => setWhiteboardInitialData(parseWhiteboardData()), []);
   useEffect(() => {
-    if (isEnding) {
+    if (isEnding && user.role === "teacher") {
       toast(
         ({ id }) => (
           <ExtendLessonPrompt
