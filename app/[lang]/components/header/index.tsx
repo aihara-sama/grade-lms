@@ -9,7 +9,7 @@ import { toCapitalCase } from "@/utils/string/to-capital-case";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { startTransition, type FunctionComponent } from "react";
+import { type FunctionComponent } from "react";
 
 const Header: FunctionComponent<PropsWithClassName> = ({ className }) => {
   // Hooks
@@ -21,15 +21,13 @@ const Header: FunctionComponent<PropsWithClassName> = ({ className }) => {
   console.log({ locale });
 
   const changeLocale = (_locale: Locale) => {
-    startTransition(() => {
-      router.replace(
-        // @ts-expect-error -- TypeScript will validate that only known `params`
-        // are used in combination with a given `pathname`. Since the two will
-        // always match for the current route, we can skip runtime checks.
-        { pathname, params },
-        { locale: _locale }
-      );
-    });
+    router.replace(
+      // @ts-expect-error -- TypeScript will validate that only known `params`
+      // are used in combination with a given `pathname`. Since the two will
+      // always match for the current route, we can skip runtime checks.
+      { pathname, params },
+      { locale: _locale }
+    );
   };
 
   // View

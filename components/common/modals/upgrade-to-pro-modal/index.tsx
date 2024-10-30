@@ -31,7 +31,7 @@ const UpgradeToProModal: FunctionComponent<Props> = ({
         {t("modal.titles.upgrade_to_pro")}
       </p>
       <p className="text-center text-neutral-500 mb-4">
-        {t("common.get_access_to_all_features_for", { price: "4.99" })}
+        {t("common.get_access_to_all_features_for", { price: "3.99" })}
       </p>
 
       <p className="text-lg mb-1">{t("common.what_you_get")}</p>
