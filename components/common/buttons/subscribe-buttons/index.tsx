@@ -20,8 +20,7 @@ const SubscribeButtons: FunctionComponent<Props> = ({ onSubscribed }) => {
     actions: CreateSubscriptionActions
   ) => {
     const orderID = await actions.subscription.create({
-      // plan_id: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID,
-      plan_id: "P-3TH91731HG320143WM4ITYCA",
+      plan_id: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID,
       custom_id: user.id,
     });
 
