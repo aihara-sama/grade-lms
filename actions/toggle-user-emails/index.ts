@@ -16,6 +16,19 @@ const handler = async (): Promise<ReturnType> => {
     };
   }
 
+  const { data: profile, error: profileError } = await getServerDB()
+    .from("users")
+    .select("creator_id")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError) {
+    return {
+      error: "Something went wrong",
+      data: null,
+    };
+  }
+
   const [
     { data: userSettings, error: userSettingsError },
     { data: isPro, error: isProError },
@@ -25,21 +38,12 @@ const handler = async (): Promise<ReturnType> => {
       .select("role, is_emails_on")
       .eq("user_id", user.id)
       .single(),
-    adminDB.rpc("is_pro", { user_uuid: user.id }),
+    adminDB.rpc("is_pro", { user_uuids: [user.id, profile.creator_id] }),
   ]);
 
   if (!userSettings || userSettingsError || isProError) {
-    console.log({ userSettingsError, isProError });
-
     return {
       error: "Something went wrong",
-      data: null,
-    };
-  }
-
-  if (userSettings.role !== "teacher") {
-    return {
-      error: "Forbidden",
       data: null,
     };
   }

@@ -31,7 +31,7 @@ const handler = async (payload: InputType): Promise<ReturnType> => {
       .select("role, is_emails_on")
       .eq("user_id", user.id)
       .single(),
-    serverDB.rpc("is_pro", { user_uuid: user.id }),
+    serverDB.rpc("is_pro", { user_uuids: [user.id] }),
     serverDB
       .from("users")
       .select("preferred_locale")

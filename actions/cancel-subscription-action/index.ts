@@ -18,14 +18,17 @@ const handler = async (): Promise<ReturnType> => {
     };
   }
 
-  const maybeSubscription = await adminDB
-    .from("subscriptions")
-    .select("id, paypal_subscription_id")
-    .eq("user_id", user.id)
-    .filter("end_date", "is", null)
-    .maybeSingle();
+  const [maybeSubscription, createdUsers] = await Promise.all([
+    adminDB
+      .from("subscriptions")
+      .select("id, paypal_subscription_id")
+      .eq("user_id", user.id)
+      .filter("end_date", "is", null)
+      .maybeSingle(),
+    adminDB.from("users").select("id").eq("creator_id", user.id),
+  ]);
 
-  if (!maybeSubscription.data) {
+  if (!maybeSubscription.data || !createdUsers.error) {
     console.error(maybeSubscription.error);
 
     return {
@@ -89,6 +92,13 @@ const handler = async (): Promise<ReturnType> => {
       data: null,
     };
   }
+
+  await adminDB
+    .from("user_settings")
+    .update({
+      is_emails_on: false,
+    })
+    .in("user_id", [user.id, ...createdUsers.data]);
 
   return {
     error: null,

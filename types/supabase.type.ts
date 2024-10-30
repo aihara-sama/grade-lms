@@ -646,7 +646,7 @@ export type Database = {
       };
       is_pro: {
         Args: {
-          user_uuid: string;
+          user_uuids: string[];
         };
         Returns: boolean;
       };

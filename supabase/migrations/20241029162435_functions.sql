@@ -155,22 +155,22 @@ $$ LANGUAGE plpgsql;
 
 -- Helpers
 CREATE FUNCTION is_pro(
-  user_uuid UUID
+  user_uuids UUID[]
 ) 
-RETURNS BOOLEAN AS $$
-DECLARE
-    is_pro BOOLEAN;
-BEGIN
-    -- Check if the user has an active subscription (end_date is either NULL or in the future)
+RETURNS BOOLEAN AS $$ 
+DECLARE 
+    has_pro BOOLEAN; 
+BEGIN 
+    -- Check if any user in the array has an active subscription 
     SELECT EXISTS (
         SELECT 1 
-        FROM public.subscriptions
-        WHERE user_id = user_uuid
-          AND (end_date IS NULL OR end_date > NOW())
-    ) INTO is_pro;
+        FROM public.subscriptions 
+        WHERE user_id = ANY(user_uuids) 
+          AND (end_date IS NULL OR end_date > NOW()) 
+    ) INTO has_pro; 
 
-    RETURN is_pro;
-END;
+    RETURN has_pro; 
+END; 
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION is_in_course(

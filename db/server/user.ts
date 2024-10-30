@@ -21,7 +21,7 @@ export const getProfile = async (id: string) => {
       .eq("id", id)
       .single(),
     serverDB.rpc("is_pro", {
-      user_uuid: id,
+      user_uuids: [id],
     }),
   ]);
 

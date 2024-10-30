@@ -58,6 +58,7 @@ const Profile: FunctionComponent<Props> = ({
       setCanceledSubscription(await cancelSubscription());
 
       setIsCancelSubscriptionModal(false);
+      setUser({ ...user, is_emails_on: false });
     } catch (error: any) {
       toast.error(error.message);
     } finally {
