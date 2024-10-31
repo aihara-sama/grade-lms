@@ -1,6 +1,6 @@
 # Next.js LMS Application with Supabase Backend
 
-This project is a Learning Management System (LMS) built using Next.js and Supabase. It provides role-based access to courses, lessons, assignments, notifications, and chat functionality for users with different roles: Teacher, Student, and Guest. The app includes various features like course enrollment, real-time notifications, lesson scheduling, assignment submissions, and user messaging, along with permission handling and notifications using Firebase Cloud Messaging (FCM).
+This Next.js LMS (Learning Management System) application provides a platform for managing users, courses, lessons, assignments, notifications, and more. The app includes various features like course enrollment, real-time notifications, lesson scheduling, assignment submissions, and user messaging, along with permission handling and notifications using Firebase Cloud Messaging (FCM).
 
 ## Table of Contents
 
