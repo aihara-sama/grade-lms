@@ -26,5 +26,3 @@ const Layout: FunctionComponent<PropsWithChildren> = async ({ children }) => {
 };
 
 export default Layout;
-
-export const revalidate = 0;
