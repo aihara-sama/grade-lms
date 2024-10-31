@@ -19,9 +19,6 @@ const SignOutButton: FunctionComponent<PropsWithClassName> = ({
       const { error } = await DB.auth.signOut();
 
       if (error) throw new Error(t("error.something_went_wrong"));
-
-      // revalidatePageAction();
-      // router.push(`/sign-in`);
     } catch (error: any) {
       toast.error(error.message);
     }

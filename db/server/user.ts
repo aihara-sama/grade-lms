@@ -1,10 +1,9 @@
 import { MEMBERS_GET_LIMIT, USERS_GET_LIMIT } from "@/constants";
 import { getServerDB } from "@/lib/supabase/db/get-server-db";
 import { addDays, format, subWeeks } from "date-fns";
-import { cache } from "react";
 
 // GET
-export const getCachedUser = cache(() => getServerDB().auth.getUser());
+export const getCachedUser = () => getServerDB().auth.getUser();
 
 export const getProfile = async (id: string) => {
   const serverDB = getServerDB();

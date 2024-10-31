@@ -1,6 +1,5 @@
 "use client";
 
-import { revalidatePageAction } from "@/actions/revalidate-page-action";
 import GuestPrompt from "@/components/common/prompts/guest-prompt";
 import { UserContext } from "@/contexts/user-context";
 import type { getProfile } from "@/db/server/user";
@@ -20,8 +19,8 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
   children,
 }) => {
   // Hooks
-  const router = useRouter();
   const store = useRef(createUserStore(initProfile)).current;
+  const router = useRouter();
 
   const [user, setUser] = useState(initProfile);
   store.subscribe((state) => setUser(state.user));
@@ -31,9 +30,8 @@ const UserProvider: FunctionComponent<PropsWithChildren<Props>> = ({
     DB.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         store.setState({ user: undefined });
-
-        revalidatePageAction();
-        router.push(`/sign-in`);
+        router.push("/sign-in");
+        router.refresh();
       }
     });
   }, []);
