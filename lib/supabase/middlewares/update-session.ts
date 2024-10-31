@@ -1,4 +1,3 @@
-import { getLocale } from "@/utils/localization/get-locale";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -59,12 +58,10 @@ export const updateSession = async (
     response.cookies.set("NEXT_LOCALE", data.preferred_locale);
   }
 
-  const locale = getLocale(request);
-
   if (error)
     return NextResponse.redirect(
       new URL(
-        `/${locale}/sign-in?redirect=${encodeURIComponent(request.url)}`,
+        `sign-in?redirect=${encodeURIComponent(request.url)}`,
         request.url
       )
     );
