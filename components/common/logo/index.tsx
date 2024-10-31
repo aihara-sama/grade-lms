@@ -5,7 +5,7 @@ interface Props {}
 
 const Logo: FunctionComponent<Props> = () => {
   return (
-    <Link href="/">
+    <Link href="/dashboard">
       <svg
         width="133"
         height="33"
