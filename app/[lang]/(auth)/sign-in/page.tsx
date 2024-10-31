@@ -20,8 +20,8 @@ const Page: FunctionComponent = () => {
   const searchParams = useSearchParams();
 
   // State
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
