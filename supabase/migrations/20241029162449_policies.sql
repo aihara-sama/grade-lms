@@ -11,7 +11,7 @@ ON public.users
 FOR SELECT
 TO authenticated
 USING (
-  auth.uid() = id
+  auth.uid() = public.users.id
   OR auth.uid()::TEXT = public.users.creator_id
   OR EXISTS (
     SELECT 1
@@ -337,7 +337,7 @@ USING (
 );
 
 
--- Submissions' policies
+-- Grades' policies
 ALTER TABLE public.grades ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow course creators to insert grades for valid submissions"
