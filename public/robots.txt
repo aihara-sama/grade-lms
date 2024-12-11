@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://grade-lms.vercel.app
+
+# Sitemaps
+Sitemap: https://grade-lms.vercel.app/sitemap.xml
