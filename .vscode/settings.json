@@ -53,5 +53,6 @@
   "spellright.documentTypes": ["markdown", "latex", "plaintext"],
   "spellright.language": ["en"],
   "tailwindCSS.emmetCompletions": true,
-  "typescript.referencesCodeLens.enabled": true
+  "typescript.referencesCodeLens.enabled": true,
+  "i18n-ally.localesPaths": ["i18n", "public/messages"]
 }
